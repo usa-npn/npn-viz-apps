@@ -1,0 +1,40 @@
+
+
+.vis-container {
+    display: block;
+    position: relative;
+
+    agm-map {
+        /*
+        /deep/ allows this rule to ignore then
+        _ngcontent class added by angular (since this element is added by google.)
+        other wise the rule turns into something like
+        agm-map[_ngcontent-c4]   img[src*=usanpn][_ngcontent-c4] { ... }
+        */
+        /deep/ img[src*=usanpn] {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+        }
+    }
+
+    .vis-working {
+        width: 100%;
+        height: 100%;
+        color: #fff;
+        background-color: rgba(0,0,0,.25);
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 2000;
+        text-align: center;
+        i {
+            margin-top: 15%;
+        }
+        mat-progress-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+    }
+}

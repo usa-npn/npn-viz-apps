@@ -13,9 +13,18 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": ["googlemaps"],
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "@npn/common": [
+        "dist/npn/common"
+      ],
+      "@npn/common/*": [
+        "dist/npn/common/*"
+      ]
+    }
   }
 }

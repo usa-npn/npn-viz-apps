@@ -1,0 +1,12 @@
+<div class="vis-container">
+    <div class="vis-working" *ngIf="selection.working">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+    <div class="map-wrapper">
+        <agm-map (mapReady)="mapReady($event)"  [streetViewControl]="false"  [styles]="mapStyles" [scrollwheel]="false"></agm-map>
+        <wms-map-legend *ngIf="!thumbnail && selection.legend && selection.data && selection.data.statistics && selection.data.statistics.count !== 0" [legend]="selection.legend"></wms-map-legend>
+        <clipped-wms-map-statistics *ngIf="!thumbnail && selection && selection.data && selection.data.statistics"
+            [selection]="selection"></clipped-wms-map-statistics>
+    </div>
+    <wms-map-opacity-control *ngIf="!thumbnail" [supportsOpacity]="selection.overlay"></wms-map-opacity-control>
+</div>

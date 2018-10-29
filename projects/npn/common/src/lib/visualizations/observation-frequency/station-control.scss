@@ -1,0 +1,12 @@
+@import '../../_variables';
+
+button[mat-button] {
+    display: none;
+    @media(min-width: $screen-md-min) {
+        display: inherit;
+    }
+}
+.station-input {
+    margin-top: 10px;
+    width: 300px;
+}

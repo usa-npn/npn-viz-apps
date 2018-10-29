@@ -11,5 +11,12 @@
       "ts-md5/dist/md5": "Md5",
       "@agm/core": "ngmaps"
     }
-  }
+  },
+  "whitelistedNonPeerDependencies":[
+     "@agm/core",
+     "ts-md5",
+     "d3",
+     "jquery",
+     "@angular"
+  ]
 }

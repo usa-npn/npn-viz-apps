@@ -1,5 +1,4 @@
-import { Headers, Http, URLSearchParams } from '@angular/http';
-import 'rxjs/add/operator/toPromise';
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
 import { CacheService, Species, Phenophase, SpeciesTitlePipe, NpnConfiguration } from '../common';
@@ -22,8 +21,6 @@ export class ObservationDateData {
 }
 
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
-    private headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-
     requestSrc: string = 'observation-date-vis-selection';
 
     @selectionProperty()
@@ -35,7 +32,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     @selectionProperty()
     plots: ObservationDatePlot[] = [];
 
-    constructor(protected http: Http,
+    constructor(protected http: HttpClient,
         protected cacheService: CacheService,
         protected speciesTitle: SpeciesTitlePipe,
         protected config: NpnConfiguration) {
@@ -52,8 +49,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         });
     }
 
-    toURLSearchParams(): URLSearchParams {
-        let params = new URLSearchParams();
+    toURLSearchParams(): HttpParams {
+        let params = new HttpParams();
         params.set('request_src', this.requestSrc);
         this.years.forEach((y, i) => {
             params.set(`year[${i}]`, `${y}`);
@@ -132,11 +129,11 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         } else {
             this.working = true;
             return new Promise(resolve => {
-                this.http.post(url, params.toString(), { headers: this.headers })
+                this.http.post(url,params.toString(),{headers: this.headers})
                     .toPromise()
                     .then(response => {
-                        let arr = response.json() as any[];
-                        this.cacheService.set(cacheKey, arr);
+                        let arr = response as any[];
+                        this.cacheService.set(cacheKey,arr);
                         this.working = false;
                         resolve(arr);
                     })

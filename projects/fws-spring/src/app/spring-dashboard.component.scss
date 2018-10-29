@@ -1,0 +1,108 @@
+@import '../_variables';
+// a lot of this CSS is cut/paste/tweak from
+// npn_fws_dashboard/src/app/refuge-dashboard.component.scss
+
+:host {
+    display: block;
+}
+
+$db-border-color: #ddd; //darken($site-bg-color, 33%);
+$tab-content-bg: transparent;
+$dash-border: 2px solid $db-border-color;
+
+$tab-height: 48px;
+$tab-angle-width: $tab-height/2;
+$tab-content-bg: transparent;
+$color-tab1: #271614;
+$color-tab2: #3f322b;
+$color-tab3: #574d3f;
+
+.mat-tab-header {
+    .mat-ink-bar {
+        display: none;
+    }
+    border-bottom: none;
+    .mat-tab-labels {
+        flex-flow: row nowrap; // from Lee
+    }
+    .mat-tab-labels >.mat-tab-label{
+        width: 100%; // from Lee
+        white-space: normal; // from Lee
+        display: block;
+        font-size: 0.9em;
+        @media (min-width: $screen-sm-min) {
+            display: flex;
+        }
+        @media (min-width: $screen-md-min) {
+            font-size: 1em;
+        }
+        >.mat-tab-label-content {
+            width: 100%; // from Lee
+        }
+        >.mat-tab-label-content,
+        >.mat-tab-label-content >.spring-tab-label {
+            display: block;
+            padding: 0px;
+            height: 100%;
+        }
+        height: $tab-height;
+        opacity: 1;
+        color: #fff;
+        padding: 0px;
+        background-color: $tab-content-bg;
+        &:focus {
+            background-color: $tab-content-bg;
+        }
+        &.mat-tab-label-active {
+            color: orange;
+        }
+        &:nth-of-type(1) {
+            >.mat-tab-label-content >.spring-tab-label {
+                background-color: $color-tab1;
+                @media (min-width: $screen-sm-min) {
+                    padding-left: 24px;
+                }
+            }
+            &::after {
+                content: '';
+                border-top: $tab-angle-width solid $color-tab2;
+                border-right: $tab-angle-width solid $color-tab2;
+                border-bottom: $tab-angle-width solid $color-tab1;
+                border-left: $tab-angle-width solid $color-tab1;
+            }
+        }
+        &:nth-of-type(2) {
+            >.mat-tab-label-content >.spring-tab-label {
+                background-color: $color-tab2;
+            }
+            &::after {
+                content: '';
+                border-top: $tab-angle-width solid transparent;
+                border-right: $tab-angle-width solid transparent;
+                border-bottom: $tab-angle-width solid $color-tab2;
+                border-left: $tab-angle-width solid $color-tab2;
+            }
+        }
+    }
+}
+
+.spring-tab-label {
+    position: relative;
+    text-transform: uppercase;
+    >label {
+        color: inherit;
+        margin-top: 1em;
+    }
+}
+
+.spring-tab-content {
+    padding: 20px 5px;
+    @media (min-width: $screen-md-min) {
+        padding: 20px;
+    }
+    color: #000;
+    border-left: $dash-border;
+    border-right: $dash-border;
+    border-bottom: $dash-border;
+    background-color: #fff;
+}

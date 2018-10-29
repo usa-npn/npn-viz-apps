@@ -44,8 +44,8 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
 
     private data:any[];
 
-    constructor(protected window: Window, protected rootElement: ElementRef, protected media:ObservableMedia, protected speciesTitle: SpeciesTitlePipe) {
-        super(window,rootElement,media);
+    constructor(protected rootElement: ElementRef, protected media:ObservableMedia, protected speciesTitle: SpeciesTitlePipe) {
+        super(rootElement,media);
     }
 
     protected reset(): void {

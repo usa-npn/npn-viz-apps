@@ -1,4 +1,5 @@
-import {Component,Input,Output,EventEmitter,OnInit} from '@angular/core';
+import {Component,Input,Output,EventEmitter,ElementRef} from '@angular/core';
+import { ObservableMedia } from "@angular/flex-layout";
 
 import {VisualizationMargins} from '../visualization-base.component';
 import {SvgVisualizationBaseComponent,DEFAULT_MARGINS,FONT_SIZE,FONT_SIZE_PX} from '../svg-visualization-base.component';
@@ -37,6 +38,10 @@ export class ObservationFrequencyComponent extends SvgVisualizationBaseComponent
     stations:any[]; // to avoid null check
     _station:any; // the current station being displayed
     data:any;
+
+    constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
+        super(rootElement,media);
+    }
 
     set station(s:any) {
         this._station = s;

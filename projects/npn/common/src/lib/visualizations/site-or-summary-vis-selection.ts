@@ -1,5 +1,4 @@
-import { Headers, Http, URLSearchParams } from '@angular/http';
-import 'rxjs/add/operator/toPromise';
+import { HttpClient, HttpParams} from '@angular/common/http';
 
 import { CacheService, NpnConfiguration } from '../common';
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
@@ -9,20 +8,18 @@ const filterLqdSummary = true
 const filterLqdDisclaimer = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
 
 export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection {
-    private headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-
     @selectionProperty()
     individualPhenometrics: boolean = false;
     @selectionProperty()
     filterDisclaimer: string;
 
-    constructor(protected http: Http,
+    constructor(protected http: HttpClient,
         protected cacheService: CacheService,
         protected config: NpnConfiguration) {
         super();
     }
 
-    abstract toURLSearchParams(): URLSearchParams;
+    abstract toURLSearchParams(): HttpParams;
 
     private filterSuspectSummaryData(d) {
         var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
@@ -106,7 +103,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         return this.http.post(url, params.toString(), { headers: this.headers })
             .toPromise()
             .then(response => {
-                let arr = response.json() as any[]
+                let arr = response as any[]
                 this.cacheService.set(cacheKey, arr);
                 let filtered = filterLqd(arr);
                 this.working = false;

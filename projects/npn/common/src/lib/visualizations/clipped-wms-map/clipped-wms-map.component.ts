@@ -1,4 +1,5 @@
-import {Component,Input} from '@angular/core';
+import {Component,Input,ElementRef} from '@angular/core';
+import { ObservableMedia } from "@angular/flex-layout";
 
 import {MapVisualizationBaseComponent} from '../map-visualization-base.component';
 
@@ -11,6 +12,10 @@ import {ClippedWmsMapSelection} from './clipped-wms-map-selection';
 })
 export class ClippedWmsMapComponent extends MapVisualizationBaseComponent {
     @Input() selection: ClippedWmsMapSelection;
+
+    constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
+        super(rootElement,media);
+    }
 
     mapReady(map:google.maps.Map): void {
         // TODO should be private.

@@ -1,5 +1,4 @@
 import { EventEmitter } from '@angular/core';
-import { URLSearchParams } from '@angular/http';
 import { newGuid } from '../common';
 
 export const NULL_DATA = -9999;

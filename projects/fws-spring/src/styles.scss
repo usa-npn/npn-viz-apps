@@ -1,0 +1,82 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '_variables';
+
+/* TODO deal with shared css
+@import '../node_modules/npn_common/styles.scss';
+*/
+@import '../../npn/common/src/lib/styles.scss';
+
+agm-map {
+    height: 500px;
+    img[src*=usanpn] {
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+    }
+}
+.mat-dialog-container {
+    max-width: 90vw !important;
+    max-height: 90vh !important;
+}
+
+.control-form {
+    margin: 0px !important;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: flex-start;
+    >* {
+        margin: 5px;
+    }
+}
+
+// this is a class from the parent theme but it's width
+// exceeds that of the map when used under it.
+.project-profile-block {
+    width: auto;
+    margin-top: 15px;
+    p {
+        margin-left: 0px;
+    }
+}
+
+label {
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    color: rgba(0,0,0,.87);
+}
+
+spring-dashboard {
+    .mat-form-field-flex {
+        background-color: rgba(255,255,255,0.5);
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+        .mat-form-field-infix,
+        .mat-form-field-placeholder,
+        .mat-form-field-label {
+            padding-left: 5px;
+        }
+    }
+}
+
+.vis-working {
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    background-color: rgba(0,0,0,.25);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 2000;
+    text-align: center;
+    i {
+        margin-top: 15%;
+    }
+    mat-progress-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        //transform: translate(-50%,-50%);
+        margin-left: -60px;
+        margin-top: -60px;
+    }
+}

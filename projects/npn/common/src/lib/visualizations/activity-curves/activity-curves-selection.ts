@@ -1,7 +1,6 @@
 //import {Headers,Http,URLSearchParams} from '@angular/common/http';
 import {HttpClient} from '@angular/common/http';
 import {DatePipe} from '@angular/common';
-import 'rxjs/add/operator/toPromise';
 
 import {CacheService,NpnConfiguration} from '../../common';
 

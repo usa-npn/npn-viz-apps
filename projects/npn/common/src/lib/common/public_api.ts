@@ -1,4 +1,4 @@
-export { NpnCommonModule } from './npn-common.module';
+export { NpnCommonModule, NPN_BASE_HREF } from './npn-common.module';
 export { Species } from './species';
 export { Phenophase } from './phenophase';
 

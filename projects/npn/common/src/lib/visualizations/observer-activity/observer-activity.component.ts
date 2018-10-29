@@ -1,4 +1,5 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input,ElementRef} from '@angular/core';
+import { ObservableMedia } from "@angular/flex-layout";
 
 import {Window} from '../../common';
 import {VisualizationMargins} from '../visualization-base.component';
@@ -46,6 +47,10 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
     margins: VisualizationMargins = {...DEFAULT_MARGINS, ...{top: 100,left: 80}};
 
     data:any;
+
+    constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
+        super(rootElement,media);
+    }
 
     private getMonthFormat(): string {
         if(this.sizing && this.sizing.width < 800) {

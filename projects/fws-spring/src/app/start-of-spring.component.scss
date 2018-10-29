@@ -1,0 +1,58 @@
+@import '../_variables';
+
+.map-wrapper {
+    position: relative;
+    ul.start-of-spring-legend {
+        list-style: none;
+        margin: 0px;
+        width: 185px;
+
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        padding: 8px;
+        border: 1px solid #aaa;
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 5px;
+        >li {
+            list-style: none;
+            padding: 0px;
+            &:not(.title) {
+                position: relative;
+                padding: 0px 0px 4px 25px;
+                &:before {
+                    display: inline-block;
+                    content: ' ';
+                    width: 20px;
+                    height: 20px;
+                    border: 1px solid #aaa;
+                    margin-right: 5px;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                } 
+            }
+            &.mean-5:before {
+                background-color: #ed3d3d;
+            }
+            &.mean-5-25:before {
+                background-color: #f5a27a;
+            }
+            &.mean-25-75:before {
+                background-color: #828282;
+            }
+            &.mean-75-95:before {
+                background-color: #5cb3f2;
+            }
+            &.mean-95:before {
+                background-color: #3b3bf0;
+            }
+            &.no-data:before {
+                background-color: #ffffff;
+            }
+            &.title {
+                font-weight: bold;
+            }
+        }
+    }
+}

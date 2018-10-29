@@ -1,6 +1,6 @@
 import {NULL_DATA,ONE_DAY_MILLIS,selectionProperty} from '../vis-selection';
 import {SiteOrSummaryVisSelection} from '../site-or-summary-vis-selection';
-import {URLSearchParams} from '@angular/http';
+import {HttpParams} from '@angular/common/http';
 
 import {Species,Phenophase} from '../../common';
 
@@ -94,8 +94,8 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return this.plots.filter(p => p.color && p.species && p.phenophase);
     }
 
-    toURLSearchParams(): URLSearchParams {
-        let params = new URLSearchParams();
+    toURLSearchParams(): HttpParams {
+        let params = new HttpParams();
         params.set('climate_data','1');
         params.set('request_src','npn-vis-scatter-plot');
         params.set('start_date',`${this.start}-01-01`);

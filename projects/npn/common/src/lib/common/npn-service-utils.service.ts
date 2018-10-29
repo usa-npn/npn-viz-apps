@@ -1,7 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
-
 import { CacheService } from './cache-service';
 
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';
@@ -33,7 +31,7 @@ export class NpnServiceUtils {
     public get(url: string, params?: any, asText?: boolean): Promise<any> {
         params = params || {};
         return asText
-            ? this.http.get<string>(url, { params: params }).toPromise()
+            ? this.http.get(url, { params: params, responseType: 'text' }).toPromise()
             : this.http.get<any>(url, { params: params }).toPromise()
         /*
         return this.http.get<any>(url,{params:params})

@@ -20,11 +20,20 @@
     ],
     "paths": {
       "@npn/common": [
+        "projects/npn/common/src/lib"
+      ],
+      "@npn/common/*": [
+        "projects/npn/common/src/lib/*"
+      ]
+    }
+    /*
+    "paths": {
+      "@npn/common": [
         "dist/npn/common"
       ],
       "@npn/common/*": [
         "dist/npn/common/*"
       ]
-    }
+    }*/
   }
 }

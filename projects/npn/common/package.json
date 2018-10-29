@@ -1,6 +1,13 @@
 {
   "name": "@npn/common",
   "version": "0.0.1",
+  "dependencies": {
+    "@agm/core": "^1.0.0-beta.5",
+    "ts-md5": "^1.2.4",
+    "d3": "^4.13.0",
+    "jquery": "^3.3.1",
+    "@angular/material": "^6.4.7"
+  },
   "peerDependencies": {
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0"

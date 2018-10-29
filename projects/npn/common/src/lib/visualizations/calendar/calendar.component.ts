@@ -1,12 +1,12 @@
-import {Component,Input} from '@angular/core';
+import {Component,Input, ElementRef} from '@angular/core';
+import { ObservableMedia } from "@angular/flex-layout";
 
 import {ONE_DAY_MILLIS} from '../vis-selection';
 import {CalendarSelection,ObservationDataDataPoint,ObservationDateData} from './calendar-selection';
 import {VisualizationMargins} from '../visualization-base.component';
-import {SvgVisualizationBaseComponent,DEFAULT_MARGINS} from '../svg-visualization-base.component';
+import {SvgVisualizationBaseComponent} from '../svg-visualization-base.component';
 
 import {Axis,axisBottom,axisRight} from 'd3-axis';
-import {Selection} from 'd3-selection';
 import {ScaleBand,scaleBand} from 'd3-scale';
 import * as d3 from 'd3';
 
@@ -29,6 +29,10 @@ export class CalendarComponent extends SvgVisualizationBaseComponent {
 
     private processed:ObservationDateData;
     private data:any[];
+
+    constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
+        super(rootElement,media);
+    }
 
     // the doy of the first of each month doesn't change from year to year just what
     // day of the week days fall on so what year is used to calculate them is irrelevant

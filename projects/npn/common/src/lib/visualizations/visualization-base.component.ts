@@ -47,7 +47,7 @@ export class VisualizationBaseComponent implements AfterViewInit, OnDestroy {
     private subscription: any;
     protected isIE: boolean;
 
-    constructor(protected window: Window, protected rootElement: ElementRef, protected media: ObservableMedia) {
+    constructor(/*protected window: Window, */protected rootElement: ElementRef, protected media: ObservableMedia) {
         this.mediaSubscription = this.media.subscribe((mediaChange: MediaChange) => {
             this.mobileMode = mediaChange.mqAlias === 'xs' || mediaChange.mqAlias === 'sm';
         });

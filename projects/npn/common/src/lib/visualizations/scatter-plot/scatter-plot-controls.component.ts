@@ -1,10 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 
-import {VisSelectionEvent} from '../vis-selection';
 import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
-
-import {Subject} from 'rxjs';
-import 'rxjs/add/operator/debounceTime';
 
 @Component({
     selector: 'scatter-plot-control',

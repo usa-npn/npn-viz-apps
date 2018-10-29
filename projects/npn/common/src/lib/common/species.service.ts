@@ -2,7 +2,6 @@ import { Injectable, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 
 import { CacheService } from './cache-service';
 import { Species } from './species';

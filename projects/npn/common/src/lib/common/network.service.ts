@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
 import { CacheService } from './cache-service';
 
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';

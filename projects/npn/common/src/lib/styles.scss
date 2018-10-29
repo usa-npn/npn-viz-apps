@@ -1,1 +1,7 @@
 @import './gridded/styles.scss';
+
+button.dialog-close {
+    .mat-button-focus-overlay {
+        display: none;
+    }
+}

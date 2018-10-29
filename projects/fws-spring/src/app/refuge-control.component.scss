@@ -1,0 +1,10 @@
+@import '../_variables';
+:host {
+    flex-grow: 1;
+    mat-form-field {
+        width: 100%;
+    }
+    @media(min-width: $screen-md-min) {
+        max-width: 60%;
+    }
+}

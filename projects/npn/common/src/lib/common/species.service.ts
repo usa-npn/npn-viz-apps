@@ -1,14 +1,12 @@
 import { Injectable, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { CacheService } from './cache-service';
 import { Species } from './species';
 import { Phenophase } from './phenophase';
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';
-
-const HEADERS = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
 @Injectable()
 export class SpeciesService {
@@ -32,9 +30,9 @@ export class SpeciesService {
             if (data) {
                 resolve(data);
             } else {
-                let uParams = new HttpParams()
-                Object.keys(params).forEach(key => uParams.set(`${key}`, `${params[key]}`));
-                this.http.post<Species[]>(url, uParams.toString(), { headers: HEADERS })
+                let postParams = new HttpParams()
+                Object.keys(params).forEach(key => postParams = postParams.set(`${key}`, `${params[key]}`));
+                this.http.post<Species[]>(url, postParams.toString(), { headers: {'Content-Type':'application/x-www-form-urlencoded'} })
                     .toPromise()
                     .then(data => {
                         this.cache.set(cacheKey, data);

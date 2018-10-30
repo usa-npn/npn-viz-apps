@@ -100,7 +100,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             return Promise.resolve(filterLqd(data));
         }
         this.working = true;
-        return this.http.post(url, params.toString(), { headers: this.headers })
+        return this.http.post(url, params.toString(), { headers: {'Content-Type':'application/x-www-form-urlencoded'} })
             .toPromise()
             .then(response => {
                 let arr = response as any[]

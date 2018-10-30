@@ -50,17 +50,16 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     }
 
     toURLSearchParams(): HttpParams {
-        let params = new HttpParams();
-        params.set('request_src', this.requestSrc);
+        let params = new HttpParams()
+            .set('request_src', this.requestSrc);
         this.years.forEach((y, i) => {
-            params.set(`year[${i}]`, `${y}`);
+            params = params.set(`year[${i}]`, `${y}`);
         });
         this.validPlots.forEach((plot, i) => {
-            params.set(`species_id[${i}]`, `${plot.species.species_id}`);
-            params.set(`phenophase_id[${i}]`, `${plot.phenophase.phenophase_id}`);
+            params = params.set(`species_id[${i}]`, `${plot.species.species_id}`)
+                           .set(`phenophase_id[${i}]`, `${plot.phenophase.phenophase_id}`);
         });
-        this.addNetworkParams(params);
-        return params;
+        return this.addNetworkParams(params);
     }
 
     postProcessData(data: any[]): ObservationDateData {
@@ -129,10 +128,16 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         } else {
             this.working = true;
             return new Promise(resolve => {
-                this.http.post(url,params.toString(),{headers: this.headers})
+                this.http.post(url,params.toString(),{headers: {'Content-Type':'application/x-www-form-urlencoded'}})
                     .toPromise()
-                    .then(response => {
-                        let arr = response as any[];
+                    .then((response:any) => {
+                        let arr;
+                        if(Array.isArray(response)) {
+                            arr = response as any[];
+                        } else {
+                            console.error(response.error_message ? response.error_message : 'Response was not an array');
+                            arr = [];
+                        }
                         this.cacheService.set(cacheKey,arr);
                         this.working = false;
                         resolve(arr);

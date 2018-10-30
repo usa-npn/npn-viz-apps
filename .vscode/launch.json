@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Refuge dashboard app",
+            "url": "http://fwstest.loc:8888/arctic-nwr",
+            "webRoot": "/Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${workspaceFolder}/projects/fws-dashboard/*",
+                "webpack:///../npn/common/*": "${workspaceFolder}/projects/npn/common/*"
+            }
+        }
+    ]
+}

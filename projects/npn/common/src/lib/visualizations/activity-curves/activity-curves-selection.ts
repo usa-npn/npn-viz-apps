@@ -156,7 +156,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
                         if(data) {
                             loaded(c.data(data));
                         } else {
-                            this.http.post<any[]>(url,params.toString(),{headers: this.headers})
+                            this.http.post<any[]>(url,params.toString(),{headers: {'Content-Type':'application/x-www-form-urlencoded'}})
                                 .toPromise()
                                 .then(arr => {
                                     this.cacheService.set(cacheKey,arr);

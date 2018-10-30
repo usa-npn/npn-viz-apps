@@ -95,20 +95,19 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     }
 
     toURLSearchParams(): HttpParams {
-        let params = new HttpParams();
-        params.set('climate_data','1');
-        params.set('request_src','npn-vis-scatter-plot');
-        params.set('start_date',`${this.start}-01-01`);
-        params.set('end_date',`${this.end}-12-31`);
-        // TODO - this typically comes from app wide configuration settings`
-        // is "environment" an ok place to bind this config, probably not
-        params.set('num_days_quality_filter',''+num_days_quality_filter);
+        let params = new HttpParams()
+            .set('climate_data','1')
+            .set('request_src','npn-vis-scatter-plot')
+            .set('start_date',`${this.start}-01-01`)
+            .set('end_date',`${this.end}-12-31`)
+            // TODO - this typically comes from app wide configuration settings`
+            // is "environment" an ok place to bind this config, probably not
+            .set('num_days_quality_filter',''+num_days_quality_filter);
         this.validPlots.forEach((p,i) => {
-            params.set(`species_id[${i}]`,`${p.species.species_id}`);
-            params.set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+           params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                          .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
         });
-        this.addNetworkParams(params);
-        return params;
+        return this.addNetworkParams(params);
     }
 
     doyDateFormat(doy:number):string {

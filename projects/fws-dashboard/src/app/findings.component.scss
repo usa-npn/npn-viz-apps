@@ -1,0 +1,286 @@
+@import '../_variables';
+@import '../_mixins';
+
+
+$thumbs-wide: 2;
+$thumb-r-pad: 5px;
+
+$thumb-width: 150px;
+$admin-width: ($thumb-width + ($thumb-r-pad * 2)) * $thumbs-wide;
+
+$max-height-bp1: 600px;
+$thumb-width2: 125px;
+$admin-width2: ($thumb-width2 + ($thumb-r-pad * 2)) * $thumbs-wide;
+
+$max-height-bp2: 550px;
+$thumb-width3: 100px;
+$admin-width3: ($thumb-width3 + ($thumb-r-pad * 2)) * $thumbs-wide;
+
+:host {
+    position: relative;
+    display: block;
+    &.adminMode {
+        /* if were not in another container would simply be $admin-width
+           but the page content has its own padding so for now just picking
+           a value that works */
+        padding-left: 275px;
+        @media (min-width: $screen-md-min) {
+            padding-left: 215px;
+        }
+        @media (min-width: $screen-lg-min) {
+            padding-left: 200px;
+        }
+    }
+    //@include _devadaptiveborders();
+}
+.visualizations {
+    display: flex;
+    flex-flow: row wrap;
+    mat-card {
+        margin: 10px auto;
+        padding: 10px;
+        @media (min-width: $screen-md-min) {
+            padding: 15px;
+        }
+        @media (min-width: $screen-lg-min) {
+            padding: 20px;
+        }
+        flex: 0 1 95%;
+        @media (min-width: $screen-md-min) {
+            flex: 0 1 44%;
+        }
+        @media (min-width: $screen-lg-min) {
+            flex: 0 1 28%;
+        }
+        &:first-of-type {
+            flex: 0 1 95%;
+            /* attempt to avoid jumpiness when switching the active visualization
+               numbers are rough based widths at different device screen sizes */
+            min-height: 200px; // mobile
+            @media (min-width: $screen-md-min) {
+                min-height: 400px;
+            }
+            @media (min-width: $screen-lg-min) {
+                min-height: 500px;
+            }
+        }
+
+        /* a non flex layout attempt
+        box-sizing: border-box;
+        width: 100%;
+        padding: 2px;
+        margin: 10px 0px;
+        display: block;
+        @media(min-width: $screen-sm-min) {
+            padding: 10px;
+        }
+        @media(min-width: $screen-md-min) {
+            padding: 20px;
+            display: inline-block;
+            width: 48%;
+            margin: 5px;
+        }
+        @media(min-width: $screen-lg-min) {
+            width: 30%;
+        }
+
+        &:first-of-type {
+            @media(min-width: $screen-md-min) {
+                margin: auto;
+                display: block;
+                width: 95%;
+            }
+        }*/
+
+        vertical-align: top;
+        position: relative;
+        overflow: hidden;
+
+        .visualization-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .visualization-description {
+            color: #aaa;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        > .cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            text-align: center;
+
+            &:hover {
+                cursor: pointer;
+                background-color: rgba(0,0,0,0.25);
+                .visualization-title {
+                    display: inherit;
+                }
+            }
+            .visualization-title {
+                font-size: 1.25em;
+                color: #fff;
+                text-shadow: 1px 1px 2px #000;
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+        }
+
+        &.new-vis-placeholder {
+            height: 200px;
+            background-color: #eee;
+            &:before {
+                content: 'Drop New Visualization Here';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+            &.look-at-me {
+                border: 2px solid yellow;
+                box-shadow: 0 0 10px yellow;
+                outline: none;
+                -webkit-animation-name: wiggle;
+                  -ms-animation-name: wiggle;
+                  -ms-animation-duration: 500ms;
+                  -webkit-animation-duration: 500ms;
+                  -webkit-animation-iteration-count: 1;
+                  -ms-animation-iteration-count: 1;
+                  -webkit-animation-timing-function: ease-in-out;
+                  -ms-animation-timing-function: ease-in-out;
+            }
+        }
+    }
+}
+
+
+mat-list.new-vis-list {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    padding: 65px 0px 100px 0;
+    width: $admin-width;
+    @media(max-height: $max-height-bp1) {
+        width: $admin-width2;
+    }
+    @media(max-height: $max-height-bp2) {
+        width: $admin-width3;
+    }
+    /* if the scrollbar ever kicks in it won't go away
+    overflow-y:auto;
+    */
+
+    background-color: rgba(0,0,0,0.25);
+    z-index: 5000;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
+    >div {
+        @include clearfix();
+        color: #fff;
+        button.toggle-admin-mode {
+            float: right;
+        }
+        >p {
+            background-color: rgba(0,0,0,0.5);
+            padding: $thumb-r-pad;
+            clear: right;
+            line-height: 1.5em;
+            @media(max-height: $max-height-bp1) {
+                font-size: 0.9em;
+            }
+            @media(max-height: $max-height-bp2) {
+                font-size: 0.8em;
+            }
+        }
+    }
+    mat-list-item {
+        width: $thumb-width;
+        @media(max-height: $max-height-bp1) {
+            width: $thumb-width2;
+        }
+        @media(max-height: $max-height-bp2) {
+            width: $thumb-width3;
+        }
+        margin-right: $thumb-r-pad;
+        &:nth-of-type(odd) {
+            margin-left: $thumb-r-pad;
+        }
+        &.vis-template {
+            border: 1px dotted black;
+            margin-bottom: 10px;
+            /deep/ .mat-list-item-content {
+                height: auto;
+                padding: 0px;
+                img {
+                    width: 100%
+                }
+            }
+        }
+        &.trash,
+        &.save {
+            position: relative;
+            margin-top: 20px;
+        }
+        &.trash {
+            &:before {
+                font-family: 'FontAwesome';
+                content: '\f1f8';
+                font-size: 2em;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+        }
+        &.save button {
+            font-size: 2em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+    }
+}
+
+.select-refuge {
+    width: 400px;
+}
+
+.admin-toggle {
+    &:before {
+        font-family: 'FontAwesome';
+        content: '\f073';
+        margin-right: 5px;
+    }
+}
+
+@-webkit-keyframes wiggle {
+  0% {-webkit-transform: rotate(5deg);}
+  25% {-webkit-transform: rotate(-5deg);}
+  50% {-webkit-transform: rotate(10deg);}
+  75% {-webkit-transform: rotate(-2.5deg);}
+  100% {-webkit-transform: rotate(0deg);}
+}
+
+@keyframes wiggle {
+  0% {transform: rotate(5deg);}
+  25% {transform: rotate(-5deg);}
+  50% {transform: rotate(10deg);}
+  75% {transform: rotate(-2.5deg);}
+  100% {transform: rotate(0deg);}
+}

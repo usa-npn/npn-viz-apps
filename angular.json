@@ -152,6 +152,121 @@
           }
         }
       }
+    },
+    "fws-dashboard": {
+      "root": "projects/fws-dashboard/",
+      "sourceRoot": "projects/fws-dashboard/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss",
+          "spec": false
+        },
+        "@schematics/angular:class": {
+          "spec": false
+        },
+        "@schematics/angular:directive": {
+          "spec": false
+        },
+        "@schematics/angular:guard": {
+          "spec": false
+        },
+        "@schematics/angular:module": {
+          "spec": false
+        },
+        "@schematics/angular:pipe": {
+          "spec": false
+        },
+        "@schematics/angular:service": {
+          "spec": false
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/fws-dashboard",
+            "index": "projects/fws-dashboard/src/index.html",
+            "main": "projects/fws-dashboard/src/main.ts",
+            "polyfills": "projects/fws-dashboard/src/polyfills.ts",
+            "tsConfig": "projects/fws-dashboard/tsconfig.app.json",
+            "assets": [
+              "projects/fws-dashboard/src/favicon.ico",
+              "projects/fws-dashboard/src/assets"
+            ],
+            "styles": [
+              "projects/fws-dashboard/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/fws-dashboard/src/environments/environment.ts",
+                  "with": "projects/fws-dashboard/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "fws-dashboard:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "fws-dashboard:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "fws-dashboard:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/fws-dashboard/src/test.ts",
+            "polyfills": "projects/fws-dashboard/src/polyfills.ts",
+            "tsConfig": "projects/fws-dashboard/tsconfig.spec.json",
+            "karmaConfig": "projects/fws-dashboard/karma.conf.js",
+            "styles": [
+              "projects/fws-dashboard/src/styles.scss"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/fws-dashboard/src/favicon.ico",
+              "projects/fws-dashboard/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/fws-dashboard/tsconfig.app.json",
+              "projects/fws-dashboard/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "npn-apps"

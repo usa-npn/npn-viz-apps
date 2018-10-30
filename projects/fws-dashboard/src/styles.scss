@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "~ng2-dnd/style.css";
+@import '_variables';
+
+@import '../../npn/common/src/lib/styles.scss';
+
+npn-visualization {
+    margin: 0px;
+    display: block;
+    width: 100%;
+}
+
+label {
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    color: rgba(0,0,0,.87);
+}
+
+// should really probably be in the theme but....
+body.node-type-refuge {
+    .refuge-content {
+        margin: 0px;
+        width: 100%;
+    }
+}

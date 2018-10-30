@@ -1,36 +1,19 @@
 import {Injectable} from '@angular/core';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
 
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 
-import {CacheService,VisualizationSelectionFactory,VisSelection} from  '@npn/common';
+import {CacheService,VisualizationSelectionFactory,VisSelection} from '@npn/common';
+
+import {MockRefuge} from './mock-refuge';
 
 // this means that the app can no longer function outside of the context of Drupal, period.
 const API_ROOT = '/api/refuge';
 
 @Injectable()
 export class RefugeService {
-    private refugePromiseResolver;
-    private refugePromiseRejector;
-    private refugeListPromise:Promise<Refuge[]> = new Promise((resolve,reject) => {
-        this.refugePromiseResolver = resolve;
-        this.refugePromiseRejector = reject;
-    });
-
     constructor(private http: HttpClient,
                 protected cacheService: CacheService,
                 protected selectionFactory: VisualizationSelectionFactory) {
-        this.http.get(`${API_ROOT}`,{
-                params: {
-                    terse: 'true'
-                }
-            }).pipe(
-                map(map => Object.keys(map).map(key => map[key]) as Refuge[])
-            )
-            .subscribe(
-                refuges => this.refugePromiseResolver(refuges),
-                err => this.refugePromiseRejector(err));
     }
 
     parseSelections(json:string):VisSelection[] {
@@ -53,8 +36,14 @@ export class RefugeService {
         return refuge as Refuge;
     }
 
-    refugeList():Observable<Refuge []> {
-        return from(this.refugeListPromise);
+    refugeList():Promise<any> {
+        return this.http.get(`${API_ROOT}`)
+                .toPromise()
+                .then(refuges => Object.keys(refuges).map(key => ({
+                        id: key,
+                        title: refuges[key].title
+                    })) // firebase returns a keyed map of them all.
+                );
     }
 
     getRefuge(refuge_id):Promise<Refuge> {
@@ -64,33 +53,21 @@ export class RefugeService {
     }
 
     saveRefuge(refuge:Refuge):Promise<Refuge> {
-            let r = {...{},...refuge} as any;
-            r.selections = (r.selections||[]).map(s => JSON.stringify(s.external) );
-            let json = JSON.stringify(r);
-            console.log(`JSON ${json}`)
-            return this.http.put(this.refugeUrl(refuge.id),json,{headers:{'Content-Type':'application/json'}})
+        let r = {...{},...refuge} as any;
+        r.selections = (r.selections||[]).map(s => JSON.stringify(s.external) );
+        let json = JSON.stringify(r);
+        console.log(`JSON ${json}`);
+        return this.http.put(this.refugeUrl(refuge.id),json,{headers:{'Content-Type':'application/json'}})
                 .toPromise()
                 .then(response => this.castRefuge(refuge.id,response));
     }
-}
-
-export class Location {
-    lat: number;
-    lng: number;
 }
 
 export class Refuge {
     id:string;
     title:string;
     network_id:number;
-    partner:boolean;
-    no_geospatial: boolean;
     boundary_id:string;
-    location?:Location;
     selections:VisSelection[];
     resources?:string;
-    flywayId?:string;
-    point?:any;
-    data?:any;
-    icon?:any;
 }

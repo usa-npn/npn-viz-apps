@@ -1,5 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { newGuid } from '../common';
+import { HttpParams } from '@angular/common/http';
 
 export const NULL_DATA = -9999;
 export const ONE_DAY_MILLIS: number = (24 * 60 * 60 * 1000);
@@ -251,9 +252,8 @@ export abstract class NetworkAwareVisSelection extends VisSelection {
     networkIds?: any[] = [];
 
     addNetworkParams(params: any): any {
-        if (params instanceof URLSearchParams) {
-            let p = params as URLSearchParams;
-            (this.networkIds || []).forEach((id, i) => p.set(`network_id[${i}]`, `${id}`));
+        if (params instanceof HttpParams) {
+            (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
         } else if (params && typeof (params) === 'object') {
             (this.networkIds || []).forEach((id, i) => params[`network_id[${i}]`] = `${id}`);
         }
@@ -270,9 +270,8 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
 
     addNetworkParams(params: any): any {
         super.addNetworkParams(params);
-        if (params instanceof URLSearchParams) {
-            let p = params as URLSearchParams;
-            (this.stationIds || []).forEach((id, i) => p.set(`station_ids[${i}]`, `${id}`));
+        if (params instanceof HttpParams) {
+            (this.stationIds || []).forEach((id, i) => params = params.set(`station_ids[${i}]`, `${id}`));
         } else if (params && typeof (params) === 'object') {
             (this.stationIds || []).forEach((id, i) => params[`station_ids[${i}]`] = `${id}`);
         }

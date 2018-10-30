@@ -4,7 +4,7 @@
 .map-wrapper {
     position: relative;
     wms-map-legend {
-        /deep/ .gridded-legend {
+        .gridded-legend {
             margin-top: 10px;
             border-bottom: 1px solid #aaa;
         }
@@ -22,7 +22,7 @@
         wms-map-legend {
             bottom: 25px;
             width: 60%;
-            /deep/ .gridded-legend {
+            .gridded-legend {
                 margin-top: 0px;
                 border-bottom: none;
                 width: 100%;

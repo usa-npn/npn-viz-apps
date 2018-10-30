@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-fws-spring": "ng build fws-spring"
+    "watch-fws-spring": "ng build fws-spring --output-path /Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/spring --watch",
+    "watch-fws-dashboard": "ng build fws-dashboard --output-path /Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app --watch"
   },
   "private": true,
   "dependencies": {
@@ -28,6 +29,7 @@
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.5.4",
     "d3": "^4.13.0",
+    "hammerjs": "^2.0.8",
     "jquery": "^3.3.1",
     "ng2-dnd": "^4.2.0",
     "rxjs": "~6.2.0",

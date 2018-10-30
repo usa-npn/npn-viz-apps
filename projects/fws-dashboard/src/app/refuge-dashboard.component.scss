@@ -86,7 +86,7 @@ $color-tab3: #574d3f;
             }
         }
         &:nth-of-type(3) {
-            >.rd-tab-label>.mat-tab-label-content >.rd-tab-label {
+            >.mat-tab-label-content >.rd-tab-label {
                 background-color: $color-tab3;
             }
             &::after {

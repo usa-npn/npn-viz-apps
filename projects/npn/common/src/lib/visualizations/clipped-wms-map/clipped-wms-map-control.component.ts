@@ -4,12 +4,16 @@ import {ClippedWmsMapSelection} from './clipped-wms-map-selection';
 @Component({
     selector: 'clipped-wms-map-control',
     template: `
-    <mat-select class="map-service-input" placeholder="Map" [(ngModel)]="selection.service" (change)="serviceChange()">
-        <mat-option *ngFor="let s of validServices" [value]="s.value">{{s.label}}</mat-option>
-    </mat-select>
-    <mat-select class="map-layer-input" placeholder="Layer" [(ngModel)]="selection.layer" (change)="layerChange()">
-        <mat-option *ngFor="let l of validLayers" [value]="l">{{l.label}}</mat-option>
-    </mat-select>
+    <mat-form-field class="map-service-input">
+        <mat-select placeholder="Map" [(ngModel)]="selection.service" (ngModelChange)="serviceChange()">
+            <mat-option *ngFor="let s of validServices" [value]="s.value">{{s.label}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field class="map-layer-input">
+        <mat-select placeholder="Layer" [(ngModel)]="selection.layer" (ngModelChange)="layerChange()">
+            <mat-option *ngFor="let l of validLayers" [value]="l">{{l.label}}</mat-option>
+        </mat-select>
+    </mat-form-field>
     <mat-checkbox [(ngModel)]="selection.useBufferedBoundary" (change)="layerChange()">Use Buffered Boundary</mat-checkbox>
     `,
     styles:[`
@@ -18,6 +22,9 @@ import {ClippedWmsMapSelection} from './clipped-wms-map-selection';
         }
         .map-layer-input {
             width: 155px;
+        }
+        mat-form-field {
+            padding-right: 10px;
         }
     `]
 })

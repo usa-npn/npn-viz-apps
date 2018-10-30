@@ -1,5 +1,4 @@
-//import {Headers,Http,URLSearchParams} from '@angular/common/http';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient,HttpParams} from '@angular/common/http';
 import {DatePipe} from '@angular/common';
 
 import {CacheService,NpnConfiguration} from '../../common';
@@ -139,14 +138,13 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
                 .filter(c => c.data(null).isValid())
                 .map(c => {
                     return new Promise<any[]>(loaded => {
-                        let params = new URLSearchParams();
-                        params.set('request_src','npn-vis-activity-curves');
-                        params.set('start_date',`${c.year}-01-01`);
-                        params.set('end_date',this.endDate(c.year));
-                        params.set('frequency',`${this.frequency.value}`);
-                        params.set('species_id[0]',`${c.species.species_id}`);
-                        params.set('phenophase_id[0]',`${c.phenophase.phenophase_id}`);
-                        this.addNetworkParams(params);
+                        const params = this.addNetworkParams(new HttpParams()
+                            .set('request_src','npn-vis-activity-curves')
+                            .set('start_date',`${c.year}-01-01`)
+                            .set('end_date',this.endDate(c.year))
+                            .set('frequency',`${this.frequency.value}`)
+                            .set('species_id[0]',`${c.species.species_id}`)
+                            .set('phenophase_id[0]',`${c.phenophase.phenophase_id}`));
                         let url = `${this.config.apiRoot}/npn_portal/observations/getMagnitudeData.json`,
                             cacheKey = {
                                 u: url,

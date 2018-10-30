@@ -1,4 +1,4 @@
-import {Component,Input,ElementRef} from '@angular/core';
+import {Component,Input,ElementRef, ViewEncapsulation} from '@angular/core';
 import { ObservableMedia } from "@angular/flex-layout";
 
 import {MapVisualizationBaseComponent} from '../map-visualization-base.component';
@@ -8,7 +8,8 @@ import {ClippedWmsMapSelection} from './clipped-wms-map-selection';
 @Component({
     selector: 'clipped-wms-map',
     templateUrl: './clipped-wms-map.component.html',
-    styleUrls: ['./clipped-wms-map.component.scss']
+    styleUrls: ['./clipped-wms-map.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class ClippedWmsMapComponent extends MapVisualizationBaseComponent {
     @Input() selection: ClippedWmsMapSelection;

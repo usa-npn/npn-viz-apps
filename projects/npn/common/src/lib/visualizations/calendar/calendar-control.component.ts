@@ -19,7 +19,7 @@ const VALID_YEARS = (function(){
     <div>
         <div class="year-input-wrapper" *ngFor="let plotYear of selection.years;index as idx">
             <mat-form-field class="year-input">
-                <mat-select placeholder="Year {{idx+1}}" [(ngModel)]="selection.years[idx]" (change)="updateChange()" id="year_{{idx}}">
+                <mat-select placeholder="Year {{idx+1}}" [(ngModel)]="selection.years[idx]" (ngModelChange)="updateChange()" id="year_{{idx}}">
                     <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y}}</mat-option>
                 </mat-select>
             </mat-form-field>

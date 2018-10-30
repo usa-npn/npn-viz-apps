@@ -14,3 +14,4 @@ export * from './guid';
 export * from './config';
 export { NpnServiceUtils } from './npn-service-utils.service';
 export * from './detect-ie';
+export * from './monitors-destroy';

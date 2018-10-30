@@ -19,6 +19,9 @@ import {Component,Input,Output,EventEmitter,OnInit} from '@angular/core';
         .end-year {
             width: 75px;
         }
+        mat-form-field {
+            padding-right: 10px;
+        }
     `]
 })
 export class YearRangeInputComponent {

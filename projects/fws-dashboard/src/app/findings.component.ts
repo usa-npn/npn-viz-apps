@@ -1,4 +1,4 @@
-import {Component,OnInit,Input,ElementRef,HostBinding,Inject,Injectable,Optional} from '@angular/core';
+import {Component,OnInit,Input,ElementRef,HostBinding,Inject,Injectable,Optional, ViewEncapsulation} from '@angular/core';
 import {MatSnackBar,MatDialog,MatDialogRef} from '@angular/material';
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
 
@@ -82,9 +82,10 @@ const VIS_TEMPLATES = [{
         (onDropSuccess)="addVisualization($event)"
         [ngClass]="{'new-vis-placeholder': true, 'look-at-me': lookAtVisDrop}"></mat-card>
 </div>
-<mat-button-toggle *ngIf="userIsAdmin && !mobileMode && !adminMode && !isTouchDevice" (change)="toggleAdminMode()"><span class="admin-toggle">Customize</span></mat-button-toggle>
+<button mat-raised-button *ngIf="userIsAdmin && !mobileMode && !adminMode && !isTouchDevice" (click)="toggleAdminMode()"><span class="admin-toggle">Customize</span></button>
   `,
-  styleUrls: ['./findings.component.scss']
+  styleUrls: ['./findings.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class FindingsComponent implements OnInit {
     @Input()

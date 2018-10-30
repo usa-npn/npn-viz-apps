@@ -6,12 +6,9 @@
 
     agm-map {
         /*
-        /deep/ allows this rule to ignore then
-        _ngcontent class added by angular (since this element is added by google.)
-        other wise the rule turns into something like
-        agm-map[_ngcontent-c4]   img[src*=usanpn][_ngcontent-c4] { ... }
+        encapsulation: ViewEncapsulation.None or this rule won't be able to apply
         */
-        /deep/ img[src*=usanpn] {
+        img[src*=usanpn] {
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
         }

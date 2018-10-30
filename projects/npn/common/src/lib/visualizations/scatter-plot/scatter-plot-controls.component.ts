@@ -21,7 +21,7 @@ import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
 
     <div>
         <mat-form-field>
-            <mat-select placeholder="X Axis" name="xAxis" [(ngModel)]="selection.axis" (change)="redrawChange()">
+            <mat-select placeholder="X Axis" name="xAxis" [(ngModel)]="selection.axis" (ngModelChange)="redrawChange()">
               <mat-option *ngFor="let a of axis" [value]="a">{{a.label}}</mat-option>
             </mat-select>
         </mat-form-field>
@@ -37,6 +37,10 @@ import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
         .phenophase-input-wrapper {
             display: block;
             margin-top: 15px;
+        }
+        mat-form-field,
+        mat-checkbox {
+            padding-right: 10px;
         }
     `]
 })

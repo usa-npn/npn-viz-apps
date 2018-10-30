@@ -1,4 +1,4 @@
-import {Component,Inject,Input,OnInit} from '@angular/core';
+import {Component,Inject,Input,OnInit, ViewEncapsulation} from '@angular/core';
 import {MAT_DIALOG_DATA,MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
@@ -61,13 +61,13 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         mat-horizontal-stepper {
             height: 100%;
         }
-        /* argh deep
+        /* ViewEncapsulation.None
            75px is slightly larger than the stepper header
         */
-        /deep/ .mat-horizontal-content-container {
+        .mat-horizontal-content-container {
             height: calc(100% - 75px);
         }
-        /deep/ .mat-horizontal-content-container .mat-horizontal-stepper-content {
+        .mat-horizontal-content-container .mat-horizontal-stepper-content {
             height: 100%;
         }
         .step-wrapper {
@@ -99,7 +99,8 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
             font-size: 0.95em;
             margin-top: 20px;
         }
-    `]
+    `],
+    encapsulation: ViewEncapsulation.None
 })
 export class NewVisualizationDialogComponent implements OnInit {
     edit:boolean;

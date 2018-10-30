@@ -6,7 +6,7 @@ import {ObservationFrequencySelection} from './observation-frequency-selection';
     selector: 'observation-frequency-control',
     template:`
     <mat-form-field class="year-input">
-        <mat-select placeholder="Year *" [(ngModel)]="selection.year" (change)="selection.update()">
+        <mat-select placeholder="Year *" [(ngModel)]="selection.year" (ngModelChange)="selection.update()">
             <mat-option *ngFor="let y of validYears" [value]="y">{{y}}</mat-option>
         </mat-select>
     </mat-form-field>

@@ -1,10 +1,10 @@
 import {Component,Input,Output,EventEmitter,OnInit,DoCheck,OnChanges,SimpleChanges} from '@angular/core';
-import {FormControl,Validators} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 
 import {Observable,Subject} from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
+import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 
-import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE} from '../../common';
+import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
 import {VisSelection} from '../vis-selection';
 
 const COLORS = [
@@ -19,7 +19,7 @@ const COLORS = [
     <mat-form-field class="species-input">
         <input matInput [placeholder]="'Species'+(required ? ' *':'')" aria-label="Species"
                [matAutocomplete]="sp"
-               [formControl]="speciesControl" [(ngModel)]="species" (focus)="speciesFocus()" />
+               [formControl]="speciesControl" (focus)="speciesFocus()" />
         <mat-autocomplete #sp="matAutocomplete" [displayWith]="speciesTitle.transform">
           <mat-option *ngFor="let s of filteredSpecies | async" [value]="s">
             {{s | speciesTitle}} ({{s.number_observations}})
@@ -36,7 +36,7 @@ const COLORS = [
     </mat-form-field>
 
     <mat-form-field *ngIf="gatherColor" class="color-input">
-        <mat-select  [placeholder]="'Color'+(required ? ' *':'')" [(ngModel)]="color" [formControl]="colorControl">
+        <mat-select  [placeholder]="'Color'+(required ? ' *':'')" [formControl]="colorControl">
           <mat-select-trigger><div class="color-swatch" [ngStyle]="{'background-color':color}"></div></mat-select-trigger>
           <mat-option *ngFor="let c of colorList" [value]="c"><div class="color-swatch" [ngStyle]="{'background-color':c}"></div></mat-option>
         </mat-select>
@@ -44,6 +44,9 @@ const COLORS = [
     </mat-form-field>
     `,
     styles: [`
+        mat-form-field {
+            padding-right: 5px;
+        }
         .species-input {
             width: 200px;
         }
@@ -58,12 +61,9 @@ const COLORS = [
         .color-input {
             width: 60px;
         }
-        .color-input /deep/ .mat-select-trigger {
-            //border: 1px solid red;
-        }
     `]
 })
-export class SpeciesPhenophaseInputComponent implements OnInit,DoCheck,OnChanges {
+export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements OnInit,DoCheck,OnChanges {
     @Input() required:boolean = true;
     @Input() disabled:boolean = false;
 
@@ -109,6 +109,7 @@ export class SpeciesPhenophaseInputComponent implements OnInit,DoCheck,OnChanges
 
     constructor(private speciesService: SpeciesService,
                 public speciesTitle: SpeciesTitlePipe) {
+        super();
         this.filteredSpecies = this.speciesControl.valueChanges
             .pipe(
                 debounceTime(500),
@@ -140,6 +141,11 @@ export class SpeciesPhenophaseInputComponent implements OnInit,DoCheck,OnChanges
                         });
                     });
             });
+        this.colorControl.valueChanges.pipe(takeUntil(this.componentDestroyed))
+            .subscribe(v => this.color = v);
+        this.speciesControl.valueChanges.pipe(takeUntil(this.componentDestroyed))
+            .subscribe(v => this.species = v);
+        
     }
 
     ngOnChanges(changes:SimpleChanges) {
@@ -170,7 +176,7 @@ export class SpeciesPhenophaseInputComponent implements OnInit,DoCheck,OnChanges
     // this kicks speciesControl.valueChanges to display a list of
     // all species on focus
     speciesFocus() {
-        if(!this.isIE && this.speciesList) {
+        if(!this.isIE && !this.species && this.speciesList) {
             this.speciesControl.setValue(' ');
         }
     }

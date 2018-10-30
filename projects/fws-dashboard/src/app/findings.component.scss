@@ -223,7 +223,8 @@ mat-list.new-vis-list {
         &.vis-template {
             border: 1px dotted black;
             margin-bottom: 10px;
-            /deep/ .mat-list-item-content {
+            height: auto;
+            .mat-list-item-content {
                 height: auto;
                 padding: 0px;
                 img {

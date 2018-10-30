@@ -6,7 +6,7 @@ import {ObserverActivitySelection} from './observer-activity-selection';
     selector: 'observer-activity-control',
     template:`
     <mat-form-field class="year-input">
-        <mat-select placeholder="Year *" [(ngModel)]="selection.year" (change)="selection.update()">
+        <mat-select placeholder="Year *" [(ngModel)]="selection.year" (ngModelChange)="selection.update()">
             <mat-option *ngFor="let y of validYears" [value]="y">{{y}}</mat-option>
         </mat-select>
     </mat-form-field>

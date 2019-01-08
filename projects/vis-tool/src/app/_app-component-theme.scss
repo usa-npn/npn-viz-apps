@@ -1,0 +1,53 @@
+@import '~@angular/material/theming';
+
+@mixin app-component-theme($theme,$icon-theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+
+    $icon-primary: map-get($icon-theme,primary);
+    $icon-accent: map-get($icon-theme,accent);
+    $icon-warn: map-get($icon-theme,warn);
+
+    //color: mat-contrast($warn,500);
+    $main-nav-active-color: mat-color($warn);
+
+    mat-drawer-container {
+        height: 100vh;
+    }
+    [mat-line].mat-caption {
+        font-size: 12px !important;
+    }
+    
+    mat-drawer.main-nav {
+        background-color: mat-color($primary,900);
+        &.expanded {
+            mat-list-item.active {
+                background-color: $main-nav-active-color;
+            }
+        }
+        &:not(.expanded) {
+            mat-list-item.active {
+                color: $main-nav-active-color;
+            }
+        }
+        mat-list-item:not(.contract) {
+            &:hover {
+                cursor: pointer;
+            }
+        }
+        mat-list-item.contract {
+            height: 32px !important;
+            [mat-list-icon] {
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                font-size: 0.9em;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+    
+}

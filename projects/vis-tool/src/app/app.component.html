@@ -1,0 +1,21 @@
+<mat-drawer-container class="mat-typography" autosize>
+  <mat-drawer mode="side" opened class="main-nav" [ngClass]="{expanded:mainNavExpanded}">
+      <mat-list>
+        <mat-list-item class="contract">
+          <div *ngIf="mainNavExpanded" mat-list-icon (click)="mainNavExpanded = !mainNavExpanded"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
+        </mat-list-item>
+        <mat-list-item *ngFor="let item of menuItems"
+            [routerLink]="item.routerLink" routerLinkActive="active"
+            [matTooltip]="mainNavExpanded ? null : item.title">
+            <div mat-list-icon><fa-icon [icon]="item.icon"></fa-icon></div>
+            <h4 mat-line *ngIf="mainNavExpanded">{{item.title}}</h4>
+            <p mat-line class="mat-caption" *ngIf="mainNavExpanded">{{item.caption}}</p>
+        </mat-list-item>
+    </mat-list>
+  </mat-drawer>
+  <mat-drawer-content>
+      <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+

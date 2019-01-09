@@ -5,21 +5,87 @@
     $accent: map-get($theme,accent);
     $warn: map-get($theme,warn);
 
+    $step-title-bg: mat-color($primary,800);
+    $drawer-title-height: 36px;
+    $drawer-padding: 15px;
+
+    #explorePhenoSteps,
+    #explorePhenoControls {
+        .drawer-contents {
+            padding: $drawer-padding;
+        }
+        .drawer-title {
+            display: flex;
+            align-items: center;
+            height: $drawer-title-height;
+            .title-inner {
+                padding-left: $drawer-padding;
+                padding-right: $drawer-padding;
+            }
+        }
+    }
+
     #explorePhenoSteps {
         $bg-color: mat-color($primary,50);
         background-color: lighten($bg-color,15%); // even lighter than the lightest the palette offers
+
+        .drawer-title {
+            background-color: $step-title-bg;
+            color: mat-color($warn);
+        }
+
+        $step-icon-w: 32px;
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            &:hover {
+                cursor: pointer;
+            }
+            step-icon {
+                width: $step-icon-w;
+                height: $step-icon-w;
+                font-size: 1.35em;
+                display: inline-block;
+                position: relative;
+                
+                border-radius: 50%;
+                color: #fff;
+                // TODO states
+                background-color: orange;
+                fa-icon {
+                    position: absolute;
+                    top: 50%;
+                    right: 50%;
+                    transform: translate(50%,-50%);
+                }
+            }
+            .text {
+                text-transform: uppercase;
+                font-weight: 600;
+                padding: 0px 15px;
+            }
+        }
+        .step-host {
+            margin-left: $step-icon-w;
+        }
+
     }
     
     #explorePhenoControls {
-
-        // TODO temporary
-        >div {
-            margin: 5px;
-            >button {
-                display: block;
-                width: 100%;
-                margin-bottom: 5px;
+        .drawer-title {
+            background-color: mat-color($warn);
+            color: #fff;//mat-contrast($warn,500);
+            .title-caret {
+                $half-drawer-title-height: ($drawer-title-height/2);
+                border-top: $half-drawer-title-height solid transparent;
+                border-bottom: $half-drawer-title-height solid transparent;
+                border-left: $half-drawer-title-height solid $step-title-bg;
             }
         }
+    }
+
+    #visualizationContainer {
+        background-color: mat-color($warn,100);
     }
 }

@@ -1,0 +1,33 @@
+@import '~@angular/material/theming';
+
+@mixin vis-selection-theme($theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+
+    h4 {
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+    .vis-selectors {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+        > button {
+            flex-grow: 1;
+            text-align: left;
+            fa-icon {
+                margin-right: 5px;
+            }
+            &:not(.selected) {
+                &:hover {
+                    background-color: mat-color($warn,100);
+                }
+            }
+        }
+        .info {
+            padding-left: 5px;
+        }
+    }
+}

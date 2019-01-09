@@ -6,7 +6,7 @@
     $warn: map-get($theme,warn);
     
     //color: mat-contrast($warn,500);
-    $main-nav-active-color: mat-color($warn);
+    $main-nav-active-color: mat-color($warn,500);
 
     mat-drawer-container {
         height: 100vh;

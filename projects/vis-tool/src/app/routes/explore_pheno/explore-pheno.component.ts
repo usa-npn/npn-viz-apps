@@ -64,7 +64,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             stepHost.viewContainerRef.clear();
             controlHost.viewContainerRef.clear();
 
-            const stepRef = stepHost.viewContainerRef.createComponent(stepFactory);
+            const stepRef = stepHost.viewContainerRef.createComponent(stepFactory,0);
             const controlRef = controlHost.viewContainerRef.createComponent(controlFactory);
             // wire the two together
             const stepComponent = (<StepComponent>stepRef.instance);

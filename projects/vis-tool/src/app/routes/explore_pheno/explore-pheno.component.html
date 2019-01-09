@@ -1,19 +1,25 @@
 <mat-drawer-container class="mat-typography" id="explorePhenologicalFindings" autosize>
     <mat-drawer mode="side" opened id="explorePhenoSteps">
-        <div *ngFor="let step of steps" class="step">
-            <div>
-                <button mat-button mat-icon-button><fa-icon [icon]="step.icon"></fa-icon></button>
-                <span class="step-title">{{step.title}}</span>
+        <div class="drawer-title"><div class="title-inner">Explore phenological findings</div></div>
+        <div class="drawer-contents">
+            <div *ngFor="let step of steps" class="step">
+                <div class="step-title">
+                    <step-icon [step]="step"></step-icon>
+                    <span class="text">{{step.title}}</span>
+                </div>
+                <div class="step-host" step-host></div>
             </div>
-            <div step-host></div>
         </div>
     </mat-drawer>
     <mat-drawer-content>
         <mat-drawer-container autosize>
                 <mat-drawer mode="side" opened id="explorePhenoControls">
-                    <div *ngFor="let step of steps" control-host></div>
+                    <div class="drawer-title"><div class="title-caret"></div><div class="title-inner">Active step title goes here...</div></div>
+                    <div class="drawer-contents">
+                        <div *ngFor="let step of steps" control-host></div>
+                    </div>
                 </mat-drawer>
-                <mat-drawer-content>      
+                <mat-drawer-content id="visualizationContainer">      
                     Visualization goes in here.
                 </mat-drawer-content>
             </mat-drawer-container>

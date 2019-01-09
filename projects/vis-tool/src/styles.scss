@@ -19,11 +19,13 @@ $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 
 // import component mixins here
 @import './app/app-component-theme';
-@import './app/routes/explore_pheno/explore-pheno-theme';
 
 @include angular-material-theme($app-dark-theme);
 // call core app mixins here
 @include app-component-theme($app-dark-theme);
+
+@import './app/routes/explore_pheno/explore-pheno-theme';
+@import './app/routes/explore_pheno/step_controls/vis-selection-theme';
 
 body {
     margin: 0px;
@@ -31,5 +33,6 @@ body {
     #explorePhenologicalFindings {
         @include angular-material-theme($app-light-theme);
         @include explore-pheno-theme($app-light-theme);
+        @include vis-selection-theme($app-light-theme);
     }
 }

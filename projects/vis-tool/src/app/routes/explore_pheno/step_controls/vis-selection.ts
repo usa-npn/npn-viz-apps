@@ -7,7 +7,8 @@ import {
     faMapMarker,
     faChartNetwork,
     faCalendarAlt,
-    faThermometerHalf
+    faThermometerHalf,
+    faInfoCircle
 } from '@fortawesome/pro-light-svg-icons';
 
 import { StepComponent, ControlComponent, VisConfigStep, VisDefinition } from "../interfaces";
@@ -29,30 +30,20 @@ export class VisSelectionStepComponent implements StepComponent {
 @Component({
     template: `
     <div>
-        <h3>maps</h3>
-        <button mat-raised-button *ngFor="let v of maps" (click)="selection.selected = v;">
-            <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
-        </button>
-        <h3>charts</h3>
-        <button mat-raised-button *ngFor="let v of charts" (click)="selection.selected = v;">
-            <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
-        </button>
+        <div *ngFor="let cat of categories">
+            <h4>{{cat.title}}</h4>
+            <div class="vis-selectors" *ngFor="let v of cat.defs">
+                <button mat-raised-button (click)="selection.selected = v;" [color]="selection.selected === v ? 'accent' : null" [ngClass]="{selected: selection.selected === v}">
+                    <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
+                </button>
+                <div class="info"><fa-icon [icon]="infoIcon"></fa-icon></div>
+            </div>
+        </div>
     </div>
-    `,
-    styles:[`
-    :host {
-
-    }
-    h3 {
-        text-transform: uppercase;
-    }
-    button {
-        display: block;
-        width: 100%;
-    }
-    `]
+    `
 })
 export class VisSelectionControlComponent implements ControlComponent {
+    infoIcon = faInfoCircle;
     maps:VisDefinition[] = [{
         title: 'Map',
         icon: faMapMarker
@@ -70,6 +61,14 @@ export class VisSelectionControlComponent implements ControlComponent {
     },{
         title: 'Calendar',
         icon: faCalendarAlt
+    }]
+
+    categories:any[] = [{
+        title: 'maps',
+        defs: this.maps
+    },{
+        title: 'charts',
+        defs: this.charts
     }]
 }
 

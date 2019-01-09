@@ -1,0 +1,29 @@
+@import '~@angular/material/theming';
+
+@mixin explore-pheno-theme($theme,$icon-theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+
+    $icon-primary: map-get($icon-theme,primary);
+    $icon-accent: map-get($icon-theme,accent);
+    $icon-warn: map-get($icon-theme,warn);
+
+    #explorePhenoSteps {
+        $bg-color: mat-color($primary,50);
+        background-color: lighten($bg-color,15%); // even lighter than the lightest the palette offers
+    }
+    
+    #explorePhenoControls {
+
+        // TODO temporary
+        >div {
+            margin: 5px;
+            >button {
+                display: block;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    }
+}

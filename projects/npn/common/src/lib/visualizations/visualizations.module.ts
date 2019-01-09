@@ -77,7 +77,8 @@ import {NpnGriddedModule} from '../gridded';
       CalendarComponent,CalendarControlComponent,
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,
       VisualizationComponent,
-      SpeciesPhenophaseInputComponent
+      SpeciesPhenophaseInputComponent,
+      YearRangeInputComponent
   ],
   providers: [
       DatePipe,

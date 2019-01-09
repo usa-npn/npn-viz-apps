@@ -20,7 +20,7 @@
     }
     
     mat-drawer.main-nav {
-        background-color: mat-color($primary,900);
+        background-color: mat-color($primary,800);
         &.expanded {
             mat-list-item.active {
                 background-color: $main-nav-active-color;
@@ -29,6 +29,7 @@
         &:not(.expanded) {
             mat-list-item.active {
                 color: $main-nav-active-color;
+                background-color: mat-color($primary,900);
             }
         }
         mat-list-item:not(.contract) {

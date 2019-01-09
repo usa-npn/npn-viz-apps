@@ -1,4 +1,4 @@
-import { Component, ViewChildren, QueryList, ComponentFactoryResolver } from "@angular/core";
+import { Component, ViewChildren, QueryList, ComponentFactoryResolver, ViewContainerRef } from "@angular/core";
 import { zip } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -10,7 +10,6 @@ import {
 
 import { VisConfigStep } from "./interfaces";
 
-import { StepHost, ControlHost } from "./step-hosts";
 import { StepComponent, ControlComponent } from './interfaces';
 import { MonitorsDestroy } from "@npn/common";
 
@@ -22,13 +21,11 @@ import { VisSelectionStep, VisSelectionSelection } from "./step_controls";
 export class ExplorePhenoComponent extends MonitorsDestroy {
     icons = {faMapMarker,faChartLine,faCalendarAlt};
 
-    @ViewChildren(StepHost) stepHosts:QueryList<StepHost>;
-    @ViewChildren(ControlHost) controlHosts:QueryList<ControlHost>;
+    @ViewChildren('stepHost',{read:ViewContainerRef}) stepHosts:QueryList<ViewContainerRef>;
+    @ViewChildren('controlHost',{read:ViewContainerRef}) controlHosts:QueryList<ViewContainerRef>;
 
     visSelectionSelection:VisSelectionSelection = new VisSelectionSelection();
-    steps:VisConfigStep[];/* = [
-        VisSelectionStep
-    ];*/
+    steps:VisConfigStep[];
 
     constructor(private componentFactoryResolver:ComponentFactoryResolver) {
         super();
@@ -49,8 +46,8 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
 
     setupSteps(hosts) {
         const [steps,controls] = hosts;
-        const stepHosts:StepHost[] = steps.toArray();
-        const controlHosts:ControlHost[] = controls.toArray();
+        const stepHosts:ViewContainerRef[] = steps.toArray();
+        const controlHosts:ViewContainerRef[] = controls.toArray();
         console.log('stepHosts',stepHosts)
         console.log('controlHosts',controlHosts)
         // parallel arrays not wonderful but want all controls to actually be in the DOM
@@ -61,11 +58,11 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const controlFactory = this.componentFactoryResolver.resolveComponentFactory(step.controlComponent);
             const controlHost = controlHosts[i];
 
-            stepHost.viewContainerRef.clear();
-            controlHost.viewContainerRef.clear();
+            stepHost.clear();
+            controlHost.clear();
 
-            const stepRef = stepHost.viewContainerRef.createComponent(stepFactory,0);
-            const controlRef = controlHost.viewContainerRef.createComponent(controlFactory);
+            const stepRef = stepHost.createComponent(stepFactory);
+            const controlRef = controlHost.createComponent(controlFactory);
             // wire the two together
             const stepComponent = (<StepComponent>stepRef.instance);
             const controlComponent = (<ControlComponent>controlRef.instance);

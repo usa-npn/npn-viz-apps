@@ -7,7 +7,9 @@
                     <step-icon [step]="step"></step-icon>
                     <span class="text">{{step.title}}</span>
                 </div>
-                <div class="step-host" step-host></div>
+                <div class="step-host">
+                    <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
+                </div>
             </div>
         </div>
     </mat-drawer>
@@ -16,7 +18,9 @@
                 <mat-drawer mode="side" opened id="explorePhenoControls">
                     <div class="drawer-title"><div class="title-caret"></div><div class="title-inner">Active step title goes here...</div></div>
                     <div class="drawer-contents">
-                        <div *ngFor="let step of steps" control-host></div>
+                        <div *ngFor="let step of steps" class="control-host">
+                            <div #controlHost class="component-anchor"></div>
+                        </div>
                     </div>
                 </mat-drawer>
                 <mat-drawer-content id="visualizationContainer">      

@@ -11,6 +11,13 @@
 
     #explorePhenoSteps,
     #explorePhenoControls {
+        .component-anchor {
+            // when creating dynamic components they are always inserted
+            // as siblings, not children of the "anchor" which is odd
+            // so need to wrap the anchors and then just keep them hidden
+            // since they'll always just be empty DOM elements....
+            display: none;
+        }
         .drawer-contents {
             padding: $drawer-padding;
         }
@@ -52,7 +59,7 @@
                 border-radius: 50%;
                 color: #fff;
                 // TODO states
-                background-color: orange;
+                background-color: mat-color($warn);
                 fa-icon {
                     position: absolute;
                     top: 50%;
@@ -63,11 +70,11 @@
             .text {
                 text-transform: uppercase;
                 font-weight: 600;
-                padding: 0px 15px;
+                padding: 0px $drawer-padding;
             }
         }
         .step-host {
-            margin-left: $step-icon-w;
+            margin-left: $step-icon-w + $drawer-padding;
         }
 
     }

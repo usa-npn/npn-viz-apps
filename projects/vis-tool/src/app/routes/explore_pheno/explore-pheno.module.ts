@@ -5,7 +5,6 @@ import { MaterialModule } from '../../material';
 import { StepIconComponent } from './step-icon.component';
 import { ExplorePhenoComponent } from './explore-pheno.component';
 import { StepControlsModule } from './step_controls';
-import { StepHost, ControlHost } from './step-hosts';
 
 @NgModule({
     imports: [
@@ -13,7 +12,6 @@ import { StepHost, ControlHost } from './step-hosts';
         StepControlsModule
     ],
     declarations: [
-        StepHost, ControlHost,
         StepIconComponent,
         ExplorePhenoComponent
     ],

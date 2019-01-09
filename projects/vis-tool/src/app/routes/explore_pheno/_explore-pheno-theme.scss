@@ -1,13 +1,9 @@
 @import '~@angular/material/theming';
 
-@mixin explore-pheno-theme($theme,$icon-theme) {
+@mixin explore-pheno-theme($theme) {
     $primary: map-get($theme,primary);
     $accent: map-get($theme,accent);
     $warn: map-get($theme,warn);
-
-    $icon-primary: map-get($icon-theme,primary);
-    $icon-accent: map-get($icon-theme,accent);
-    $icon-warn: map-get($icon-theme,warn);
 
     #explorePhenoSteps {
         $bg-color: mat-color($primary,50);

@@ -1,14 +1,10 @@
 @import '~@angular/material/theming';
 
-@mixin app-component-theme($theme,$icon-theme) {
+@mixin app-component-theme($theme) {
     $primary: map-get($theme,primary);
     $accent: map-get($theme,accent);
     $warn: map-get($theme,warn);
-
-    $icon-primary: map-get($icon-theme,primary);
-    $icon-accent: map-get($icon-theme,accent);
-    $icon-warn: map-get($icon-theme,warn);
-
+    
     //color: mat-contrast($warn,500);
     $main-nav-active-color: mat-color($warn);
 

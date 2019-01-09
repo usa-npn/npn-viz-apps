@@ -8,27 +8,28 @@
 $primary-palette: mat-palette($md-primary);
 $accent-palette: mat-palette($md-accent);
 $warn-palette: mat-palette($md-warn);
-$app-dark-theme: mat-dark-theme($primary-palette, $accent-palette, $warn-palette);
-$app-light-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
+$app-dark-base-theme: mat-dark-theme($primary-palette, $accent-palette, $warn-palette);
+$app-light-base-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
 
-$primary-icon-palette: mat-palette($md-iconprimary);
-$accent-icon-palette: mat-palette($md-iconaccent);
-$warn-icon-palette: mat-palette($md-iconwarn);
-$icon-dark-theme: mat-dark-theme($primary-icon-palette, $accent-icon-palette, $warn-icon-palette);
-$icon-light-theme: mat-light-theme($primary-icon-palette, $accent-icon-palette, $warn-icon-palette);
+// add another key to the maps with a 4th palette for accent purposes...
+// TODO - update with color/s of Jon's choosing..
+$accent2-palette: mat-palette($mat-teal);
+$app-dark-theme: map-merge($app-dark-base-theme,(accent2:$accent2-palette));
+$app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 
 // import component mixins here
 @import './app/app-component-theme';
 @import './app/routes/explore_pheno/explore-pheno-theme';
 
 @include angular-material-theme($app-dark-theme);
-@include app-component-theme($app-dark-theme,$icon-dark-theme);
+// call core app mixins here
+@include app-component-theme($app-dark-theme);
 
 body {
     margin: 0px;
     padding: 0px;
     #explorePhenologicalFindings {
         @include angular-material-theme($app-light-theme);
-        @include explore-pheno-theme($app-light-theme,$icon-light-theme);
+        @include explore-pheno-theme($app-light-theme);
     }
 }

@@ -10,17 +10,19 @@
     $drawer-title-height: 36px;
     $drawer-padding: 15px;
 
+    .component-anchor {
+        // when creating dynamic components they are always inserted
+        // as siblings, not children of the "anchor" which is odd
+        // so need to wrap the anchors and then just keep them hidden
+        // since they'll always just be empty DOM elements....
+        display: none;
+    }
+
     #explorePhenoSteps,
     #explorePhenoControls {
         display: flex;
         flex-direction: column;
-        .component-anchor {
-            // when creating dynamic components they are always inserted
-            // as siblings, not children of the "anchor" which is odd
-            // so need to wrap the anchors and then just keep them hidden
-            // since they'll always just be empty DOM elements....
-            display: none;
-        }
+
         .drawer-contents {
             padding: $drawer-padding;
         }
@@ -53,16 +55,32 @@
 
         $step-icon-w: 32px;
 
+        $step-lines-width: 2px;
+        $step-lines-margin: ($step-icon-w/2)-($step-lines-width/2);
         .step-wrapper {
             position: relative;
-            $step-lines-width: 4px;
             .step-lines {
                 position: absolute;
-                z-index: -1;
-                border-left: $step-lines-width solid mat-color($accent2);
+                z-index: -2;
+                border-left: $step-lines-width solid mat-color($accent2,500);
                 height: 100%;
-                margin-left: ($step-icon-w/2)-($step-lines-width/2);
+                margin-left: $step-lines-margin;
                 opacity: 0.45;
+            }
+        }
+        .step {
+            position: relative;
+            padding-bottom: 30px;
+            // for the final step this just covers the line connecting steps.
+            .step-line-cover {
+                background-color: $lighter-bg-color;
+                //border: 1px solid red;
+                width: $step-lines-width;
+                height: 100%;
+                position: absolute;
+                z-index: -1;
+                top: 1px;
+                left: $step-lines-margin;
             }
         }
 
@@ -126,11 +144,27 @@
     }
 
     #visualizationContainer {
+        position: relative;
         display: flex;
         align-items: center;
+        justify-content: space-around;
         background-color: mat-color($warn,100);
 
         // TODO not sure about this...
         padding: 15px;
+
+        #noActiveVis {
+            npn-logo {
+                .swirl-top,
+                .swirl-left,
+                .swirl-right {
+                    fill: mat-color($warn,200);
+                }
+            }
+            .headline {
+                text-align: center;
+                color: mat-color($warn,300);
+            }
+        }
     }
 }

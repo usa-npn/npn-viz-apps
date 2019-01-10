@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common';
 
 import { NPN_CONFIGURATION } from './config';
 import { NpnServiceUtils } from './npn-service-utils.service';
+import { NpnLogoComponent } from './npn-logo.component';
 
 export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
 
@@ -25,12 +26,14 @@ export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
     declarations: [
         SpeciesTitlePipe,
         LegendDoyPipe,
-        DoyPipe
+        DoyPipe,
+        NpnLogoComponent
     ],
     exports: [
         SpeciesTitlePipe,
         LegendDoyPipe,
-        DoyPipe
+        DoyPipe,
+        NpnLogoComponent
     ],
     providers: [
         CacheService,

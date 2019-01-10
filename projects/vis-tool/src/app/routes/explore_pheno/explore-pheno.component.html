@@ -5,7 +5,7 @@
             <div class="step-wrapper">
                 <div class="step-lines"></div>
                 <div class="steps">
-                    <div *ngFor="let step of steps" class="step">
+                    <div *ngFor="let step of steps; last as isLast" class="step">
                         <div class="step-title" (click)="focusStep(step)">
                             <step-icon [step]="step"></step-icon>
                             <span class="text">{{step.title}}</span>
@@ -13,6 +13,7 @@
                         <div class="step-host">
                             <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
                         </div>
+                        <div class="step-line-cover" *ngIf="isLast"></div>
                     </div>
                 </div>
             </div>
@@ -33,7 +34,11 @@
                     </div>
                 </mat-drawer>
                 <mat-drawer-content id="visualizationContainer">
-                    <div #visualizationHost class="component-anchor"></div>      
+                    <div #visualizationHost class="component-anchor"></div>
+                    <div *ngIf="!activeVis" id="noActiveVis">
+                        <npn-logo></npn-logo>
+                        <div class="mat-h3 headline">PREPARING PHENO PHINDINGS</div>
+                    </div>
 <!--pre>
 activeStep="{{activeStep?.title}}"
 </pre>

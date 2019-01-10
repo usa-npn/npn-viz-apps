@@ -2,13 +2,18 @@
     <mat-drawer mode="side" opened id="explorePhenoSteps">
         <div class="drawer-title"><div class="title-inner">Explore phenological findings</div></div>
         <div class="drawer-contents">
-            <div *ngFor="let step of steps" class="step">
-                <div class="step-title">
-                    <step-icon [step]="step"></step-icon>
-                    <span class="text">{{step.title}}</span>
-                </div>
-                <div class="step-host">
-                    <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
+            <div class="step-wrapper">
+                <div class="step-lines"></div>
+                <div class="steps">
+                    <div *ngFor="let step of steps" class="step">
+                        <div class="step-title" (click)="focusStep(step)">
+                            <step-icon [step]="step"></step-icon>
+                            <span class="text">{{step.title}}</span>
+                        </div>
+                        <div class="step-host">
+                            <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -16,15 +21,26 @@
     <mat-drawer-content>
         <mat-drawer-container autosize>
                 <mat-drawer mode="side" opened id="explorePhenoControls">
-                    <div class="drawer-title"><div class="title-caret"></div><div class="title-inner">Active step title goes here...</div></div>
+                    <div class="drawer-title"><div class="title-caret"></div><div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div></div>
                     <div class="drawer-contents">
-                        <div *ngFor="let step of steps" class="control-host">
+                        <div *ngFor="let step of steps" [ngClass]="{'control-host':true,'active-step':(step === activeStep)}">
                             <div #controlHost class="component-anchor"></div>
                         </div>
                     </div>
                 </mat-drawer>
-                <mat-drawer-content id="visualizationContainer">      
-                    Visualization goes in here.
+                <mat-drawer-content id="visualizationContainer">
+                    <div #visualizationHost class="component-anchor"></div>      
+<!--pre>
+activeStep="{{activeStep?.title}}"
+</pre>
+<pre *ngIf="activeVis && activeVis.selection && activeVis.selection.external; else objVis">
+{{activeVis.selection.external | json}}
+</pre>
+<ng-template #objVis>
+<pre>
+{{activeVis?.selection | json}}
+</pre>
+</ng-template-->
                 </mat-drawer-content>
             </mat-drawer-container>
     </mat-drawer-content>

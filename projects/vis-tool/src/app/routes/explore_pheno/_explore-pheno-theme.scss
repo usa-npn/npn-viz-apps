@@ -4,6 +4,7 @@
     $primary: map-get($theme,primary);
     $accent: map-get($theme,accent);
     $warn: map-get($theme,warn);
+    $accent2: map-get($theme,accent2);
 
     $step-title-bg: mat-color($primary,800);
     $drawer-title-height: 36px;
@@ -41,7 +42,22 @@
             color: mat-color($warn);
         }
 
+
+
         $step-icon-w: 32px;
+
+        .step-wrapper {
+            position: relative;
+            $step-lines-width: 4px;
+            .step-lines {
+                position: absolute;
+                z-index: -1;
+                border-left: $step-lines-width solid mat-color($accent2);
+                height: 100%;
+                margin-left: ($step-icon-w/2)-($step-lines-width/2);
+                opacity: 0.45;
+            }
+        }
 
         .step-title {
             display: flex;
@@ -90,9 +106,14 @@
                 border-left: $half-drawer-title-height solid $step-title-bg;
             }
         }
+        .control-host:not(.active-step) {
+            display: none;
+        }
     }
 
     #visualizationContainer {
+        display: flex;
+        align-items: center;
         background-color: mat-color($warn,100);
     }
 }

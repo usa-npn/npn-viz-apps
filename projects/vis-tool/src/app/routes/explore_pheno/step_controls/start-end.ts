@@ -4,7 +4,7 @@ import { faCalendarAlt } from '@fortawesome/pro-light-svg-icons';
 import { Component } from "@angular/core";
 
 @Component({
-    template: `start/end: {{selection?.start}}<span *ngIf="selection && selection.end"> - </span>{{selection?.end}}`
+    template: `{{selection?.start}}<span *ngIf="selection && selection.end"> - </span>{{selection?.end}}`
 })
 export class StartEndStepComponent implements StepComponent {
 }
@@ -16,7 +16,8 @@ export class StartEndControlComponent implements ControlComponent {
 }
 
 export const StartEndStep:VisConfigStep = {
-    title: 'date range',
+    title: 'Date range',
+    controlTitle: 'Select date range',
     icon: faCalendarAlt,
     stepComponent: StartEndStepComponent,
     controlComponent: StartEndControlComponent

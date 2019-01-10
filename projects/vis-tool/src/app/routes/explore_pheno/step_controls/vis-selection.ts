@@ -2,6 +2,8 @@ import { Component } from "@angular/core";
 
 import { Subject } from 'rxjs';
 
+import { StartEndStep } from './start-end';
+
 import {
     faChartLine,
     faMapMarker,
@@ -12,6 +14,9 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { StepComponent, ControlComponent, VisConfigStep, VisDefinition } from "../interfaces";
+import { VisualizationSelectionFactory, ScatterPlotComponent } from "@npn/common";
+import { LegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
+import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -44,37 +49,61 @@ export class VisSelectionStepComponent implements StepComponent {
 })
 export class VisSelectionControlComponent implements ControlComponent {
     infoIcon = faInfoCircle;
-    maps:VisDefinition[] = [{
-        title: 'Map',
-        icon: faMapMarker
-    },{
-        title: 'Spring onset',
-        icon: faThermometerHalf
-    }]
-
-    charts:VisDefinition[] = [{
-        title: 'Scatter plot',
-        icon: faChartNetwork
-    },{
-        title: 'Activity curve',
-        icon: faChartLine
-    },{
-        title: 'Calendar',
-        icon: faCalendarAlt
-    }]
 
     categories:any[] = [{
         title: 'maps',
-        defs: this.maps
+        defs: MAPS
     },{
         title: 'charts',
-        defs: this.charts
+        defs: CHARTS
     }]
+
+    constructor(private selectionFactory:VisualizationSelectionFactory) {}
+
+    ngOnInit() {
+        [...MAPS,...CHARTS].forEach(visDef => {
+            if(typeof(visDef.selection) === 'string') {
+                visDef.selection = this.selectionFactory.newSelection({$class:visDef.selection});
+            }
+        });
+    }
 }
 
 export const VisSelectionStep:VisConfigStep = {
-    title: 'visualization type',
+    title: 'Visualization type',
+    controlTitle: 'Select visualization',
     icon: faChartLine,
     stepComponent: VisSelectionStepComponent,
     controlComponent: VisSelectionControlComponent
 };
+
+const MAPS:VisDefinition[] = [{
+    title: 'Map',
+    icon: faMapMarker,
+    steps:[StartEndStep],
+    selection: {},
+},{
+    title: 'Spring onset',
+    icon: faThermometerHalf,
+    selection: {},
+}];
+
+const CHARTS:VisDefinition[] = [{
+    title: 'Scatter plot',
+    icon: faChartNetwork,
+    selection: 'ScatterPlotSelection',
+    steps:[
+        StartEndStep,
+        LegacySpeciesPhenoColorStep,
+        ScatterPlotMiscStep
+    ],
+    component: ScatterPlotComponent
+},{
+    title: 'Activity curve',
+    icon: faChartLine,
+    selection: {},
+},{
+    title: 'Calendar',
+    icon: faCalendarAlt,
+    selection: {},
+}];

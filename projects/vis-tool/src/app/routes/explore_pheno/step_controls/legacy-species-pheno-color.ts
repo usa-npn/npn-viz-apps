@@ -1,7 +1,7 @@
 import { StepComponent, ControlComponent, VisConfigStep } from "../interfaces";
 
 import { faCrow } from '@fortawesome/pro-light-svg-icons';
-import { Component } from "@angular/core";
+import { Component, ViewEncapsulation } from "@angular/core";
 import { ScatterPlotSelection } from "@npn/common";
 
 @Component({
@@ -59,12 +59,17 @@ export class LegacySpeciesPhenoColorStepComponent implements StepComponent {
     species-phenophase-input {
         display: flex;
         flex-direction: column;
+        align-items: stretch;
+    }
+    species-phenophase-input>* {
+        width: inherit !important;
     }
     .buttons {
         display:flex;
         justify-content: flex-end;
     }
-    `]
+    `],
+    encapsulation: ViewEncapsulation.None
 })
 export class LegacySpeciesPhenoColorControlComponent implements ControlComponent {
     selection: ScatterPlotSelection;

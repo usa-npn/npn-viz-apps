@@ -1,3 +1,11 @@
+export const emptyIcon:any = {
+    prefix: '',
+    iconName:'',
+    icon: [
+        512,512,[],'',''
+    ]
+}
+
 export const npnAcorn:any = {
     prefix: 'foo',
     iconName: 'bar',

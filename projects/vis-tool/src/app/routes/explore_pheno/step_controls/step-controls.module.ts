@@ -7,7 +7,7 @@ import {
     ScatterPlotComponent } from '@npn/common';
 
 import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
-
+import { DummyComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
@@ -18,6 +18,7 @@ import { LegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlCom
 // rather than cut/pasting everythign just define the list once
 const COMPONENTS:any[] = [
     VisSelectionControlComponent, VisSelectionStepComponent,
+    DummyComponent,
     StartEndControlComponent, StartEndStepComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,

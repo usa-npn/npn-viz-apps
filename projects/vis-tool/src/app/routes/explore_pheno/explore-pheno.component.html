@@ -3,12 +3,14 @@
         <div class="drawer-title"><div class="title-inner">Explore phenological findings</div></div>
         <div class="drawer-contents">
             <div class="step-wrapper">
-                <div class="step-lines"></div>
+                <div class="step-lines" *ngIf="activeVis"></div>
+                <div class="step-gradient" *ngIf="!activeVis"></div>
                 <div class="steps">
-                    <div *ngFor="let step of steps; last as isLast" class="step">
-                        <div class="step-title" (click)="focusStep(step)">
+                    <div *ngFor="let step of steps; last as isLast, first as isFirst" class="step" [ngClass]="{first:isFirst,last:isLast}">
+                        <!-- TODO step state needs to flow into step-icon -->
+                        <div class="step-title" (click)="focusStep(step)" [ngClass]="{'bogus-title': (!isFirst && !activeVis)}">
                             <step-icon [step]="step"></step-icon>
-                            <span class="text">{{step.title}}</span>
+                            <div class="text">{{step.title}}<div class="bogus-bar" *ngIf="!isFirst && !activeVis"></div></div>
                         </div>
                         <div class="step-host">
                             <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
@@ -34,6 +36,7 @@
                     </div>
                 </mat-drawer>
                 <mat-drawer-content id="visualizationContainer">
+                    <!-- TODO 3rd level controls will put yet another mat-drawer-container here -->
                     <div #visualizationHost class="component-anchor"></div>
                     <div *ngIf="!activeVis" id="noActiveVis">
                         <npn-logo></npn-logo>

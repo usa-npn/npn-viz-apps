@@ -22,7 +22,7 @@
             }
             &:not(.selected) {
                 &:hover {
-                    background-color: mat-color($warn,100);
+                    background-color: mat-color($accent,100);
                 }
             }
         }

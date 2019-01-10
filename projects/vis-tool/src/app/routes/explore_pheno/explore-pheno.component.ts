@@ -11,7 +11,7 @@ import { VisConfigStep, VisDefinition } from "./interfaces";
 import { StepComponent, ControlComponent } from './interfaces';
 import { MonitorsDestroy } from "@npn/common";
 
-import { VisSelectionStep, VisSelectionSelection } from "./step_controls";
+import { VisSelectionStep, VisSelectionSelection, DummyStep } from "./step_controls";
 
 @Component({
     templateUrl: './explore-pheno.component.html'
@@ -56,7 +56,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             this.stepHosts.changes,
             this.controlHosts.changes
         ).subscribe(hosts => setTimeout(() => this.setupSteps(hosts)));
-        setTimeout(() => this.steps = [VisSelectionStep]);
+        setTimeout(() => this.steps = [VisSelectionStep,DummyStep,DummyStep,DummyStep,DummyStep]);
     }
 
     closeControls() {
@@ -105,7 +105,9 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             
             stepComponent.selection = (i === 0)
                 ? controlComponent.selection = this.visSelectionSelection // 0 always vis selection
-                : controlComponent.selection = this.activeVis.selection;
+                : controlComponent.selection = 
+                    // check only necessary because initial setup uses dummy selections with no activeVis in place.
+                    this.activeVis ? this.activeVis.selection : null; 
         });
         this.focusStep(this.steps[0]);
         if(this.visualizationHost && this.activeVis && this.activeVis.component) {

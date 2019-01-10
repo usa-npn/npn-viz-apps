@@ -13,8 +13,18 @@
 @include mat-core();
 @import '_material-palettes';
 
+// the contrast color of the 500 for the accent palette is very dark (dark on dark)
+// the mockups would like accent buttons to have white foreground text
+// this may need to change if/when the palette changes but just forcing it to white.
+// not updating it IN the palette since that's intended to be cut/paste
+$accent-contrast: map-get($md-accent,contrast);
+$accent-contrast: map-merge($accent-contrast,(500:#ffffff));
+$md-accent: map-merge($md-accent,(contrast:$accent-contrast));
+
 $primary-palette: mat-palette($md-primary);
 $accent-palette: mat-palette($md-accent);
+
+
 $warn-palette: mat-palette($md-warn);
 $app-dark-base-theme: mat-dark-theme($primary-palette, $accent-palette, $warn-palette);
 $app-light-base-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
@@ -24,6 +34,9 @@ $app-light-base-theme: mat-light-theme($primary-palette, $accent-palette, $warn-
 $accent2-palette: mat-palette($md-accent2);
 $app-dark-theme: map-merge($app-dark-base-theme,(accent2:$accent2-palette));
 $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
+
+
+
 
 // import component mixins here
 @import './app/app-component-theme';

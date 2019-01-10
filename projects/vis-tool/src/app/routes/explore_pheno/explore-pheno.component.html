@@ -20,8 +20,12 @@
     </mat-drawer>
     <mat-drawer-content>
         <mat-drawer-container autosize>
-                <mat-drawer mode="side" opened id="explorePhenoControls">
-                    <div class="drawer-title"><div class="title-caret"></div><div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div></div>
+                <mat-drawer mode="over" [opened]="controlsOpen" id="explorePhenoControls">
+                    <div class="drawer-title">
+                        <div class="title-caret"></div>
+                        <div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div>
+                        <div class="close-control" (click)="closeControls()"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
+                    </div>
                     <div class="drawer-contents">
                         <div *ngFor="let step of steps" [ngClass]="{'control-host':true,'active-step':(step === activeStep)}">
                             <div #controlHost class="component-anchor"></div>

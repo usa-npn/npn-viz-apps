@@ -159,6 +159,7 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     // would like to have a control pick "default state" while the visualization
     // is being built.
     editMode: boolean = false;
+    updateSent: boolean = false;
     [x: string]: any
 
     readonly INVALID_SELECTION = REJECT_INVALID_SELECTION;
@@ -182,16 +183,28 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     /**
      * Instruct the visualization to redraw itself using the data it already
      * has and the current state of the selection.
+     * Will do nothing if the selection is not valid.
+     * If an update has not been sent yet then redraw will cause an update.
      */
     redraw(): void {
-        this.emit(VisSelectionEvent.REDRAW);
+        if(this.isValid()) {
+            if(!this.updateSent) {
+                this.update();
+            } else {
+                this.emit(VisSelectionEvent.REDRAW);
+            }
+        }
     }
 
     /**
      * Instruct the visualization to go get new data and reset/redraw itself.
+     * Will do nothing if the selection is not valid.
      */
     update(): void {
-        this.emit(VisSelectionEvent.UPDATE);
+        if(this.isValid()) {
+            this.emit(VisSelectionEvent.UPDATE);
+            this.updateSent = true;
+        }
     }
 
     /**

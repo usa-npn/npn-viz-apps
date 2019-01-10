@@ -10,7 +10,7 @@ export class StartEndStepComponent implements StepComponent {
 }
 
 @Component({
-    template: `<year-range-input [(start)]="selection.start" [(end)]="selection.end"></year-range-input>`
+    template: `<year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="selection.update()" (onEndChange)="selection.update()"></year-range-input>`
 })
 export class StartEndControlComponent implements ControlComponent {
 }

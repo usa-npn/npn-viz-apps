@@ -3,9 +3,7 @@ import { zip } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import {
-    faMapMarker,
-    faChartLine,
-    faCalendarAlt
+    faArrowLeft
   } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition } from "./interfaces";
@@ -19,7 +17,8 @@ import { VisSelectionStep, VisSelectionSelection } from "./step_controls";
     templateUrl: './explore-pheno.component.html'
 })
 export class ExplorePhenoComponent extends MonitorsDestroy {
-    icons = {faMapMarker,faChartLine,faCalendarAlt};
+    controlsOpen = true;
+    faArrowLeft = faArrowLeft;
 
     @ViewChildren('stepHost',{read:ViewContainerRef}) stepHosts:QueryList<ViewContainerRef>;
     @ViewChildren('controlHost',{read:ViewContainerRef}) controlHosts:QueryList<ViewContainerRef>;
@@ -29,12 +28,14 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     activeVis:VisDefinition;
     activeStep:VisConfigStep;
     steps:VisConfigStep[];
+    activeVisComponent: any;
 
     constructor(private componentFactoryResolver:ComponentFactoryResolver) {
         super();
     }
 
     focusStep(step:VisConfigStep) {
+        this.controlsOpen = true;
         this.activeStep = step;
     }
 
@@ -58,6 +59,17 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         setTimeout(() => this.steps = [VisSelectionStep]);
     }
 
+    closeControls() {
+        this.controlsOpen = false;
+        setTimeout(() => this.resize()); // feels like a workaround
+    }
+
+    resize() {
+        if(this.activeVisComponent && typeof(this.activeVisComponent.resize) === 'function') {
+            this.activeVisComponent.resize();
+        }
+    }
+
     private setupSteps(hosts) {
         const [steps,controls] = hosts;
         const stepHosts:ViewContainerRef[] = steps.toArray();
@@ -67,6 +79,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         console.log('stepHosts',stepHosts)
         console.log('controlHosts',controlHosts)
 
+        delete this.activeVisComponent;
         if(this.visualizationHost) {
             this.visualizationHost.clear();
         }
@@ -101,9 +114,8 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const visRef = this.visualizationHost.createComponent(visFactory);
             const visComponent = (<any>visRef.instance);
             visComponent.selection = this.activeVis.selection;
-            if(typeof(visComponent.resize) === 'function') {
-                setTimeout(() => visComponent.resize());
-            }
+            this.activeVisComponent = visComponent;
+            setTimeout(() => this.resize());
         }
     }
 }

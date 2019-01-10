@@ -12,6 +12,8 @@
 
     #explorePhenoSteps,
     #explorePhenoControls {
+        display: flex;
+        flex-direction: column;
         .component-anchor {
             // when creating dynamic components they are always inserted
             // as siblings, not children of the "anchor" which is odd
@@ -31,18 +33,23 @@
                 padding-right: $drawer-padding;
             }
         }
+        .drawer-contents {
+            flex-grow: 1;
+        }
     }
 
     #explorePhenoSteps {
         $bg-color: mat-color($primary,50);
-        background-color: lighten($bg-color,15%); // even lighter than the lightest the palette offers
-
+        $lighter-bg-color: lighten($bg-color,15%); // even lighter than the lightest the palette offers
+        background-color: $lighter-bg-color; 
+        box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
         .drawer-title {
             background-color: $step-title-bg;
             color: mat-color($warn);
         }
-
-
+        .drawer-contents {
+            border-right: 1px solid darken($lighter-bg-color,4%);
+        }
 
         $step-icon-w: 32px;
 
@@ -97,6 +104,7 @@
     
     #explorePhenoControls {
         .drawer-title {
+            justify-content: space-between;
             background-color: mat-color($warn);
             color: #fff;//mat-contrast($warn,500);
             .title-caret {
@@ -104,6 +112,12 @@
                 border-top: $half-drawer-title-height solid transparent;
                 border-bottom: $half-drawer-title-height solid transparent;
                 border-left: $half-drawer-title-height solid $step-title-bg;
+            }
+            .close-control {
+                padding-right: 10px;
+                &:hover {
+                    cursor: pointer;
+                }
             }
         }
         .control-host:not(.active-step) {
@@ -115,5 +129,8 @@
         display: flex;
         align-items: center;
         background-color: mat-color($warn,100);
+
+        // TODO not sure about this...
+        padding: 15px;
     }
 }

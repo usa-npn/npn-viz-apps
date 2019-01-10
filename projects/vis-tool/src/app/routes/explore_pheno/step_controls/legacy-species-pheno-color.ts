@@ -45,8 +45,8 @@ export class LegacySpeciesPhenoColorStepComponent implements StepComponent {
             [(species)]="spi.species" [(phenophase)]="spi.phenophase" [(color)]="spi.color"
             [selection]="selection"
             [gatherColor]="true"
-            (onSpeciesChange)="updateChange()"
-            (onPhenophaseChange)="updateChange()"
+            (onSpeciesChange)="selection.update()"
+            (onPhenophaseChange)="selection.update()"
             (onColorChange)="redrawChange($event)"></species-phenophase-input>
         <div class="buttons">
             <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
@@ -75,24 +75,11 @@ export class LegacySpeciesPhenoColorControlComponent implements ControlComponent
         }
     }
 
-    updateChange() {
-        if(this.selection.isValid()) {
-            this.selection.update();
-            this.selection.$updateSent = true;
-        }
-    }
-
     redrawChange(change?) {
-        if(this.selection.isValid()) {
-            if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
-                this.updateChange();
-            } else {
-                if(this.selection.$updateSent) {
-                    this.selection.redraw();
-                } else {
-                    this.updateChange();
-                }
-            }
+        if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
+            this.selection.update();
+        } else {
+            this.selection.redraw(); // will update if necessary
         }
     }
 
@@ -102,7 +89,7 @@ export class LegacySpeciesPhenoColorControlComponent implements ControlComponent
 
     removePlot(index:number) {
         this.selection.plots.splice(index,1);
-        this.updateChange();
+        this.selection.update();
     }
 
     plotsValid() {

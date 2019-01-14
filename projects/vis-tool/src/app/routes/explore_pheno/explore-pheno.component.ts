@@ -3,7 +3,8 @@ import { zip } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import {
-    faArrowLeft
+    faArrowLeft,
+    faArrowRight
   } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition } from "./interfaces";
@@ -19,6 +20,7 @@ import { VisSelectionStep, VisSelectionSelection, DummyStep } from "./step_contr
 export class ExplorePhenoComponent extends MonitorsDestroy {
     controlsOpen = true;
     faArrowLeft = faArrowLeft;
+    faArrowRight = faArrowRight;
 
     @ViewChildren('stepHost',{read:ViewContainerRef}) stepHosts:QueryList<ViewContainerRef>;
     @ViewChildren('controlHost',{read:ViewContainerRef}) controlHosts:QueryList<ViewContainerRef>;

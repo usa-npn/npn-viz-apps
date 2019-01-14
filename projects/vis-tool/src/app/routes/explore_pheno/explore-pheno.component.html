@@ -34,8 +34,11 @@
                     </div>
                     <div class="drawer-contents">
                         <div class="selection-working" [ngStyle]="{display: activeVis && activeVis.selection && activeVis.selection.working ? 'inherit' : 'none'}"></div>
-                        <div *ngFor="let step of steps" [ngClass]="{'control-host':true,'active-step':(step === activeStep)}">
+                        <div *ngFor="let step of steps; last as isLast, index as stepIndex" [ngClass]="{'control-host':true,'active-step':(step === activeStep)}">
                             <div #controlHost class="component-anchor"></div>
+                            <button *ngIf="!isLast" mat-stroked-button color="accent" class="next-step"
+                                [disabled]="steps[stepIndex+1].$stepInstance?.state === 'unavailable'"
+                                (click)="focusStep(steps[stepIndex+1])">Next <fa-icon [icon]="faArrowRight"></fa-icon></button>
                         </div>
                     </div>
                 </mat-drawer>

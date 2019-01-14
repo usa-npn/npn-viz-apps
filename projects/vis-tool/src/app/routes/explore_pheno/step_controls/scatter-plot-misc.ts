@@ -28,17 +28,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     `]
 })
 export class ScatterPlotMiscStepComponent extends BaseStepComponent {
-    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics'];
     selection: ScatterPlotSelection;
-
-    stepVisit():void {
-        const firstVisit = !this.visited;
-        super.stepVisit();
-        // this feels a little less than ideal...
-        if(firstVisit) {
-            this.selection.redraw();
-        }
-    }
 
     get state():StepState {
         return this.selection.validPlots.length
@@ -72,8 +62,18 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class ScatterPlotMiscControlComponent extends BaseControlComponent {
+    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics'];
     selection: ScatterPlotSelection;
     axis = AXIS;
+
+    stepVisit():void {
+        const firstVisit = !this.visited;
+        super.stepVisit();
+        // this feels a little less than ideal...
+        if(firstVisit) {
+            this.selection.redraw();
+        }
+    }
 
     updateChange() {
         if(this.selection.isValid()) {

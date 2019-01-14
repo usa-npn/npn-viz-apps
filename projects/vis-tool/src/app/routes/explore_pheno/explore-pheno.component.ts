@@ -35,22 +35,19 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     focusStep(step:VisConfigStep) {
-        const execVisitFunc = funcName => {
-            const step = this.activeStep;
-            if(step) {
-                [step.$stepInstance,step.$controlInstance].forEach(instance => {
+        const execVisitFunc = (s,funcName) => {
+            if(s) {
+                [s.$stepInstance,s.$controlInstance].forEach(instance => {
                     if(typeof(instance[funcName]) === 'function') {
                         instance[funcName]();
                     }
                 });
             }
         }
-
         this.controlsOpen = true;    
-        execVisitFunc('stepDepart');
-        this.activeStep = step;
-        execVisitFunc('stepVisit');
-        
+        execVisitFunc(this.activeStep,'stepDepart');
+        execVisitFunc((this.activeStep = step),'stepVisit');
+        step.$controlInstance.visited = step.$stepInstance.visited = true;
     }
 
     ngOnInit() {

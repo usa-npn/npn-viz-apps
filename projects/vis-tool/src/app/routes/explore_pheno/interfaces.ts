@@ -18,6 +18,8 @@ export interface VisConfigComponent {
     step?: VisConfigStep;
     /** The selection object used as input for the visualization (likely an instance of VisSelection) */
     selection?: any;
+    /** Flag that will be set to true when a component is visited (after any invocation of `stepVisit` will not be reset to false). */
+    visited?: boolean;
     /** If available invoked when a step is visited */
     stepVisit?: () => void;
     /** If available invoked when a step is left for another */

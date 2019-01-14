@@ -8,8 +8,6 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     template: `{{selection?.start}}<span *ngIf="selection && selection.end"> - </span>{{selection?.end}}`
 })
 export class StartEndStepComponent extends BaseStepComponent {
-    protected defaultPropertyKeys:string[] = ['start','end'];
-
     get state():StepState {
         return this.selection.start && this.selection.end
             ? StepState.COMPLETE
@@ -32,6 +30,7 @@ export class StartEndStepComponent extends BaseStepComponent {
     encapsulation: ViewEncapsulation.None
 })
 export class StartEndControlComponent extends BaseControlComponent {
+    protected defaultPropertyKeys:string[] = ['start','end'];
 }
 
 export const StartEndStep:VisConfigStep = {

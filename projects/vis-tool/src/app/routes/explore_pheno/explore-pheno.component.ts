@@ -35,8 +35,22 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     focusStep(step:VisConfigStep) {
-        this.controlsOpen = true;
+        const execVisitFunc = funcName => {
+            const step = this.activeStep;
+            if(step) {
+                [step.$stepInstance,step.$controlInstance].forEach(instance => {
+                    if(typeof(instance[funcName]) === 'function') {
+                        instance[funcName]();
+                    }
+                });
+            }
+        }
+
+        this.controlsOpen = true;    
+        execVisitFunc('stepDepart');
         this.activeStep = step;
+        execVisitFunc('stepVisit');
+        
     }
 
     ngOnInit() {
@@ -79,6 +93,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         console.log('stepHosts',stepHosts)
         console.log('controlHosts',controlHosts)
 
+        delete this.activeStep;
         delete this.activeVisComponent;
         if(this.visualizationHost) {
             this.visualizationHost.clear();
@@ -97,11 +112,14 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const stepRef = stepHost.createComponent(stepFactory);
             const controlRef = controlHost.createComponent(controlFactory);
             // wire the two together
-            const stepComponent = (<StepComponent>stepRef.instance);
-            const controlComponent = (<ControlComponent>controlRef.instance);
+            const stepComponent = step.$stepInstance = (<StepComponent>stepRef.instance);
+            const controlComponent = step.$controlInstance = (<ControlComponent>controlRef.instance);
 
-            stepComponent.control = controlComponent;
-            controlComponent.step = stepComponent;
+            
+            stepComponent.definition = controlComponent.definition = this.activeVis;
+            stepComponent.step = controlComponent.step = step;
+            stepComponent.controlComponent = controlComponent;
+            controlComponent.stepComponent = stepComponent;
             
             stepComponent.selection = (i === 0)
                 ? controlComponent.selection = this.visSelectionSelection // 0 always vis selection

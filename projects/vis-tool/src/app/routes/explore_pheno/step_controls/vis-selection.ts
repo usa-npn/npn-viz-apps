@@ -13,7 +13,7 @@ import {
     faInfoCircle
 } from '@fortawesome/pro-light-svg-icons';
 
-import { StepComponent, ControlComponent, VisConfigStep, VisDefinition } from "../interfaces";
+import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
 import { VisualizationSelectionFactory, ScatterPlotComponent } from "@npn/common";
 import { LegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
@@ -30,6 +30,15 @@ export class VisSelectionSelection {
     template: `{{selection?.selected?.title}}`
 })
 export class VisSelectionStepComponent implements StepComponent {
+    state:StepState;
+
+    stepVisit() {
+        this.state = StepState.AVAILABLE;
+    }
+
+    stepDepart() {
+        this.state = StepState.COMPLETE; // if not on this step it means we've picked a visualization.
+    }
 }
 
 @Component({
@@ -61,9 +70,25 @@ export class VisSelectionControlComponent implements ControlComponent {
     constructor(private selectionFactory:VisualizationSelectionFactory) {}
 
     ngOnInit() {
+        console.warn('VisSelectionControlComponent.ngOnInit');
         [...MAPS,...CHARTS].forEach(visDef => {
             if(typeof(visDef.selection) === 'string') {
+                visDef.templateSelection = this.selectionFactory.newSelection({$class:visDef.selection});
                 visDef.selection = this.selectionFactory.newSelection({$class:visDef.selection});
+                const externalTemplate = visDef.templateSelection.external;
+                Object.keys(externalTemplate)
+                    .filter(k => ['guid','meta','$class'].indexOf(k) === -1)
+                    .forEach(key => {
+                        const val = visDef.selection[key];
+                        if(val !== null) {
+                            // leave empty arrays alone
+                            if(!Array.isArray(val) || val.length) {
+                                visDef.selection[key] = undefined;
+                            }
+                        }
+                    });
+                console.log('template',visDef.templateSelection);
+                console.log('selection',visDef.selection);
             }
         });
     }
@@ -82,10 +107,12 @@ const MAPS:VisDefinition[] = [{
     icon: faMapMarker,
     steps:[StartEndStep],
     selection: {},
+    templateSelection: {},
 },{
     title: 'Spring onset',
     icon: faThermometerHalf,
     selection: {},
+    templateSelection: {},
 }];
 
 const CHARTS:VisDefinition[] = [{
@@ -102,8 +129,10 @@ const CHARTS:VisDefinition[] = [{
     title: 'Activity curve',
     icon: faChartLine,
     selection: {},
+    templateSelection: {},
 },{
     title: 'Calendar',
     icon: faCalendarAlt,
     selection: {},
+    templateSelection: {},
 }];

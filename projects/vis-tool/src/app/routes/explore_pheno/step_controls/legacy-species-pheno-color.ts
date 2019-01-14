@@ -1,19 +1,16 @@
-import { StepComponent, ControlComponent, VisConfigStep } from "../interfaces";
+import { VisConfigStep, StepState } from "../interfaces";
 
 import { faCrow } from '@fortawesome/pro-light-svg-icons';
 import { Component, ViewEncapsulation } from "@angular/core";
 import { ScatterPlotSelection } from "@npn/common";
+import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div *ngIf="(!selection.plots || !selection.validPlots.length); else plots">None</div>
-    <ng-template #plots>
-    <div *ngFor="let plot of selection?.plots" class="plot">
+    <div *ngFor="let plot of selection.plots" class="plot">
         <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>
         <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
     </div>
-    </ng-template>
-
     `,
     styles:[`
     :host {
@@ -34,8 +31,16 @@ import { ScatterPlotSelection } from "@npn/common";
     }
     `]
 })
-export class LegacySpeciesPhenoColorStepComponent implements StepComponent {
+export class LegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
     selection: ScatterPlotSelection;
+
+    get state():StepState {
+        return this.selection.validPlots.length
+            ? StepState.COMPLETE
+            : this.selection.start && this.selection.end
+                ? StepState.AVAILABLE
+                : StepState.UNAVAILABLE;
+    }
 }
 
 @Component({
@@ -71,7 +76,7 @@ export class LegacySpeciesPhenoColorStepComponent implements StepComponent {
     `],
     encapsulation: ViewEncapsulation.None
 })
-export class LegacySpeciesPhenoColorControlComponent implements ControlComponent {
+export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponent {
     selection: ScatterPlotSelection;
 
     ngOnInit() {

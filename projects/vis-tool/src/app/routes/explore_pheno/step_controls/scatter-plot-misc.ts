@@ -1,14 +1,15 @@
-import { StepComponent, ControlComponent, VisConfigStep } from "../interfaces";
+import { VisConfigStep, StepState } from "../interfaces";
 
 import { faBars } from '@fortawesome/pro-light-svg-icons';
 import { Component } from "@angular/core";
 import { ScatterPlotSelection, AXIS } from "@npn/common";
+import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
-    <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
-    <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
+    <div *ngIf="visited"><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
+    <div *ngIf="visited"><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
+    <div *ngIf="visited"><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
     `,
     styles: [`
     :host {
@@ -26,7 +27,26 @@ import { ScatterPlotSelection, AXIS } from "@npn/common";
     }
     `]
 })
-export class ScatterPlotMiscStepComponent implements StepComponent {
+export class ScatterPlotMiscStepComponent extends BaseStepComponent {
+    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics'];
+    selection: ScatterPlotSelection;
+
+    stepVisit():void {
+        const firstVisit = !this.visited;
+        super.stepVisit();
+        // this feels a little less than ideal...
+        if(firstVisit) {
+            this.selection.redraw();
+        }
+    }
+
+    get state():StepState {
+        return this.selection.validPlots.length
+            ? this.visited
+                ? StepState.COMPLETE
+                : StepState.AVAILABLE
+            : StepState.UNAVAILABLE;
+    }
 }
 
 @Component({
@@ -51,7 +71,7 @@ export class ScatterPlotMiscStepComponent implements StepComponent {
     }
     `]
 })
-export class ScatterPlotMiscControlComponent implements ControlComponent {
+export class ScatterPlotMiscControlComponent extends BaseControlComponent {
     selection: ScatterPlotSelection;
     axis = AXIS;
 

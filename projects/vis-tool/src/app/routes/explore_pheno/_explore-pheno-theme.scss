@@ -102,6 +102,12 @@
             &:hover {
                 cursor: pointer;
             }
+            &.unavailable {
+                pointer-events: none;
+                &:hover {
+                    cursor: initial;
+                }
+            }
             step-icon {
                 width: $step-icon-w;
                 height: $step-icon-w;
@@ -111,13 +117,28 @@
                 
                 border-radius: 50%;
                 color: #fff;
-                // TODO states
-                background-color: mat-color($warn);
+
                 fa-icon {
                     position: absolute;
                     top: 50%;
                     right: 50%;
                     transform: translate(50%,-50%);
+                }
+                background-color: transparent;
+                transition-property: background-color;
+                transition-timing-function: ease-in-out;
+                transition-duration: 0.25s;
+                &.active {
+                    background-color: mat-color($warn,500);
+                }
+                &.complete {
+                    background-color: mat-color($accent,500);
+                }
+                &.available {
+                    background-color: mat-color($accent,300);
+                }
+                &.unavailable {
+                    background-color: mat-color($primary,300);
                 }
             }
             .text {

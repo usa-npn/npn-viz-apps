@@ -1,12 +1,27 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { IconDefinition } from '@fortawesome/pro-light-svg-icons';
 
+export enum StepState {
+    ACTIVE = 'active',
+    COMPLETE = 'complete',
+    AVAILABLE = 'available',
+    UNAVAILABLE = 'unavailable'
+};
+
 /**
  * Base interface for the other components.
  */
 export interface VisConfigComponent {
+    /** The corresponding visualization definition */
+    definition?: VisDefinition;
+    /** The specific step this component is associated with */
+    step?: VisConfigStep;
     /** The selection object used as input for the visualization (likely an instance of VisSelection) */
     selection?: any;
+    /** If available invoked when a step is visited */
+    stepVisit?: () => void;
+    /** If available invoked when a step is left for another */
+    stepDepart?: () => void;
     /** Any other properties the control may need to function */
     [prop:string]: any;
 }
@@ -17,7 +32,9 @@ export interface VisConfigComponent {
  */
 export interface StepComponent extends VisConfigComponent {
     /** The corresponding control component */
-    control?: ControlComponent;
+    controlComponent?: ControlComponent;
+    /** Idicates a step's current state (likely a getter). */
+    state:StepState;
 }
 /**
  * UI control/s that manipulate a portion of its
@@ -25,7 +42,7 @@ export interface StepComponent extends VisConfigComponent {
  */
 export interface ControlComponent extends VisConfigComponent {
     /** The corresponding step component */
-    step?: StepComponent;
+    stepComponent?: StepComponent;
 }
 
 /**
@@ -42,6 +59,10 @@ export interface VisConfigStep {
     stepComponent: ComponentType<StepComponent>;
     /** The component that gathers user inpur for the step. */
     controlComponent: ComponentType<ControlComponent>;
+    /** Used at runtime to hold onto a reference to the actual step component */
+    $stepInstance?: StepComponent;
+    /** Used at runtime to hold onto a reference to the actual control component */
+    $controlInstance?: ControlComponent;
 }
 
 /**
@@ -55,12 +76,23 @@ export interface VisDefinition {
     icon: IconDefinition;
     /** A short description of the visualization */
     description?: string;
-    /** The selection object specific to this visualization. */
+    /**
+     * A copy of the initial selection object with everything intact as it
+     * arrived from the `VisualizationSelectionFactory`.  The keys of this object's
+     * `external` representation will be used to delete any defaults to construct
+     * the `selection` property value below.  This can be used by steps to
+     * re-populate defaults when a step is first visited.
+     */
+    templateSelection?: any;
+    /**
+     * The selection object specific to this visualization.
+     * When defined initially the value should be the string containing the
+     * classname of the `VisSelection` to pass to the `VisualizationSelectionFactory`
+     * used to create and populate this field and the `templateSelection` field.
+     */
     selection: any;
     /**
      * The list of steps used to gather user input to tailor the visualization.
-     * If the value is a string then it is assumed to be the classname of a `VisSelection`
-     * instance and will be given to the `VisualizationSelectionFactory` to reconstitute.
      * @see step_controls/vis-selection.ts
     */
     steps?: VisConfigStep[];

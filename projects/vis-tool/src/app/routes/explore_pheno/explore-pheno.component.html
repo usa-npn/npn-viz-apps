@@ -1,5 +1,5 @@
 <mat-drawer-container class="mat-typography" id="explorePhenologicalFindings" autosize>
-    <mat-drawer mode="side" opened id="explorePhenoSteps">
+    <mat-drawer mode="side" opened disableClose="true" id="explorePhenoSteps">
         <div class="drawer-title"><div class="title-inner">Explore phenological findings</div></div>
         <div class="drawer-contents">
             <div class="step-wrapper">
@@ -7,9 +7,12 @@
                 <div class="step-gradient" *ngIf="!activeVis"></div>
                 <div class="steps">
                     <div *ngFor="let step of steps; last as isLast, first as isFirst" class="step" [ngClass]="{first:isFirst,last:isLast}">
-                        <!-- TODO step state needs to flow into step-icon -->
-                        <div class="step-title" (click)="focusStep(step)" [ngClass]="{'bogus-title': (!isFirst && !activeVis)}">
-                            <step-icon [step]="step"></step-icon>
+                        <!-- state held on title, not icon so can be used to prevent mouse events -->
+                        <div class="step-title" (click)="focusStep(step)" [ngClass]="{
+                            'bogus-title': (!isFirst && !activeVis),
+                            'unavailable': step.$stepInstance?.state === 'unavailable'
+                        }">
+                            <step-icon [step]="step" [active]="step === activeStep"></step-icon>
                             <div class="text">{{step.title}}<div class="bogus-bar" *ngIf="!isFirst && !activeVis"></div></div>
                         </div>
                         <div class="step-host">
@@ -23,7 +26,7 @@
     </mat-drawer>
     <mat-drawer-content>
         <mat-drawer-container autosize>
-                <mat-drawer mode="over" [opened]="controlsOpen" id="explorePhenoControls">
+                <mat-drawer mode="over" [opened]="controlsOpen" disableClose="true" id="explorePhenoControls">
                     <div class="drawer-title">
                         <div class="title-caret"></div>
                         <div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div>

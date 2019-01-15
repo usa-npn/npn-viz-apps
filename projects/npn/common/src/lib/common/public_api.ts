@@ -1,5 +1,5 @@
 export { NpnCommonModule, NPN_BASE_HREF } from './npn-common.module';
-export { Species } from './species';
+export * from './species';
 export { Phenophase } from './phenophase';
 
 export { CacheService } from './cache-service';

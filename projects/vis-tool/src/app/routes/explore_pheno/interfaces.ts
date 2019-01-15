@@ -5,7 +5,8 @@ export enum StepState {
     ACTIVE = 'active',
     COMPLETE = 'complete',
     AVAILABLE = 'available',
-    UNAVAILABLE = 'unavailable'
+    UNAVAILABLE = 'unavailable',
+    ALT = 'alt' // reserved for non-steps, like share
 };
 
 /**

@@ -1,6 +1,6 @@
 import { Component, ViewChildren, QueryList, ComponentFactoryResolver, ViewContainerRef, ViewChild } from "@angular/core";
-import { zip } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { zip, Subscription } from 'rxjs';
+import { takeUntil, map, filter } from 'rxjs/operators';
 
 import {
     faArrowLeft,
@@ -10,9 +10,11 @@ import {
 import { VisConfigStep, VisDefinition } from "./interfaces";
 
 import { StepComponent, ControlComponent } from './interfaces';
-import { MonitorsDestroy } from "@npn/common";
+import { MonitorsDestroy, VisSelection } from "@npn/common";
 
-import { VisSelectionStep, VisSelectionSelection, DummyStep } from "./step_controls";
+import { VisSelectionStep, VisSelectionSelection, DummyStep, VisSelectionControlComponent } from "./step_controls";
+import { SharingService } from './sharing.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     templateUrl: './explore-pheno.component.html'
@@ -30,13 +32,21 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     activeVis:VisDefinition;
     activeStep:VisConfigStep;
     steps:VisConfigStep[];
-    activeVisComponent: any;
+    activeVisComponent:any;
+    // value never used since unsubscription via takeUntil
+    // but exists to know when to generate the subscription
+    private sharingSubscription:Subscription;
 
-    constructor(private componentFactoryResolver:ComponentFactoryResolver) {
+    constructor(
+        private componentFactoryResolver:ComponentFactoryResolver,
+        private activedRoute:ActivatedRoute,
+        private sharingService:SharingService
+    ) {
         super();
     }
 
     focusStep(step:VisConfigStep) {
+        console.log('focusStep',step);
         const execVisitFunc = (s,funcName) => {
             if(s) {
                 [s.$stepInstance,s.$controlInstance].forEach(instance => {
@@ -87,10 +97,10 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         const [steps,controls] = hosts;
         const stepHosts:ViewContainerRef[] = steps.toArray();
         const controlHosts:ViewContainerRef[] = controls.toArray();
-        console.log('visualizationHost',this.visualizationHost);
-        console.log('activeVis',this.activeVis);
-        console.log('stepHosts',stepHosts)
-        console.log('controlHosts',controlHosts)
+        // console.log('visualizationHost',this.visualizationHost);
+        // console.log('activeVis',this.activeVis);
+        // console.log('stepHosts',stepHosts);
+        // console.log('controlHosts',controlHosts);
 
         delete this.activeStep;
         delete this.activeVisComponent;
@@ -136,5 +146,38 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             this.activeVisComponent = visComponent;
             setTimeout(() => this.resize());
         }
+        if(!this.sharingSubscription) {
+            // this should only happen once but cannot happen until after the steps have been setup
+            this.initializeSharingSubscription();
+        }
+    }
+
+    private initializeSharingSubscription() {
+        this.sharingSubscription = this.activedRoute.paramMap
+            .pipe(
+                map(pm => pm.get('s')),
+                filter(s => !!s),
+                takeUntil(this.componentDestroyed)
+            )
+            .subscribe(s => {
+                const visSelectionControl = this.steps[0].$controlInstance as VisSelectionControlComponent;
+                const selection:VisSelection = this.sharingService.deserialize(s);
+                console.log('shared selection',selection);
+                visSelectionControl.setVisSelection(selection)
+                    // the use of a pause value on this setTimeout does not feel ideal here but the problem is
+                    // the VisSelectionSelection is static, as are the list of visualization definitions
+                    // but ALL steps are re-initialized when a visualization is selected, including visualization selection,
+                    // so the visSelectionControl instance used to populate the selection disppears by virtue of
+                    // the above call and then the new one gets re-focused when the list of steps is re-written.
+                    // so the setting of controlsOpen has no effect until -after- all that happens and the "new"
+                    // step 0 is inserted into the DOM
+                    .then(selected => setTimeout(() => {
+                            this.controlsOpen = !selected
+                            if(selected) {
+                                setTimeout(() => this.resize());
+                            }
+                        },500)); // close control if the set was successful
+                
+            });
     }
 }

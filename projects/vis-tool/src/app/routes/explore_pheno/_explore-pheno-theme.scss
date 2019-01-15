@@ -99,7 +99,7 @@
         .step-title {
             display: flex;
             align-items: center;
-            &:hover {
+            &:not(.alt):hover {
                 cursor: pointer;
             }
             &.unavailable {
@@ -139,6 +139,9 @@
                 }
                 &.unavailable {
                     background-color: mat-color($primary,300);
+                }
+                &.alt {
+                    background-color: mat-color($accent2,500);
                 }
             }
             .text {

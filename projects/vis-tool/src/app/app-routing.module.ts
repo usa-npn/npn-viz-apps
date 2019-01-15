@@ -1,16 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { RoutePath } from './route-path';
 import {
     ExplorePhenoComponent,
     PhenoNearComponent
 } from './routes';
-
-export enum RoutePath {
-    PHENO_NEAR = 'phenology-near-me',
-    EXPLORE_PHENO = 'explore-phenological-findings'
-
-}
 
 const ROUTES:Routes = [{
     path: '',

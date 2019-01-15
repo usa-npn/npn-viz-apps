@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection } from "@npn/common";
 import { LegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 
@@ -57,6 +57,7 @@ export class VisSelectionStepComponent implements StepComponent {
     `
 })
 export class VisSelectionControlComponent implements ControlComponent {
+    selection:VisSelectionSelection;
     infoIcon = faInfoCircle;
 
     categories:any[] = [{
@@ -65,7 +66,10 @@ export class VisSelectionControlComponent implements ControlComponent {
     },{
         title: 'charts',
         defs: CHARTS
-    }]
+    }];
+
+    private readyResolver:Function;
+    private ready:Promise<void> = new Promise(resolve => this.readyResolver = resolve);
 
     constructor(private selectionFactory:VisualizationSelectionFactory) {}
 
@@ -91,6 +95,21 @@ export class VisSelectionControlComponent implements ControlComponent {
                 console.log('selection',visDef.selection);
             }
         });
+        this.readyResolver();
+    }
+
+    setVisSelection(selection:VisSelection):Promise<boolean> {
+        return this.ready
+            .then(() => {
+                const visDef = [...MAPS,...CHARTS].find(vd => vd.selection && selection.$class === vd.selection.$class);
+                console.log('setVisSelection:visDef',visDef);
+                if(visDef) {
+                    visDef.selection = selection;
+                    this.selection.selected = visDef;
+                    return true;
+                }
+                return false;
+            });
     }
 }
 
@@ -102,16 +121,20 @@ export const VisSelectionStep:VisConfigStep = {
     controlComponent: VisSelectionControlComponent
 };
 
+const DEV_SELECTION = {
+    isValid: () => false
+};
+
 const MAPS:VisDefinition[] = [{
     title: 'Map',
     icon: faMapMarker,
     steps:[StartEndStep],
-    selection: {},
+    selection: DEV_SELECTION,
     templateSelection: {},
 },{
     title: 'Spring onset',
     icon: faThermometerHalf,
-    selection: {},
+    selection: DEV_SELECTION,
     templateSelection: {},
 }];
 
@@ -128,11 +151,11 @@ const CHARTS:VisDefinition[] = [{
 },{
     title: 'Activity curve',
     icon: faChartLine,
-    selection: {},
+    selection: DEV_SELECTION,
     templateSelection: {},
 },{
     title: 'Calendar',
     icon: faCalendarAlt,
-    selection: {},
+    selection: DEV_SELECTION,
     templateSelection: {},
 }];

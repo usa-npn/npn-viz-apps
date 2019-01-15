@@ -9,7 +9,7 @@ import {
   faArrowLeft
 } from '@fortawesome/pro-light-svg-icons';
 
-import { RoutePath } from './app-routing.module';
+import { RoutePath } from './route-path';
 
 interface MenuItem {
   routerLink: RoutePath,

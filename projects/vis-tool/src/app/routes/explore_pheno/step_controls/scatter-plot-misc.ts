@@ -7,16 +7,18 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div *ngIf="visited"><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
-    <div *ngIf="visited"><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
-    <div *ngIf="visited"><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
+    <div class="misc"  *ngIf="state !== 'unavailable'">
+        <div><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
+        <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
+        <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
+    </div>
     `,
     styles: [`
-    :host {
+    .misc {
         display: flex;
         flex-direction: column;
     }
-    :host >div {
+    .misc >div {
         padding-bottom: 5px;
     }
     label {

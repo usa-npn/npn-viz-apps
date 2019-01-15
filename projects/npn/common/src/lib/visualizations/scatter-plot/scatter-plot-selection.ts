@@ -49,7 +49,6 @@ export interface ScatterPlotSelectionPlot {
     phenophase?: Phenophase;
     [x: string]: any;
 }
-const TODAY = new Date();
 
 // TODO goes to config service used to be in environment
 //import {environment} from '../../environments/environment';
@@ -69,7 +68,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     @selectionProperty()
     regressionLines: boolean = false;
     @selectionProperty()
-    axis:any = AXIS[0];
+    _axis:any = AXIS[0];
     @selectionProperty({
         ser: d => {
             return {
@@ -82,6 +81,22 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     plots:ScatterPlotSelectionPlot[] = [];
 
     private d3DateFormat = d3.timeFormat('%x');
+
+    set axis(a:any) {
+        if(a) {
+            // an axis may hold axisFmt and if this selection is 
+            // deserialized then it won't be in that array
+            this._axis = AXIS.indexOf(a) !== -1
+                ? a
+                : AXIS.find(ax => a.key === ax.key);
+        } else {
+            this._axis = a;
+        }
+    }
+
+    get axis():any {
+        return this._axis;
+    }
 
     isValid():boolean {
         return this.start &&

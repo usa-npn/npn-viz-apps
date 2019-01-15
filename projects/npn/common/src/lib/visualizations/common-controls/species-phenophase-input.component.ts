@@ -4,7 +4,7 @@ import {FormControl} from '@angular/forms';
 import {Observable,Subject} from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 
-import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
+import {Species,speciesComparator,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
 import {VisSelection} from '../vis-selection';
 
 const COLORS = [

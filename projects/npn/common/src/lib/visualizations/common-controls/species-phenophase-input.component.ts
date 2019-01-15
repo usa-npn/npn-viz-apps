@@ -94,8 +94,8 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
         return null;
     };
 
-    speciesControl:FormControl = new FormControl(null,this.requiredValidator);
-    colorControl:FormControl = new FormControl(null,this.requiredValidator);
+    speciesControl:FormControl;
+    colorControl:FormControl;
 
     filteredSpecies: Observable<Species[]>;
     speciesList:Species[];
@@ -110,6 +110,12 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     constructor(private speciesService: SpeciesService,
                 public speciesTitle: SpeciesTitlePipe) {
         super();
+        this.isIE = !!detectIE();
+    }
+
+    ngOnInit() {
+        this.speciesControl = new FormControl(this.species,this.requiredValidator)
+        this.colorControl = new FormControl(this.color,this.requiredValidator);
         this.filteredSpecies = this.speciesControl.valueChanges
             .pipe(
                 debounceTime(500),
@@ -120,10 +126,6 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
                         this.speciesList ? this.speciesList.slice() : []
                 })
             );
-        this.isIE = !!detectIE();
-    }
-
-    ngOnInit() {
         this.speciesParams
             .subscribe(params => {
                 this.speciesList = undefined;
@@ -240,13 +242,11 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
         return this.colorValue;
     }
     set color(c:string) {
-        if(c !== this.colorValue) {
-            let oldValue = this.colorValue;
-            this.colorChange.emit(this.colorValue = c);
-            this.onColorChange.emit({
-                oldValue: oldValue,
-                newValue: this.colorValue
-            });
-        }
+        let oldValue = this.colorValue;
+        this.colorChange.emit(this.colorValue = c);
+        this.onColorChange.emit({
+            oldValue: oldValue,
+            newValue: this.colorValue
+        });
     }
 }

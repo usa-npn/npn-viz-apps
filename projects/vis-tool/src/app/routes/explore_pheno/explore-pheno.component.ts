@@ -82,11 +82,6 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         setTimeout(() => this.steps = [VisSelectionStep,DummyStep,DummyStep,DummyStep,DummyStep]);
     }
 
-    closeControls() {
-        this.controlsOpen = false;
-        setTimeout(() => this.resize()); // feels like a workaround
-    }
-
     resize() {
         if(this.activeVisComponent && typeof(this.activeVisComponent.resize) === 'function') {
             this.activeVisComponent.resize();
@@ -171,12 +166,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                     // the above call and then the new one gets re-focused when the list of steps is re-written.
                     // so the setting of controlsOpen has no effect until -after- all that happens and the "new"
                     // step 0 is inserted into the DOM
-                    .then(selected => setTimeout(() => {
-                            this.controlsOpen = !selected
-                            if(selected) {
-                                setTimeout(() => this.resize());
-                            }
-                        },500)); // close control if the set was successful
+                    .then(selected => setTimeout(() => this.controlsOpen = !selected,500)); // close control if the set was successful
                 
             });
     }

@@ -44,10 +44,14 @@
             }
         }
 
+        #explorePhenoSteps,
+        #explorePhenoControls {
+            box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+
         #explorePhenoSteps {
             $bg-color: mat-color($primary,50);
             background-color: $bg-color; 
-            box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
             .drawer-title {
                 background-color: $step-title-bg;
                 color: mat-color($warn);

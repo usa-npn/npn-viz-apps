@@ -27,11 +27,11 @@
     </mat-drawer>
     <mat-drawer-content>
         <mat-drawer-container autosize>
-                <mat-drawer mode="over" [opened]="controlsOpen" disableClose="true" id="explorePhenoControls">
+                <mat-drawer mode="side" [opened]="controlsOpen" (openedChange)="resize()" disableClose="true" id="explorePhenoControls">
                     <div class="drawer-title">
                         <div class="title-caret"></div>
                         <div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div>
-                        <div class="close-control" (click)="closeControls()"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
+                        <div class="close-control" (click)="controlsOpen = false;"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
                     </div>
                     <div class="drawer-contents">
                         <div class="selection-working" [ngStyle]="{display: activeVis && activeVis.selection && activeVis.selection.working ? 'inherit' : 'none'}"></div>

@@ -12,6 +12,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule,DatePipe } from '@angular/common';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 import {VisualizationDownloadComponent} from './visualization-download.component';
 
 import {ScatterPlotSelectionFactory,ScatterPlotComponent,ScatterPlotControls} from './scatter-plot';
@@ -22,9 +24,6 @@ import {ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsCompo
 import {ObserverActivitySelectionFactory,ObserverActivityComponent,ObserverActivityControl} from './observer-activity';
 import {ObservationFrequencySelectionFactory,ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent} from './observation-frequency';
 
-import {VisualizationBaseComponent} from './visualization-base.component';
-import {SvgVisualizationBaseComponent} from './svg-visualization-base.component';
-import {MapVisualizationBaseComponent} from './map-visualization-base.component';
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
@@ -48,6 +47,7 @@ import {NpnGriddedModule} from '../gridded';
     BrowserModule,
     CommonModule,
     FormsModule,ReactiveFormsModule,
+    FontAwesomeModule,
     MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
     MatProgressSpinnerModule, MatExpansionModule,MatAutocompleteModule,
     MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,

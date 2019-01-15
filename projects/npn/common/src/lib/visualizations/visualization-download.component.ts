@@ -1,12 +1,14 @@
 import { Component, Input } from '@angular/core';
 
+import { faDownload } from '@fortawesome/pro-light-svg-icons';
+
 import * as d3 from 'd3';
 
 @Component({
     selector: 'visualization-download',
     template: `
     <div class="vis-download">
-        <a href (click)="download($event)" title="Download"><i class="fa fa-download"></i></a>
+        <a href (click)="download($event)" title="Download"><fa-icon [icon]="faDownload"></fa-icon></a>
         <canvas id="dlcanvas-{{svgWrapperId}}" style="display: none;"></canvas>
         <a id="dllink-{{svgWrapperId}}" style="display: none;">download</a>
     </div>
@@ -29,6 +31,7 @@ import * as d3 from 'd3';
     `]
 })
 export class VisualizationDownloadComponent {
+    faDownload = faDownload;
     @Input() svgWrapperId: string;
     @Input() filename: string;
 

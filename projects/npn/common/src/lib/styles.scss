@@ -17,3 +17,9 @@ npn-logo {
         fill: #3b94d0;
     }
 }
+
+svg.svg-visualization {
+    transition-property: width,height;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+}

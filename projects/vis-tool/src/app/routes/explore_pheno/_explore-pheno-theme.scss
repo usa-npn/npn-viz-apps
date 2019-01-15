@@ -51,6 +51,8 @@
 
         #explorePhenoSteps {
             $bg-color: mat-color($primary,50);
+            $fg-color: mat-contrast($primary,50);
+            color: $fg-color;
             background-color: $bg-color; 
             .drawer-title {
                 background-color: $step-title-bg;

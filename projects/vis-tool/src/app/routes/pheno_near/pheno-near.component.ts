@@ -122,6 +122,67 @@ const MAPLES_BLB_2017_2018 = {
     "filterDisclaimer": "For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization."
   };
 const MAPLES_COLORS_2017_2018 = {
+    "$class": "CalendarSelection",
+    "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
+    "meta": {},
+    "networkIds": [],
+    "stationIds": [],
+    "negative": true,
+    "negativeColor": "#aaa",
+    "years": [
+      2017,
+      2018
+    ],
+    "plots": [
+      {
+        "color": "#d62728",
+        "species": {
+          "common_name": "red maple",
+          "genus": "Acer",
+          "species": "rubrum",
+          "kingdom": "Plantae",
+          "species_id": 3,
+          "number_observations": 675361
+        },
+        "phenophase": {
+          "phenophase_id": 371,
+          "phenophase_name": "Breaking leaf buds",
+          "phenophase_category": "Leaves",
+          "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+          "phenophase_additional_definition": "",
+          "seq_num": 10,
+          "color": "Green1",
+          "abundance_category": -1,
+          "raw_abundance": false
+        }
+      },
+      {
+        "color": "#1f77b4",
+        "species": {
+          "common_name": "sugar maple",
+          "genus": "Acer",
+          "species": "saccharum",
+          "kingdom": "Plantae",
+          "species_id": 61,
+          "number_observations": 258618
+        },
+        "phenophase": {
+          "phenophase_id": 371,
+          "phenophase_name": "Breaking leaf buds",
+          "phenophase_category": "Leaves",
+          "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+          "phenophase_additional_definition": "",
+          "seq_num": 10,
+          "color": "Green1",
+          "abundance_category": -1,
+          "raw_abundance": false
+        }
+      }
+    ],
+    "labelOffset": 15,
+    "bandPadding": 0.55,
+    "fontSizeDelta": 2
+};/*{
     "$class": "ScatterPlotSelection",
     "guid": "8e31fd43-e770-424a-b1a2-3f168f5a9c75",
     "meta": {},
@@ -182,4 +243,4 @@ const MAPLES_COLORS_2017_2018 = {
       }
     ],
     "filterDisclaimer": "For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization."
-  };
+  };*/

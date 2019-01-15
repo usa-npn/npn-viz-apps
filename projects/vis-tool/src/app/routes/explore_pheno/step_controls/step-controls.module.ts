@@ -4,14 +4,17 @@ import { MaterialModule } from '../../../material';
 import {
     VisualizationsModule,
     NpnCommonModule,
-    ScatterPlotComponent } from '@npn/common';
+    ScatterPlotComponent,
+    CalendarComponent } from '@npn/common';
 
 import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
 import { DummyStepComponent, DummyControlComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
+import { YearsControlComponent, YearsStepComponent } from './years';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
-import { LegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent } from './legacy-species-pheno-color';
+import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
+import { StartEndLegacySpeciesPhenoColorStepComponent, YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent } from './legacy-species-pheno-color';
 
 // all of the components of this module have to be entryComponents
 // since they are all dynamically inserted into the application.
@@ -20,14 +23,17 @@ const COMPONENTS:any[] = [
     VisSelectionControlComponent, VisSelectionStepComponent,
     DummyStepComponent, DummyControlComponent,
     StartEndControlComponent, StartEndStepComponent,
+    YearsControlComponent, YearsStepComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
+    CalendarMiscStepComponent, CalendarMiscControlComponent,
 
-    LegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
+    StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
 ];
 const ENTRY_COMPONENTS:any[] = [
     ...COMPONENTS,
-    ScatterPlotComponent
+    ScatterPlotComponent,
+    CalendarComponent
 ];
 
 @NgModule({

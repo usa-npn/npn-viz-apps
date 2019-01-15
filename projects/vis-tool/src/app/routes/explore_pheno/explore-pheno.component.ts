@@ -60,7 +60,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         execVisitFunc(this.activeStep,'stepDepart');
         execVisitFunc((this.activeStep = step),'stepVisit');
         step.$controlInstance.visited = step.$stepInstance.visited = true;
-        setTimeout(() => this.resize(),250);
+        setTimeout(() => this.resize(),500);
     }
 
     ngOnInit() {

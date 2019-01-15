@@ -44,14 +44,14 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
 @Component({
     template: `
     <mat-form-field>
-        <mat-select placeholder="X Axis" name="xAxis" [(ngModel)]="selection.axis" (ngModelChange)="redrawChange()">
+        <mat-select placeholder="X Axis" name="xAxis" [(ngModel)]="selection.axis" (ngModelChange)="selection.redraw()">
             <mat-option *ngFor="let a of axis" [value]="a">{{a.label}}</mat-option>
         </mat-select>
     </mat-form-field>
 
-    <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="redrawChange()">Fit Lines</mat-checkbox>
+    <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="selection.redraw()">Fit Lines</mat-checkbox>
 
-    <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="updateChange()">Use Individual Phenometrics</mat-checkbox>
+    <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="selection.update()">Use Individual Phenometrics</mat-checkbox>
     `,
     styles:[`
     :host {
@@ -74,23 +74,6 @@ export class ScatterPlotMiscControlComponent extends BaseControlComponent {
         // this feels a little less than ideal...
         if(firstVisit) {
             this.selection.redraw();
-        }
-    }
-
-    updateChange() {
-        if(this.selection.isValid()) {
-            this.selection.update();
-            this.selection.$updateSent = true;
-        }
-    }
-
-    redrawChange() {
-        if(this.selection.isValid()) {
-            if(this.selection.$updateSent) {
-                this.selection.redraw();
-            } else {
-                this.updateChange();
-            }
         }
     }
 }

@@ -1,7 +1,6 @@
 import {ObservationDateVisSelection} from '../observation-date-vis-selection';
 
 import {selectionProperty} from '../vis-selection';
-import {FONT_SIZE} from '../visualization-base.component';
 
 export class CalendarSelection extends ObservationDateVisSelection {
     @selectionProperty()
@@ -15,6 +14,13 @@ export class CalendarSelection extends ObservationDateVisSelection {
     fontSizeDelta:number = 0;
     @selectionProperty()
     monthFormat?:string;
+
+    isValid():boolean {
+        return typeof(this.labelOffset) === 'number' &&
+               typeof(this.bandPadding) === 'number' &&
+               typeof(this.fontSizeDelta) === 'number' &&
+                super.isValid();
+    }
 }
 
 export {ObservationDataDataPoint,ObservationDateData} from '../observation-date-vis-selection';

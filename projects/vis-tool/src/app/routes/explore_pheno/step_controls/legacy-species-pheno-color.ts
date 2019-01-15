@@ -4,40 +4,61 @@ import { faCrow } from '@fortawesome/pro-light-svg-icons';
 import { Component, ViewEncapsulation } from "@angular/core";
 import { ScatterPlotSelection } from "@npn/common";
 import { BaseStepComponent, BaseControlComponent } from "./base";
+// TODO ? export from @npn/common
+import { ObservationDateVisSelection } from '@npn/common/visualizations/observation-date-vis-selection';
+
+const STEP_TEMPLATE = `
+<div *ngFor="let plot of selection.plots" class="plot">
+    <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>
+    <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
+</div>
+`;
+const STEP_STYLES = `
+:host {
+    display: flex;
+    flex-direction: column;
+}
+.plot {
+    display :flex;
+    flex-direction: row;
+    padding-bottom: 5px;
+}
+.swatch {
+    width: 20px;
+    height: 20px;
+}
+.title {
+    padding-left: 5px;
+}
+`;
 
 @Component({
-    template: `
-    <div *ngFor="let plot of selection.plots" class="plot">
-        <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>
-        <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
-    </div>
-    `,
-    styles:[`
-    :host {
-        display: flex;
-        flex-direction: column;
-    }
-    .plot {
-        display :flex;
-        flex-direction: row;
-        padding-bottom: 5px;
-    }
-    .swatch {
-        width: 20px;
-        height: 20px;
-    }
-    .title {
-        padding-left: 5px;
-    }
-    `]
+    template: STEP_TEMPLATE,
+    styles:[STEP_STYLES]
 })
-export class LegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+export class StartEndLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
     selection: ScatterPlotSelection;
 
     get state():StepState {
         return this.selection.validPlots.length
             ? StepState.COMPLETE
             : this.selection.start && this.selection.end
+                ? StepState.AVAILABLE
+                : StepState.UNAVAILABLE;
+    }
+}
+
+@Component({
+    template: STEP_TEMPLATE,
+    styles:[STEP_STYLES]
+})
+export class YearsLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+    selection: ObservationDateVisSelection;
+
+    get state():StepState {
+        return this.selection.validPlots.length
+            ? StepState.COMPLETE
+            : this.selection.years && this.selection.years.length
                 ? StepState.AVAILABLE
                 : StepState.UNAVAILABLE;
     }
@@ -77,7 +98,7 @@ export class LegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
     encapsulation: ViewEncapsulation.None
 })
 export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponent {
-    selection: ScatterPlotSelection;
+    selection: any; //(ScatterPlotSelection|ObservationDateVisSelection);
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
@@ -94,11 +115,13 @@ export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponen
     }
 
     addPlot() {
-        this.selection.plots.push({});
+        const plots:any[] = this.selection.plots;
+        plots.push({});
     }
 
     removePlot(index:number) {
-        this.selection.plots.splice(index,1);
+        const plots:any[] = this.selection.plots;
+        plots.splice(index,1);
         this.selection.update();
     }
 
@@ -107,10 +130,18 @@ export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponen
     }
 }
 
-export const LegacySpeciesPhenoColorStep:VisConfigStep = {
+export const StartEndLegacySpeciesPhenoColorStep:VisConfigStep = {
     title: 'Species/Phenophase',
     controlTitle: 'Select species phenophase',
     icon: faCrow,
-    stepComponent: LegacySpeciesPhenoColorStepComponent,
+    stepComponent: StartEndLegacySpeciesPhenoColorStepComponent,
+    controlComponent: LegacySpeciesPhenoColorControlComponent
+};
+
+export const YearsLegacySpeciesPhenoColorStep:VisConfigStep = {
+    title: 'Species/Phenophase',
+    controlTitle: 'Select species phenophase',
+    icon: faCrow,
+    stepComponent: YearsLegacySpeciesPhenoColorStepComponent,
     controlComponent: LegacySpeciesPhenoColorControlComponent
 };

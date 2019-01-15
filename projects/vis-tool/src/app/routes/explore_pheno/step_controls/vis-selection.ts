@@ -3,6 +3,7 @@ import { Component } from "@angular/core";
 import { Subject } from 'rxjs';
 
 import { StartEndStep } from './start-end';
+import { YearsStep } from './years';
 
 import {
     faChartLine,
@@ -14,9 +15,10 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection } from "@npn/common";
-import { LegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent } from "@npn/common";
+import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
+import { CalendarMiscStep } from './calendar-misc';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -144,7 +146,7 @@ const CHARTS:VisDefinition[] = [{
     selection: 'ScatterPlotSelection',
     steps:[
         StartEndStep,
-        LegacySpeciesPhenoColorStep,
+        StartEndLegacySpeciesPhenoColorStep,
         ScatterPlotMiscStep
     ],
     component: ScatterPlotComponent
@@ -156,6 +158,11 @@ const CHARTS:VisDefinition[] = [{
 },{
     title: 'Calendar',
     icon: faCalendarAlt,
-    selection: DEV_SELECTION,
-    templateSelection: {},
+    selection: 'CalendarSelection',
+    steps:[
+        YearsStep,
+        YearsLegacySpeciesPhenoColorStep,
+        CalendarMiscStep
+    ],
+    component: CalendarComponent
 }];

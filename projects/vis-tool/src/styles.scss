@@ -30,15 +30,10 @@ $app-dark-base-theme: mat-dark-theme($primary-palette, $accent-palette, $warn-pa
 $app-light-base-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
 
 // add another key to the maps with a 4th palette for accent purposes...
-// TODO - update with color/s of Jon's choosing..
 $accent2-palette: mat-palette($md-accent2);
 $app-dark-theme: map-merge($app-dark-base-theme,(accent2:$accent2-palette));
 $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 
-
-
-
-// import component mixins here
 @import './app/app-component-theme';
 
 @include angular-material-theme($app-dark-theme);
@@ -46,14 +41,11 @@ $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 @include app-component-theme($app-dark-theme);
 
 @import './app/routes/explore_pheno/explore-pheno-theme';
-@import './app/routes/explore_pheno/step_controls/vis-selection-theme';
+@import './app/routes/pheno_near/pheno-near-theme';
 
 body {
     margin: 0px;
     padding: 0px;
-    #explorePhenologicalFindings {
-        @include angular-material-theme($app-light-theme);
-        @include explore-pheno-theme($app-light-theme);
-        @include vis-selection-theme($app-light-theme);
-    }
+    @include explore-pheno-theme($app-light-theme);
+    @include pheno-near-theme($app-dark-theme);
 }

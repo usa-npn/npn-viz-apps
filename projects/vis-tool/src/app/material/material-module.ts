@@ -9,7 +9,8 @@ import {
     MatCheckbox,
     MatSelectModule,
     MatCheckboxModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatInputModule
  } from "@angular/material";
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -30,7 +31,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatTooltipModule,
         MatCheckboxModule,
         MatSelectModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatInputModule
     ],
     exports: [
         BrowserModule, FormsModule, ReactiveFormsModule,
@@ -42,7 +44,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatTooltipModule,
         MatCheckbox,
         MatSelectModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatInputModule
     ]
 })
 export class MaterialModule {

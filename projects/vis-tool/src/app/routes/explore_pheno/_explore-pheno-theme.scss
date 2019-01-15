@@ -1,235 +1,243 @@
 @import '~@angular/material/theming';
+@import './step_controls/vis-selection-theme';
 
 @mixin explore-pheno-theme($theme) {
-    $primary: map-get($theme,primary);
-    $accent: map-get($theme,accent);
-    $warn: map-get($theme,warn);
-    $accent2: map-get($theme,accent2);
+    #explorePhenologicalFindings {
+        @include angular-material-theme($theme);
 
-    $step-title-bg: mat-color($primary,800);
-    $drawer-title-height: 36px;
-    $drawer-padding: 15px;
+        $primary: map-get($theme,primary);
+        $accent: map-get($theme,accent);
+        $warn: map-get($theme,warn);
+        $accent2: map-get($theme,accent2);
+    
+        $step-title-bg: mat-color($primary,800);
+        $drawer-title-height: 36px;
+        $drawer-padding: 15px;
 
-    .component-anchor {
-        // when creating dynamic components they are always inserted
-        // as siblings, not children of the "anchor" which is odd
-        // so need to wrap the anchors and then just keep them hidden
-        // since they'll always just be empty DOM elements....
-        display: none;
-    }
-
-    #explorePhenoSteps,
-    #explorePhenoControls {
-        display: flex;
-        flex-direction: column;
-
-        .drawer-contents {
-            padding: $drawer-padding;
+        .component-anchor {
+            // when creating dynamic components they are always inserted
+            // as siblings, not children of the "anchor" which is odd
+            // so need to wrap the anchors and then just keep them hidden
+            // since they'll always just be empty DOM elements....
+            display: none;
         }
-        .drawer-title {
+
+        #explorePhenoSteps,
+        #explorePhenoControls {
             display: flex;
-            align-items: center;
-            height: $drawer-title-height;
-            .title-inner {
-                padding-left: $drawer-padding;
-                padding-right: $drawer-padding;
-            }
-        }
-        .drawer-contents {
-            flex-grow: 1;
-        }
-    }
+            flex-direction: column;
 
-    #explorePhenoSteps {
-        $bg-color: mat-color($primary,50);
-        background-color: $bg-color; 
-        box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
-        .drawer-title {
-            background-color: $step-title-bg;
-            color: mat-color($warn);
-        }
-        .drawer-contents {
-            border-right: 1px solid darken($bg-color,4%);
-        }
-
-        $step-icon-w: 32px;
-
-        $step-lines-width: 2px;
-        $step-lines-margin: ($step-icon-w/2)-($step-lines-width/2);
-        $first-step-height: 52px;
-        .step-wrapper {
-            position: relative;
-            .step-lines {
-                position: absolute;
-                z-index: -2;
-                border-left: $step-lines-width solid mat-color($accent2,500);
-                height: 100%;
-                margin-left: $step-lines-margin;
-                opacity: 0.45;
+            .drawer-contents {
+                padding: $drawer-padding;
             }
-            .step-gradient {
-                position: absolute;
-                z-index: 2;
-                top: $first-step-height;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(rgba(256,256,256,0.10),$bg-color 90%);
-            }
-        }
-        .step {
-            position: relative;
-            padding-bottom: 30px;
-            // for the final step this just covers the line connecting steps.
-            .step-line-cover {
-                background-color: $bg-color;
-                //border: 1px solid red;
-                width: $step-lines-width;
-                height: 100%;
-                position: absolute;
-                z-index: -1;
-                top: 1px;
-                left: $step-lines-margin;
-            }
-            &.first {
-                height: $first-step-height;
-            }
-        }
-
-        .step-title {
-            display: flex;
-            align-items: center;
-            &:not(.alt):hover {
-                cursor: pointer;
-            }
-            &.unavailable {
-                pointer-events: none;
-                &:hover {
-                    cursor: initial;
+            .drawer-title {
+                display: flex;
+                align-items: center;
+                height: $drawer-title-height;
+                .title-inner {
+                    padding-left: $drawer-padding;
+                    padding-right: $drawer-padding;
                 }
             }
-            step-icon {
-                width: $step-icon-w;
-                height: $step-icon-w;
-                font-size: 1.35em;
-                display: inline-block;
+            .drawer-contents {
+                flex-grow: 1;
+            }
+        }
+
+        #explorePhenoSteps {
+            $bg-color: mat-color($primary,50);
+            background-color: $bg-color; 
+            box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
+            .drawer-title {
+                background-color: $step-title-bg;
+                color: mat-color($warn);
+            }
+            .drawer-contents {
+                border-right: 1px solid darken($bg-color,4%);
+            }
+
+            $step-icon-w: 32px;
+
+            $step-lines-width: 2px;
+            $step-lines-margin: ($step-icon-w/2)-($step-lines-width/2);
+            $first-step-height: 52px;
+            .step-wrapper {
                 position: relative;
-                
-                border-radius: 50%;
-                color: #fff;
-
-                fa-icon {
+                .step-lines {
                     position: absolute;
-                    top: 50%;
-                    right: 50%;
-                    transform: translate(50%,-50%);
+                    z-index: -2;
+                    border-left: $step-lines-width solid mat-color($accent2,500);
+                    height: 100%;
+                    margin-left: $step-lines-margin;
+                    opacity: 0.45;
                 }
-                background-color: transparent;
-                transition-property: background-color;
-                transition-timing-function: ease-in-out;
-                transition-duration: 0.25s;
-                &.active {
-                    background-color: mat-color($warn,500);
+                .step-gradient {
+                    position: absolute;
+                    z-index: 2;
+                    top: $first-step-height;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(rgba(256,256,256,0.10),$bg-color 90%);
                 }
-                &.complete {
-                    background-color: mat-color($accent,500);
+            }
+            .step {
+                position: relative;
+                padding-bottom: 30px;
+                // for the final step this just covers the line connecting steps.
+                .step-line-cover {
+                    background-color: $bg-color;
+                    //border: 1px solid red;
+                    width: $step-lines-width;
+                    height: 100%;
+                    position: absolute;
+                    z-index: -1;
+                    top: 1px;
+                    left: $step-lines-margin;
                 }
-                &.available {
-                    background-color: mat-color($accent,300);
+                &.first {
+                    height: $first-step-height;
+                }
+            }
+
+            .step-title {
+                display: flex;
+                align-items: center;
+                &:not(.alt):hover {
+                    cursor: pointer;
                 }
                 &.unavailable {
-                    background-color: mat-color($primary,300);
+                    pointer-events: none;
+                    &:hover {
+                        cursor: initial;
+                    }
                 }
-                &.alt {
-                    background-color: mat-color($accent2,500);
+                step-icon {
+                    width: $step-icon-w;
+                    height: $step-icon-w;
+                    font-size: 1.35em;
+                    display: inline-block;
+                    position: relative;
+                    
+                    border-radius: 50%;
+                    color: #fff;
+
+                    fa-icon {
+                        position: absolute;
+                        top: 50%;
+                        right: 50%;
+                        transform: translate(50%,-50%);
+                    }
+                    background-color: transparent;
+                    transition-property: background-color;
+                    transition-timing-function: ease-in-out;
+                    transition-duration: 0.25s;
+                    &.active {
+                        background-color: mat-color($warn,500);
+                    }
+                    &.complete {
+                        background-color: mat-color($accent,500);
+                    }
+                    &.available {
+                        background-color: mat-color($accent,300);
+                    }
+                    &.unavailable {
+                        background-color: mat-color($primary,300);
+                    }
+                    &.alt {
+                        background-color: mat-color($accent2,500);
+                    }
                 }
-            }
-            .text {
-                text-transform: uppercase;
-                font-weight: 600;
-                padding: 0px $drawer-padding;
-            }
-            &.bogus-title {
                 .text {
-                    height: 18px;
-                    flex-grow: 1;
-                    .bogus-bar {
-                        width: 100%;
-                        height: 100%;
-                        background-color: mat-color($primary,100);
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    padding: 0px $drawer-padding;
+                }
+                &.bogus-title {
+                    .text {
+                        height: 18px;
+                        flex-grow: 1;
+                        .bogus-bar {
+                            width: 100%;
+                            height: 100%;
+                            background-color: mat-color($primary,100);
+                        }
                     }
                 }
             }
-        }
-        .step-host {
-            margin-left: $step-icon-w + $drawer-padding;
-        }
-
-    }
-    
-    #explorePhenoControls {
-        .drawer-title {
-            justify-content: space-between;
-            background-color: mat-color($warn);
-            color: #fff;//mat-contrast($warn,500);
-            .title-caret {
-                $half-drawer-title-height: ($drawer-title-height/2);
-                border-top: $half-drawer-title-height solid transparent;
-                border-bottom: $half-drawer-title-height solid transparent;
-                border-left: $half-drawer-title-height solid $step-title-bg;
+            .step-host {
+                margin-left: $step-icon-w + $drawer-padding;
             }
-            .close-control {
-                padding-right: 10px;
-                &:hover {
-                    cursor: pointer;
+
+        }
+        
+        #explorePhenoControls {
+            .drawer-title {
+                justify-content: space-between;
+                background-color: mat-color($warn);
+                color: #fff;//mat-contrast($warn,500);
+                .title-caret {
+                    $half-drawer-title-height: ($drawer-title-height/2);
+                    border-top: $half-drawer-title-height solid transparent;
+                    border-bottom: $half-drawer-title-height solid transparent;
+                    border-left: $half-drawer-title-height solid $step-title-bg;
+                }
+                .close-control {
+                    padding-right: 10px;
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+            .drawer-contents {
+                position: relative;
+                .selection-working {
+                    position: absolute;
+                    z-index: 1;
+                    top: 0;
+                    right: 0;
+                    left: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.35);
+                }
+            }
+            .control-host {
+                &:not(.active-step) {
+                    display: none;
+                }
+                button.next-step {
+                    margin-top: 30px;
+                    float: right;
                 }
             }
         }
-        .drawer-contents {
+
+        #visualizationContainer {
             position: relative;
-            .selection-working {
-                position: absolute;
-                z-index: 1;
-                top: 0;
-                right: 0;
-                left: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.35);
-            }
-        }
-        .control-host {
-            &:not(.active-step) {
-                display: none;
-            }
-            button.next-step {
-                margin-top: 30px;
-                float: right;
-            }
-        }
-    }
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background-color: mat-color($warn,100);
 
-    #visualizationContainer {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        background-color: mat-color($warn,100);
+            // TODO not sure about this...
+            padding: 15px;
 
-        // TODO not sure about this...
-        padding: 15px;
-
-        #noActiveVis {
-            npn-logo {
-                .swirl-top,
-                .swirl-left,
-                .swirl-right {
-                    fill: mat-color($warn,200);
+            #noActiveVis {
+                npn-logo {
+                    .swirl-top,
+                    .swirl-left,
+                    .swirl-right {
+                        fill: mat-color($warn,200);
+                    }
+                }
+                .headline {
+                    text-align: center;
+                    color: mat-color($warn,300);
                 }
             }
-            .headline {
-                text-align: center;
-                color: mat-color($warn,300);
-            }
         }
+
+
+        @include vis-selection-theme($theme);
     }
 }

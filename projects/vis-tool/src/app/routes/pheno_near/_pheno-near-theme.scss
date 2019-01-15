@@ -1,0 +1,75 @@
+@import '~@angular/material/theming';
+
+@mixin pheno-near-theme($theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+    $accent2: map-get($theme,accent2);
+
+    #phenoNearMe {
+        width: 100%;
+        height: 100%;
+        background: url('assets/leaves.jpg');
+        background-size: cover;
+
+        display: flex;
+        flex-direction: column;
+        .top {
+            padding-bottom: 20px;
+            flex-basis: 33%;
+            display: flex;
+            align-items: flex-end;
+            .zip-code {
+                flex-basis: 40%;
+                margin: 0px auto;
+                .mat-form-field-wrapper {
+                    $background: map-get($theme, background);
+                    $bg-color: mat-color($background, background);
+                    background-color: rgba($bg-color,0.75);
+                }
+                .mat-form-field-flex {
+                    height: 60px;
+                    font-size: 2.5em;
+                    text-align: center;
+                    .mat-form-field-infix {
+                        padding: .5em 0;
+                    }
+                }
+            }
+        }        
+        .bottom {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0px;
+            >.canned-vis-wrapper {
+                display:flex;
+                flex-basis: 45%;
+                padding: 10px;
+                list-style: none;
+                .canned-vis {
+                    padding: .75em;
+                    background-color: mat-contrast($primary,500);
+                    color: mat-color($primary,500);
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    .title {
+                        font-size: 1.65em;
+                        line-height: 1.2em;
+                        margin-bottom: 10px;
+                        font-weight: 400;
+                    }
+                    .tagline {
+                        flex: 1 0 auto;
+                    }
+                    &:hover {
+                        background-color: mat-color($primary,100);
+                        color: mat-contrast($primary,100);
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}

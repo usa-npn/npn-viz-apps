@@ -13,12 +13,15 @@ import {
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { NpnCommonModule } from '@npn/common';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     MaterialModule,
+
+    NpnCommonModule,
 
     PhenoNearModule,
     ExplorePhenoModule,

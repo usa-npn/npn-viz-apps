@@ -17,12 +17,41 @@
     
     mat-drawer.main-nav {
         background-color: mat-color($primary,800);
+        .titled-logo,
+        npn-logo {
+            position: absolute;
+            bottom: 0;
+            display: none;
+            margin: 15px 0;
+        }
+        .titled-logo {
+            position: absolute;
+            bottom: 0;
+            margin: 15px;
+        }
+        npn-logo {
+            width: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            // NOTE: the .titlted-logo above is an SVG image
+            // so it's paths cannot be styled like this. if the theme changes...
+            path {
+                fill: mat-color($primary,600);
+            }
+        }
+
         &.expanded {
             mat-list-item.active {
                 background-color: $main-nav-active-color;
             }
+            .titled-logo {
+                display: inherit;
+            }
         }
         &:not(.expanded) {
+            npn-logo {
+                display: inherit;
+            }
             mat-list-item.active {
                 color: $main-nav-active-color;
                 background-color: mat-color($primary,900);

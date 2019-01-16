@@ -9,6 +9,9 @@
     img.thumbnail-image {
             border: 1px solid #000;
     }
+    .visualization >svg {
+        display: block;
+    }
     .vis-disclaimer {
         margin-top: 5px;
         font-size: .75em;

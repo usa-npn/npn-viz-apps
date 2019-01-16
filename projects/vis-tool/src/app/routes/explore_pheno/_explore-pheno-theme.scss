@@ -44,10 +44,10 @@
             }
         }
 
-        #explorePhenoSteps,
+        /*#explorePhenoSteps,
         #explorePhenoControls {
             box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
-        }
+        }*/
 
         #explorePhenoSteps {
             $bg-color: mat-color($primary,50);
@@ -223,7 +223,7 @@
             display: flex;
             align-items: center;
             justify-content: space-around;
-            background-color: mat-color($warn,100);
+            background-color: mat-color($warn,50);
 
             // TODO not sure about this...
             padding: 15px;

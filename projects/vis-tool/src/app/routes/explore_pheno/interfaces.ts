@@ -1,5 +1,6 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { IconDefinition } from '@fortawesome/pro-light-svg-icons';
+import { Subject } from 'rxjs';
 
 export enum StepState {
     ACTIVE = 'active',
@@ -13,12 +14,17 @@ export enum StepState {
  * Base interface for the other components.
  */
 export interface VisConfigComponent {
+    /** Title to display for the component. */
+    title: string;
     /** The corresponding visualization definition */
     definition?: VisDefinition;
     /** The specific step this component is associated with */
     step?: VisConfigStep;
     /** The selection object used as input for the visualization (likely an instance of VisSelection) */
     selection?: any;
+}
+
+export interface VisConfigStepComponent extends VisConfigComponent {
     /** Flag that will be set to true when a component is visited (after any invocation of `stepVisit` will not be reset to false). */
     visited?: boolean;
     /** If available invoked when a step is visited */
@@ -33,7 +39,7 @@ export interface VisConfigComponent {
  * Simple component that displays, in a list, the portions of its
  * selection its corresponding control is responsible for.
  */
-export interface StepComponent extends VisConfigComponent {
+export interface StepComponent extends VisConfigStepComponent {
     /** The corresponding control component */
     controlComponent?: ControlComponent;
     /** Idicates a step's current state (likely a getter). */
@@ -43,29 +49,44 @@ export interface StepComponent extends VisConfigComponent {
  * UI control/s that manipulate a portion of its
  * selection.
  */
-export interface ControlComponent extends VisConfigComponent {
+export interface ControlComponent extends VisConfigStepComponent {
     /** The corresponding step component */
     stepComponent?: StepComponent;
+    /** THe corresponding sub-control if there is one. */
+    subControlComponent?: SubControlComponent;
+}
+
+/**
+ * An optional component that can be nested within the 3rd level nav.
+ * This control is bound to a parent `ControlComponent`
+ */
+export interface SubControlComponent extends VisConfigComponent {
+    /** The corresponding control component */
+    controlComponent?: ControlComponent;
+    /** Component must supply a stream of indications of when to show/hide. */
+    visibility:Subject<boolean>;
 }
 
 /**
  * Defines a single step in the gathering of user input for a visualization.
  */
 export interface VisConfigStep {
-    /** The title to be displayed over the step next to its icon. */
-    title: string;
     /** The icon to display in the step list. */
     icon: IconDefinition;
-    /** To be displayed at the top of the control area (default title) */
-    controlTitle?: string;
     /** The component that displays the selection from its corresponding control component. */
     stepComponent: ComponentType<StepComponent>;
     /** The component that gathers user inpur for the step. */
     controlComponent: ComponentType<ControlComponent>;
-    /** Used at runtime to hold onto a reference to the actual step component */
+    /** Optional sub-component to the control component. */
+    subControlComponent?: ComponentType<SubControlComponent>;
+    /** Runtime generated. */
+    $id?: string;
+    /** Used at runtime to hold onto a reference to the actual step component. */
     $stepInstance?: StepComponent;
-    /** Used at runtime to hold onto a reference to the actual control component */
+    /** Used at runtime to hold onto a reference to the actual control component. */
     $controlInstance?: ControlComponent;
+    /**  Used at runtime to hold onto a reference tot he actual sub-control component (if there is one). */
+    $subControlInstance?: SubControlComponent;
 }
 
 /**

@@ -1,5 +1,6 @@
 import { Component, ViewChildren, QueryList, ComponentFactoryResolver, ViewContainerRef, ViewChild } from "@angular/core";
-import { zip, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { zip, Subscription, merge as mergeObservables } from 'rxjs';
 import { takeUntil, map, filter } from 'rxjs/operators';
 
 import {
@@ -9,23 +10,29 @@ import {
 
 import { VisConfigStep, VisDefinition } from "./interfaces";
 
-import { StepComponent, ControlComponent } from './interfaces';
-import { MonitorsDestroy, VisSelection } from "@npn/common";
+import { StepComponent, ControlComponent, SubControlComponent } from './interfaces';
+import { MonitorsDestroy, VisSelection, newGuid } from "@npn/common";
 
 import { VisSelectionStep, VisSelectionSelection, DummyStep, VisSelectionControlComponent } from "./step_controls";
 import { SharingService } from './sharing.service';
 import { ActivatedRoute } from '@angular/router';
 
+const INIT_STEPS = (steps:VisConfigStep[]) => steps.forEach(s => s.$id = (s.$id||newGuid()));
+const STEP_ID = (vcr:ViewContainerRef) => (vcr.element.nativeElement.getAttribute('id')||'').replace(/^[^\-]+\-/,'');
+
 @Component({
     templateUrl: './explore-pheno.component.html'
 })
 export class ExplorePhenoComponent extends MonitorsDestroy {
-    controlsOpen = true;
+    controlsOpen:Subject<boolean> = new Subject();
+    subControlsOpen:Subject<boolean> = new Subject();
+    subControlsOpen$:Observable<boolean>;
     faArrowLeft = faArrowLeft;
     faArrowRight = faArrowRight;
 
     @ViewChildren('stepHost',{read:ViewContainerRef}) stepHosts:QueryList<ViewContainerRef>;
     @ViewChildren('controlHost',{read:ViewContainerRef}) controlHosts:QueryList<ViewContainerRef>;
+    @ViewChildren('subControlHost',{read:ViewContainerRef}) subControlHosts:QueryList<ViewContainerRef>;
     @ViewChild('visualizationHost',{read:ViewContainerRef}) visualizationHost:ViewContainerRef;
 
     visSelectionSelection:VisSelectionSelection = new VisSelectionSelection();
@@ -56,7 +63,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                 });
             }
         }
-        this.controlsOpen = true;    
+        this.controlsOpen.next(true);
         execVisitFunc(this.activeStep,'stepDepart');
         execVisitFunc((this.activeStep = step),'stepVisit');
         step.$controlInstance.visited = step.$stepInstance.visited = true;
@@ -64,6 +71,9 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     ngOnInit() {
+        // when main controls state triggered close sub-controls if open
+        this.controlsOpen.pipe(takeUntil(this.componentDestroyed))
+            .subscribe(() => this.subControlsOpen.next(false));
         this.visSelectionSelection.changes.pipe(takeUntil(this.componentDestroyed))
             .subscribe(visDef => {
                 this.activeVis = visDef;
@@ -72,15 +82,22 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                     const args:any[] = [1,0].concat(visDef.steps as any[]);
                     this.steps.splice.apply(this.steps,args);
                 }
+                INIT_STEPS(this.steps);
             });
+    }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
+        this.subControlsOpen.complete();
     }
 
     ngAfterViewInit() {
         zip(
             this.stepHosts.changes,
-            this.controlHosts.changes
+            this.controlHosts.changes,
+            this.subControlHosts.changes
         ).subscribe(hosts => setTimeout(() => this.setupSteps(hosts)));
-        setTimeout(() => this.steps = [VisSelectionStep,DummyStep,DummyStep,DummyStep,DummyStep]);
+        setTimeout(() => INIT_STEPS(this.steps = [VisSelectionStep,DummyStep,DummyStep,DummyStep,DummyStep]));
     }
 
     resize() {
@@ -90,19 +107,22 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     private setupSteps(hosts) {
-        const [steps,controls] = hosts;
+        const [steps,controls,subs] = hosts;
         const stepHosts:ViewContainerRef[] = steps.toArray();
         const controlHosts:ViewContainerRef[] = controls.toArray();
+        const subControlHosts:ViewContainerRef[] = subs.toArray();
         // console.log('visualizationHost',this.visualizationHost);
         // console.log('activeVis',this.activeVis);
         // console.log('stepHosts',stepHosts);
         // console.log('controlHosts',controlHosts);
+        // console.log('subControlHosts',subControlHosts);
 
         delete this.activeStep;
         delete this.activeVisComponent;
         if(this.visualizationHost) {
             this.visualizationHost.clear();
         }
+        const subControlsVisibilitySubjects:Subject<boolean>[] = [this.subControlsOpen];
         // parallel arrays not wonderful but want all controls to actually be in the DOM
         // at the same time (not created/recreated as users navigate steps)
         this.steps.forEach((step,i) => {
@@ -110,9 +130,14 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const stepHost = stepHosts[i];
             const controlFactory = this.componentFactoryResolver.resolveComponentFactory(step.controlComponent);
             const controlHost = controlHosts[i];
+            const subControlFactory = !!step.subControlComponent
+                ? this.componentFactoryResolver.resolveComponentFactory(step.subControlComponent)
+                : null;
+            const subControlHost = subControlHosts[i];
 
             stepHost.clear();
             controlHost.clear();
+            subControlHost.clear();
 
             const stepRef = stepHost.createComponent(stepFactory);
             const controlRef = controlHost.createComponent(controlFactory);
@@ -120,18 +145,29 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const stepComponent = step.$stepInstance = (<StepComponent>stepRef.instance);
             const controlComponent = step.$controlInstance = (<ControlComponent>controlRef.instance);
 
-            
-            stepComponent.definition = controlComponent.definition = this.activeVis;
-            stepComponent.step = controlComponent.step = step;
+            const subControlRef = subControlFactory
+                ? subControlHost.createComponent(subControlFactory)
+                : null;
+            const subControlComponent = step.$subControlInstance = subControlRef
+                ? (<SubControlComponent>subControlRef.instance)
+                : null;
+            if(subControlComponent) {
+                subControlsVisibilitySubjects.push(subControlComponent.visibility);
+            }
+
+            const subCompRef:any = subControlComponent||{};
+            stepComponent.definition = controlComponent.definition = subCompRef.definition = this.activeVis;
+            stepComponent.step = controlComponent.step = subCompRef.step = step;
             stepComponent.controlComponent = controlComponent;
             controlComponent.stepComponent = stepComponent;
+            controlComponent.subControlComponent = subControlComponent;
+            subCompRef.controlComponent = controlComponent;
             
-            stepComponent.selection = (i === 0)
-                ? controlComponent.selection = this.visSelectionSelection // 0 always vis selection
-                : controlComponent.selection = 
-                    // check only necessary because initial setup uses dummy selections with no activeVis in place.
-                    this.activeVis ? this.activeVis.selection : null; 
+            stepComponent.selection = subCompRef.selection = controlComponent.selection = (i === 0)
+                ? this.visSelectionSelection // 0 always vis selection
+                : this.activeVis ? this.activeVis.selection : null; // check only necessary because initial setup uses dummy selections with no activeVis in place.
         });
+        this.subControlsOpen$ = mergeObservables.apply(null,subControlsVisibilitySubjects);
         this.focusStep(this.steps[0]);
         if(this.visualizationHost && this.activeVis && this.activeVis.component) {
             // create and insert the visualization
@@ -167,7 +203,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                     // the above call and then the new one gets re-focused when the list of steps is re-written.
                     // so the setting of controlsOpen has no effect until -after- all that happens and the "new"
                     // step 0 is inserted into the DOM
-                    .then(selected => setTimeout(() => this.controlsOpen = !selected,500)); // close control if the set was successful
+                    .then(selected => setTimeout(() => this.controlsOpen.next(!selected),500)); // close control if the set was successful
                 
             });
     }

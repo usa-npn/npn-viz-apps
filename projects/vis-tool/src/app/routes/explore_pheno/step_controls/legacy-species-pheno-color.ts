@@ -7,6 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 // TODO ? export from @npn/common
 import { ObservationDateVisSelection } from '@npn/common/visualizations/observation-date-vis-selection';
 
+const CONTROL_TITLE = 'Select species phenophase';
 const STEP_TEMPLATE = `
 <div *ngFor="let plot of selection.plots" class="plot">
     <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>
@@ -37,6 +38,7 @@ const STEP_STYLES = `
     styles:[STEP_STYLES]
 })
 export class StartEndLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+    title:string = 'Species/Phenophase';
     selection: ScatterPlotSelection;
 
     get state():StepState {
@@ -53,6 +55,7 @@ export class StartEndLegacySpeciesPhenoColorStepComponent extends BaseStepCompon
     styles:[STEP_STYLES]
 })
 export class YearsLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+    title:string = CONTROL_TITLE;
     selection: ObservationDateVisSelection;
 
     get state():StepState {
@@ -98,6 +101,7 @@ export class YearsLegacySpeciesPhenoColorStepComponent extends BaseStepComponent
     encapsulation: ViewEncapsulation.None
 })
 export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponent {
+    title:string = CONTROL_TITLE;
     selection: any; //(ScatterPlotSelection|ObservationDateVisSelection);
 
     ngOnInit() {
@@ -131,16 +135,12 @@ export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponen
 }
 
 export const StartEndLegacySpeciesPhenoColorStep:VisConfigStep = {
-    title: 'Species/Phenophase',
-    controlTitle: 'Select species phenophase',
     icon: faCrow,
     stepComponent: StartEndLegacySpeciesPhenoColorStepComponent,
     controlComponent: LegacySpeciesPhenoColorControlComponent
 };
 
 export const YearsLegacySpeciesPhenoColorStep:VisConfigStep = {
-    title: 'Species/Phenophase',
-    controlTitle: 'Select species phenophase',
     icon: faCrow,
     stepComponent: YearsLegacySpeciesPhenoColorStepComponent,
     controlComponent: LegacySpeciesPhenoColorControlComponent

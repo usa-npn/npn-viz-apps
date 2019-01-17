@@ -23,7 +23,8 @@
         }
 
         #explorePhenoSteps,
-        #explorePhenoControls {
+        #explorePhenoControls,
+        #explorePhenoSubControls {
             display: flex;
             flex-direction: column;
 
@@ -49,17 +50,14 @@
             box-shadow: 2px 0px 4px 0px rgba(0, 0, 0, 0.1);
         }*/
 
+        $steps-bg-color: mat-color($primary,50);
+        $steps-fg-color: mat-contrast($primary,50);
         #explorePhenoSteps {
-            $bg-color: mat-color($primary,50);
-            $fg-color: mat-contrast($primary,50);
-            color: $fg-color;
-            background-color: $bg-color; 
+            color: $steps-fg-color;
+            background-color: $steps-bg-color; 
             .drawer-title {
                 background-color: $step-title-bg;
                 color: mat-color($warn);
-            }
-            .drawer-contents {
-                border-right: 1px solid darken($bg-color,4%);
             }
 
             $step-icon-w: 32px;
@@ -84,7 +82,7 @@
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: linear-gradient(rgba(256,256,256,0.10),$bg-color 90%);
+                    background: linear-gradient(rgba(256,256,256,0.10),$steps-bg-color 90%);
                 }
             }
             .step {
@@ -92,7 +90,7 @@
                 padding-bottom: 30px;
                 // for the final step this just covers the line connecting steps.
                 .step-line-cover {
-                    background-color: $bg-color;
+                    background-color: $steps-bg-color;
                     //border: 1px solid red;
                     width: $step-lines-width;
                     height: 100%;
@@ -177,16 +175,16 @@
 
         }
         
-        #explorePhenoControls {
+        $controls-title-bg: mat-color($warn);
+        $half-drawer-title-height: ($drawer-title-height/2);
+        #explorePhenoControls,
+        #explorePhenoSubControls {
             .drawer-title {
                 justify-content: space-between;
-                background-color: mat-color($warn);
                 color: #fff;//mat-contrast($warn,500);
                 .title-caret {
-                    $half-drawer-title-height: ($drawer-title-height/2);
                     border-top: $half-drawer-title-height solid transparent;
                     border-bottom: $half-drawer-title-height solid transparent;
-                    border-left: $half-drawer-title-height solid $step-title-bg;
                 }
                 .close-control {
                     padding-right: 10px;
@@ -214,6 +212,28 @@
                 button.next-step {
                     margin-top: 30px;
                     float: right;
+                }
+            }
+        }
+        #explorePhenoSteps,
+        #explorePhenoControls {
+            .drawer-contents {
+                border-right: 1px solid darken($steps-bg-color,4%);
+            }
+        }
+        #explorePhenoControls {
+            .drawer-title {
+                background-color: $controls-title-bg;
+                .title-caret {
+                    border-left: $half-drawer-title-height solid $step-title-bg;
+                }
+            }
+        }
+        #explorePhenoSubControls {
+            .drawer-title {
+                background-color: mat-color($accent2);
+                .title-caret {
+                    border-left: $half-drawer-title-height solid $controls-title-bg;
                 }
             }
         }

@@ -13,10 +13,10 @@
                             'unavailable': step.$stepInstance?.state === 'unavailable'
                         }">
                             <step-icon [step]="step" [active]="step === activeStep"></step-icon>
-                            <div class="text">{{step.title}}<div class="bogus-bar" *ngIf="!isFirst && !activeVis"></div></div>
+                            <div class="text">{{step?.$stepInstance?.title}}<div class="bogus-bar" *ngIf="!isFirst && !activeVis"></div></div>
                         </div>
                         <div class="step-host">
-                            <div #stepHost class="component-anchor"></div><!-- component inserted after ??-->
+                            <div #stepHost class="component-anchor" id="step-{{step.$id}}"></div><!-- component inserted after ??-->
                         </div>
                         <div class="step-line-cover" *ngIf="isLast"></div>
                     </div>
@@ -27,29 +27,45 @@
     </mat-drawer>
     <mat-drawer-content>
         <mat-drawer-container autosize>
-                <mat-drawer mode="side" [opened]="controlsOpen" (openedChange)="resize()" disableClose="true" id="explorePhenoControls">
+                <mat-drawer mode="side" [opened]="controlsOpen | async" (openedChange)="resize()" disableClose="true" id="explorePhenoControls">
                     <div class="drawer-title">
                         <div class="title-caret"></div>
-                        <div class="title-inner">{{activeStep?.controlTitle||activeStep?.title}}</div>
-                        <div class="close-control" (click)="controlsOpen = false;"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
+                        <div class="title-inner">{{activeStep?.$controlInstance?.title||activeStep?.title}}</div>
+                        <div class="close-control" (click)="controlsOpen.next(false)"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
                     </div>
                     <div class="drawer-contents">
                         <div class="selection-working" [ngStyle]="{display: activeVis && activeVis.selection && activeVis.selection.working ? 'inherit' : 'none'}"></div>
                         <div *ngFor="let step of steps; last as isLast, index as stepIndex" [ngClass]="{'control-host':true,'active-step':(step === activeStep)}">
-                            <div #controlHost class="component-anchor"></div>
+                            <div #controlHost class="component-anchor"  id="ctrl-{{step.$id}}"></div>
                             <button *ngIf="!isLast" mat-stroked-button color="accent" class="next-step"
                                 [disabled]="steps[stepIndex+1].$stepInstance?.state === 'unavailable'"
                                 (click)="focusStep(steps[stepIndex+1])">Next <fa-icon [icon]="faArrowRight"></fa-icon></button>
                         </div>
                     </div>
                 </mat-drawer>
-                <mat-drawer-content id="visualizationContainer">
-                    <!-- TODO 3rd level controls will put yet another mat-drawer-container here -->
-                    <div #visualizationHost class="component-anchor"></div>
-                    <div *ngIf="!activeVis" id="noActiveVis">
-                        <npn-logo></npn-logo>
-                        <div class="mat-h3 headline">PREPARING PHENO PHINDINGS</div>
-                    </div>
+                <mat-drawer-content>
+                    <mat-drawer-container autosize>
+                        <mat-drawer mode="over" [opened]="subControlsOpen$ | async" (openChange)="resize()" disableClose="true" id="explorePhenoSubControls">
+                            <div class="drawer-title">
+                                <div class="title-caret"></div>
+                                <div class="title-inner">{{activeStep?.$subControlInstance?.title||activeStep?.title}}</div>
+                                <div class="close-control" (click)="subControlsOpen.next(false)"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
+                            </div>
+                            <div class="drawer-contents">
+                                <div *ngFor="let step of steps; last as isLast, index as stepIndex" [ngClass]="{'control-host':true,'active-step':(!!step.subControlComponent && (step === activeStep))}">
+                                    <div #subControlHost class="component-anchor"  id="subctrl-{{step.$id}}"></div>
+                                </div>
+                            </div>
+                        </mat-drawer>
+                        <mat-drawer-content id="visualizationContainer">
+                            <div #visualizationHost class="component-anchor"></div>
+                            <div *ngIf="!activeVis" id="noActiveVis">
+                                <npn-logo></npn-logo>
+                                <div class="mat-h3 headline">PREPARING PHENO PHINDINGS</div>
+                            </div>
+                        </mat-drawer-content>
+                    </mat-drawer-container>
+    
 <!--pre>
 activeStep="{{activeStep?.title}}"
 </pre>

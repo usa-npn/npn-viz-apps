@@ -7,6 +7,7 @@ import { Component } from "@angular/core";
     template: ''
 })
 export class DummyStepComponent implements StepComponent {
+    title:string = '';
     state = StepState.UNAVAILABLE;
 }
 
@@ -14,11 +15,10 @@ export class DummyStepComponent implements StepComponent {
     template: ''
 })
 export class DummyControlComponent implements ControlComponent {
+    title:string = '';
 }
 
 export const DummyStep:VisConfigStep = {
-    title: '',
-    controlTitle: '',
     icon: emptyIcon,
     stepComponent: DummyStepComponent,
     controlComponent: DummyControlComponent

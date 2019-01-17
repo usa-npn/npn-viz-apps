@@ -21,7 +21,7 @@ import { MatSnackBar } from '@angular/material';
     <div class="step">
         <div class="step-title alt" [ngClass]="{unavailable: state === 'unavailable'}">
             <step-icon [step]="step"></step-icon>
-            <div class="text">{{step.title}}</div>
+            <div class="text">{{title}}</div>
         </div>
         <div class="step-host">
             <div *ngIf="selection?.isValid()">
@@ -31,10 +31,10 @@ import { MatSnackBar } from '@angular/material';
     </div>
     `
 })
-export class ShareControlComponent extends MonitorsDestroy implements StepComponent  {
+export class ShareControlComponent extends MonitorsDestroy implements StepComponent {
+    title:string = 'share visualization';
     @Input() selection:VisSelection;
     step:VisConfigStep = {
-        title: 'share visualization',
         icon: faShareAlt,
         stepComponent: ShareControlComponent,
         controlComponent: null

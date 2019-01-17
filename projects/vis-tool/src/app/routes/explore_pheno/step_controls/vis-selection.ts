@@ -19,6 +19,7 @@ import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, Cale
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
+import { LocationStep } from './location';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -32,6 +33,7 @@ export class VisSelectionSelection {
     template: `{{selection?.selected?.title}}`
 })
 export class VisSelectionStepComponent implements StepComponent {
+    title:string = 'Visualization type';
     state:StepState;
 
     stepVisit() {
@@ -59,6 +61,7 @@ export class VisSelectionStepComponent implements StepComponent {
     `
 })
 export class VisSelectionControlComponent implements ControlComponent {
+    title:string = 'Select visualization';
     selection:VisSelectionSelection;
     infoIcon = faInfoCircle;
 
@@ -116,8 +119,6 @@ export class VisSelectionControlComponent implements ControlComponent {
 }
 
 export const VisSelectionStep:VisConfigStep = {
-    title: 'Visualization type',
-    controlTitle: 'Select visualization',
     icon: faChartLine,
     stepComponent: VisSelectionStepComponent,
     controlComponent: VisSelectionControlComponent
@@ -130,7 +131,7 @@ const DEV_SELECTION = {
 const MAPS:VisDefinition[] = [{
     title: 'Map',
     icon: faMapMarker,
-    steps:[StartEndStep],
+    steps:[LocationStep],
     selection: DEV_SELECTION,
     templateSelection: {},
 },{

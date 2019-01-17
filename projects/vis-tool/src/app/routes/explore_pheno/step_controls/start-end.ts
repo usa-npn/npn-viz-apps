@@ -8,6 +8,8 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     template: `{{selection?.start}}<span *ngIf="selection && selection.end"> - </span>{{selection?.end}}`
 })
 export class StartEndStepComponent extends BaseStepComponent {
+    title:string = 'Date range';
+
     get state():StepState {
         return this.selection.start && this.selection.end
             ? StepState.COMPLETE
@@ -30,12 +32,11 @@ export class StartEndStepComponent extends BaseStepComponent {
     encapsulation: ViewEncapsulation.None
 })
 export class StartEndControlComponent extends BaseControlComponent {
+    title:string = 'Select date range';
     protected defaultPropertyKeys:string[] = ['start','end'];
 }
 
 export const StartEndStep:VisConfigStep = {
-    title: 'Date range',
-    controlTitle: 'Select date range',
     icon: faCalendarAlt,
     stepComponent: StartEndStepComponent,
     controlComponent: StartEndControlComponent

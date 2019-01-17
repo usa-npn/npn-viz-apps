@@ -11,6 +11,7 @@ import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-s
 import { DummyStepComponent, DummyControlComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 import { YearsControlComponent, YearsStepComponent } from './years';
+import { LocationStepComponent, LocationControlComponent, LocationControlSubComponent } from './location';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
@@ -24,6 +25,7 @@ const COMPONENTS:any[] = [
     DummyStepComponent, DummyControlComponent,
     StartEndControlComponent, StartEndStepComponent,
     YearsControlComponent, YearsStepComponent,
+    LocationStepComponent, LocationControlComponent, LocationControlSubComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,

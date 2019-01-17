@@ -8,6 +8,8 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     template: `{{(selection.years||[]).join(', ')}}`
 })
 export class YearsStepComponent extends BaseStepComponent {
+    title:string = 'Years';
+
     get state():StepState {
         return this.selection.years && this.selection.years.length
             ? StepState.COMPLETE
@@ -52,6 +54,7 @@ const VALID_YEARS = (function(){
     encapsulation: ViewEncapsulation.None
 })
 export class YearsControlComponent extends BaseControlComponent {
+    title:string = 'Select years to plot';
     maxYears = 5;
 
     stepVisit() {
@@ -86,8 +89,6 @@ export class YearsControlComponent extends BaseControlComponent {
 }
 
 export const YearsStep:VisConfigStep = {
-    title: 'Years',
-    controlTitle: 'Select years to plot',
     icon: faCalendarAlt,
     stepComponent: YearsStepComponent,
     controlComponent: YearsControlComponent

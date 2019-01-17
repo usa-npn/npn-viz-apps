@@ -7,7 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div class="misc"  *ngIf="state !== 'unavailable'">
+    <div class="misc"  *ngIf="visited">
         <div><label>Display negative data</label> {{selection.negative ? 'Yes' : 'No'}}</div>
     </div>
     `,
@@ -28,6 +28,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     `]
 })
 export class CalendarMiscStepComponent extends BaseStepComponent {
+    title:string = 'Behavior';
     selection: CalendarSelection;
 
     get state():StepState {
@@ -66,6 +67,7 @@ export class CalendarMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class CalendarMiscControlComponent extends BaseControlComponent {
+    title:string = 'Select visualization behavior'
     protected defaultPropertyKeys:string[] = ['negative','fontSizeDelta','labelOffset','bandPadding'];
     selection: CalendarSelection;
     axis = AXIS;
@@ -81,8 +83,6 @@ export class CalendarMiscControlComponent extends BaseControlComponent {
 }
 
 export const CalendarMiscStep:VisConfigStep = {
-    title: 'Behavior',
-    controlTitle: 'Select visualization behavior',
     icon: faBars,
     stepComponent: CalendarMiscStepComponent,
     controlComponent: CalendarMiscControlComponent

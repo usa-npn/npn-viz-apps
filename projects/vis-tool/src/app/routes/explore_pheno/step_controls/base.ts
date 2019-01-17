@@ -1,7 +1,9 @@
-import { StepComponent, ControlComponent, StepState, VisDefinition, VisConfigComponent } from '../interfaces';
-import { VisSelection } from '@npn/common';
+import { StepComponent, ControlComponent, SubControlComponent, StepState, VisDefinition, VisConfigStepComponent } from '../interfaces';
+import { VisSelection, MonitorsDestroy } from '@npn/common';
+import { Subject } from 'rxjs';
 
-abstract class ComponentBase implements VisConfigComponent {
+abstract class ComponentBase extends MonitorsDestroy implements VisConfigStepComponent {
+    title:string = 'not set';
     templateSelection:VisSelection;
     selection:VisSelection;
     definition:VisDefinition;
@@ -33,9 +35,26 @@ export class BaseControlComponent extends ComponentBase implements ControlCompon
                     this.selection[key] = this.definition.templateSelection[key];
                 }
             })
-            console.log('ControlComponent: after populating defaults');
-            console.log('ControlComponent: selection',this.selection);
-            console.log('ControlComponent: templateSelection',this.definition.templateSelection);
+            // console.log('ControlComponent: after populating defaults');
+            // console.log('ControlComponent: selection',this.selection);
+            // console.log('ControlComponent: templateSelection',this.definition.templateSelection);
         }
+    }
+}
+
+export class BaseSubControlComponent extends ComponentBase implements SubControlComponent {
+    visibility:Subject<boolean> = new Subject();
+
+    show() {
+        this.visibility.next(true);
+    }
+
+    hide() {
+        this.visibility.next(false);
+    }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
+        this.visibility.complete();
     }
 }

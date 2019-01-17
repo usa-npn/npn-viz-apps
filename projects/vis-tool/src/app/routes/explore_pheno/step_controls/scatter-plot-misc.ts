@@ -7,7 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div class="misc"  *ngIf="state !== 'unavailable'">
+    <div class="misc"  *ngIf="visited">
         <div><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
         <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
         <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
@@ -30,6 +30,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     `]
 })
 export class ScatterPlotMiscStepComponent extends BaseStepComponent {
+    title:string = 'Behavior';
     selection: ScatterPlotSelection;
 
     get state():StepState {
@@ -64,6 +65,7 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class ScatterPlotMiscControlComponent extends BaseControlComponent {
+    title:string = 'Select visualization behavior';
     protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics'];
     selection: ScatterPlotSelection;
     axis = AXIS;
@@ -79,8 +81,6 @@ export class ScatterPlotMiscControlComponent extends BaseControlComponent {
 }
 
 export const ScatterPlotMiscStep:VisConfigStep = {
-    title: 'Behavior',
-    controlTitle: 'Select visualization behavior',
     icon: faBars,
     stepComponent: ScatterPlotMiscStepComponent,
     controlComponent: ScatterPlotMiscControlComponent

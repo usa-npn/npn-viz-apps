@@ -7,3 +7,4 @@ export * from './activity-curves/public_api';
 export * from './clipped-wms-map/public_api';
 export * from './observer-activity/public_api';
 export * from './observation-frequency/public_api';
+export * from './map/public_api';

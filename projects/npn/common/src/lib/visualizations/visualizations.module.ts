@@ -24,6 +24,8 @@ import {ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsCompo
 import {ObserverActivitySelectionFactory,ObserverActivityComponent,ObserverActivityControl} from './observer-activity';
 import {ObservationFrequencySelectionFactory,ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent} from './observation-frequency';
 
+import {MapSelectionFactory, MapVisualizationComponent} from './map';
+
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
@@ -63,10 +65,11 @@ import {NpnGriddedModule} from '../gridded';
       ObserverActivityComponent,ObserverActivityControl,
       ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent /* not exported private */,
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,ClippedStatValuePipe /* not exported */,
+      MapVisualizationComponent,
       VisualizationDownloadComponent,
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
-      YearRangeInputComponent
+      YearRangeInputComponent,
   ],
   exports: [
       ScatterPlotComponent,
@@ -76,6 +79,7 @@ import {NpnGriddedModule} from '../gridded';
       ObservationFrequencyComponent,ObservationFrequencyControl,
       CalendarComponent,CalendarControlComponent,
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,
+      MapVisualizationComponent,
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
       YearRangeInputComponent
@@ -89,6 +93,7 @@ import {NpnGriddedModule} from '../gridded';
       ActivityCurvesSelectionFactory,
       ObserverActivitySelectionFactory,
       ObservationFrequencySelectionFactory,
+      MapSelectionFactory,
       // OR one factory to rule them all
       VisualizationSelectionFactory
   ]

@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                         </mat-drawer>
-                        <mat-drawer-content id="visualizationContainer">
+                        <mat-drawer-content id="visualizationContainer" [ngClass]="{'full-screen': activeVis?.fullScreen}">
                             <div #visualizationHost class="component-anchor"></div>
                             <div *ngIf="!activeVis" id="noActiveVis">
                                 <npn-logo></npn-logo>

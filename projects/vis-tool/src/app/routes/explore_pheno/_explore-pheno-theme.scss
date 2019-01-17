@@ -1,5 +1,6 @@
 @import '~@angular/material/theming';
 @import './step_controls/vis-selection-theme';
+@import './step_controls/vis-theme';
 
 @mixin explore-pheno-theme($theme) {
     #explorePhenologicalFindings {
@@ -245,8 +246,10 @@
             justify-content: space-around;
             background-color: mat-color($warn,50);
 
-            // TODO not sure about this...
-            padding: 15px;
+            &:not(.full-screen) {
+                padding: 15px;
+            }
+            
 
             #noActiveVis {
                 npn-logo {
@@ -263,7 +266,7 @@
             }
         }
 
-
         @include vis-selection-theme($theme);
+        @include vis-theme($theme);
     }
 }

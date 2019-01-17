@@ -5,7 +5,8 @@ import {
     VisualizationsModule,
     NpnCommonModule,
     ScatterPlotComponent,
-    CalendarComponent } from '@npn/common';
+    CalendarComponent,
+    MapVisualizationComponent } from '@npn/common';
 
 import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
 import { DummyStepComponent, DummyControlComponent } from './dummy';
@@ -35,7 +36,8 @@ const COMPONENTS:any[] = [
 const ENTRY_COMPONENTS:any[] = [
     ...COMPONENTS,
     ScatterPlotComponent,
-    CalendarComponent
+    CalendarComponent,
+    MapVisualizationComponent
 ];
 
 @NgModule({

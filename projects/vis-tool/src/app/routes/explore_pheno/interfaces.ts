@@ -100,6 +100,8 @@ export interface VisDefinition {
     icon: IconDefinition;
     /** A short description of the visualization */
     description?: string;
+    /** Set to true if visualization should use all screen realestate. */
+    fullScreen?:boolean;
     /**
      * A copy of the initial selection object with everything intact as it
      * arrived from the `VisualizationSelectionFactory`.  The keys of this object's

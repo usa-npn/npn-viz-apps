@@ -14,6 +14,8 @@ import {
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { NpnCommonModule } from '@npn/common';
+import { AgmCoreModule } from '@agm/core';
+import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
@@ -25,7 +27,11 @@ import { NpnCommonModule } from '@npn/common';
 
     PhenoNearModule,
     ExplorePhenoModule,
-    AppRoutingModule
+    AppRoutingModule,
+
+    AgmCoreModule.forRoot({
+      apiKey: environment.googleMapsApiKey
+    })
   ],
   declarations: [
     AppComponent

@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent } from "@npn/common";
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
@@ -131,9 +131,10 @@ const DEV_SELECTION = {
 const MAPS:VisDefinition[] = [{
     title: 'Map',
     icon: faMapMarker,
+    fullScreen: true,
+    selection: 'MapSelection',
     steps:[LocationStep],
-    selection: DEV_SELECTION,
-    templateSelection: {},
+    component: MapVisualizationComponent
 },{
     title: 'Spring onset',
     icon: faThermometerHalf,

@@ -7,6 +7,7 @@ import {ActivityCurvesSelection,ActivityCurvesSelectionFactory} from './activity
 import {ObserverActivitySelection,ObserverActivitySelectionFactory} from './observer-activity';
 import {ObservationFrequencySelection,ObservationFrequencySelectionFactory} from './observation-frequency';
 import {ClippedWmsMapSelection,ClippedWmsMapSelectionFactory} from './clipped-wms-map';
+import { MapSelectionFactory, MapSelection } from './map';
 
 @Injectable()
 export class VisualizationSelectionFactory {
@@ -17,13 +18,17 @@ export class VisualizationSelectionFactory {
                 private activity: ActivityCurvesSelectionFactory,
                 private observer: ObserverActivitySelectionFactory,
                 private observationFreq: ObservationFrequencySelectionFactory,
-                private clippedWmsMap: ClippedWmsMapSelectionFactory) {
+                private clippedWmsMap: ClippedWmsMapSelectionFactory,
+                private map: MapSelectionFactory
+
+    ) {
         this.factoryMap.CalendarSelection = calendar;
         this.factoryMap.ScatterPlotSelection = scatter;
         this.factoryMap.ActivityCurvesSelection = activity;
         this.factoryMap.ObserverActivitySelection = observer;
         this.factoryMap.ObservationFrequencySelection = observationFreq;
         this.factoryMap.ClippedWmsMapSelection = clippedWmsMap;
+        this.factoryMap.MapSelection = map;
     }
 
     newCalendarSelection():CalendarSelection {
@@ -48,6 +53,10 @@ export class VisualizationSelectionFactory {
 
     newClippedWmsMapSelection(): ClippedWmsMapSelection {
         return this.clippedWmsMap.newSelection();
+    }
+
+    newMapSelection(): MapSelection {
+        return this.map.newSelection();
     }
 
     cloneSelection(selection:VisSelection): VisSelection {

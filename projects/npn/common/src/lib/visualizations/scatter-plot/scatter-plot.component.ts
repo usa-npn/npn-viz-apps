@@ -1,16 +1,16 @@
-import {Component, Input, ElementRef} from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 
 import { ObservableMedia } from "@angular/flex-layout";
 
-import {Window,SpeciesTitlePipe} from '../../common';
-import {VisualizationMargins} from '../visualization-base.component';
-import {SvgVisualizationBaseComponent,DEFAULT_MARGINS,FONT_SIZE,FONT_SIZE_PX} from '../svg-visualization-base.component';
+import { SpeciesTitlePipe } from '../../common';
+import { VisualizationMargins } from '../visualization-base.component';
+import { SvgVisualizationBaseComponent, DEFAULT_MARGINS } from '../svg-visualization-base.component';
 
-import {ScatterPlotSelection} from './scatter-plot-selection';
+import { ScatterPlotSelection } from './scatter-plot-selection';
 
-import {Axis,axisBottom,axisLeft} from 'd3-axis';
-import {Selection} from 'd3-selection';
-import {ScaleLinear,scaleLinear} from 'd3-scale';
+import { Axis, axisBottom, axisLeft } from 'd3-axis';
+import { Selection } from 'd3-selection';
+import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
 
 @Component({

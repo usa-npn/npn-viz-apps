@@ -1,15 +1,14 @@
-import {Component, Input,ElementRef} from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 import { ObservableMedia } from "@angular/flex-layout";
 
-import {Window} from '../../common';
-import {VisualizationMargins} from '../visualization-base.component';
-import {SvgVisualizationBaseComponent,DEFAULT_MARGINS,FONT_SIZE,FONT_SIZE_PX} from '../svg-visualization-base.component';
+import { VisualizationMargins } from '../visualization-base.component';
+import { SvgVisualizationBaseComponent, DEFAULT_MARGINS } from '../svg-visualization-base.component';
 
-import {ObserverActivitySelection} from './observer-activity-selection';
+import { ObserverActivitySelection } from './observer-activity-selection';
 
-import {Axis,axisBottom,axisLeft} from 'd3-axis';
-import {Selection} from 'd3-selection';
-import {ScaleBand,scaleBand,ScaleLinear,scaleLinear,ScaleOrdinal,scaleOrdinal} from 'd3-scale';
+import { Axis, axisBottom, axisLeft } from 'd3-axis';
+import { Selection } from 'd3-selection';
+import { ScaleBand, scaleBand, ScaleLinear, scaleLinear, ScaleOrdinal, scaleOrdinal } from 'd3-scale';
 import * as d3 from 'd3';
 
 const TITLE = 'New/Active Observers';

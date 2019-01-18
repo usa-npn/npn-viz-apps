@@ -1,17 +1,16 @@
-import {Component, Input, ElementRef} from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 
 import { ObservableMedia } from "@angular/flex-layout";
 
-import {Window,LegendDoyPipe} from '../../common';
-import {VisualizationMargins} from '../visualization-base.component';
-import {ONE_DAY_MILLIS} from '../vis-selection';
-import {SvgVisualizationBaseComponent,DEFAULT_MARGINS,FONT_SIZE,FONT_SIZE_PX} from '../svg-visualization-base.component';
+import { LegendDoyPipe } from '../../common';
+import { VisualizationMargins } from '../visualization-base.component';
+import { ONE_DAY_MILLIS } from '../vis-selection';
+import { SvgVisualizationBaseComponent } from '../svg-visualization-base.component';
 
-import {ActivityCurvesSelection} from './activity-curves-selection';
+import { ActivityCurvesSelection } from './activity-curves-selection';
 
-import {Axis,axisBottom,axisLeft} from 'd3-axis';
-import {Selection} from 'd3-selection';
-import {ScaleLinear,scaleLinear} from 'd3-scale';
+import { Axis, axisBottom } from 'd3-axis';
+import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
 
 const ROOT_DATE = new Date(2010,0);

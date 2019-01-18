@@ -1,6 +1,6 @@
 import { Component, Input, ElementRef, SimpleChanges } from '@angular/core';
 
-import { Window, MonitorsDestroy } from '../common/index';
+import { MonitorsDestroy } from '../common/index';
 import { WmsMapLegend } from './wms-map-legend';
 
 import { fromEvent } from 'rxjs';
@@ -31,7 +31,7 @@ export class WmsMapLegendComponent extends MonitorsDestroy {
 
     private svg: Selection<any,any,any,any>;
 
-    constructor(protected window: Window, protected rootElement: ElementRef) {
+    constructor(protected rootElement: ElementRef) {
         super();
     }
 

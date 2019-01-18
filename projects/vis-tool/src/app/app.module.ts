@@ -14,9 +14,13 @@ import {
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { NpnCommonModule } from '@npn/common';
+import { NpnCommonModule, NpnConfiguration, NPN_CONFIGURATION } from '@npn/common';
 import { AgmCoreModule } from '@agm/core';
 import { environment } from '../environments/environment';
+
+export function npnConfigurationFactory():NpnConfiguration {
+  return environment.npnConfiguration;
+}
 
 @NgModule({
   imports: [
@@ -39,7 +43,8 @@ import { environment } from '../environments/environment';
     AppComponent
   ],
   providers: [
-    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 }}
+    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 }},
+    {provide: NPN_CONFIGURATION, useFactory: npnConfigurationFactory }
   ],
   bootstrap: [AppComponent]
 })

@@ -1,3 +1,12 @@
+import { NpnConfiguration } from '@npn/common';
+
+const npnConfiguration:NpnConfiguration = {
+  cacheTTL: 60,
+  apiRoot: '//www-dev.usanpn.org',
+  dataApiRoot: 'https://data-dev.usanpn.org:3006',
+  dataApiUseStatisticsCache: false,
+  geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+};
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -5,6 +14,7 @@
 export const environment = {
   production: false,
   googleMapsApiKey: 'AIzaSyAsTM8XaktfkwpjEeDMXkNrojaiB2W5WyE',
+  npnConfiguration
 };
 
 /*

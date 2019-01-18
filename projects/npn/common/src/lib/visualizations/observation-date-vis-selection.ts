@@ -1,7 +1,7 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
-import { CacheService, Species, Phenophase, SpeciesTitlePipe, NpnConfiguration } from '../common';
+import { Species, Phenophase, SpeciesTitlePipe, NpnServiceUtils } from '../common';
 
 export class ObservationDatePlot {
     color?: String;
@@ -32,10 +32,10 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     @selectionProperty()
     plots: ObservationDatePlot[] = [];
 
-    constructor(protected http: HttpClient,
-        protected cacheService: CacheService,
-        protected speciesTitle: SpeciesTitlePipe,
-        protected config: NpnConfiguration) {
+    constructor(
+        protected serviceUtils:NpnServiceUtils,
+        protected speciesTitle: SpeciesTitlePipe
+    ) {
         super();
     }
 
@@ -115,35 +115,17 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
-        let params = this.toURLSearchParams(),
-            url = `${this.config.apiRoot}/npn_portal/observations/getObservationDates.json`,
-            cacheKey = {
-                u: url,
-                params: params.toString()
-            },
-            data: any[] = this.cacheService.get(cacheKey);
-
-        if (data) {
-            return Promise.resolve(data);
-        } else {
-            this.working = true;
-            return new Promise(resolve => {
-                this.http.post(url,params.toString(),{headers: {'Content-Type':'application/x-www-form-urlencoded'}})
-                    .toPromise()
-                    .then((response:any) => {
-                        let arr;
-                        if(Array.isArray(response)) {
-                            arr = response as any[];
-                        } else {
-                            console.error(response.error_message ? response.error_message : 'Response was not an array');
-                            arr = [];
-                        }
-                        this.cacheService.set(cacheKey,arr);
-                        this.working = false;
-                        resolve(arr);
-                    })
-                    .catch(this.handleError);
+        const params = this.toURLSearchParams();
+        const url = this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json');
+        this.working = true;
+        return this.serviceUtils.cachedPost(url,params.toString())
+            .then(arr => {
+                this.working = false;
+                return arr;
+            })
+            .catch(err => {
+                this.working = false;
+                this.handleError(err);
             });
-        }
     }
 }

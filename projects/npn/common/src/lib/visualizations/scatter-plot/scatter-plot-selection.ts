@@ -1,9 +1,7 @@
-import {NULL_DATA,ONE_DAY_MILLIS,selectionProperty} from '../vis-selection';
-import {SiteOrSummaryVisSelection} from '../site-or-summary-vis-selection';
-import {HttpParams} from '@angular/common/http';
-
-import {Species,Phenophase,APPLICATION_SETTINGS} from '../../common';
-
+import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty } from '../vis-selection';
+import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
+import { HttpParams } from '@angular/common/http';
+import { Species, Phenophase, APPLICATION_SETTINGS } from '../../common';
 import * as d3 from 'd3';
 
 const KEYS_TO_NORMALIZE  = {
@@ -176,7 +174,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                 d.day_in_range = ((d.fyy-startYear)*365)+this.getDoy(d);
                 return true;
             });
-            this.working = false;
-            return result;
+        this.working = false;
+        return result;
     }
 }

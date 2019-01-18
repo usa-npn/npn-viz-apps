@@ -1,14 +1,15 @@
-import {NetworkAwareVisSelection,selectionProperty,ONE_DAY_MILLIS} from '../vis-selection';
-import{NpnConfiguration,NpnServiceUtils} from '../../common';
+import { NetworkAwareVisSelection, selectionProperty, ONE_DAY_MILLIS } from '../vis-selection';
+import { NpnServiceUtils } from '../../common';
 import {
     WmsMapLegend,
     WmsMapLegendService,
     WmsMapSupportsOpacity,
     googleFeatureBounds,
     WcsDataService,
-    GriddedInfoWindowHandler} from '../../gridded';
+    GriddedInfoWindowHandler
+} from '../../gridded';
 
-import {DatePipe} from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 const SIX_NODATA_DISCLAIMER = `This Refuge has not yet met the requirements for the Spring Leaf Index model. Check back later in the year.`;
 
@@ -122,22 +123,18 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     }
 
     getBoundary(): Promise<any> {
-        return new Promise((resolve,reject) => {
-            let url = this.serviceUtils.dataApiUrl('/v0/si-x/area/boundary'),
-                params = {
-                    format: 'geojson',
-                    fwsBoundary: this.fwsBoundary
-                };
-            this.serviceUtils.cachedGet(url,params)
-                .then(response => {
-                    if(response && response.boundary) {
-                        this.serviceUtils.cachedGet(response.boundary,{}).then(resolve).catch(reject);
-                    } else {
-                        reject('missing boundary in response.');
-                    }
-                })
-                .catch(reject);
-        });
+        const url = this.serviceUtils.dataApiUrl('/v0/si-x/area/boundary');
+        const params = {
+                format: 'geojson',
+                fwsBoundary: this.fwsBoundary
+            };
+        return this.serviceUtils.cachedGet(url,params)
+            .then(response => {
+                if(response && response.boundary) {
+                    return this.serviceUtils.cachedGet(response.boundary,{});
+                }
+                throw new Error('missing boundary in response.');
+            });
     }
 
     getData(): Promise<any> {
@@ -154,47 +151,39 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     }
 
     getStatistics(): Promise<any> {
-        return new Promise((resolve,reject) => {
-            let url = this.serviceUtils.dataApiUrl(`/v0/${this.layer.statisticsService}`),
-                params = {
-                    layerName: this.layer.layerName,
-                    fwsBoundary: this.fwsBoundary,
-                    date: this.apiDate,
-                    useBufferedBoundary: this.useBufferedBoundary,
-                    useCache: this.serviceUtils.dataApiUseStatisticsCache
-                };
-            this.serviceUtils.cachedGet(url,params)
-                .then(stats => {
-                    // translate the date string to a date object.
-                    let dateParts = /^(\d{4})-(\d{2})-(\d{2})/.exec(stats.date);
-                    stats.date = new Date(
-                        parseInt(dateParts[1]),
-                        parseInt(dateParts[2])-1,
-                        parseInt(dateParts[3])
-                    );
-                    resolve(stats);
-                })
-                .catch(reject);
-        });
+        const url = this.serviceUtils.dataApiUrl(`/v0/${this.layer.statisticsService}`);
+        const params = {
+                layerName: this.layer.layerName,
+                fwsBoundary: this.fwsBoundary,
+                date: this.apiDate,
+                useBufferedBoundary: this.useBufferedBoundary,
+                useCache: this.serviceUtils.dataApiUseStatisticsCache
+            };
+        return this.serviceUtils.cachedGet(url,params)
+            .then(stats => {
+                // translate the date string to a date object.
+                let dateParts = /^(\d{4})-(\d{2})-(\d{2})/.exec(stats.date);
+                stats.date = new Date(
+                    parseInt(dateParts[1]),
+                    parseInt(dateParts[2])-1,
+                    parseInt(dateParts[3])
+                );
+                return stats;
+            });
 
     }
 
     getAllData(): Promise<WmsMapSelectionData> {
-        return new Promise((resolve,reject) => {
-            Promise.all([
+        return Promise.all([
                 this.getData(),
                 this.getBoundary(),
                 this.getStatistics()
             ])
-            .then(arr => {
-                resolve({
+            .then(arr => ({
                     data: arr[0],
                     boundary: arr[1],
                     statistics: arr[2]
-                });
-            })
-            .catch(reject);
-        });
+                }));
     }
 
     fitBounds(map: google.maps.Map) {

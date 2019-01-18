@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -6,73 +6,32 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CacheService } from './cache-service';
 import { Species } from './species';
 import { Phenophase } from './phenophase';
-import { NpnConfiguration, NPN_CONFIGURATION } from './config';
+import { NpnServiceUtils } from './npn-service-utils.service';
 
 @Injectable()
 export class SpeciesService {
-    constructor(private http: HttpClient,
-        private cache: CacheService,
-        private datePipe: DatePipe,
-        @Inject(NPN_CONFIGURATION) private config: NpnConfiguration) {
-    }
+    constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe) {}
 
     getAllSpecies(params?: any): Promise<Species[]> {
         // NOTE: when there are multiple species phenophase controls on the screen the result can
         // be multiple simultaneous queries...
-        return new Promise((resolve, reject) => {
-            console.log('SpeciesService.getAllSpecies:params', params)
-            let url = `${this.config.apiRoot}/npn_portal/species/getSpeciesFilter.json`,
-                cacheKey = {
-                    u: url,
-                    params: params
-                },
-                data: Species[] = this.cache.get(cacheKey);
-            if (data) {
-                resolve(data);
-            } else {
-                let postParams = new HttpParams()
-                Object.keys(params).forEach(key => postParams = postParams.set(`${key}`, `${params[key]}`));
-                this.http.post<Species[]>(url, postParams.toString(), { headers: {'Content-Type':'application/x-www-form-urlencoded'} })
-                    .toPromise()
-                    .then(data => {
-                        this.cache.set(cacheKey, data);
-                        resolve(data);
-                    })
-                    .catch(reject);
-            }
-        });
+        console.log('SpeciesService.getAllSpecies:params', params)
+        const url = this.serviceUtils.apiUrl('/npn_portal/species/getSpeciesFilter.json');
+        let postParams = new HttpParams()
+        Object.keys(params).forEach(key => postParams = postParams.set(`${key}`, `${params[key]}`));
+        return this.serviceUtils.cachedPost(url,postParams.toString());
     }
 
     private _getPhenophases(species: Species, date?: Date): Promise<Phenophase[]> {
-        return new Promise((resolve, reject) => {
-            let url = `${this.config.apiRoot}/npn_portal/phenophases/getPhenophasesForSpecies.json`,
-                params: any = {
-                    species_id: species.species_id
-                };
-            if (date) {
-                params.date = this.datePipe.transform(date, 'y-MM-dd')
-            } else {
-                params.return_all = true;
-            }
-            let cacheKey = {
-                u: url,
-                params: params
-            },
-                data: Phenophase[] = this.cache.get(cacheKey);
-            if (data) {
-                resolve(data);
-            } else {
-                this.http.get<any[]>(url, { params: params })
-                    .toPromise()
-                    .then(phases => {
-                        data = phases[0].phenophases as Phenophase[];
-                        data = this.removeRedundantPhenophases(data);
-                        this.cache.set(cacheKey, data);
-                        resolve(data);
-                    })
-                    .catch(reject);
-            }
-        });
+        const url = this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json');
+        const params: any = { species_id: species.species_id };
+        if (date) {
+            params.date = this.datePipe.transform(date, 'y-MM-dd')
+        } else {
+            params.return_all = true;
+        }
+        return this.serviceUtils.cachedGet(url,params)
+            .then(phases => this.removeRedundantPhenophases(phases[0].phenophases as Phenophase[]));
     }
 
     getAllPhenophases(species: Species): Promise<Phenophase[]> {
@@ -84,17 +43,12 @@ export class SpeciesService {
     }
 
     getPhenophasesForYear(species: Species, year: number) {
-        return new Promise((resolve, reject) => {
-            let jan1 = new Date(year, 0, 1),
-                dec31 = new Date(year, 11, 31);
-            Promise.all([
-                this.getPhenophasesForDate(species, jan1),
-                this.getPhenophasesForDate(species, dec31)
-            ]).then(lists => {
-                resolve(this.mergeRedundantPhenophaseLists(lists));
-            })
-                .catch(reject);
-        });
+        let jan1 = new Date(year, 0, 1),
+            dec31 = new Date(year, 11, 31);
+        return Promise.all([
+            this.getPhenophasesForDate(species, jan1),
+            this.getPhenophasesForDate(species, dec31)
+        ]).then(lists => this.mergeRedundantPhenophaseLists(lists));
     }
 
     getPhenophasesForYears(species: Species, startYear: number, endYear: number): Promise<Phenophase[]> {
@@ -108,13 +62,8 @@ export class SpeciesService {
         while (i++ < endYear) {
             years.push(i);
         }
-        return new Promise((resolve, reject) => {
-            Promise.all(years.map(y => this.getPhenophasesForYear(species, y)))
-                .then(lists => {
-                    resolve(this.mergeRedundantPhenophaseLists(lists));
-                })
-                .catch(reject);
-        });
+        return Promise.all(years.map(y => this.getPhenophasesForYear(species, y)))
+                .then(lists => this.mergeRedundantPhenophaseLists(lists));
     }
 
     getPhenophases(species: Species, startYear?: number, endYear?: number): Promise<Phenophase[]> {

@@ -1,10 +1,10 @@
-import {HttpClient,HttpParams} from '@angular/common/http';
-import {DatePipe} from '@angular/common';
+import { HttpParams } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 
-import {CacheService,NpnConfiguration} from '../../common';
+import { NpnServiceUtils } from '../../common';
 
-import {INTERPOLATE,ActivityCurve} from './activity-curve';
-import {StationAwareVisSelection,selectionProperty} from '../vis-selection';
+import { INTERPOLATE, ActivityCurve } from './activity-curve';
+import { StationAwareVisSelection, selectionProperty } from '../vis-selection';
 
 export class ActivityFrequency {
     value:string|number;
@@ -50,10 +50,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     })
     private _curves:ActivityCurve[];
 
-    constructor(protected http: HttpClient,
-                protected cacheService: CacheService,
-                protected datePipe: DatePipe,
-                protected config: NpnConfiguration) {
+    constructor(protected serviceUtils:NpnServiceUtils,protected datePipe: DatePipe) {
         super();
         this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
             let c = new ActivityCurve();
@@ -132,43 +129,29 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
 
     loadCurveData(): Promise<any> {
-        return new Promise(resolve => {
-            this.working = true;
-            let promises:Promise<any[]>[] = this.curves
-                .filter(c => c.data(null).isValid())
-                .map(c => {
-                    return new Promise<any[]>(loaded => {
-                        const params = this.addNetworkParams(new HttpParams()
-                            .set('request_src','npn-vis-activity-curves')
-                            .set('start_date',`${c.year}-01-01`)
-                            .set('end_date',this.endDate(c.year))
-                            .set('frequency',`${this.frequency.value}`)
-                            .set('species_id[0]',`${c.species.species_id}`)
-                            .set('phenophase_id[0]',`${c.phenophase.phenophase_id}`));
-                        let url = `${this.config.apiRoot}/npn_portal/observations/getMagnitudeData.json`,
-                            cacheKey = {
-                                u: url,
-                                params: params.toString()
-                            },
-                            data:any[] = this.cacheService.get(cacheKey);
-                        if(data) {
-                            loaded(c.data(data));
-                        } else {
-                            this.http.post<any[]>(url,params.toString(),{headers: {'Content-Type':'application/x-www-form-urlencoded'}})
-                                .toPromise()
-                                .then(arr => {
-                                    this.cacheService.set(cacheKey,arr);
-                                    loaded(c.data(arr));
-                                })
-                                .catch(this.handleError);
-                        }
-                    });
-                });
-            Promise.all(promises).then(() => {
-                this.working = false;
-                resolve();
+        this.working = true;
+        let promises:Promise<any[]>[] = this.curves
+            .filter(c => c.data(null).isValid())
+            .map(c => {
+                const params = this.addNetworkParams(new HttpParams()
+                    .set('request_src','npn-vis-activity-curves')
+                    .set('start_date',`${c.year}-01-01`)
+                    .set('end_date',this.endDate(c.year))
+                    .set('frequency',`${this.frequency.value}`)
+                    .set('species_id[0]',`${c.species.species_id}`)
+                    .set('phenophase_id[0]',`${c.phenophase.phenophase_id}`));
+                const url = this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json');
+                return this.serviceUtils.cachedPost(url,params.toString())
+                    .then(data => c.data(data));
             });
-        });
+
+        return Promise.all(promises)
+            .then(() => this.working = false)
+            .catch(err => {
+                this.working = false;
+                //throw err;
+                this.handleError(err);
+            });
     }
 
     protected handleError(error: any): void {

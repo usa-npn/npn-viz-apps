@@ -160,7 +160,7 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     // is being built.
     editMode: boolean = false;
     updateSent: boolean = false;
-    [x: string]: any
+    [x: string]: any;
 
     readonly INVALID_SELECTION = REJECT_INVALID_SELECTION;
 

@@ -6,6 +6,8 @@ import { Md5 } from 'ts-md5/dist/md5';
 export class CacheService {
     ttl: number = (60 * 60 * 1000); // default 1 hour
 
+    // has to inject NpnConfiguration since can't use NpnServiceUtils
+    // w/out introducing a circular dependency.
     constructor(@Inject(NPN_CONFIGURATION) public config: NpnConfiguration) {
         if ((typeof (config.cacheTTL)) === 'number') {
             this.ttl = config.cacheTTL * 60 * 1000; // value in minutes

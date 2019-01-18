@@ -1,8 +1,5 @@
 import { InjectionToken } from '@angular/core';
 
-// TODO rather than injecting the configuration directly should have a service
-// that simplifies the process.
-
 export class NpnConfiguration {
     cacheTTL?: number; // # of minutes for CacheService
     apiRoot: string; // URL of NPN web services

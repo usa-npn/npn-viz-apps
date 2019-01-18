@@ -33,18 +33,9 @@ export class NpnServiceUtils {
         return asText
             ? this.http.get(url, { params: params, responseType: 'text' }).toPromise()
             : this.http.get<any>(url, { params: params }).toPromise()
-        /*
-        return this.http.get<any>(url,{params:params})
-                .toPromise()
-                .then(response => {
-                    const data = asText ? response.text() as any: response.json() as any;
-                    return data;
-                });
-                */
     }
 
     public cachedGet(url: string, params?: any, asText?: boolean): Promise<any> {
-
         params = params || {};
         const cacheKey = {
             u: url,
@@ -59,26 +50,25 @@ export class NpnServiceUtils {
                 this.cache.set(cacheKey, data);
                 return data;
             });
-        /*
-        return new Promise((resolve,reject) => {
-            let cacheKey = {
-                u: url,
-                params: params
-            },
-            data:any = this.cache.get(cacheKey);
-            if(data) {
-                resolve(data);
-            } else {
-                this.http.get(url,{params:params})
-                    .toPromise()
-                    .then(response => {
-                        data = asText ? response.text() as any: response.json() as any;
-                        this.cache.set(cacheKey,data);
-                        resolve(data);
-                    })
-                    .catch(reject);
-            }
-        });
-        */
+    }
+
+    public post(url:string,body:string):Promise<any> {
+        return this.http.post(url,body,{headers: {'Content-Type':'application/x-www-form-urlencoded'}}).toPromise();
+    }
+
+    public cachedPost(url:string,body:string):Promise<any> {
+        const cacheKey = {
+            u: url,
+            params: body
+        };
+        const data = this.cache.get(cacheKey);
+        if(data) {
+            return Promise.resolve(data);
+        }
+        return this.post(url,body)
+            .then(response => {
+                this.cache.set(cacheKey,response);
+                return response;
+            });
     }
 }

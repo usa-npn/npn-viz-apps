@@ -8,7 +8,8 @@ import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material';
 
 import {
   PhenoNearModule,
-  ExplorePhenoModule
+  ExplorePhenoModule,
+  SettingsModule
 } from './routes';
 
 import { AppComponent } from './app.component';
@@ -27,6 +28,7 @@ import { environment } from '../environments/environment';
 
     PhenoNearModule,
     ExplorePhenoModule,
+    SettingsModule,
     AppRoutingModule,
 
     AgmCoreModule.forRoot({

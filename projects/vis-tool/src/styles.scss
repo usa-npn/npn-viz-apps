@@ -1,6 +1,3 @@
-/* TODO deal with shared css
-@import '../node_modules/npn_common/styles.scss';
-*/
 @import '../../npn/common/src/lib/styles.scss';
 
 @import '~@angular/material/theming';
@@ -38,10 +35,24 @@ $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 
 @import './app/routes/explore_pheno/explore-pheno-theme';
 @import './app/routes/pheno_near/pheno-near-theme';
+@import './app/routes/settings/settings-theme';
 
 body {
     margin: 0px;
     padding: 0px;
-    @include explore-pheno-theme($app-light-theme);
+
     @include pheno-near-theme($app-dark-theme);
+
+    #applicationRouterOutlet {
+        &.light {
+            @include angular-material-theme($app-light-theme);
+            $background: map-get($app-light-theme, background);
+            $foreground: map-get($app-light-theme, foreground);
+    
+            background-color: mat-color($background, background);
+            color: mat-color($foreground, text);
+        }
+    }
+    @include explore-pheno-theme($app-light-theme);
+    @include settings-theme($app-light-theme);
 }

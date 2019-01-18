@@ -289,15 +289,12 @@ export class ActivityCurve {
             line = d3.line();
             switch(self.interpolate) {
                 case INTERPOLATE.monotone:
-console.log('MONOTONE');
                     line.curve(d3.curveMonotoneX);
                     break;
                 case INTERPOLATE.stepAfter:
-console.log('STEP AFTER');
                     line.curve(d3.curveStepAfter);
                     break;
                 case INTERPOLATE.linear:
-console.log('LINEAR');
                     line.curve(d3.curveLinear);
                     break;
             }
@@ -338,13 +335,9 @@ export enum INTERPOLATE {
 const DECIMAL = v => v.toFixed(2);
 const IDENTITY = o => o;
 const SPECIES_TITLE_PIPE = new SpeciesTitlePipe();
-const SPECIES_TITLE = (item: Species,format?: string) => {
-    return SPECIES_TITLE_PIPE.transform(item,format);
-}
+const SPECIES_TITLE = (item: Species) => SPECIES_TITLE_PIPE.transform(item);
 const DOY_PIPE = new DoyPipe();
-const DOY = (date,ignoreLeapYear?:boolean): any => {
-    return DOY_PIPE.transform(date,ignoreLeapYear);
-}
+const DOY = (date,ignoreLeapYear?:boolean): any => DOY_PIPE.transform(date,ignoreLeapYear);
 
 const COMMON_METRICS:any[] = [{
             id: 'num_yes_records',

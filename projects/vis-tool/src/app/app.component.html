@@ -15,7 +15,7 @@
     <img class="titled-logo" src="assets/titled_logo.svg" />
     <npn-logo></npn-logo>
   </mat-drawer>
-  <mat-drawer-content>
+  <mat-drawer-content id="applicationRouterOutlet" [ngClass]="{light: routeTheme === 'light'}">
       <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

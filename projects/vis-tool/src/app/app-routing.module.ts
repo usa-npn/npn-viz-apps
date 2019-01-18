@@ -4,7 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { RoutePath } from './route-path';
 import {
     ExplorePhenoComponent,
-    PhenoNearComponent
+    PhenoNearComponent,
+    SettingsComponent
 } from './routes';
 
 const ROUTES:Routes = [{
@@ -16,6 +17,9 @@ const ROUTES:Routes = [{
 },{
     path: RoutePath.EXPLORE_PHENO,
     component: ExplorePhenoComponent
+},{
+    path: RoutePath.SETTINGS,
+    component: SettingsComponent
 }];
 
 @NgModule({

@@ -2,7 +2,7 @@ import {NULL_DATA,ONE_DAY_MILLIS,selectionProperty} from '../vis-selection';
 import {SiteOrSummaryVisSelection} from '../site-or-summary-vis-selection';
 import {HttpParams} from '@angular/common/http';
 
-import {Species,Phenophase} from '../../common';
+import {Species,Phenophase,APPLICATION_SETTINGS} from '../../common';
 
 import * as d3 from 'd3';
 
@@ -49,10 +49,6 @@ export interface ScatterPlotSelectionPlot {
     phenophase?: Phenophase;
     [x: string]: any;
 }
-
-// TODO goes to config service used to be in environment
-//import {environment} from '../../environments/environment';
-const num_days_quality_filter = 30;
 
 /**
  * @dynamic
@@ -116,9 +112,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
             .set('request_src','npn-vis-scatter-plot')
             .set('start_date',`${this.start}-01-01`)
             .set('end_date',`${this.end}-12-31`)
-            // TODO - this typically comes from app wide configuration settings`
-            // is "environment" an ok place to bind this config, probably not
-            .set('num_days_quality_filter',''+num_days_quality_filter);
+            .set('num_days_quality_filter',`${APPLICATION_SETTINGS.numDaysQualityFilter}`);
         this.validPlots.forEach((p,i) => {
            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
                           .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);

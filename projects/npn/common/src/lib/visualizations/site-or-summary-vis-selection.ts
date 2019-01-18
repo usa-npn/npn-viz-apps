@@ -1,11 +1,9 @@
 import { HttpClient, HttpParams} from '@angular/common/http';
 
-import { CacheService, NpnConfiguration } from '../common';
+import { CacheService, NpnConfiguration, APPLICATION_SETTINGS } from '../common';
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
 
-// TODO get from app config where used below
-const filterLqdSummary = true
-const filterLqdDisclaimer = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
+const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
 
 export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection {
     @selectionProperty()
@@ -59,7 +57,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             filterLqd = this.individualPhenometrics ?
                 (data) => { // summary
                     let minusSuspect = data.filter(this.filterSuspectSummaryData),
-                        filtered = filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
+                        filtered = APPLICATION_SETTINGS.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
                         individuals = filtered.reduce(function (map, d) {
                             var key = d.individual_id + '/' + d.phenophase_id + '/' + d.first_yes_year;
                             map[key] = map[key] || [];
@@ -82,16 +80,16 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                     }
                     console.debug('filtered out ' + (filtered.length - uniqueIndividuals.length) + '/' + filtered.length + ' individual records (preferring lowest first_yes_doy)');
 
-                    this.filterDisclaimer = (minusSuspect.length !== filtered.length) ? filterLqdDisclaimer : undefined;
+                    this.filterDisclaimer = (minusSuspect.length !== filtered.length) ? FILTER_LQD_DISCLAIMER : undefined;
                     return filtered;
                 } :
                 (data) => { // site
                     let minusSuspect = data.filter(this.filterSuspectSummaryData),
-                        filtered = filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
+                        filtered = APPLICATION_SETTINGS.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
                     console.debug('filtered out ' + (data.length - minusSuspect.length) + '/' + data.length + ' suspect records');
                     console.debug('filtered out ' + (minusSuspect.length - filtered.length) + '/' + minusSuspect.length + ' LQD records.');
                     this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?
-                        filterLqdDisclaimer : undefined;
+                        FILTER_LQD_DISCLAIMER : undefined;
                     return filtered;
                 }
 

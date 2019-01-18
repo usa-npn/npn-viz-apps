@@ -4,8 +4,6 @@
 
 @mixin explore-pheno-theme($theme) {
     #explorePhenologicalFindings {
-        @include angular-material-theme($theme);
-
         $primary: map-get($theme,primary);
         $accent: map-get($theme,accent);
         $warn: map-get($theme,warn);

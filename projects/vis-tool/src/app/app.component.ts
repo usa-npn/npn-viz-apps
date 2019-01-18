@@ -6,10 +6,16 @@ import {
   IconDefinition,
   faStreetView,
   faMapMarkedAlt,
-  faArrowLeft
+  faArrowLeft,
+  faCogs
 } from '@fortawesome/pro-light-svg-icons';
 
 import { RoutePath } from './route-path';
+
+enum AppTheme {
+  LIGHT = 'light',
+  DARK = 'dark'
+}
 
 interface MenuItem {
   routerLink: RoutePath,
@@ -17,6 +23,7 @@ interface MenuItem {
   title: string;
   caption: string;
   navExpandedWhenActive: boolean;
+  theme: AppTheme
 }
 
 /**
@@ -30,19 +37,29 @@ export class AppComponent {
   faArrowLeft = faArrowLeft;
   // technically the drawer is always open it just shrinks when "collapsed" since only the icon remains
   mainNavExpanded:boolean = true;
+  routeTheme:AppTheme;
 
   menuItems:MenuItem[] = [{
     routerLink: RoutePath.PHENO_NEAR,
     icon: faStreetView,
     title: 'Phenology near me',
     caption: 'Seasons and cycles in my area',
-    navExpandedWhenActive: true
+    navExpandedWhenActive: true,
+    theme: AppTheme.DARK
   },{
     routerLink: RoutePath.EXPLORE_PHENO,
     icon: faMapMarkedAlt,
     title: 'Explore phenological findings',
     caption: 'Plant, animal and phenophase charts and maps',
-    navExpandedWhenActive: false
+    navExpandedWhenActive: false,
+    theme: AppTheme.LIGHT
+  },{
+    routerLink: RoutePath.SETTINGS,
+    icon: faCogs,
+    title: 'Settings',
+    caption: 'Update application level settings',
+    navExpandedWhenActive: true,
+    theme: AppTheme.LIGHT
   }];
 
   constructor(private router:Router){}
@@ -53,6 +70,7 @@ export class AppComponent {
       .subscribe((e:NavigationEnd) => {
         const activeItem:MenuItem = this.menuItems.find(mi => (new RegExp(`^\\/${mi.routerLink}`)).test(e.url))
         this.mainNavExpanded = activeItem ? activeItem.navExpandedWhenActive : true;
+        this.routeTheme = activeItem ? activeItem.theme : null;
       });
   }
 }

@@ -11,7 +11,8 @@ import {
     MatCheckboxModule,
     MatSnackBarModule,
     MatInputModule,
-    MatSliderModule
+    MatSliderModule,
+    MatRadioModule
  } from "@angular/material";
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -34,7 +35,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatSelectModule,
         MatSnackBarModule,
         MatInputModule,
-        MatSliderModule
+        MatSliderModule,
+        MatRadioModule
     ],
     exports: [
         BrowserModule, FormsModule, ReactiveFormsModule,
@@ -48,7 +50,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatSelectModule,
         MatSnackBarModule,
         MatInputModule,
-        MatSliderModule
+        MatSliderModule,
+        MatRadioModule
     ]
 })
 export class MaterialModule {

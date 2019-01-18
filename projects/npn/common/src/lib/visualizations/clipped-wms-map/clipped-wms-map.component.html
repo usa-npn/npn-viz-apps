@@ -1,6 +1,6 @@
 <div class="vis-container">
     <div class="vis-working" *ngIf="selection.working">
-        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        <npn-logo spin="false"></npn-logo>
     </div>
     <div class="map-wrapper">
         <agm-map (mapReady)="mapReady($event)"  [streetViewControl]="false"  [styles]="mapStyles" [scrollwheel]="false"></agm-map>

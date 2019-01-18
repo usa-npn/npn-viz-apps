@@ -17,9 +17,9 @@ import { Component, Input, HostBinding } from "@angular/core";
         width: 100%;
         height: 100%;
     }
-    :host.spin {
+    :host.spin > svg {
         animation-name: spin;
-        animation-duration: 2000ms;
+        animation-duration: 1250ms;
         animation-iteration-count: infinite;
         animation-timing-function: linear;
     }

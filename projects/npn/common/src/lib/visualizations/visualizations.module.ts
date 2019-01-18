@@ -34,7 +34,7 @@ import {SpeciesPhenophaseInputComponent,YearRangeInputComponent} from './common-
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,
-        MatProgressSpinnerModule,MatExpansionModule,MatAutocompleteModule,
+        MatExpansionModule,MatAutocompleteModule,
         MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule} from '@angular/material';
 
 import {AgmCoreModule} from '@agm/core';
@@ -51,7 +51,7 @@ import {NpnGriddedModule} from '../gridded';
     FormsModule,ReactiveFormsModule,
     FontAwesomeModule,
     MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
-    MatProgressSpinnerModule, MatExpansionModule,MatAutocompleteModule,
+    MatExpansionModule,MatAutocompleteModule,
     MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
     AgmCoreModule,
     FlexLayoutModule,

@@ -1,12 +1,12 @@
-import {Component,Input,AfterViewInit,HostListener,ElementRef,OnDestroy,OnChanges,SimpleChanges} from '@angular/core';
+import { Component, Input, ElementRef, SimpleChanges } from '@angular/core';
 
-import {Window} from '../common/index';
-import {WmsMapLegend} from './wms-map-legend';
+import { Window, MonitorsDestroy } from '../common/index';
+import { WmsMapLegend } from './wms-map-legend';
 
-import {fromEvent} from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
-import {Selection} from 'd3-selection';
+import { Selection } from 'd3-selection';
 import * as d3 from 'd3';
 
 @Component({
@@ -23,7 +23,7 @@ import * as d3 from 'd3';
         }
     `]
 })
-export class WmsMapLegendComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class WmsMapLegendComponent extends MonitorsDestroy {
     @Input()
     legendTitle:string;
     @Input()
@@ -31,15 +31,16 @@ export class WmsMapLegendComponent implements AfterViewInit, OnDestroy, OnChange
 
     private svg: Selection<any,any,any,any>;
 
-    private resizeSubscription:any;
-
-    constructor(protected window: Window, protected rootElement: ElementRef) {}
+    constructor(protected window: Window, protected rootElement: ElementRef) {
+        super();
+    }
 
     ngAfterViewInit() {
         console.debug('WmsMapLegendComponent.ngAfterViewInit');
-        this.resizeSubscription = fromEvent(window,'resize')
+        fromEvent(window,'resize')
             .pipe(
-                debounceTime(500)
+                debounceTime(500),
+                takeUntil(this.componentDestroyed)
             )
             .subscribe(event => this.redraw());
         this.svg = d3.select(this.rootElement.nativeElement).select('svg');
@@ -49,13 +50,6 @@ export class WmsMapLegendComponent implements AfterViewInit, OnDestroy, OnChange
     ngOnChanges(changes:SimpleChanges):void {
         console.debug('WmsMapLegendComponent.ngOnChanges',changes);
         setTimeout(() => this.redraw()); // all that can change at the moment is the reference to legend
-    }
-
-    ngOnDestroy() {
-        console.debug('WmsMapLegendComponent.ngOnDestroy');
-        if(this.resizeSubscription) {
-            this.resizeSubscription.unsubscribe();
-        }
     }
 
     redraw() {

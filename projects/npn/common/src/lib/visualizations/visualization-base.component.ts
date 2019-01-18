@@ -1,15 +1,12 @@
-import { Component, Input, AfterViewInit, HostListener, ElementRef, OnDestroy } from '@angular/core';
+import { Input, ElementRef } from '@angular/core';
 
-import { Window, detectIE } from '../common';
+import { detectIE, MonitorsDestroy } from '../common';
 import { VisSelection, VisSelectionEvent, REJECT_INVALID_SELECTION } from './vis-selection';
 
-import { Observable, fromEvent } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
-
-import { Selection } from 'd3-selection';
-import * as d3 from 'd3';
 
 export const DEFAULT_MARGINS: VisualizationMargins = { top: 20, right: 30, bottom: 60, left: 40 };
 export const FONT_SIZE: number = 14;
@@ -28,7 +25,7 @@ then fail.
   template: '"abstract" component'
 })
 */
-export class VisualizationBaseComponent implements AfterViewInit, OnDestroy {
+export class VisualizationBaseComponent extends MonitorsDestroy {
     @Input()
     selection: VisSelection;
     @Input()
@@ -42,15 +39,12 @@ export class VisualizationBaseComponent implements AfterViewInit, OnDestroy {
     margins: VisualizationMargins = { top: 0, right: 0, left: 0, bottom: 0 };
     mobileMode: boolean = false;
 
-    private resizeSubscription: any;
-    private mediaSubscription: any;
-    private subscription: any;
     protected isIE: boolean;
 
-    constructor(/*protected window: Window, */protected rootElement: ElementRef, protected media: ObservableMedia) {
-        this.mediaSubscription = this.media.subscribe((mediaChange: MediaChange) => {
-            this.mobileMode = mediaChange.mqAlias === 'xs' || mediaChange.mqAlias === 'sm';
-        });
+    constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
+        super();
+        this.media.asObservable().pipe(takeUntil(this.componentDestroyed))
+            .subscribe((mediaChange: MediaChange) => this.mobileMode = mediaChange.mqAlias === 'xs' || mediaChange.mqAlias === 'sm');
         this.isIE = !!detectIE();
     }
 
@@ -121,15 +115,13 @@ export class VisualizationBaseComponent implements AfterViewInit, OnDestroy {
         // that should then implement its own debounce (via setTimeout)
         // and they seem to want to push the use of RxJs so this kind of thing
         // feels cleaner.
-        this.resizeSubscription = fromEvent(window, 'resize')
-            .pipe(debounceTime(500))
-            .subscribe((event) => {
-                this.resize();
-            });
+        fromEvent(window, 'resize').pipe(debounceTime(500),takeUntil(this.componentDestroyed))
+            .subscribe(() => this.resize());
 
         // now that we're prepared to start listening to our selection for
         // VisSelectionEvents.
-        this.subscription = this.selection
+        this.selection
+            .pipe(takeUntil(this.componentDestroyed))
             .subscribe((event) => {
                 switch (event) {
                     case VisSelectionEvent.RESET:
@@ -142,19 +134,6 @@ export class VisualizationBaseComponent implements AfterViewInit, OnDestroy {
                         return this.resize();
                 }
             });
-    }
-
-    ngOnDestroy() {
-        console.debug('visualization.ngOnDestroy');
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-        if (this.resizeSubscription) {
-            this.resizeSubscription.unsubscribe();
-        }
-        if (this.mediaSubscription) {
-            this.mediaSubscription.unsubscribe();
-        }
     }
 
     /* a way of capturing window events...

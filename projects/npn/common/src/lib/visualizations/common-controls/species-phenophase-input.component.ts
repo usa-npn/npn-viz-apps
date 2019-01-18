@@ -127,6 +127,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
                 })
             );
         this.speciesParams
+            .pipe(takeUntil(this.componentDestroyed))
             .subscribe(params => {
                 this.speciesList = undefined;
                 // load up the available species

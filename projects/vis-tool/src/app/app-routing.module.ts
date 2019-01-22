@@ -20,6 +20,9 @@ const ROUTES:Routes = [{
 },{
     path: RoutePath.SETTINGS,
     component: SettingsComponent
+},{
+    path: RoutePath.DEV,
+    loadChildren: './routes/dev/dev.module#DevModule'
 }];
 
 @NgModule({

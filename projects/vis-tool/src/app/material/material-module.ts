@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core";
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
     MatButtonModule,
@@ -16,6 +15,8 @@ import {
  } from "@angular/material";
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CommonModule } from '@angular/common';
+import { SelectTreeModule } from '../select-tree';
 
 /**
  * Consolidates inclusion of all used [Google material](https://material.angular.io/) components.
@@ -24,8 +25,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     imports:[
         // most of the time if you're working with MaterialModule
         // then you're alsow orking with forms.
-        BrowserModule, FormsModule, ReactiveFormsModule,
+        CommonModule, FormsModule, ReactiveFormsModule,
         FontAwesomeModule,
+
+        SelectTreeModule,
 
         MatButtonModule,
         MatSidenavModule,
@@ -39,8 +42,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         MatRadioModule
     ],
     exports: [
-        BrowserModule, FormsModule, ReactiveFormsModule,
+        CommonModule, FormsModule, ReactiveFormsModule,
         FontAwesomeModule,
+
+        SelectTreeModule,
 
         MatButtonModule,
         MatSidenavModule,

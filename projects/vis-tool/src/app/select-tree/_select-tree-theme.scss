@@ -1,0 +1,78 @@
+@import '~@angular/material/theming';
+
+@mixin select-tree-theme($theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+
+    $max-children: 50;
+    $child-height: 24px; // just a number based on inspecting, cannot force or lists go weird.
+    $level-padding: 10px;
+
+    ul.select-tree {
+        margin: 0px;
+        padding: 0px;
+        node-label {
+            display: block;
+            &:not(.noclick):hover {
+                cursor: pointer;
+                background-color: mat-color($accent,50);
+            }
+            .label-wrapper,
+            .label {
+                display: inline-block;
+            }
+            .label {
+                padding: 2px 0px;
+            }
+            .normal {
+                font-weight: normal;
+            }
+        }
+        ul {
+            margin: 0px;
+            padding: 0px;
+
+            max-height: $child-height * $max-children;
+            overflow: hidden;
+            transition-property: max-height;
+            transition-timing-function: ease-in-out;
+            transition-duration: 0.5s;
+            &.collapsed {
+                max-height: 0px;
+            }
+
+            @for $i from 1 through 5 {
+              &.level-#{$i} {
+                >li {
+                    >node-label {
+                        .label-wrapper {
+                            margin-left: $i * $level-padding;
+                        }
+                    }
+                }
+              }
+            }
+        }
+        li {
+            list-style: none;
+            &:not(.leaf) {
+                >node-label {
+                    font-weight: bold;
+                }
+            }
+            &.leaf {
+                >node-label .label-wrapper {
+                    padding-left: $level-padding;
+                    border-left: 4px solid mat-color($primary,100);
+                }
+                &.selected {
+                    background-color: mat-color($accent,50);
+                    >node-label .label-wrapper {
+                        border-left-color: mat-color($accent,500)
+                    }
+                }
+            }
+        }
+    }
+}

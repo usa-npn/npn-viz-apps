@@ -7,10 +7,12 @@ import {
   faStreetView,
   faMapMarkedAlt,
   faArrowLeft,
-  faCogs
+  faCogs,
+  faCode
 } from '@fortawesome/pro-light-svg-icons';
 
 import { RoutePath } from './route-path';
+import { environment } from '../environments/environment';
 
 enum AppTheme {
   LIGHT = 'light',
@@ -18,7 +20,7 @@ enum AppTheme {
 }
 
 interface MenuItem {
-  routerLink: RoutePath,
+  routerLink: RoutePath|string,
   icon: IconDefinition;
   title: string;
   caption: string;
@@ -65,6 +67,16 @@ export class AppComponent {
   constructor(private router:Router){}
 
   ngOnInit() {
+    if(!environment.production) {
+      this.menuItems.push({
+        routerLink: `${RoutePath.DEV}/selectTree`,
+        icon: faCode,
+        title: 'Dev',
+        caption: 'Development',
+        navExpandedWhenActive: false,
+        theme: AppTheme.LIGHT
+      });
+    }
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e:NavigationEnd) => {

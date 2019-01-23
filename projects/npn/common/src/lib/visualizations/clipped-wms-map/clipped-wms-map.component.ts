@@ -19,11 +19,10 @@ export class ClippedWmsMapComponent extends MapVisualizationBaseComponent {
     }
 
     mapReady(map:google.maps.Map): void {
-        // TODO should be private.
         this.getMapResolver(map);
     }
 
-    protected reset(): void {
+    protected reset():void {
         this.getMap().then(m => {
             this.selection.removeFrom(m)
                 .then(() => {
@@ -32,7 +31,7 @@ export class ClippedWmsMapComponent extends MapVisualizationBaseComponent {
         });
     }
 
-    protected update(): void {
+    protected update():void {
         this.resize();
         this.getMap().then(m => {
             this.selection.removeFrom(m)
@@ -42,7 +41,7 @@ export class ClippedWmsMapComponent extends MapVisualizationBaseComponent {
         });
     }
 
-    protected resize(): void {
+    protected resize():void {
         super.resize();
         this.getMap().then(m => this.selection.resizeMap(m));
     }

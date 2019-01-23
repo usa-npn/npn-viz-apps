@@ -20,6 +20,7 @@ import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep }
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
 import { LocationStep } from './location';
+import { LayerStep } from './layer';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -133,7 +134,7 @@ const MAPS:VisDefinition[] = [{
     icon: faMapMarker,
     fullScreen: true,
     selection: 'MapSelection',
-    steps:[LocationStep],
+    steps:[LayerStep,LocationStep],
     component: MapVisualizationComponent
 },{
     title: 'Spring onset',

@@ -10,7 +10,6 @@ import { WmsPipeFactory } from './wms-pipe-factory.service';
 import { WmsMapLayerService } from './wms-map-layer.service';
 import { WmsMapLegendService } from './wms-map-legend.service';
 import { NpnCommonModule } from '../common/index';
-import { DateExtentUtil } from './date-extent-util.service';
 import { WmsMapLegendComponent } from './wms-map-legend.component';
 import { WmsMapOpacityControl } from './wms-map-opacity-control.component';
 import { GriddedUrls } from './gridded-common';
@@ -18,7 +17,8 @@ import { WcsDataService } from './wcs-data.service';
 
 import {
     LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
-    AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe
+    AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
+    ThirtyYearAvgDayOfYearPipe,GriddedPipeProvider
 } from './pipes';
 
 @NgModule({
@@ -33,7 +33,8 @@ import {
         WmsMapLegendComponent,
         WmsMapOpacityControl,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
-        AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe
+        AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
+        ThirtyYearAvgDayOfYearPipe
     ],
     exports: [
         WmsMapLegendComponent,
@@ -41,9 +42,9 @@ import {
     ],
     providers: [
         DatePipe, DecimalPipe,
-        DateExtentUtil,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
+        ThirtyYearAvgDayOfYearPipe, GriddedPipeProvider,
         WmsPipeFactory,
         WmsMapLayerService,
         WmsMapLegendService,

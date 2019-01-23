@@ -2,10 +2,14 @@ import {Injectable} from '@angular/core';
 import * as $jq_ from 'jquery';
 const $jq = $jq_;
 
-import {DateExtentUtil} from './date-extent-util.service';
 import {NpnServiceUtils} from '../common/index';
-import {MAP_LAYERS,GriddedUrls} from './gridded-common';
+// TODO MAP_LAYERS here has been coded into the application
+// it may differ from the FWS apps to the vis-tool???
+// depending on how that shakes out perhaps a "provider" Injectable
+// that individual apps then wire into this service instance??
+import {MAP_LAYERS,GriddedUrls, WmsLayerDefs, WmsLayerDefinition, parseExtentDate} from './gridded-common';
 import {WmsMapLayer} from './wms-map-layer';
+import { GriddedPipeProvider } from './pipes';
 
 const DEEP_COPY = (o) => JSON.parse(JSON.stringify(o));
 
@@ -14,26 +18,27 @@ export class WmsMapLayerService {
     private layerDefs:any;
 
     constructor(private serviceUtils:NpnServiceUtils,
-                private dateExtentUtil:DateExtentUtil,
-                private urls:GriddedUrls) {
+                private griddedPipes:GriddedPipeProvider,
+                private griddedUrls:GriddedUrls) {
     }
 
+    /** TODO not sure if this function makes any sense any longer
     getLayers(map:google.maps.Map):Promise<any> {
-        return new Promise((resolve,reject) => {
-            this.getLayerDefinitions()
+        return this.getLayerDefinitions()
                 .then(definitions => {
                     let copy = DEEP_COPY(definitions);
-                    copy.categories.forEach(cat => {
-                        // replace layer definitions with actual layers
-                        cat.layers = cat.layers.map(l => new WmsMapLayer(map,l,this.urls.wmsBaseUrl));
-                    });
-                    resolve(copy);
-                })
-                .catch(reject);
-        });
+                    // replace layer definitions with actual layers
+                    copy.categories.forEach(cat =>  cat.layers = cat.layers.map(l => new WmsMapLayer(map,l,this.griddedPipes,this.griddedUrls)));
+                    return copy;
+                });
+    }
+    */
+
+    newLayer(map:google.maps.Map,layerDef:WmsLayerDefinition):WmsMapLayer {
+        return new WmsMapLayer(map,layerDef,this.griddedPipes,this.griddedUrls);
     }
 
-    getLayerDefinitions():Promise<any> {
+    getLayerDefinitions():Promise<WmsLayerDefs> {
         function mergeLayersIntoConfig(wms_layer_defs) {
             let result = DEEP_COPY(MAP_LAYERS),
                 base_description = result.description;
@@ -51,11 +56,10 @@ export class WmsMapLayerService {
             });
             return result;
         }
-        return new Promise((resolve,reject) => {
-            if(this.layerDefs) {
-                resolve(this.layerDefs);
-            } else {
-                this.serviceUtils.cachedGet(this.urls.wmsCapabilitiesUrl,null,true/*as text*/)
+        if(this.layerDefs) {
+            return Promise.resolve(this.layerDefs);
+        }
+        return this.serviceUtils.cachedGet(this.griddedUrls.wmsCapabilitiesUrl,null,true/*as text*/)
                     .then(xml => {
                         let wms_capabilities = $jq($jq.parseXML(xml));
                         console.debug('WmsMapLayerService:capabilities',wms_capabilities);
@@ -63,16 +67,12 @@ export class WmsMapLayerService {
                         console.debug('WmsMapLayerService:wms layer definitions',wms_layer_defs);
                         this.layerDefs = mergeLayersIntoConfig(wms_layer_defs);
                         console.debug('WmsMapLayerService:layer definitions',this.layerDefs);
-                        resolve(this.layerDefs);
-                    })
-                    .catch(reject);
-            }
-        });
+                        return this.layerDefs;
+                    });
     }
 
-    getLayerDefinition(layerName:string):Promise<any> {
-        return new Promise((resolve,reject) => {
-            this.getLayerDefinitions()
+    getLayerDefinition(layerName:string):Promise<WmsLayerDefinition> {
+        return this.getLayerDefinitions()
                 .then(definitions => {
                     let layerMap = definitions.categories.reduce((map,c) => {
                             c.layers.forEach(l => {
@@ -80,12 +80,12 @@ export class WmsMapLayerService {
                             });
                             return map;
                         },{});
-                    resolve(layerMap[layerName]);
-                })
-                .catch(reject);
-        });
+                    return layerMap[layerName];
+                });
     }
 
+    // private functions used to parse layer info out of WMS Capabilities response
+    // remain instance functions since they use some injected services
     // returns an associative array of machine name layer to layer definition
     private _getLayers(layers) {
         if(!layers || layers.length < 2) { // 1st layer is parent, children are the real layers
@@ -110,7 +110,7 @@ export class WmsMapLayerService {
                 abstract: l.find('Abstract').first().text(),
                 bbox: this._parseBoundingBox(l.find('EX_GeographicBoundingBox').first()),
                 style: this._parseStyle(l.find('Style').first()),
-                //extent: this._parseExtent(l.find('Extent').first()) // TODO see unmigrated code below
+                extent: this._parseExtent(l.find('Extent').first()) // TODO see unmigrated code below
             };
         if(!o.bbox) {
             o.bbox = this._parseLatLonBoundingBox(l.find('LatLonBoundingBox').first());
@@ -164,15 +164,13 @@ export class WmsMapLayerService {
             },false) ? bbox : undefined;
         }
     }
-    /* TODO extents involve filters, etc. so this code, and the code that calls it has yet to be
-     * migrated there will be a "PipeFactory" so this can be dealt with.
     // represents an extent value of month/day/year
-    function DateExtentValue(value,dateFmt) {
-        var d = DateExtentUtil.parse(value);
+    private _dateExtentValue(value,dateFmt?:string) {
+        const d = parseExtentDate(value);
         return {
             value: value,
             date: d,
-            label: $filter('date')(d,(dateFmt||'longDate')),
+            label: this.griddedPipes.get('date').transform(d,(dateFmt||'longDate')),
             addToWmsParams: function(params) {
                 params.time = value;
             },
@@ -185,10 +183,10 @@ export class WmsMapLayerService {
         };
     }
     // represents an extent value of day of year
-    function DoyExtentValue(value) {
+    private _doyExtentValue(value) {
         return {
             value: value,
-            label: $filter('thirtyYearAvgDayOfYear')(value),
+            label: this.griddedPipes.get('thirtyYearAvgDayOfYear').transform(value),
             addToWmsParams: function(params) {
                 params.elevation = value;
             },
@@ -200,8 +198,8 @@ export class WmsMapLayerService {
             }
         };
     }
-    function parseExtent(extent) {
-        var e = $(extent),
+    private _parseExtent(extent) {
+        var e = $jq(extent),
             content = e.text(),
             dfltValue = e.attr('default'),
             dflt,values,
@@ -215,7 +213,7 @@ export class WmsMapLayerService {
         }
         if(name === 'time') {
             if(content.indexOf('/') === -1) { // for now skip <lower>/<upper>/<resolution>
-                values = content.split(',').map(function(d) { return new DateExtentValue(d); });
+                values = content.split(',').map(d => this._dateExtentValue(d));
                 // ugh
                 dfltValue = dfltValue.replace(/0Z/,'0.000Z'); // extent values in ms preceision but not the default...
                 dflt = values.reduce(findDefault,undefined);
@@ -228,12 +226,12 @@ export class WmsMapLayerService {
             } else {
                 values = /^([^\/]+)\/(.*)\/P1Y$/.exec(content);
                 if(values && values.length === 3) {
-                    start = new DateExtentValue(values[1],yearFmt);
-                    end = new DateExtentValue(values[2],yearFmt);
+                    start = this._dateExtentValue(values[1],yearFmt);
+                    end = this._dateExtentValue(values[2],yearFmt);
                     if(end.date.getFullYear() > start.date.getFullYear()) { // should never happen but to be safe
                         values = [start];
                         for(i = start.date.getFullYear()+1; i < end.date.getFullYear();i++) {
-                            values.push(new DateExtentValue(i+'-01-01T00:00:00.000Z',yearFmt));
+                            values.push(this._dateExtentValue(i+'-01-01T00:00:00.000Z',yearFmt));
                         }
                         values.push(end);
                         return {
@@ -246,7 +244,7 @@ export class WmsMapLayerService {
                 }
             }
         } else if (name === 'elevation') {
-            values = content.split(',').map(function(e) { return new DoyExtentValue(e); });
+            values = content.split(',').map(e => this._doyExtentValue(e));
             dflt = values.reduce(findDefault,undefined);
             return {
                 label: 'Day of Year',
@@ -255,5 +253,5 @@ export class WmsMapLayerService {
                 values: values
             };
         }
-    }*/
+    }
 }

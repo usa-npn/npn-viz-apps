@@ -53,7 +53,7 @@ export class MapVisualizationBaseComponent extends VisualizationBaseComponent {
         this.getMapResolver(map);
     }
 
-    protected getMap(): Promise<google.maps.Map> {
+    getMap(): Promise<google.maps.Map> {
         return this.getMapPromise;
     }
 

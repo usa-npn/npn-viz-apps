@@ -13,6 +13,7 @@ import { DummyStepComponent, DummyControlComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 import { YearsControlComponent, YearsStepComponent } from './years';
 import { LocationStepComponent, LocationControlComponent, LocationControlSubComponent } from './location';
+import { LayerStepComponent, LayerControlComponent } from './layer';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
@@ -27,6 +28,7 @@ const COMPONENTS:any[] = [
     StartEndControlComponent, StartEndStepComponent,
     YearsControlComponent, YearsStepComponent,
     LocationStepComponent, LocationControlComponent, LocationControlSubComponent,
+    LayerStepComponent, LayerControlComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,

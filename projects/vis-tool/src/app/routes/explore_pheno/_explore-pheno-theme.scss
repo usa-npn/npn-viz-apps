@@ -26,7 +26,7 @@
         #explorePhenoSubControls {
             display: flex;
             flex-direction: column;
-
+            
             .drawer-contents {
                 padding: $drawer-padding;
             }
@@ -41,6 +41,8 @@
             }
             .drawer-contents {
                 flex-grow: 1;
+                height: 100%;
+                overflow: auto;
             }
         }
 

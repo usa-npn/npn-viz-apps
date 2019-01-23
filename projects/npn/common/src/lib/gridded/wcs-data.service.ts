@@ -50,18 +50,15 @@ export class WcsDataService {
                    latLng:google.maps.LatLng,
                    gridSize:number,
                    paramsAugment?:(args:any) => void):Observable<number[]> {
-        let edges = [0,80,180,270].map(function(bearing) {
-                return DESTINATION_POINT(latLng,bearing,(gridSize/2));
-            }),
-            wcsArgs = {
+        const edges = [0,80,180,270].map(bearing => DESTINATION_POINT(latLng,bearing,(gridSize/2)));
+        const wcsArgs = {
                 service: 'WCS',
                 request: 'GetCoverage',
                 version: '2.0.1',
                 coverageId: layerName.replace(':','__'), // convention
                 format: 'application/gml+xml',
                 subset: []
-            },
-            url;
+            };
         // add edges
         wcsArgs.subset.push('http://www.opengis.net/def/axis/OGC/0/Long('+[edges[3].lng(),edges[1].lng()].join(',')+')');
         wcsArgs.subset.push('http://www.opengis.net/def/axis/OGC/0/Lat('+[edges[2].lat(),edges[0].lat()].join(',')+')');

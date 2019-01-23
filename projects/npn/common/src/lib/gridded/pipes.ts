@@ -1,6 +1,6 @@
-import {Pipe,PipeTransform} from '@angular/core';
-import {DatePipe,DecimalPipe} from '@angular/common';
-import {DateExtentUtil} from './date-extent-util.service';
+import { Pipe, PipeTransform, Injectable } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { parseExtentDate } from './gridded-common';
 
 const ONE_DAY = (24*60*60*1000);
 const JAN_ONE_2010 = new Date(2010,0);
@@ -76,10 +76,9 @@ export class LegendDoyPipe implements PipeTransform {
     }
 }
 
-
 @Pipe({name: 'extentDates'})
 export class ExtentDatesPipe implements PipeTransform {
-    constructor(private datePipe:DatePipe,private dateExtentUtil:DateExtentUtil) {}
+    constructor(private datePipe:DatePipe) {}
 
     toTime(s:string):number {
         let d = new Date();
@@ -93,7 +92,7 @@ export class ExtentDatesPipe implements PipeTransform {
         } else if(s.indexOf('T') === -1) {
             s = d.getFullYear()+'-'+s+' 00:00:00';
         }
-        return this.dateExtentUtil.parse(s).getTime();
+        return parseExtentDate(s).getTime();
     }
 
     transform(arr:string[],after:string,before:string):string[] {
@@ -101,10 +100,54 @@ export class ExtentDatesPipe implements PipeTransform {
             b = before ? this.toTime(before) : undefined;
         if(a || b) {
             arr = arr.filter((d) => {
-                var t = this.dateExtentUtil.parse(d).getTime();
+                var t = parseExtentDate(d).getTime();
                 return (!a || (a && t > a)) && (!b || (b && t < b));
             });
         }
         return arr;
+    }
+}
+
+@Pipe({name: 'thirtyYearAvgDayOfYear'})
+export class ThirtyYearAvgDayOfYearPipe implements PipeTransform {
+    constructor(private datePipe:DatePipe) {}
+
+    transform(doy:any,returnDate?:boolean):any {
+        if(typeof(doy) === 'string') {
+            doy = parseFloat(doy);
+        }
+        var date = doy instanceof Date ? doy : new Date(JAN_ONE_2010.getTime()+((doy-1)*ONE_DAY));
+        return returnDate ? date : this.datePipe.transform(date,'MMMM d');
+    }
+}
+
+@Injectable()
+export class GriddedPipeProvider {
+    readonly pipes:any = {};
+
+    constructor(
+        private extentDates:ExtentDatesPipe,
+        private legendDoy:LegendDoyPipe,
+        private legendSixAnomaly:LegendSixAnomalyPipe,
+        private agddDefaultTodayTime:AgddDefaultTodayTimePipe,
+        private legendAgddAnomaly:LegendAgddAnomalyPipe,
+        private agddDefaultTodayElevation:AgddDefaultTodayElevationPipe,
+        private legendGddUnits:LegendGddUnitsPipe,
+        private thirtyYearAvgDayOfYear:ThirtyYearAvgDayOfYearPipe,
+        private date:DatePipe
+    ) {
+        this.pipes.extentDates = extentDates;
+        this.pipes.legendDoy = legendDoy;
+        this.pipes.legendSixAnomaly = legendSixAnomaly;
+        this.pipes.agddDefaultTodayTime = agddDefaultTodayTime;
+        this.pipes.legendAgddAnomaly = legendAgddAnomaly;
+        this.pipes.agddDefaultTodayElevation = agddDefaultTodayElevation;
+        this.pipes.legendGddUnits = legendGddUnits;
+        this.pipes.thirtyYearAvgDayOfYear = thirtyYearAvgDayOfYear;
+        this.pipes.date = date;
+    }
+
+    get(pipeName:string):PipeTransform {
+        return this.pipes[pipeName];
     }
 }

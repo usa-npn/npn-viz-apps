@@ -1,10 +1,5 @@
-import {BOX_SIZE,BASE_WMS_ARGS} from './gridded-common';
-
-// this is incomplete (obviously).  after starting down this path
-// realized that WmsMapLegend could be migrated without Layer which isn't initially needed
-// leaving the current state of things as is.
-// this will compile but is useless...
-function $filter(name:string):any {}
+import {BOX_SIZE,BASE_WMS_ARGS, WmsLayerDefinition, GriddedUrls} from './gridded-common';
+import { GriddedPipeProvider } from './pipes';
 
 export class WmsMapLayer {
     private wmsArgs:any;
@@ -12,14 +7,18 @@ export class WmsMapLayer {
     googleLayer: google.maps.ImageMapType;
     [x: string]: any; // allow arbitrary properties
 
-    constructor(protected map:google.maps.Map,protected layer_def:any,protected wmsBaseUrl:string) {
+    constructor(
+        protected map:google.maps.Map,
+        protected layer_def:WmsLayerDefinition,
+        protected griddedPipes:GriddedPipeProvider,
+        protected griddedUrls:GriddedUrls
+    ) {
         if(layer_def.extent_values_filter) {
             console.debug('layer '+layer_def.name+' has an extent_values_filter, processing',layer_def.extent_values_filter);
-            let valuesFilter = $filter(layer_def.extent_values_filter.name),
-                extentValues = layer_def.extent.values.map(function(e){ return e.value; }),
-                filterArgs = [extentValues].concat(layer_def.extent_values_filter.args||[]),
-                filteredValues;
-            filteredValues = valuesFilter.apply(undefined,filterArgs);
+            const valuesPipe = griddedPipes.get(layer_def.extent_values_filter.name),
+                    extentValues = layer_def.extent.values.map(e => e.value),
+                    filterArgs = [extentValues].concat(layer_def.extent_values_filter.args||[]),
+                    filteredValues = valuesPipe.transform.apply(valuesPipe,filterArgs);
             console.debug('filteredValues',(filteredValues.length > 1 ? (filteredValues[0]+'...'+filteredValues[filteredValues.length-1]) : filteredValues));
             layer_def.extent.values = layer_def.extent.values.filter(function(v) {
                 return filteredValues.indexOf(v.value) !== -1;
@@ -31,9 +30,9 @@ export class WmsMapLayer {
         }
         if(layer_def.extent_default_filter) {
             console.debug('layer '+layer_def.name+' has an extent_default_filter, processing', layer_def.extent_default_filter);
-            let defaultFilter = $filter(layer_def.extent_default_filter.name),
+            let defaultPipe = griddedPipes.get(layer_def.extent_default_filter.name),
                 defaultFilterArgs = [layer_def.extent.values].concat(layer_def.extent_default_filter.values||[]);
-            layer_def.extent.current = defaultFilter.apply(undefined,defaultFilterArgs)||layer_def.extent.current;
+            layer_def.extent.current = defaultPipe.transform.apply(defaultPipe,defaultFilterArgs)||layer_def.extent.current;
             console.debug('resulting default value',layer_def.extent.current);
         }
         /*
@@ -58,7 +57,7 @@ export class WmsMapLayer {
                     args.sld_body = this.sldBody;
                 }
                 let all_args = {...base,...this.wmsArgs,...args};
-                return this.wmsBaseUrl+'?'+encodeHttpParams(all_args);
+                return this.griddedUrls.wmsBaseUrl+'?'+encodeHttpParams(all_args);
             },
             tileSize: new google.maps.Size(BOX_SIZE, BOX_SIZE),
             //isPng: true,
@@ -69,6 +68,36 @@ export class WmsMapLayer {
         Object.keys(layer_def).forEach(key => {
             this[key] = layer_def[key];
         });
+    }
+
+    get layerName():string { return this.layer_def.name; }
+
+    /**
+     * @returns {google.maps.Map} The map instance.
+     */
+    getMap():google.maps.Map {
+        return this.map;
+    }
+
+    // TODO there are quite a lot of other functions that need to come over.
+
+    on():WmsMapLayer {
+        // TODO analytics
+        //Analytics.trackEvent('gridded-layer','on',this.getTitle());
+        if(this.googleLayer) {
+            this.map.overlayMapTypes.push(this.googleLayer);
+        }
+        // TODO deal with pest map which is a google.maps.GroundOverlay
+        return this;
+    }
+
+    off():WmsMapLayer {
+        if(this.map.overlayMapTypes.getLength()) {
+            //Analytics.trackEvent('gridded-layer','off',this.getTitle());
+            this.map.overlayMapTypes.pop();
+        }
+        // TODO deal with pest map which is a google.maps.GroundOverlay
+        return this;
     }
 }
 

@@ -20,6 +20,7 @@ export interface WmsLayerFilterDef {
 
 interface WmsLayerCommon {
     name: string;
+    layerBasis?: string;
     /** contains a description of a given layer.  this value can also be specified at the top level so that it applies to all layers in all categories (as the default). */
     description?: string;
     /** specifies a boolean indicating if a layer supports plotting of data on it or not (default true). */
@@ -81,10 +82,16 @@ export interface WmsLayerStyle {
     legend: string; // URL
 }
 
+export enum WmsLayerType {
+    STANDARD = 'standard',
+    PEST = 'pest'
+}
+
 export interface WmsLayerDefinition extends WmsLayerCommon {
+    /** defaults to `WmsLayerType.STANDARD` */
+    type?: WmsLayerType;
     title?: string;
     abstract?: string;
-    pest?: Pest;
     extent?: WmsLayerExtent;
     bbox?: WmsLayerBoundingBox;
     style?: WmsLayerStyle;
@@ -99,28 +106,34 @@ export interface WmsLayerDefs {
     categories: WmsLayerCategory[];
 }
 
-export class Pest {
-    constructor(public title:string,public name:string) {}
-}
-
-export const PESTS:Pest[] = [
-    new Pest('Emerald Ash Borer','emerald_ash_borer'),
-    new Pest('Apple Maggot','apple_maggot'),
-    new Pest('Hemlock Woolly Adelgid','hemlock_woolly_adelgid'),
-    new Pest('Winter Moth','winter_moth'),
-    new Pest('Lilac Borer','lilac_borer'),
-]
-
 export const MAP_LAYERS:WmsLayerDefs = {
     "description": "",
     "categories": [{
         "name": "Pest maps",
         "supports_data": false, // TODO they do support data but...
-        "layers": PESTS.map(pest => ({
-            name: pest.name,
-            title: pest.title,
-            pest
-        }))
+        "layerBasis": "gdd:agdd_50f",
+        "layers": [{
+            name: 'emerald_ash_borer',
+            title: 'Emerald Ash Borer',
+            type: WmsLayerType.PEST
+        },{
+            name: 'apple_maggot',
+            title: 'Apple Maggot',
+            type: WmsLayerType.PEST
+        },{
+            name: 'hemlock_woolly_adelgid',
+            layerBasis: 'gdd:agdd', // based on a different map than the others.
+            title: 'Hemlock Woolly Adelgid',
+            type: WmsLayerType.PEST
+        },{
+            name: 'winter_moth',
+            title: 'Winter Moth',
+            type: WmsLayerType.PEST
+        },{
+            name: 'lilac_borer',
+            title: 'Lilac Borer',
+            type: WmsLayerType.PEST
+        }]
     },{
         "name": "Temperature Accumulations, Daily 30-year Average",
         "supports_data": false,

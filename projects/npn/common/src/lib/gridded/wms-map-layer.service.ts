@@ -18,7 +18,8 @@ import {
     WmsLayerBoundingBox,
     WmsLayerStyle,
     WmsLayerExtentType,
-    WMS_VERSION
+    WMS_VERSION,
+    WmsLayerType
 } from './gridded-common';
 import { NpnMapLayer, PestMapLayer, WmsMapLayer } from './wms-map-layer';
 import { GriddedPipeProvider } from './pipes';
@@ -38,9 +39,12 @@ export class WmsMapLayerService {
     ) {}
 
     newLayer(map:google.maps.Map,layerDef:WmsLayerDefinition):NpnMapLayer {
-        return layerDef.pest
-            ? new PestMapLayer(map,layerDef,this)
-            : new WmsMapLayer(map,layerDef,this);
+        switch(layerDef.type||WmsLayerType.STANDARD) {
+            case WmsLayerType.STANDARD:
+                return new WmsMapLayer(map,layerDef,this);
+            case WmsLayerType.PEST:
+                return new PestMapLayer(map,layerDef,this);
+        }
     }
 
     getLegend(input:WmsLayerDefinition | string):Promise<WmsMapLegend> {
@@ -48,10 +52,7 @@ export class WmsMapLayerService {
             ? this.getLayerDefinition(input as string)
             : Promise.resolve(input as WmsLayerDefinition);
         return definition.then(layerDef => {
-            if(layerDef.pest) {
-                console.log('TODO pest legend');
-                return Promise.resolve(null);
-            }
+            const layerBasis = layerDef.layerBasis;
             const layerName = layerDef.name;
             if(this.legends[layerName]) {
                 return Promise.resolve(this.legends[layerName]);
@@ -60,19 +61,31 @@ export class WmsMapLayerService {
                     service: 'wms',
                     request: 'GetStyles',
                     version: WMS_VERSION,
-                    layers: layerName
+                    layers: layerBasis||layerName
                 },true /* as text*/)
                 .then(xml => {
-                    let legend_data = $jq($jq.parseXML(xml)),
-                        color_map = legend_data.find('ColorMap');
-                    if(color_map.length === 0) {
-                        // FF
-                        color_map = legend_data.find('sld\\:ColorMap');
-                    }
+                    const legend_data = $jq($jq.parseXML(xml));
+                    const findChildren = (tagName,jqParent) => {
+                        let found = jqParent.find(tagName);
+                        return found.length === 0
+                            ? jqParent.find('sld\\:'+tagName) // FF
+                            : found;
+                    };
+                    const userStyles = findChildren('UserStyle',legend_data);
+                    const userStyleElm = !!layerBasis
+                        ? userStyles.toArray().reduce((found,e) => {
+                                if(found) {
+                                    return found;
+                                }
+                                const styleName = findChildren('Name',$jq(e)).first().text();
+                                return styleName === layerName ? e : null;
+                            },null)
+                        : userStyles.toArray()[0]; 
+                    let color_map = findChildren('ColorMap',$jq(userStyleElm));
                     let l:WmsMapLegend = color_map.length !== 0 ?
                         new WmsMapLegend(this.griddedPipes,
                                 $jq(color_map.toArray()[0]),
-                                input,
+                                layerDef,
                                 legend_data) : undefined;
                     return this.legends[layerName] = l;
                 });

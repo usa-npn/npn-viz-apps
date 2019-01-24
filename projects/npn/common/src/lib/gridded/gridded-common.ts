@@ -42,6 +42,11 @@ interface NpnLayerCommon {
     current_year_only?: boolean;
 }
 
+export enum NpnLayerServiceType {
+    WMS = 'wms',
+    WCS = 'wcs'
+};
+
 export interface NpnLayerExtentValue {
     /** The raw extent value from the WMS layer definition */
     value: string;
@@ -49,11 +54,8 @@ export interface NpnLayerExtentValue {
     date?: Date;
     /** The value transformed into a readable label. */
     label: string;
-    /** TODO maybe make just addToParams(type:string) */
-    /** Used to add the extent as a parameter to a request to a WMS service. */
-    addToWmsParams?: (any) => void;
-    /** Used to add the extent as a parameter to a request to a WCS service. */
-    addToWcsParams?: (any) => void;
+    /** Add extent value to a service request's parameters */
+    addToParams: (params:any,serviceType:NpnLayerServiceType) => void;
 }
 
 export enum NpnLayerExtentType {

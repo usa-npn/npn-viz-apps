@@ -19,7 +19,8 @@ import {
     NpnLayerStyle,
     NpnLayerExtentType,
     WMS_VERSION,
-    NpnLayerType
+    NpnLayerType,
+    NpnLayerServiceType
 } from './gridded-common';
 import { NpnMapLayer, PestMapLayer, WmsMapLayer } from './wms-map-layer';
 import { GriddedPipeProvider } from './pipes';
@@ -241,14 +242,16 @@ export class WmsMapLayerService {
             value: value,
             date: d,
             label: this.griddedPipes.get('date').transform(d,(dateFmt||'longDate')),
-            addToWmsParams: function(params) {
-                params.time = value;
-            },
-            addToWcsParams: function(params) {
-                if(!params.subset) {
-                    params.subset = [];
+            addToParams: function(params:any,serviceType:NpnLayerServiceType):void {
+                switch(serviceType) {
+                    case NpnLayerServiceType.WMS:
+                        params.time = value;
+                        break;
+                    case NpnLayerServiceType.WCS:
+                        params.subset = params.subset||[];
+                        params.subset.push(`http://www.opengis.net/def/axis/OGC/0/time("${value}")`);
+                        break;
                 }
-                params.subset.push('http://www.opengis.net/def/axis/OGC/0/time("'+value+'")');
             }
         };
     }
@@ -257,14 +260,16 @@ export class WmsMapLayerService {
         return {
             value: value,
             label: this.griddedPipes.get('thirtyYearAvgDayOfYear').transform(value),
-            addToWmsParams: function(params) {
-                params.elevation = value;
-            },
-            addToWcsParams: function(params) {
-                if(!params.subset) {
-                    params.subset = [];
+            addToParams: function(params:any,serviceType:NpnLayerServiceType):void {
+                switch(serviceType) {
+                    case NpnLayerServiceType.WMS:
+                        params.elevation = value;
+                        break;
+                    case NpnLayerServiceType.WCS:
+                        params.subset = params.subset||[];
+                        params.subset.push(`http://www.opengis.net/def/axis/OGC/0/elevation(${value})`);
+                        break;
                 }
-                params.subset.push('http://www.opengis.net/def/axis/OGC/0/elevation('+value+')');
             }
         };
     }

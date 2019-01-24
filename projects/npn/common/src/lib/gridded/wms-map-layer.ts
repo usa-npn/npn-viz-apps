@@ -1,4 +1,4 @@
-import {BOX_SIZE,BASE_WMS_ARGS, NpnLayerDefinition, GriddedUrls, NpnLayerExtentType} from './gridded-common';
+import {BOX_SIZE,BASE_WMS_ARGS, NpnLayerDefinition, GriddedUrls, NpnLayerExtentType, NpnLayerServiceType, NpnLayerExtentValue, NpnLayerType} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
 import { WmsMapLayerService } from './wms-map-layer.service';
 import { NpnMapLegend } from './wms-map-legend';
@@ -23,8 +23,12 @@ export abstract class NpnMapLayer {
         return this.layerService.getLegend(this.layer_def);
     }
 
+    /** Turn the layer on. */
     abstract on():NpnMapLayer;
+    /** Then the layer off. */
     abstract off():NpnMapLayer;
+    /** Called when a layer's current extent changes to update the layer in place. */
+    abstract bounce():NpnMapLayer;
 }
 
 export class WmsMapLayer extends NpnMapLayer {
@@ -76,7 +80,7 @@ export class WmsMapLayer extends NpnMapLayer {
                     cbot = srsConversion(bot),
                     base = {};
                 if(this.extent && this.extent.current) {
-                    this.extent.current.addToWmsParams(base);
+                    this.extent.current.addToParams(base,NpnLayerServiceType.WMS);
                 }
                 var args:any = {bbox: [ctop.lng,cbot.lat,cbot.lng,ctop.lat].join(',')};
                 if(this.sldBody) {
@@ -106,26 +110,31 @@ export class WmsMapLayer extends NpnMapLayer {
     // TODO there are quite a lot of other functions that need to come over.
 
     on():WmsMapLayer {
-        // TODO analytics
-        //Analytics.trackEvent('gridded-layer','on',this.getTitle());
-        if(this.googleLayer) {
-            this.map.overlayMapTypes.push(this.googleLayer);
-        }
-        // TODO deal with pest map which is a google.maps.GroundOverlay
+        //TODO Analytics.trackEvent('gridded-layer','on',this.getTitle());
+        this.map.overlayMapTypes.push(this.googleLayer);
         return this;
     }
 
     off():WmsMapLayer {
         if(this.map.overlayMapTypes.getLength()) {
-            //Analytics.trackEvent('gridded-layer','off',this.getTitle());
+            //TODO Analytics.trackEvent('gridded-layer','off',this.getTitle());
             this.map.overlayMapTypes.pop();
         }
         // TODO deal with pest map which is a google.maps.GroundOverlay
         return this;
     }
+
+    bounce():WmsMapLayer {
+        if(this.map.overlayMapTypes.getLength()) {
+            this.map.overlayMapTypes.pop();
+        }
+        this.map.overlayMapTypes.push(this.googleLayer);
+        return this;
+    }
 }
 
 export class PestMapLayer extends NpnMapLayer {
+    private overlay:google.maps.GroundOverlay;
 
     constructor(
         protected map:google.maps.Map,
@@ -133,24 +142,81 @@ export class PestMapLayer extends NpnMapLayer {
         protected layerService:WmsMapLayerService
     ) {
         super(map,layer_def,layerService);
-        var today = new Date();
-        today.setHours(0,0,0,0);
         layer_def.extent = {
-            current: {
-                value: today.toISOString(),
-                date: today,
-                label: `${today.toLocaleString('en-us',{month:'long'})} ${today.getDate()}, ${today.getFullYear()}`
-            },
+            current: this.newExtentValue(new Date()),
             label: 'Date',
             type: NpnLayerExtentType.DATE,
         };
+        // the original created a scoped object and copied all the layer_def properties onto it and
+        // added the functions to that, copy the properties onto the WmsMapLayer instance
+        Object.keys(layer_def).forEach(key => {
+            this[key] = layer_def[key];
+        });
     }
+
+    newExtentValue(date:Date):NpnLayerExtentValue {
+        date.setHours(0,0,0,0);
+        const value = date.toISOString();
+        return {
+            value,
+            date,
+            label: `${date.toLocaleString('en-us',{month:'long'})} ${date.getDate()}, ${date.getFullYear()}`,
+            addToParams(params:any,serviceType:NpnLayerServiceType):void {
+                switch(serviceType) {
+                    case NpnLayerServiceType.WMS:
+                        params.date = value.substring(0,10);
+                        break;
+                    case NpnLayerServiceType.WCS:
+                        console.warn('TODO pest map args to WCS requests')
+                        break;
+                }
+            }
+        };
+    }
+
+    private _on():PestMapLayer {
+        const params:any = {
+            species: this.layer_def.title
+        };
+        this.layer_def.extent.current.addToParams(params,NpnLayerServiceType.WMS);
+        this.layerService.serviceUtils.get(
+            this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestMap'),
+            params
+        ).then(response => {
+            const {bbox,clippedImage} = response;
+            const [west,south,east,north] = bbox;
+            this.overlay = new google.maps.GroundOverlay(
+                clippedImage,
+                {north,south,east,west},
+                {clickable:false}
+            );
+            // TODO maybe control opacity generically??
+            this.overlay.setOpacity(0.75);
+            this.overlay.setMap(this.map);
+        });
+        return this;
+    }
+
     on():PestMapLayer {
+        //TODO Analytics.trackEvent('gridded-layer','on',this.getTitle());
+        return this._on();
+    }
+
+    private _off():PestMapLayer {
+        if(this.overlay) {
+            this.overlay.setMap(null);
+            this.overlay = null;
+        }
         return this;
     }
 
     off():PestMapLayer {
-        return this;
+        //TODO Analytics.trackEvent('gridded-layer','off',this.getTitle());
+        return this._off();
+    }
+
+    bounce():PestMapLayer {
+        return this._off()._on();
     }
 }
 

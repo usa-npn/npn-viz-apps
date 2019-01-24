@@ -41,10 +41,53 @@ interface WmsLayerCommon {
     current_year_only?: boolean;
 }
 
+export interface WmsLayerExtentValue {
+    /** The raw extent value from the WMS layer definition */
+    value: string;
+    /** If `value` represents a Date then the parsed Date object. */
+    date?: Date;
+    /** The value transformed into a readable label. */
+    label: string;
+    /** Used to add the extent as a parameter to a request to a WMS service. */
+    addToWmsParams: (any) => void;
+    /** Used to add the extent as a parameter to a request to a WCS service. */
+    addToWcsParams: (any) => void;
+}
+
+export enum WmsLayerExtentType {
+    DATE = 'date',
+    YEAR = 'year',
+    DOY = 'doy'
+}
+
+export interface WmsLayerExtent {
+    current?: WmsLayerExtentValue;
+    label: string;
+    type: WmsLayerExtentType;
+    values: WmsLayerExtentValue[];
+}
+
+export interface WmsLayerBoundingBox {
+    westBoundLongitude: number;
+    eastBoundLongitude: number;
+    southBoundLatitude: number;
+    northBoundLatitude: number;
+    getBounds: () => google.maps.LatLngBounds;
+}
+
+export interface WmsLayerStyle {
+    name: string;
+    title: string;
+    legend: string; // URL
+}
+
 export interface WmsLayerDefinition extends WmsLayerCommon {
     title?: string;
-    // TODO strongly type?
-    extent?: any;
+    abstract?: string;
+    pest?: Pest;
+    extent?: WmsLayerExtent;
+    bbox?: WmsLayerBoundingBox;
+    style?: WmsLayerStyle;
 }
 
 export interface WmsLayerCategory extends WmsLayerCommon {
@@ -56,9 +99,29 @@ export interface WmsLayerDefs {
     categories: WmsLayerCategory[];
 }
 
+export class Pest {
+    constructor(public title:string,public name:string) {}
+}
+
+export const PESTS:Pest[] = [
+    new Pest('Emerald Ash Borer','emerald_ash_borer'),
+    new Pest('Apple Maggot','apple_maggot'),
+    new Pest('Hemlock Woolly Adelgid','hemlock_woolly_adelgid'),
+    new Pest('Winter Moth','winter_moth'),
+    new Pest('Lilac Borer','lilac_borer'),
+]
+
 export const MAP_LAYERS:WmsLayerDefs = {
     "description": "",
     "categories": [{
+        "name": "Pest maps",
+        "supports_data": false, // TODO they do support data but...
+        "layers": PESTS.map(pest => ({
+            name: pest.name,
+            title: pest.title,
+            pest
+        }))
+    },{
         "name": "Temperature Accumulations, Daily 30-year Average",
         "supports_data": false,
         "legend_label_filter": {

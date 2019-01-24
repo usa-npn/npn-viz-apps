@@ -2,20 +2,21 @@ import {Injectable} from '@angular/core';
 import * as $jq_ from 'jquery';
 const $jq = $jq_;
 
-import {WmsPipeFactory} from './wms-pipe-factory.service';
 import {WmsMapLayerService} from './wms-map-layer.service';
 import {NpnServiceUtils} from '../common/index';
 import {WmsMapLegend} from './wms-map-legend';
 import {WMS_VERSION,GriddedUrls} from './gridded-common';
+import { GriddedPipeProvider } from './pipes';
 
 @Injectable()
 export class WmsMapLegendService {
     legends:any = {};
 
-    constructor(private wmsPipeFactory:WmsPipeFactory,
+    constructor(private griddedPipes:GriddedPipeProvider,
                 private serviceUtils:NpnServiceUtils,
                 private layerService:WmsMapLayerService,
                 private urls:GriddedUrls) {
+        console.warn('WmsMapLegendService: depcrecated!');
     }
 
     getLegend(layerName:string):Promise<WmsMapLegend> {
@@ -41,7 +42,7 @@ export class WmsMapLegendService {
                             color_map = legend_data.find('sld\\:ColorMap');
                         }
                         let l:WmsMapLegend = color_map.length !== 0 ?
-                            new WmsMapLegend(this.wmsPipeFactory,
+                            new WmsMapLegend(this.griddedPipes,
                                     $jq(color_map.toArray()[0]),
                                     layerDefinition,
                                     legend_data) : undefined;

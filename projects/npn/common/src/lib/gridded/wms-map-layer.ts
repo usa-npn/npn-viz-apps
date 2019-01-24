@@ -1,7 +1,33 @@
 import {BOX_SIZE,BASE_WMS_ARGS, WmsLayerDefinition, GriddedUrls} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
+import { WmsMapLayerService } from './wms-map-layer.service';
+import { WmsMapLegend } from './wms-map-legend';
 
-export class WmsMapLayer {
+
+export abstract class NpnMapLayer {
+    protected griddedPipes:GriddedPipeProvider;
+    protected griddedUrls:GriddedUrls;
+
+    constructor(
+        protected map:google.maps.Map,
+        protected layer_def:WmsLayerDefinition,
+        protected layerService:WmsMapLayerService
+    ) {
+        this.griddedPipes = layerService.griddedPipes;
+        this.griddedUrls = layerService.griddedUrls;
+    }
+
+    get layerName():string { return this.layer_def.name; }
+
+    getLegend():Promise<WmsMapLegend> {
+        return this.layerService.getLegend(this.layer_def);
+    }
+
+    abstract on():NpnMapLayer;
+    abstract off():NpnMapLayer;
+}
+
+export class WmsMapLayer extends NpnMapLayer {
     private wmsArgs:any;
     private sldBody:any;
     googleLayer: google.maps.ImageMapType;
@@ -10,12 +36,12 @@ export class WmsMapLayer {
     constructor(
         protected map:google.maps.Map,
         protected layer_def:WmsLayerDefinition,
-        protected griddedPipes:GriddedPipeProvider,
-        protected griddedUrls:GriddedUrls
+        protected layerService:WmsMapLayerService
     ) {
+        super(map,layer_def,layerService);
         if(layer_def.extent_values_filter) {
             console.debug('layer '+layer_def.name+' has an extent_values_filter, processing',layer_def.extent_values_filter);
-            const valuesPipe = griddedPipes.get(layer_def.extent_values_filter.name),
+            const valuesPipe = this.griddedPipes.get(layer_def.extent_values_filter.name),
                     extentValues = layer_def.extent.values.map(e => e.value),
                     filterArgs = [extentValues].concat(layer_def.extent_values_filter.args||[]),
                     filteredValues = valuesPipe.transform.apply(valuesPipe,filterArgs);
@@ -30,7 +56,7 @@ export class WmsMapLayer {
         }
         if(layer_def.extent_default_filter) {
             console.debug('layer '+layer_def.name+' has an extent_default_filter, processing', layer_def.extent_default_filter);
-            let defaultPipe = griddedPipes.get(layer_def.extent_default_filter.name),
+            let defaultPipe = this.griddedPipes.get(layer_def.extent_default_filter.name),
                 defaultFilterArgs = [layer_def.extent.values].concat(layer_def.extent_default_filter.values||[]);
             layer_def.extent.current = defaultPipe.transform.apply(defaultPipe,defaultFilterArgs)||layer_def.extent.current;
             console.debug('resulting default value',layer_def.extent.current);
@@ -70,14 +96,12 @@ export class WmsMapLayer {
         });
     }
 
-    get layerName():string { return this.layer_def.name; }
-
     /**
      * @returns {google.maps.Map} The map instance.
-     */
+     *
     getMap():google.maps.Map {
         return this.map;
-    }
+    }*/
 
     // TODO there are quite a lot of other functions that need to come over.
 
@@ -97,6 +121,17 @@ export class WmsMapLayer {
             this.map.overlayMapTypes.pop();
         }
         // TODO deal with pest map which is a google.maps.GroundOverlay
+        return this;
+    }
+}
+
+export class PestMapLayer extends NpnMapLayer {
+
+    on():PestMapLayer {
+        return this;
+    }
+
+    off():PestMapLayer {
         return this;
     }
 }

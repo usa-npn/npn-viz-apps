@@ -1,5 +1,5 @@
 import { VisSelection, selectionProperty } from '../vis-selection';
-import { WmsMapLayer, WmsMapLayerService, WmsMapLegend, WmsMapLegendService } from '../../gridded';
+import { NpnMapLayer, WmsMapLayerService, WmsMapLegend } from '../../gridded';
 
 export class MapSelection extends VisSelection {
     @selectionProperty()
@@ -8,10 +8,10 @@ export class MapSelection extends VisSelection {
     @selectionProperty()
     wmsMapLayer:string;
 
-    layer:WmsMapLayer;
+    layer:NpnMapLayer;
     legend:WmsMapLegend;
 
-    constructor(private layerService:WmsMapLayerService,private legendService:WmsMapLegendService) {
+    constructor(private layerService:WmsMapLayerService) {
         super();
     }
 
@@ -29,19 +29,17 @@ export class MapSelection extends VisSelection {
                 this.legend = undefined;
             }
             if(!this.layer) {
-                return Promise.all([
-                    this.layerService.getLayerDefinition(wmsMapLayer)
-                        .then(layerDef => this.layerService.newLayer(map,layerDef)),
-                    this.legendService.getLegend(wmsMapLayer)
-                ])
-                .then(results => {
-                    const [layer,legend] = results;
-                    
-                    this.legend = legend;
-                    if(this.layer = layer) {
-                        layer.on();
-                    }
-                });
+                return this.layerService.getLayerDefinition(wmsMapLayer)
+                    .then(layerDef => this.layerService.newLayer(map,layerDef))
+                    .then(layer => {
+                        if(this.layer = layer) {
+                            layer.on();
+                            return layer.getLegend()
+                                .then(legend => {
+                                    this.legend = legend;
+                                });
+                        }
+                    });
             }
         }
         return Promise.resolve();

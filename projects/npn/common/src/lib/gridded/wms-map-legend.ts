@@ -1,12 +1,13 @@
 import * as $jq_ from 'jquery';
 const $jq = $jq_;
 
-import {WmsMapLayer} from './wms-map-layer';
+import {NpnMapLayer} from './wms-map-layer';
 import {WmsPipeFactory} from './wms-pipe-factory.service';
+import { GriddedPipeProvider } from './pipes';
 
 const IDENTITY = d => d;
 export class WmsMapLegend {
-    private layer:WmsMapLayer;
+    private layer:NpnMapLayer;
 
     private lformat:Function;
     private gformat:Function;
@@ -15,7 +16,7 @@ export class WmsMapLegend {
     private length:number;
 
 
-    constructor(protected wmsPipeFactory:WmsPipeFactory,
+    constructor(protected griddedPipes:GriddedPipeProvider,
                 protected color_map:any,
                 /*
                 NOTE: per the original implementation which binds extents directly into the definition this is public
@@ -27,7 +28,7 @@ export class WmsMapLegend {
             console.log('WmsMapLegend.ldef',ldef);
             console.log('WmsMapLegend.styleDefinition',styleDefinition);
             let get_filter = (filter_def) => {
-                let pipe = this.wmsPipeFactory.getPipe(filter_def.name);
+                let pipe = this.griddedPipes.get(filter_def.name);
                 if(!pipe) {
                     console.error(`WmsMapLegend: Unable to find pipe named ${filter_def.name}`);
                 }
@@ -62,7 +63,7 @@ export class WmsMapLegend {
             this.length = this.data.length;
     }
 
-    setLayer(l:WmsMapLayer):WmsMapLegend {
+    setLayer(l:NpnMapLayer):WmsMapLegend {
         this.layer = l;
         return this;
     }

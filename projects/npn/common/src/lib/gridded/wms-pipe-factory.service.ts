@@ -18,6 +18,7 @@ export class WmsPipeFactory {
         private legendSixAnomaly:LegendSixAnomalyPipe,
         private legendDoy:LegendDoyPipe,
         private extentDates:ExtentDatesPipe) {
+console.warn('WmsPipeFactory: deprecated!'); 
         this.pipes.legendGddUnits = legendGddUnits;
         this.pipes.agddDefaultTodayElevation = agddDefaultTodayElevation;
         this.pipes.legendAgddAnomaly = legendAgddAnomaly;

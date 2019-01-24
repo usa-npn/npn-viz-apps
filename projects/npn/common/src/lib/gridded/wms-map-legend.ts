@@ -2,7 +2,6 @@ import * as $jq_ from 'jquery';
 const $jq = $jq_;
 
 import {NpnMapLayer} from './wms-map-layer';
-import {WmsPipeFactory} from './wms-pipe-factory.service';
 import { GriddedPipeProvider } from './pipes';
 
 const IDENTITY = d => d;
@@ -14,7 +13,6 @@ export class WmsMapLegend {
     private title_data:any;
     private data:any[];
     private length:number;
-
 
     constructor(protected griddedPipes:GriddedPipeProvider,
                 protected color_map:any,

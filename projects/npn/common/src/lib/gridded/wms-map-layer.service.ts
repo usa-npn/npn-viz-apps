@@ -43,35 +43,40 @@ export class WmsMapLayerService {
             : new WmsMapLayer(map,layerDef,this);
     }
 
-    getLegend(layerDef:WmsLayerDefinition):Promise<WmsMapLegend> {
-        if(layerDef.pest) {
-            console.log('TODO pest legend');
-            return Promise.resolve(null);
-        }
-        const layerName = layerDef.name;
-        if(this.legends[layerName]) {
-            return Promise.resolve(this.legends[layerName]);
-        }
-        return this.serviceUtils.cachedGet(this.griddedUrls.wmsBaseUrl,{
-                service: 'wms',
-                request: 'GetStyles',
-                version: WMS_VERSION,
-                layers: layerName
-            },true /* as text*/)
-            .then(xml => {
-                let legend_data = $jq($jq.parseXML(xml)),
-                    color_map = legend_data.find('ColorMap');
-                if(color_map.length === 0) {
-                    // FF
-                    color_map = legend_data.find('sld\\:ColorMap');
-                }
-                let l:WmsMapLegend = color_map.length !== 0 ?
-                    new WmsMapLegend(this.griddedPipes,
-                            $jq(color_map.toArray()[0]),
-                            layerDef,
-                            legend_data) : undefined;
-                return this.legends[layerName] = l;
-            });
+    getLegend(input:WmsLayerDefinition | string):Promise<WmsMapLegend> {
+        const definition:Promise<WmsLayerDefinition> = typeof(input) === 'string'
+            ? this.getLayerDefinition(input as string)
+            : Promise.resolve(input as WmsLayerDefinition);
+        return definition.then(layerDef => {
+            if(layerDef.pest) {
+                console.log('TODO pest legend');
+                return Promise.resolve(null);
+            }
+            const layerName = layerDef.name;
+            if(this.legends[layerName]) {
+                return Promise.resolve(this.legends[layerName]);
+            }
+            return this.serviceUtils.cachedGet(this.griddedUrls.wmsBaseUrl,{
+                    service: 'wms',
+                    request: 'GetStyles',
+                    version: WMS_VERSION,
+                    layers: layerName
+                },true /* as text*/)
+                .then(xml => {
+                    let legend_data = $jq($jq.parseXML(xml)),
+                        color_map = legend_data.find('ColorMap');
+                    if(color_map.length === 0) {
+                        // FF
+                        color_map = legend_data.find('sld\\:ColorMap');
+                    }
+                    let l:WmsMapLegend = color_map.length !== 0 ?
+                        new WmsMapLegend(this.griddedPipes,
+                                $jq(color_map.toArray()[0]),
+                                input,
+                                legend_data) : undefined;
+                    return this.legends[layerName] = l;
+                });
+        });
     }
 
     getLayerDefinitions():Promise<WmsLayerDefs> {

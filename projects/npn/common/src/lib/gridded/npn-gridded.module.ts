@@ -6,9 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material';
 
-import { WmsPipeFactory } from './wms-pipe-factory.service';
 import { WmsMapLayerService } from './wms-map-layer.service';
-import { WmsMapLegendService } from './wms-map-legend.service';
 import { NpnCommonModule } from '../common/index';
 import { WmsMapLegendComponent } from './wms-map-legend.component';
 import { WmsMapOpacityControl } from './wms-map-opacity-control.component';
@@ -45,9 +43,7 @@ import {
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe, GriddedPipeProvider,
-        WmsPipeFactory,
         WmsMapLayerService,
-        WmsMapLegendService,
         GriddedUrls,
         WcsDataService
     ]

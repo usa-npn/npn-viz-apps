@@ -11,14 +11,14 @@ export function parseExtentDate(s:string):Date {
     return new Date(year, month, day);
 }
 
-export interface WmsLayerFilterDef {
+export interface NpnLayerFilterDef {
     name: string;
     args?: any[];
     // WmsMapLayer stores some stuff here??
     values?: any[];
 }
 
-interface WmsLayerCommon {
+interface NpnLayerCommon {
     name: string;
     layerBasis?: string;
     /** contains a description of a given layer.  this value can also be specified at the top level so that it applies to all layers in all categories (as the default). */
@@ -26,13 +26,13 @@ interface WmsLayerCommon {
     /** specifies a boolean indicating if a layer supports plotting of data on it or not (default true). */
     supports_data?: boolean;
     /** specifies an angular filter and optional arguments used to translate point data into strings for legends and map info windows. */
-    legend_label_filter?: WmsLayerFilterDef;
+    legend_label_filter?: NpnLayerFilterDef;
     /** specifies an angular filter and optional arguments used to translate point data into strings for point data map info windows (if not specified then `legend_label_filter` will be used). */
-    gridded_label_filter?: WmsLayerFilterDef;
+    gridded_label_filter?: NpnLayerFilterDef;
     /** specifies an angualr filter and optional arguments used to filter extent values for layers. */
-    extent_values_filter?: WmsLayerFilterDef;
+    extent_values_filter?: NpnLayerFilterDef;
     /** specifies anangular filter and optional arguments used to select a default value.  (if not specified the default provided by the server will be used). */
-    extent_default_filter?: WmsLayerFilterDef;
+    extent_default_filter?: NpnLayerFilterDef;
     /** specifies a string that should be placed on the legend below the cell labels (units separated from legend labels). */
     legend_units?: string;
     legend_delimiter_every?: number;
@@ -42,33 +42,34 @@ interface WmsLayerCommon {
     current_year_only?: boolean;
 }
 
-export interface WmsLayerExtentValue {
+export interface NpnLayerExtentValue {
     /** The raw extent value from the WMS layer definition */
     value: string;
     /** If `value` represents a Date then the parsed Date object. */
     date?: Date;
     /** The value transformed into a readable label. */
     label: string;
+    /** TODO maybe make just addToParams(type:string) */
     /** Used to add the extent as a parameter to a request to a WMS service. */
-    addToWmsParams: (any) => void;
+    addToWmsParams?: (any) => void;
     /** Used to add the extent as a parameter to a request to a WCS service. */
-    addToWcsParams: (any) => void;
+    addToWcsParams?: (any) => void;
 }
 
-export enum WmsLayerExtentType {
+export enum NpnLayerExtentType {
     DATE = 'date',
     YEAR = 'year',
     DOY = 'doy'
 }
 
-export interface WmsLayerExtent {
-    current?: WmsLayerExtentValue;
+export interface NpnLayerExtent {
+    current?: NpnLayerExtentValue;
     label: string;
-    type: WmsLayerExtentType;
-    values: WmsLayerExtentValue[];
+    type: NpnLayerExtentType;
+    values?: NpnLayerExtentValue[];
 }
 
-export interface WmsLayerBoundingBox {
+export interface NpnLayerBoundingBox {
     westBoundLongitude: number;
     eastBoundLongitude: number;
     southBoundLatitude: number;
@@ -76,37 +77,37 @@ export interface WmsLayerBoundingBox {
     getBounds: () => google.maps.LatLngBounds;
 }
 
-export interface WmsLayerStyle {
+export interface NpnLayerStyle {
     name: string;
     title: string;
     legend: string; // URL
 }
 
-export enum WmsLayerType {
+export enum NpnLayerType {
     STANDARD = 'standard',
     PEST = 'pest'
 }
 
-export interface WmsLayerDefinition extends WmsLayerCommon {
+export interface NpnLayerDefinition extends NpnLayerCommon {
     /** defaults to `WmsLayerType.STANDARD` */
-    type?: WmsLayerType;
+    type?: NpnLayerType;
     title?: string;
     abstract?: string;
-    extent?: WmsLayerExtent;
-    bbox?: WmsLayerBoundingBox;
-    style?: WmsLayerStyle;
+    extent?: NpnLayerExtent;
+    bbox?: NpnLayerBoundingBox;
+    style?: NpnLayerStyle;
 }
 
-export interface WmsLayerCategory extends WmsLayerCommon {
-    layers: WmsLayerDefinition[];
+export interface NpnLayerCategory extends NpnLayerCommon {
+    layers: NpnLayerDefinition[];
 }
 
-export interface WmsLayerDefs {
+export interface NpnLayerDefs {
     description?: string;
-    categories: WmsLayerCategory[];
+    categories: NpnLayerCategory[];
 }
 
-export const MAP_LAYERS:WmsLayerDefs = {
+export const MAP_LAYERS:NpnLayerDefs = {
     "description": "",
     "categories": [{
         "name": "Pest maps",
@@ -115,24 +116,24 @@ export const MAP_LAYERS:WmsLayerDefs = {
         "layers": [{
             name: 'emerald_ash_borer',
             title: 'Emerald Ash Borer',
-            type: WmsLayerType.PEST
+            type: NpnLayerType.PEST
         },{
             name: 'apple_maggot',
             title: 'Apple Maggot',
-            type: WmsLayerType.PEST
+            type: NpnLayerType.PEST
         },{
             name: 'hemlock_woolly_adelgid',
             layerBasis: 'gdd:agdd', // based on a different map than the others.
             title: 'Hemlock Woolly Adelgid',
-            type: WmsLayerType.PEST
+            type: NpnLayerType.PEST
         },{
             name: 'winter_moth',
             title: 'Winter Moth',
-            type: WmsLayerType.PEST
+            type: NpnLayerType.PEST
         },{
             name: 'lilac_borer',
             title: 'Lilac Borer',
-            type: WmsLayerType.PEST
+            type: NpnLayerType.PEST
         }]
     },{
         "name": "Temperature Accumulations, Daily 30-year Average",

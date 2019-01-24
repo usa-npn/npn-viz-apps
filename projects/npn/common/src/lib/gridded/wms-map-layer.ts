@@ -1,7 +1,7 @@
-import {BOX_SIZE,BASE_WMS_ARGS, WmsLayerDefinition, GriddedUrls} from './gridded-common';
+import {BOX_SIZE,BASE_WMS_ARGS, NpnLayerDefinition, GriddedUrls, NpnLayerExtentType} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
 import { WmsMapLayerService } from './wms-map-layer.service';
-import { WmsMapLegend } from './wms-map-legend';
+import { NpnMapLegend } from './wms-map-legend';
 
 
 export abstract class NpnMapLayer {
@@ -10,7 +10,7 @@ export abstract class NpnMapLayer {
 
     constructor(
         protected map:google.maps.Map,
-        protected layer_def:WmsLayerDefinition,
+        protected layer_def:NpnLayerDefinition,
         protected layerService:WmsMapLayerService
     ) {
         this.griddedPipes = layerService.griddedPipes;
@@ -19,7 +19,7 @@ export abstract class NpnMapLayer {
 
     get layerName():string { return this.layer_def.name; }
 
-    getLegend():Promise<WmsMapLegend> {
+    getLegend():Promise<NpnMapLegend> {
         return this.layerService.getLegend(this.layer_def);
     }
 
@@ -35,7 +35,7 @@ export class WmsMapLayer extends NpnMapLayer {
 
     constructor(
         protected map:google.maps.Map,
-        protected layer_def:WmsLayerDefinition,
+        protected layer_def:NpnLayerDefinition,
         protected layerService:WmsMapLayerService
     ) {
         super(map,layer_def,layerService);
@@ -127,6 +127,24 @@ export class WmsMapLayer extends NpnMapLayer {
 
 export class PestMapLayer extends NpnMapLayer {
 
+    constructor(
+        protected map:google.maps.Map,
+        protected layer_def:NpnLayerDefinition,
+        protected layerService:WmsMapLayerService
+    ) {
+        super(map,layer_def,layerService);
+        var today = new Date();
+        today.setHours(0,0,0,0);
+        layer_def.extent = {
+            current: {
+                value: today.toISOString(),
+                date: today,
+                label: `${today.toLocaleString('en-us',{month:'long'})} ${today.getDate()}, ${today.getFullYear()}`
+            },
+            label: 'Date',
+            type: NpnLayerExtentType.DATE,
+        };
+    }
     on():PestMapLayer {
         return this;
     }

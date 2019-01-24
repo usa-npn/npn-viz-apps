@@ -6,7 +6,7 @@ import { HttpParams } from '@angular/common/http';
 import * as $jq_ from 'jquery';
 const $jq = $jq_;
 
-import { WmsMapLegend } from './wms-map-legend';
+import { NpnMapLegend } from './wms-map-legend';
 import { NpnServiceUtils } from '../common/index';
 
 const TO_RADIANS = (degrees:number) => degrees * Math.PI / 180;
@@ -107,7 +107,7 @@ export class GriddedInfoWindowHandler {
     infoWindow:google.maps.InfoWindow;
     constructor(private dataService:WcsDataService,private map:google.maps.Map) {}
 
-    open(latLng:google.maps.LatLng,layerName:string,legend:WmsMapLegend,paramsAugment?:(args:any) => void) {
+    open(latLng:google.maps.LatLng,layerName:string,legend:NpnMapLegend,paramsAugment?:(args:any) => void) {
         this.dataService.getGriddedData(layerName,latLng,5,paramsAugment)
             .subscribe((tuples:number[]) => {
                 console.log('GriddedInfoWindowHandler.tuples',tuples);

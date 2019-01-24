@@ -3,7 +3,7 @@ import { StepState, VisConfigStep } from '../interfaces';
 import { Component } from '@angular/core';
 import { WmsMapLayerService, MapSelection } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
-import { WmsLayerDefs, WmsLayerDefinition } from '@npn/common/gridded/gridded-common';
+import { NpnLayerDefs, NpnLayerDefinition } from '@npn/common/gridded/gridded-common';
 
 
 @Component({
@@ -36,13 +36,13 @@ export class LayerStepComponent extends BaseStepComponent {
 export class LayerControlComponent extends BaseControlComponent {
     selection:MapSelection;
     title:string = 'Select layer';
-    layerDefinitions:WmsLayerDefs;
+    layerDefinitions:NpnLayerDefs;
 
     constructor(private layerService:WmsMapLayerService) {
         super();
     }
 
-    layerClick(layer:WmsLayerDefinition) {
+    layerClick(layer:NpnLayerDefinition) {
         this.selection.wmsMapLayer = this.selection.wmsMapLayer !== layer.name
             ? layer.name
             : undefined;

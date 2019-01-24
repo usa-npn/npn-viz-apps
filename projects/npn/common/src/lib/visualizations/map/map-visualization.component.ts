@@ -3,7 +3,7 @@ import { ObservableMedia } from "@angular/flex-layout";
 
 import { MapVisualizationBaseComponent } from '../map-visualization-base.component';
 import { MapSelection } from './map-selection';
-import { WmsMapLegend } from '@npn/common/gridded';
+import { NpnMapLegend } from '@npn/common/gridded';
 import { WmsMapLegendComponent } from '@npn/common/gridded/wms-map-legend.component';
 
 @Component({

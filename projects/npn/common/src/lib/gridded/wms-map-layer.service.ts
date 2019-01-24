@@ -10,20 +10,20 @@ import { NpnServiceUtils } from '../common/index';
 import {
     MAP_LAYERS,
     GriddedUrls,
-    WmsLayerDefs,
-    WmsLayerDefinition,
+    NpnLayerDefs,
+    NpnLayerDefinition,
     parseExtentDate,
-    WmsLayerExtentValue,
-    WmsLayerExtent,
-    WmsLayerBoundingBox,
-    WmsLayerStyle,
-    WmsLayerExtentType,
+    NpnLayerExtentValue,
+    NpnLayerExtent,
+    NpnLayerBoundingBox,
+    NpnLayerStyle,
+    NpnLayerExtentType,
     WMS_VERSION,
-    WmsLayerType
+    NpnLayerType
 } from './gridded-common';
 import { NpnMapLayer, PestMapLayer, WmsMapLayer } from './wms-map-layer';
 import { GriddedPipeProvider } from './pipes';
-import { WmsMapLegend } from './wms-map-legend';
+import { NpnMapLegend, WmsMapLegend, PestMapLegend } from './wms-map-legend';
 
 const DEEP_COPY = (o) => JSON.parse(JSON.stringify(o));
 
@@ -38,19 +38,23 @@ export class WmsMapLayerService {
         public griddedUrls:GriddedUrls
     ) {}
 
-    newLayer(map:google.maps.Map,layerDef:WmsLayerDefinition):NpnMapLayer {
-        switch(layerDef.type||WmsLayerType.STANDARD) {
-            case WmsLayerType.STANDARD:
+    newLayer(map:google.maps.Map,layerDef:NpnLayerDefinition):NpnMapLayer {
+        switch(layerDef.type||NpnLayerType.STANDARD) {
+            case NpnLayerType.STANDARD:
                 return new WmsMapLayer(map,layerDef,this);
-            case WmsLayerType.PEST:
+            case NpnLayerType.PEST:
                 return new PestMapLayer(map,layerDef,this);
         }
     }
 
-    getLegend(input:WmsLayerDefinition | string):Promise<WmsMapLegend> {
-        const definition:Promise<WmsLayerDefinition> = typeof(input) === 'string'
+    // this is separate from WmsLayer itself because FWS apps use
+    // legends separate from layers (for now).  If the clipped stuff
+    // is worked into a sub-class of NpnMapLayer then this should likely
+    // move into the layer implementation itself.
+    getLegend(input:NpnLayerDefinition | string):Promise<NpnMapLegend> {
+        const definition:Promise<NpnLayerDefinition> = typeof(input) === 'string'
             ? this.getLayerDefinition(input as string)
-            : Promise.resolve(input as WmsLayerDefinition);
+            : Promise.resolve(input as NpnLayerDefinition);
         return definition.then(layerDef => {
             const layerBasis = layerDef.layerBasis;
             const layerName = layerDef.name;
@@ -82,17 +86,29 @@ export class WmsMapLayerService {
                             },null)
                         : userStyles.toArray()[0]; 
                     let color_map = findChildren('ColorMap',$jq(userStyleElm));
-                    let l:WmsMapLegend = color_map.length !== 0 ?
-                        new WmsMapLegend(this.griddedPipes,
-                                $jq(color_map.toArray()[0]),
-                                layerDef,
-                                legend_data) : undefined;
+                    let l:NpnMapLegend;
+                    if(color_map.length !== 0) {
+                        switch(layerDef.type||NpnLayerType.STANDARD) {
+                            case NpnLayerType.STANDARD:
+                                l = new WmsMapLegend(this.griddedPipes,
+                                    $jq(color_map.toArray()[0]),
+                                    layerDef,
+                                    legend_data);
+                                break;
+                            case NpnLayerType.PEST:
+                                l = new PestMapLegend(this.griddedPipes,
+                                    $jq(color_map.toArray()[0]),
+                                    layerDef,
+                                    legend_data);
+                                break;
+                        }
+                    }
                     return this.legends[layerName] = l;
                 });
         });
     }
 
-    getLayerDefinitions():Promise<WmsLayerDefs> {
+    getLayerDefinitions():Promise<NpnLayerDefs> {
         function mergeLayersIntoConfig(wms_layer_defs) {
             let result = DEEP_COPY(MAP_LAYERS),
                 base_description = result.description;
@@ -114,18 +130,18 @@ export class WmsMapLayerService {
             return Promise.resolve(this.layerDefs);
         }
         return this.serviceUtils.cachedGet(this.griddedUrls.wmsCapabilitiesUrl,null,true/*as text*/)
-                    .then(xml => {
-                        let wms_capabilities = $jq($jq.parseXML(xml));
-                        console.debug('WmsMapLayerService:capabilities',wms_capabilities);
-                        let wms_layer_defs = this._getLayers(wms_capabilities.find('Layer'));
-                        console.debug('WmsMapLayerService:wms layer definitions',wms_layer_defs);
-                        this.layerDefs = mergeLayersIntoConfig(wms_layer_defs);
-                        console.debug('WmsMapLayerService:layer definitions',this.layerDefs);
-                        return this.layerDefs;
-                    });
+            .then(xml => {
+                let wms_capabilities = $jq($jq.parseXML(xml));
+                console.debug('WmsMapLayerService:capabilities',wms_capabilities);
+                let wms_layer_defs = this._getLayers(wms_capabilities.find('Layer'));
+                console.debug('WmsMapLayerService:wms layer definitions',wms_layer_defs);
+                this.layerDefs = mergeLayersIntoConfig(wms_layer_defs);
+                console.debug('WmsMapLayerService:layer definitions',this.layerDefs);
+                return this.layerDefs;
+            });
     }
 
-    getLayerDefinition(layerName:string):Promise<WmsLayerDefinition> {
+    getLayerDefinition(layerName:string):Promise<NpnLayerDefinition> {
         return this.getLayerDefinitions()
                 .then(definitions => {
                     let layerMap = definitions.categories.reduce((map,c) => {
@@ -141,7 +157,7 @@ export class WmsMapLayerService {
     // private functions used to parse layer info out of WMS Capabilities response
     // remain instance functions since they use some injected services
     // returns an associative array of machine name layer to layer definition
-    private _getLayers(layers):({[name:string]: WmsLayerDefinition}) {
+    private _getLayers(layers):({[name:string]: NpnLayerDefinition}) {
         if(!layers || layers.length < 2) { // 1st layer is parent, children are the real layers
             return;
         }
@@ -155,7 +171,7 @@ export class WmsMapLayerService {
             return map;
         },{});
     }
-    private _layerToObject(layer):WmsLayerDefinition {
+    private _layerToObject(layer):NpnLayerDefinition {
         let l = $jq(layer),
             o = {
                 name: l.find('Name').first().text(),
@@ -171,7 +187,7 @@ export class WmsMapLayerService {
         }
         return o;
     }
-    private _parseStyle(style):WmsLayerStyle {
+    private _parseStyle(style):NpnLayerStyle {
         let s = $jq(style);
         return {
             name: s.find('Name').first().text(),
@@ -197,7 +213,7 @@ export class WmsMapLayerService {
             return bbox;
         }
     }
-    private _parseBoundingBox(bb):WmsLayerBoundingBox {
+    private _parseBoundingBox(bb):NpnLayerBoundingBox {
         if(bb.length) {
             let bbox = {
                 westBoundLongitude: parseFloat(bb.find('westBoundLongitude').text()),
@@ -219,7 +235,7 @@ export class WmsMapLayerService {
         }
     }
     // represents an extent value of month/day/year
-    private _dateExtentValue(value:string,dateFmt?:string):WmsLayerExtentValue {
+    private _dateExtentValue(value:string,dateFmt?:string):NpnLayerExtentValue {
         const d = parseExtentDate(value);
         return {
             value: value,
@@ -237,7 +253,7 @@ export class WmsMapLayerService {
         };
     }
     // represents an extent value of day of year
-    private _doyExtentValue(value:string):WmsLayerExtentValue {
+    private _doyExtentValue(value:string):NpnLayerExtentValue {
         return {
             value: value,
             label: this.griddedPipes.get('thirtyYearAvgDayOfYear').transform(value),
@@ -252,7 +268,7 @@ export class WmsMapLayerService {
             }
         };
     }
-    private _parseExtent(extent):WmsLayerExtent {
+    private _parseExtent(extent):NpnLayerExtent {
         var e = $jq(extent),
             content = e.text(),
             dfltValue = e.attr('default'),
@@ -273,7 +289,7 @@ export class WmsMapLayerService {
                 dflt = values.reduce(findDefault,undefined);
                 return {
                     label: 'Date',
-                    type: WmsLayerExtentType.DATE,
+                    type: NpnLayerExtentType.DATE,
                     current: dflt, // bind the extent value to use here
                     values: values
                 };
@@ -290,7 +306,7 @@ export class WmsMapLayerService {
                         values.push(end);
                         return {
                             label: 'Year',
-                            type: WmsLayerExtentType.YEAR,
+                            type: NpnLayerExtentType.YEAR,
                             current: end,
                             values: values
                         };
@@ -302,7 +318,7 @@ export class WmsMapLayerService {
             dflt = values.reduce(findDefault,undefined);
             return {
                 label: 'Day of Year',
-                type: WmsLayerExtentType.DOY,
+                type: NpnLayerExtentType.DOY,
                 current: dflt, // bind the extent value to use here
                 values: values
             };

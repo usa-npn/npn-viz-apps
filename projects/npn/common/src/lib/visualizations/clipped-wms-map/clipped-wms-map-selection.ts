@@ -1,7 +1,7 @@
 import { NetworkAwareVisSelection, selectionProperty, ONE_DAY_MILLIS } from '../vis-selection';
 import { NpnServiceUtils } from '../../common';
 import {
-    WmsMapLegend,
+    NpnMapLegend,
     WmsMapSupportsOpacity,
     googleFeatureBounds,
     WcsDataService,
@@ -70,7 +70,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     @selectionProperty()
     useBufferedBoundary:boolean = false;
 
-    legend:WmsMapLegend;
+    legend:NpnMapLegend;
     overlay:ImageOverlay;
     data:WmsMapSelectionData;
     private features:any[];

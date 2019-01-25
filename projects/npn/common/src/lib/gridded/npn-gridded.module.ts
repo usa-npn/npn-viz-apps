@@ -5,11 +5,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material';
+import { Ng5SliderModule } from 'ng5-slider';
 
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { NpnCommonModule } from '../common/index';
 import { MapLayerLegendComponent } from './map-layer-legend.component';
 import { SupportsOpacityControl } from './supports-opacity-control.component';
+import { GriddedRangeSliderControl } from './gridded-range-slider-control.component';
 import { GriddedUrls } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
 
@@ -25,18 +27,21 @@ import {
         BrowserModule,
         FormsModule, ReactiveFormsModule,
         MatSliderModule,
+        Ng5SliderModule,
         NpnCommonModule
     ],
     declarations: [
         MapLayerLegendComponent,
         SupportsOpacityControl,
+        GriddedRangeSliderControl,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe
     ],
     exports: [
         MapLayerLegendComponent,
-        SupportsOpacityControl
+        SupportsOpacityControl,
+        GriddedRangeSliderControl
     ],
     providers: [
         DatePipe, DecimalPipe,

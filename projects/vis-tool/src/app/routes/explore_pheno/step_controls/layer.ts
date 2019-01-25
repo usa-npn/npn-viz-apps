@@ -75,8 +75,16 @@ export class LayerControlComponent extends BaseControlComponent {
 
 @Component({
     template: `
-    <supports-opacity-control *ngIf="selection.layer" [supportsOpacity]="selection.layer"></supports-opacity-control>
-    `
+    <div *ngIf="selection.layer" class="layer-controls">
+        <supports-opacity-control [supportsOpacity]="selection.layer"></supports-opacity-control>
+        <gridded-range-slider [layer]="selection.layer"></gridded-range-slider>
+    </div>
+    `,
+    styles:[`
+    .layer-controls {
+        min-width: 400px;
+    }
+    `]
 })
 export class LayerControlSubComponent extends BaseSubControlComponent {
     title:string = 'Taylor your layer';

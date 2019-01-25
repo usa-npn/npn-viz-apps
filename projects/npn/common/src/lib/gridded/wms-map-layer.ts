@@ -1,12 +1,16 @@
 import { BOX_SIZE, BASE_WMS_ARGS, MapLayerDefinition, MapLayerServiceType } from './gridded-common';
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayer, srsConversion, encodeHttpParams } from './map-layer';
+import * as $jq_ from 'jquery';
+const $jq = $jq_;
 
 export class WmsMapLayer extends MapLayer {
     private wmsArgs: any;
     private sldBody: any;
+    private styleRange: number[];
     googleLayer: google.maps.ImageMapType;
-    [x: string]: any; // allow arbitrary properties
+    //[x: string]: any; // allow arbitrary properties
+
     constructor(protected map: google.maps.Map, protected layer_def: MapLayerDefinition, protected layerService: NpnMapLayerService) {
         super(map, layer_def, layerService);
         if (layer_def.extent_values_filter) {
@@ -82,4 +86,82 @@ export class WmsMapLayer extends MapLayer {
         this.map.overlayMapTypes.push(this.googleLayer);
         return this;
     }
+
+    /**
+     * Sets the style to pass to the WMS service, used to limit the layer to a range.
+     * 
+     * @param style The new style (XML as a stirng)
+     */
+    setStyle(style:any) {
+        if(style !== this.sldBody) { // avoid off/on if nothing is changing
+            if(style) {
+                console.debug('style:',style);
+            }
+            this.sldBody = style;
+            this.bounce();
+        }
+    }
+
+    /**
+     * @returns The style range if any was set.
+     */
+    getStyleRange():number[] {
+        return this.styleRange;
+    }
+
+    /**
+     * Sets the style range to pass along to the server.
+     * 
+     * @param range The new style range.
+     */
+    setStyleRange(range:number[]) {
+        if(!(this.styleRange = range)) {
+            return this.setStyle(undefined);
+        }
+        this.getLegend().then(legend => {
+            const styleDef = legend.getStyleDefinition(),
+                data = legend.getData(),
+                minQ = data[range[0]].quantity,
+                maxQ = data[range[1]].quantity,
+                $styleDef = $jq(styleDef);
+            let colors = $styleDef.find('ColorMapEntry');
+            let colorMap = $styleDef.find('ColorMap');
+            // only want the first style assosiated with the layer
+            // todo: instead of picking first style, generalize to pick by name
+            while (styleDef[0].firstElementChild.firstElementChild.children.length > 2) {
+                styleDef[0].firstElementChild.firstElementChild.removeChild(styleDef[0].firstElementChild.firstElementChild.lastChild);
+            }    
+            if(colors.length === 0) {
+                colors = $styleDef.find('sld\\:ColorMapEntry'); // FF
+            }
+            if(colorMap.length === 0) {
+                colorMap = $styleDef.find('sld\\:ColorMap'); // FF
+            }
+            if(colorMap) {
+                colorMap.attr('type','intervals');
+            }
+            colors.each(function() {
+                var cme = $jq(this),
+                    q = parseInt(cme.attr('quantity'));
+                /*if(q === -9999) {
+                    cme.attr('opacity','0.0');
+                    //cme.remove();
+                } else {*/
+                    cme.attr('opacity',(q > minQ && q <= maxQ) ? '1.0' : '0.0');
+                /*}*/
+            });
+            this.setStyle(xmlToString(styleDef[0]));
+        });
+    }
+}
+
+
+function xmlToString(xmlData) {
+    let xmlString;
+    if ((window as any).ActiveXObject) {
+        xmlString = xmlData.xml; // MSIE
+    } else {
+        xmlString = (new XMLSerializer()).serializeToString(xmlData);
+    }
+    return xmlString;
 }

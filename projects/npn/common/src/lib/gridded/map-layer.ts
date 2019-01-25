@@ -1,4 +1,4 @@
-import {MapLayerDefinition, GriddedUrls, MapLayerType} from './gridded-common';
+import {MapLayerDefinition, GriddedUrls, MapLayerType, MapLayerExtent} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayerLegend } from './map-layer-legend';
@@ -8,6 +8,7 @@ export abstract class MapLayer implements SupportsOpacity {
     protected griddedPipes:GriddedPipeProvider;
     protected griddedUrls:GriddedUrls;
     protected opacity:number = 0.75;
+    protected extent:MapLayerExtent;
 
     constructor(
         protected map:google.maps.Map,

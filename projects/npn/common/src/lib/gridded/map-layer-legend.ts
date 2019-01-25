@@ -7,6 +7,13 @@ import { GriddedPipeProvider } from './pipes';
 import { Selection } from 'd3-selection';
 import { MapLayerDefinition } from './gridded-common';
 
+export interface LegendData {
+    color: string;
+    quantity: number;
+    original_label: string;
+    label: string;
+}
+
 const IDENTITY = d => d;
 
 export abstract class MapLayerLegend {
@@ -14,7 +21,7 @@ export abstract class MapLayerLegend {
     private lformat:Function;
     private gformat:Function;
     private title_data:any;
-    private data:any[];
+    private data:LegendData[];
     private length:number;
 
     constructor(protected griddedPipes:GriddedPipeProvider,
@@ -73,7 +80,7 @@ export abstract class MapLayerLegend {
         return this.layer;
     }
 
-    getData():any[] {
+    getData():LegendData[] {
         return this.data;
     }
 

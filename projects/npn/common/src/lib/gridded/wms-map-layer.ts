@@ -49,19 +49,19 @@ export class WmsMapLayer extends MapLayer {
             //isPng: true,
             name: (layer_def.title || layer_def.name)
         });
+        this.googleLayer.setOpacity(this.opacity);
         // the original created a scoped object and copied all the layer_def properties onto it and
         // added the functions to that, copy the properties onto the WmsMapLayer instance
         Object.keys(layer_def).forEach(key => {
             this[key] = layer_def[key];
         });
     }
-    /**
-     * @returns {google.maps.Map} The map instance.
-     *
-    getMap():google.maps.Map {
-        return this.map;
-    }*/
-    // TODO there are quite a lot of other functions that may need to come over.
+    setOpacity(opacity:number) {
+        this.opacity = opacity;
+        if(this.googleLayer) {
+            this.googleLayer.setOpacity(opacity);
+        }
+    }
     on(): WmsMapLayer {
         //TODO Analytics.trackEvent('gridded-layer','on',this.getTitle());
         this.map.overlayMapTypes.push(this.googleLayer);

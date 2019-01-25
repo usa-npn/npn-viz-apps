@@ -2,10 +2,12 @@ import {MapLayerDefinition, GriddedUrls, MapLayerType} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayerLegend } from './map-layer-legend';
+import { SupportsOpacity } from './supports-opacity-control.component';
 
-export abstract class MapLayer {
+export abstract class MapLayer implements SupportsOpacity {
     protected griddedPipes:GriddedPipeProvider;
     protected griddedUrls:GriddedUrls;
+    protected opacity:number = 0.75;
 
     constructor(
         protected map:google.maps.Map,
@@ -22,6 +24,14 @@ export abstract class MapLayer {
         return this.layerService.getLegend(this.layer_def)
             .then(legend => legend.setLayer(this))
     }
+
+    /**
+     * Sets the current opacity (0-1) for this layer.
+     * Sub-classes will over-ride to pass along the value
+     */
+    setOpacity(opacity:number) { this.opacity = opacity; }
+    /** Gets the current opacity for this layer. */
+    getOpacity():number { return this.opacity; }
 
     /** Turn the layer on. */
     abstract on():MapLayer;

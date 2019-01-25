@@ -35,6 +35,12 @@ export class PestMapLayer extends MapLayer {
             }
         };
     }
+    setOpacity(opacity:number) {
+        this.opacity = opacity;
+        if(this.overlay) {
+            this.overlay.setOpacity(opacity);
+        }
+    }
     private _on(): PestMapLayer {
         const params: any = {
             species: this.layer_def.title
@@ -45,7 +51,7 @@ export class PestMapLayer extends MapLayer {
             const [west, south, east, north] = bbox;
             this.overlay = new google.maps.GroundOverlay(clippedImage, { north, south, east, west }, { clickable: false });
             // TODO maybe control opacity generically??
-            this.overlay.setOpacity(0.75);
+            this.overlay.setOpacity(this.opacity);
             this.overlay.setMap(this.map);
         });
         return this;

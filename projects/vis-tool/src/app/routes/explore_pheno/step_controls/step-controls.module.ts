@@ -4,6 +4,7 @@ import { MaterialModule } from '../../../material';
 import {
     VisualizationsModule,
     NpnCommonModule,
+    NpnGriddedModule,
     ScatterPlotComponent,
     CalendarComponent,
     MapVisualizationComponent } from '@npn/common';
@@ -13,7 +14,7 @@ import { DummyStepComponent, DummyControlComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 import { YearsControlComponent, YearsStepComponent } from './years';
 import { LocationStepComponent, LocationControlComponent, LocationControlSubComponent } from './location';
-import { LayerStepComponent, LayerControlComponent } from './layer';
+import { LayerStepComponent, LayerControlComponent, LayerControlSubComponent } from './layer';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
@@ -28,7 +29,7 @@ const COMPONENTS:any[] = [
     StartEndControlComponent, StartEndStepComponent,
     YearsControlComponent, YearsStepComponent,
     LocationStepComponent, LocationControlComponent, LocationControlSubComponent,
-    LayerStepComponent, LayerControlComponent,
+    LayerStepComponent, LayerControlComponent, LayerControlSubComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,
@@ -46,7 +47,8 @@ const ENTRY_COMPONENTS:any[] = [
     imports: [
         MaterialModule,
         VisualizationsModule,
-        NpnCommonModule
+        NpnCommonModule,
+        NpnGriddedModule
     ],
     declarations: COMPONENTS,
     entryComponents: ENTRY_COMPONENTS

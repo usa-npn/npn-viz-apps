@@ -1,13 +1,20 @@
-import { BaseStepComponent, BaseControlComponent } from './base';
+import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from './base';
 import { StepState, VisConfigStep } from '../interfaces';
 import { Component } from '@angular/core';
 import { NpnMapLayerService, MapSelection } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
 
-
+function layerTitle(layer) {
+    if(layer) {
+        const ds = layer.title.indexOf('- ');
+        return ds !== -1
+            ? layer.title.substring(ds+2)
+            : layer.title;
+    }
+}
 @Component({
-    template: ``
+    template: `{{layerTitle(selection.layer)}}`
 })
 export class LayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
@@ -16,6 +23,10 @@ export class LayerStepComponent extends BaseStepComponent {
         return this.visited
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
+    }
+
+    layerTitle(layer) {
+        return layerTitle(layer);
     }
 }
 
@@ -37,16 +48,14 @@ export class LayerControlComponent extends BaseControlComponent {
     selection:MapSelection;
     title:string = 'Select layer';
     layerDefinitions:MapLayerDefs;
+    subControlComponent:LayerControlSubComponent;
 
     constructor(private layerService:NpnMapLayerService) {
         super();
     }
 
     layerTitle(layer) {
-        const ds = layer.title.indexOf('- ');
-        return ds !== -1
-            ? layer.title.substring(ds+2)
-            : layer.title;
+        return layerTitle(layer);
     }
 
     layerClick(layer:MapLayerDefinition) {
@@ -54,6 +63,9 @@ export class LayerControlComponent extends BaseControlComponent {
             ? layer.name
             : undefined;
         this.selection.redraw();
+        if(layer.name) {
+            this.subControlComponent.show();
+        }
     }
 
     ngOnInit() {
@@ -61,8 +73,18 @@ export class LayerControlComponent extends BaseControlComponent {
     }
 }
 
+@Component({
+    template: `
+    <supports-opacity-control *ngIf="selection.layer" [supportsOpacity]="selection.layer"></supports-opacity-control>
+    `
+})
+export class LayerControlSubComponent extends BaseSubControlComponent {
+    title:string = 'Taylor your layer';
+}
+
 export const LayerStep:VisConfigStep = {
     icon: faLayerGroup,
     stepComponent: LayerStepComponent,
-    controlComponent: LayerControlComponent
+    controlComponent: LayerControlComponent,
+    subControlComponent: LayerControlSubComponent
 }

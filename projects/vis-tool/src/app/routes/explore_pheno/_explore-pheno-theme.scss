@@ -33,7 +33,11 @@
             .drawer-title {
                 display: flex;
                 align-items: center;
+                // oddly height has no effect, height was less than directed
+                // so adding min/max to workaround.
                 height: $drawer-title-height;
+                min-height: $drawer-title-height;
+                max-height: $drawer-title-height;
                 .title-inner {
                     padding-left: $drawer-padding;
                     padding-right: $drawer-padding;

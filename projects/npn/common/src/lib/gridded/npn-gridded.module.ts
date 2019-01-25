@@ -6,10 +6,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material';
 
-import { WmsMapLayerService } from './wms-map-layer.service';
+import { NpnMapLayerService } from './npn-map-layer.service';
 import { NpnCommonModule } from '../common/index';
-import { WmsMapLegendComponent } from './wms-map-legend.component';
-import { WmsMapOpacityControl } from './wms-map-opacity-control.component';
+import { MapLayerLegendComponent } from './map-layer-legend.component';
+import { SupportsOpacityControl } from './supports-opacity-control.component';
 import { GriddedUrls } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
 
@@ -28,22 +28,22 @@ import {
         NpnCommonModule
     ],
     declarations: [
-        WmsMapLegendComponent,
-        WmsMapOpacityControl,
+        MapLayerLegendComponent,
+        SupportsOpacityControl,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe
     ],
     exports: [
-        WmsMapLegendComponent,
-        WmsMapOpacityControl
+        MapLayerLegendComponent,
+        SupportsOpacityControl
     ],
     providers: [
         DatePipe, DecimalPipe,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe, GriddedPipeProvider,
-        WmsMapLayerService,
+        NpnMapLayerService,
         GriddedUrls,
         WcsDataService
     ]

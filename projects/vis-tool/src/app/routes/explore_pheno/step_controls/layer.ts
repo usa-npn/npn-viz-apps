@@ -1,9 +1,9 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
 import { StepState, VisConfigStep } from '../interfaces';
 import { Component } from '@angular/core';
-import { WmsMapLayerService, MapSelection } from '@npn/common';
+import { NpnMapLayerService, MapSelection } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
-import { NpnLayerDefs, NpnLayerDefinition } from '@npn/common/gridded/gridded-common';
+import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
 
 
 @Component({
@@ -26,7 +26,7 @@ export class LayerStepComponent extends BaseStepComponent {
         <node-label>{{cat.name}}</node-label>
         <ul class="level-1">
             <li *ngFor="let layer of cat.layers" class="leaf"  [ngClass]="{selected:layer.name === selection.wmsMapLayer}">
-                <node-label (click)="layerClick(layer)">{{layer.title}}</node-label>
+                <node-label (click)="layerClick(layer)">{{layerTitle(layer)}}</node-label>
             </li>
         </ul>
       </li>
@@ -36,13 +36,20 @@ export class LayerStepComponent extends BaseStepComponent {
 export class LayerControlComponent extends BaseControlComponent {
     selection:MapSelection;
     title:string = 'Select layer';
-    layerDefinitions:NpnLayerDefs;
+    layerDefinitions:MapLayerDefs;
 
-    constructor(private layerService:WmsMapLayerService) {
+    constructor(private layerService:NpnMapLayerService) {
         super();
     }
 
-    layerClick(layer:NpnLayerDefinition) {
+    layerTitle(layer) {
+        const ds = layer.title.indexOf('- ');
+        return ds !== -1
+            ? layer.title.substring(ds+2)
+            : layer.title;
+    }
+
+    layerClick(layer:MapLayerDefinition) {
         this.selection.wmsMapLayer = this.selection.wmsMapLayer !== layer.name
             ? layer.name
             : undefined;

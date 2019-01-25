@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 
 import { DatePipe } from '@angular/common';
 import { NpnServiceUtils } from '../../common';
-import { WcsDataService, WmsMapLayerService } from '../../gridded';
+import { WcsDataService, NpnMapLayerService } from '../../gridded';
 
 import { ClippedWmsMapSelection } from './clipped-wms-map-selection';
 
@@ -10,7 +10,7 @@ import { ClippedWmsMapSelection } from './clipped-wms-map-selection';
 export class ClippedWmsMapSelectionFactory {
     constructor(protected serviceUtils:NpnServiceUtils,
                 protected datePipe: DatePipe,
-                protected layerService:WmsMapLayerService,
+                protected layerService:NpnMapLayerService,
                 protected dataService:WcsDataService) {}
 
     newSelection(): ClippedWmsMapSelection {

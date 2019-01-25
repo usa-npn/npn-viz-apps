@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { MapSelection } from './map-selection';
-import { WmsMapLayerService } from '../../gridded';
+import { NpnMapLayerService } from '../../gridded';
 
 @Injectable()
 export class MapSelectionFactory {
     constructor(
-        private layerService:WmsMapLayerService
+        private layerService:NpnMapLayerService
     ) {}
 
     newSelection():MapSelection {

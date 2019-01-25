@@ -3,7 +3,8 @@ import { NpnConfiguration } from '@npn/common';
 const npnConfiguration:NpnConfiguration = {
   cacheTTL: 60,
   apiRoot: '//www-dev.usanpn.org',
-  dataApiRoot: 'https://data-dev.usanpn.org:3006',
+  //dataApiRoot: 'https://data-dev.usanpn.org:3006',
+  dataApiRoot: 'https://data.usanpn.org:3006',
   dataApiUseStatisticsCache: false,
   geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
 };

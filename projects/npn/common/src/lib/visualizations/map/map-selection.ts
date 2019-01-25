@@ -1,5 +1,5 @@
 import { VisSelection, selectionProperty } from '../vis-selection';
-import { NpnMapLayer, WmsMapLayerService, NpnMapLegend } from '../../gridded';
+import { MapLayer, NpnMapLayerService, MapLayerLegend } from '../../gridded';
 
 export class MapSelection extends VisSelection {
     @selectionProperty()
@@ -8,10 +8,10 @@ export class MapSelection extends VisSelection {
     @selectionProperty()
     wmsMapLayer:string;
 
-    layer:NpnMapLayer;
-    legend:NpnMapLegend;
+    layer:MapLayer;
+    legend:MapLayerLegend;
 
-    constructor(private layerService:WmsMapLayerService) {
+    constructor(private layerService:NpnMapLayerService) {
         super();
     }
 

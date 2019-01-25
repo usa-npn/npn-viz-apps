@@ -3,14 +3,14 @@
 
 .map-wrapper {
     position: relative;
-    wms-map-legend {
+    map-layer-legend {
         .gridded-legend {
             margin-top: 10px;
             border-bottom: 1px solid #aaa;
         }
     }
     @media(min-width: $screen-md-min) {
-        wms-map-legend,
+        map-layer-legend,
         clipped-wms-map-statistics {
             position: absolute;
             left: 10px;
@@ -19,7 +19,7 @@
             background-color: rgba(255, 255, 255, 0.85);
             border-radius: 5px;
         }
-        wms-map-legend {
+        map-layer-legend {
             bottom: 25px;
             width: 60%;
             .gridded-legend {

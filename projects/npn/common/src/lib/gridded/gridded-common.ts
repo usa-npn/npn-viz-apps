@@ -42,12 +42,12 @@ interface NpnLayerCommon {
     current_year_only?: boolean;
 }
 
-export enum NpnLayerServiceType {
+export enum MapLayerServiceType {
     WMS = 'wms',
     WCS = 'wcs'
 };
 
-export interface NpnLayerExtentValue {
+export interface MapLayerExtentValue {
     /** The raw extent value from the WMS layer definition */
     value: string;
     /** If `value` represents a Date then the parsed Date object. */
@@ -55,23 +55,23 @@ export interface NpnLayerExtentValue {
     /** The value transformed into a readable label. */
     label: string;
     /** Add extent value to a service request's parameters */
-    addToParams: (params:any,serviceType:NpnLayerServiceType) => void;
+    addToParams: (params:any,serviceType:MapLayerServiceType) => void;
 }
 
-export enum NpnLayerExtentType {
+export enum MapLayerExtentType {
     DATE = 'date',
     YEAR = 'year',
     DOY = 'doy'
 }
 
-export interface NpnLayerExtent {
-    current?: NpnLayerExtentValue;
+export interface MapLayerExtent {
+    current?: MapLayerExtentValue;
     label: string;
-    type: NpnLayerExtentType;
-    values?: NpnLayerExtentValue[];
+    type: MapLayerExtentType;
+    values?: MapLayerExtentValue[];
 }
 
-export interface NpnLayerBoundingBox {
+export interface MapLayerBoundingBox {
     westBoundLongitude: number;
     eastBoundLongitude: number;
     southBoundLatitude: number;
@@ -79,37 +79,37 @@ export interface NpnLayerBoundingBox {
     getBounds: () => google.maps.LatLngBounds;
 }
 
-export interface NpnLayerStyle {
+export interface MapLayerStyle {
     name: string;
     title: string;
     legend: string; // URL
 }
 
-export enum NpnLayerType {
+export enum MapLayerType {
     STANDARD = 'standard',
     PEST = 'pest'
 }
 
-export interface NpnLayerDefinition extends NpnLayerCommon {
+export interface MapLayerDefinition extends NpnLayerCommon {
     /** defaults to `WmsLayerType.STANDARD` */
-    type?: NpnLayerType;
+    type?: MapLayerType;
     title?: string;
     abstract?: string;
-    extent?: NpnLayerExtent;
-    bbox?: NpnLayerBoundingBox;
-    style?: NpnLayerStyle;
+    extent?: MapLayerExtent;
+    bbox?: MapLayerBoundingBox;
+    style?: MapLayerStyle;
 }
 
-export interface NpnLayerCategory extends NpnLayerCommon {
-    layers: NpnLayerDefinition[];
+export interface MapLayerCategory extends NpnLayerCommon {
+    layers: MapLayerDefinition[];
 }
 
-export interface NpnLayerDefs {
+export interface MapLayerDefs {
     description?: string;
-    categories: NpnLayerCategory[];
+    categories: MapLayerCategory[];
 }
 
-export const MAP_LAYERS:NpnLayerDefs = {
+export const MAP_LAYERS:MapLayerDefs = {
     "description": "",
     "categories": [{
         "name": "Pest maps",
@@ -118,24 +118,24 @@ export const MAP_LAYERS:NpnLayerDefs = {
         "layers": [{
             name: 'emerald_ash_borer',
             title: 'Emerald Ash Borer',
-            type: NpnLayerType.PEST
+            type: MapLayerType.PEST
         },{
             name: 'apple_maggot',
             title: 'Apple Maggot',
-            type: NpnLayerType.PEST
+            type: MapLayerType.PEST
         },{
             name: 'hemlock_woolly_adelgid',
             layerBasis: 'gdd:agdd', // based on a different map than the others.
             title: 'Hemlock Woolly Adelgid',
-            type: NpnLayerType.PEST
+            type: MapLayerType.PEST
         },{
             name: 'winter_moth',
             title: 'Winter Moth',
-            type: NpnLayerType.PEST
+            type: MapLayerType.PEST
         },{
             name: 'lilac_borer',
             title: 'Lilac Borer',
-            type: NpnLayerType.PEST
+            type: MapLayerType.PEST
         }]
     },{
         "name": "Temperature Accumulations, Daily 30-year Average",

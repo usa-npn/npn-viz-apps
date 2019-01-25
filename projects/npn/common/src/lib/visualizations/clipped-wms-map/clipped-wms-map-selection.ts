@@ -1,12 +1,12 @@
 import { NetworkAwareVisSelection, selectionProperty, ONE_DAY_MILLIS } from '../vis-selection';
 import { NpnServiceUtils } from '../../common';
 import {
-    NpnMapLegend,
+    MapLayerLegend,
     WmsMapSupportsOpacity,
     googleFeatureBounds,
     WcsDataService,
     GriddedInfoWindowHandler,
-    WmsMapLayerService
+    NpnMapLayerService
 } from '../../gridded';
 
 import { DatePipe } from '@angular/common';
@@ -70,7 +70,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     @selectionProperty()
     useBufferedBoundary:boolean = false;
 
-    legend:NpnMapLegend;
+    legend:MapLayerLegend;
     overlay:ImageOverlay;
     data:WmsMapSelectionData;
     private features:any[];
@@ -84,7 +84,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
 
     constructor(protected serviceUtils:NpnServiceUtils,
                 protected datePipe:DatePipe,
-                protected mapLayerService:WmsMapLayerService,
+                protected mapLayerService:NpnMapLayerService,
                 protected dataService:WcsDataService) {
         super();
     }

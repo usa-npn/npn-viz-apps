@@ -1,7 +1,7 @@
 import { Component, Input, ElementRef, SimpleChanges } from '@angular/core';
 
 import { MonitorsDestroy } from '../common/index';
-import { NpnMapLegend, PestMapLegend } from './wms-map-legend';
+import { MapLayerLegend } from './map-layer-legend';
 
 import { fromEvent } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { Selection } from 'd3-selection';
 import * as d3 from 'd3';
 
 @Component({
-    selector: 'wms-map-legend',
+    selector: 'map-layer-legend',
     template:`
     <svg class="gridded-legend"></svg>
     `,
@@ -23,11 +23,11 @@ import * as d3 from 'd3';
         }
     `]
 })
-export class WmsMapLegendComponent extends MonitorsDestroy {
+export class MapLayerLegendComponent extends MonitorsDestroy {
     @Input()
     legendTitle:string;
     @Input()
-    legend:NpnMapLegend;
+    legend:MapLayerLegend;
 
     private svg: Selection<any,any,any,any>;
 

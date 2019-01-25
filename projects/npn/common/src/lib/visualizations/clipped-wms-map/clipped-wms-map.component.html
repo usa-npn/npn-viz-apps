@@ -4,9 +4,9 @@
     </div>
     <div class="map-wrapper">
         <agm-map (mapReady)="mapReady($event)"  [streetViewControl]="false"  [styles]="mapStyles" [scrollwheel]="false"></agm-map>
-        <wms-map-legend *ngIf="!thumbnail && selection.legend && selection.data && selection.data.statistics && selection.data.statistics.count !== 0" [legend]="selection.legend"></wms-map-legend>
+        <map-layer-legend *ngIf="!thumbnail && selection.legend && selection.data && selection.data.statistics && selection.data.statistics.count !== 0" [legend]="selection.legend"></map-layer-legend>
         <clipped-wms-map-statistics *ngIf="!thumbnail && selection && selection.data && selection.data.statistics"
             [selection]="selection"></clipped-wms-map-statistics>
     </div>
-    <wms-map-opacity-control *ngIf="!thumbnail" [supportsOpacity]="selection.overlay"></wms-map-opacity-control>
+    <supports-opacity-control *ngIf="!thumbnail" [supportsOpacity]="selection.overlay"></supports-opacity-control>
 </div>

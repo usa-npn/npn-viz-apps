@@ -45,9 +45,9 @@ interface DdSelection {
                     [latitude]="refuge.location.lat" [longitude]="refuge.location.lng"></agm-marker>
             </span>
         </agm-map>
-        <wms-map-legend *ngIf="selection && selection.legend && selection.data && selection.data.statistics && selection.data.statistics.count !== 0"
+        <map-layer-legend *ngIf="selection && selection.legend && selection.data && selection.data.statistics && selection.data.statistics.count !== 0"
             [legend]="selection.legend"
-            [legendTitle]="selection.legendTitle"></wms-map-legend>
+            [legendTitle]="selection.legendTitle"></map-layer-legend>
         <clipped-wms-map-statistics *ngIf="selection && selection.data && selection.data.statistics"
             [selection]="selection"></clipped-wms-map-statistics>
     </div>

@@ -3,8 +3,8 @@ import { ObservableMedia } from "@angular/flex-layout";
 
 import { MapVisualizationBaseComponent } from '../map-visualization-base.component';
 import { MapSelection } from './map-selection';
-import { NpnMapLegend } from '@npn/common/gridded';
-import { WmsMapLegendComponent } from '@npn/common/gridded/wms-map-legend.component';
+import { MapLayerLegend } from '@npn/common/gridded';
+import { MapLayerLegendComponent } from '@npn/common/gridded/map-layer-legend.component';
 
 @Component({
     selector: 'map-visualization',
@@ -15,7 +15,7 @@ import { WmsMapLegendComponent } from '@npn/common/gridded/wms-map-legend.compon
         </div>
         <div class="map-wrapper">
             <agm-map (mapReady)="mapReady($event)"  [streetViewControl]="false"  [styles]="mapStyles" [scrollwheel]="false"></agm-map>
-            <wms-map-legend *ngIf="!thumbnail && selection.legend" [legend]="selection.legend"></wms-map-legend>
+            <map-layer-legend *ngIf="!thumbnail && selection.legend" [legend]="selection.legend"></map-layer-legend>
         </div>
     </div>
     `,
@@ -23,7 +23,7 @@ import { WmsMapLegendComponent } from '@npn/common/gridded/wms-map-legend.compon
 })
 export class MapVisualizationComponent extends MapVisualizationBaseComponent {
     @Input() selection:MapSelection;
-    @ViewChild(WmsMapLegendComponent) legend:WmsMapLegendComponent;
+    @ViewChild(MapLayerLegendComponent) legend:MapLayerLegendComponent;
 
     constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
         super(rootElement,media);

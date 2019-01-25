@@ -10,11 +10,6 @@ export class PestMapLayer extends MapLayer {
             label: 'Date',
             type: MapLayerExtentType.DATE,
         };
-        // the original created a scoped object and copied all the layer_def properties onto it and
-        // added the functions to that, copy the properties onto the WmsMapLayer instance
-        Object.keys(layer_def).forEach(key => {
-            this[key] = layer_def[key];
-        });
     }
     newExtentValue(date: Date): MapLayerExtentValue {
         date.setHours(0, 0, 0, 0);

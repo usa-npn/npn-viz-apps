@@ -14,7 +14,7 @@ function layerTitle(layer) {
     }
 }
 @Component({
-    template: `{{layerTitle(selection.layer)}}`
+    template: `{{selection.layer?.getTitle()}}`
 })
 export class LayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
@@ -76,13 +76,15 @@ export class LayerControlComponent extends BaseControlComponent {
 @Component({
     template: `
     <div *ngIf="selection.layer" class="layer-controls">
+        <extent-control [layer]="selection.layer"></extent-control>
         <supports-opacity-control [supportsOpacity]="selection.layer"></supports-opacity-control>
         <gridded-range-slider [layer]="selection.layer"></gridded-range-slider>
+        <p *ngIf="selection.layer.hasAbstract()">{{selection.layer.getAbstract()}}</p>
     </div>
     `,
     styles:[`
     .layer-controls {
-        min-width: 400px;
+        width: 400px;
     }
     `]
 })

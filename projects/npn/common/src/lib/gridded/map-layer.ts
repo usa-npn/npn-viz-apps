@@ -1,4 +1,4 @@
-import {MapLayerDefinition, GriddedUrls, MapLayerType, MapLayerExtent} from './gridded-common';
+import {MapLayerDefinition, GriddedUrls, MapLayerType, MapLayerExtent, MapLayerExtentType} from './gridded-common';
 import { GriddedPipeProvider } from './pipes';
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayerLegend } from './map-layer-legend';
@@ -8,7 +8,6 @@ export abstract class MapLayer implements SupportsOpacity {
     protected griddedPipes:GriddedPipeProvider;
     protected griddedUrls:GriddedUrls;
     protected opacity:number = 0.75;
-    protected extent:MapLayerExtent;
 
     constructor(
         protected map:google.maps.Map,
@@ -20,7 +19,29 @@ export abstract class MapLayer implements SupportsOpacity {
     }
 
     get layerName():string { return this.layer_def.name; }
+    get extent():MapLayerExtent { return this.layer_def.extent; }
+    get extentType():MapLayerExtentType { 
+        return this.layer_def.extent
+            ? this.layer_def.extent.type
+            : null;
+    }
 
+    getTitle() {
+        return this.layer_def.title
+            ? this.layer_def.title.replace(/^(.*?)\s+-\s+(.*)$/,'$2')
+            : undefined;
+    }
+
+    hasAbstract() {
+        return !!this.layer_def.abstract;
+    }
+
+    getAbstract() {
+        return this.layer_def.abstract
+            ? this.layer_def.abstract.replace(/\s*developer notes.*$/i,'')
+            : undefined;
+    }
+    
     getLegend():Promise<MapLayerLegend> {
         return this.layerService.getLegend(this.layer_def)
             .then(legend => legend.setLayer(this))

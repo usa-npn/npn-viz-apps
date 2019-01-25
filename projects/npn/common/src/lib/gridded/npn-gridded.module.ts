@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSliderModule } from '@angular/material';
+import { MatSliderModule, MatSelectModule } from '@angular/material';
 import { Ng5SliderModule } from 'ng5-slider';
 
 import { NpnMapLayerService } from './npn-map-layer.service';
@@ -13,6 +13,7 @@ import { MapLayerLegendComponent } from './map-layer-legend.component';
 import { SupportsOpacityControl } from './supports-opacity-control.component';
 import { GriddedRangeSliderControl } from './gridded-range-slider-control.component';
 import { GriddedUrls } from './gridded-common';
+import { ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl } from './extent-controls';
 import { WcsDataService } from './wcs-data.service';
 
 import {
@@ -27,6 +28,7 @@ import {
         BrowserModule,
         FormsModule, ReactiveFormsModule,
         MatSliderModule,
+        MatSelectModule,
         Ng5SliderModule,
         NpnCommonModule
     ],
@@ -36,12 +38,14 @@ import {
         GriddedRangeSliderControl,
         LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
-        ThirtyYearAvgDayOfYearPipe
+        ThirtyYearAvgDayOfYearPipe,
+        ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl
     ],
     exports: [
         MapLayerLegendComponent,
         SupportsOpacityControl,
-        GriddedRangeSliderControl
+        GriddedRangeSliderControl,
+        ExtentControl
     ],
     providers: [
         DatePipe, DecimalPipe,

@@ -54,11 +54,6 @@ export class WmsMapLayer extends MapLayer {
             name: (layer_def.title || layer_def.name)
         });
         this.googleLayer.setOpacity(this.opacity);
-        // the original created a scoped object and copied all the layer_def properties onto it and
-        // added the functions to that, copy the properties onto the WmsMapLayer instance
-        Object.keys(layer_def).forEach(key => {
-            this[key] = layer_def[key];
-        });
     }
     setOpacity(opacity:number) {
         this.opacity = opacity;

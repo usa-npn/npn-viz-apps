@@ -1,4 +1,4 @@
-import { Component, Input, PipeTransform, SimpleChanges } from '@angular/core';
+import { Component, Input, PipeTransform } from '@angular/core';
 
 import {
     MapLayer,
@@ -18,16 +18,15 @@ import { MapSelection } from './map-selection';
 @Component({
     selector: 'extent-control',
     template: `
-    <div [ngSwitch]="layer.extentType">
+    <div [ngSwitch]="selection.layer.extentType">
         <extent-date-control *ngSwitchCase="date" [selection]="selection"></extent-date-control>
-        <extent-year-control *ngSwitchCase="year" [layer]="layer"></extent-year-control>
+        <extent-year-control *ngSwitchCase="year" [selection]="selection"></extent-year-control>
         <extent-doy-control *ngSwitchCase="doy" [selection]="selection"></extent-doy-control>
     </div>
     `
 })
 export class ExtentControl {
     @Input() selection:MapSelection;
-    @Input() layer:MapLayer; // TODO remove
     date = MapLayerExtentType.DATE;
     year = MapLayerExtentType.YEAR;
     doy = MapLayerExtentType.DOY;
@@ -126,29 +125,29 @@ export class ExtentDoyControl {
     <h4>Year</h4>
     <mat-form-field>
         <mat-select placeholder="Year" [(value)]="selectedExtent">
-            <mat-option *ngFor="let ext of layer.extent.values" [value]="ext">{{ext.label}}</mat-option>
+            <mat-option *ngFor="let ext of selection.layer?.extent.values" [value]="ext">{{ext.label}}</mat-option>
         </mat-select>
     </mat-form-field>
     `
 })
 export class ExtentYearControl {
-    @Input() layer:MapLayer;
+    @Input() selection:MapSelection;
 
     _selectedExtent:MapLayerExtentValue;
 
     get selectedExtent():MapLayerExtentValue { return this._selectedExtent; }
     set selectedExtent(ext:MapLayerExtentValue) {
-console.log('ExtentYearControl.selectedExtent',ext,this.layer.extent);
-        if(this.layer.extent.current = (this._selectedExtent = ext)) {
-            this.layer.bounce();
-        } else {
-            console.warn('unexpected selected extent value',ext);
-        } 
+        this._selectedExtent = ext;
+        this.selection.extentValue = ext.value;
     }
 
-    ngOnChanges(changes:SimpleChanges):void {
-        if(changes.layer && changes.layer.currentValue) {
-            this._selectedExtent = this.layer.extent.current;
+    private lastLayer:MapLayer;
+    ngDoCheck():void {
+        if(this.selection.layer !== this.lastLayer) {
+            const layer = this.lastLayer = this.selection.layer;
+            if(layer) {
+                this.selectedExtent = layer.extent.current;
+            }
         }
     }
 }

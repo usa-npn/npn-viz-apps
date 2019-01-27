@@ -58,7 +58,7 @@ export class LayerControlComponent extends BaseControlComponent {
     stepVisit():void {
         super.stepVisit();
         if(this.selection.wmsMapLayer) {
-            this.subControlComponent.show();
+            setTimeout(() => this.subControlComponent.show());
         }
     }
 

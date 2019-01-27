@@ -36,7 +36,7 @@ export class LayerStepComponent extends BaseStepComponent {
       <li *ngFor="let cat of layerDefinitions?.categories">
         <node-label>{{cat.name}}</node-label>
         <ul class="level-1">
-            <li *ngFor="let layer of cat.layers" class="leaf"  [ngClass]="{selected:layer.name === selection.wmsMapLayer}">
+            <li *ngFor="let layer of cat.layers" class="leaf"  [ngClass]="{selected:layer.name === selection.layerName}">
                 <node-label (click)="layerClick(layer)">{{layerTitle(layer)}}</node-label>
             </li>
         </ul>
@@ -57,7 +57,7 @@ export class LayerControlComponent extends BaseControlComponent {
 
     stepVisit():void {
         super.stepVisit();
-        if(this.selection.wmsMapLayer) {
+        if(this.selection.layerName) {
             setTimeout(() => this.subControlComponent.show());
         }
     }
@@ -67,7 +67,7 @@ export class LayerControlComponent extends BaseControlComponent {
     }
 
     layerClick(layer:MapLayerDefinition) {
-        this.selection.wmsMapLayer = this.selection.wmsMapLayer !== layer.name
+        this.selection.layerName = this.selection.layerName !== layer.name
             ? layer.name
             : undefined;
         this.selection.redraw();

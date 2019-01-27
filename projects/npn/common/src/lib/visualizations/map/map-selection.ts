@@ -8,7 +8,7 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     $class = 'MapSelection';
 
     @selectionProperty()
-    _wmsMapLayer:string;
+    _layerName:string;
     @selectionProperty()
     opacity:number = 0.75;
     @selectionProperty()
@@ -21,9 +21,9 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
         super();
     }
 
-    set wmsMapLayer(s:string) {
-console.log(`MapSelection.wmsMapLayer=${s}`);
-        this._wmsMapLayer = s;
+    set layerName(s:string) {
+console.log(`MapSelection.layerName=${s}`);
+        this._layerName = s;
         // TODO should this happen here or in visualize.
         // seems like if the layer name changes then that's
         // the appropriate time to reset a layer on the map
@@ -37,8 +37,8 @@ console.log(`MapSelection.wmsMapLayer=${s}`);
         }
     }
 
-    get wmsMapLayer():string {
-        return this._wmsMapLayer;
+    get layerName():string {
+        return this._layerName;
     }
 
     set styleRange(range:number[]) {
@@ -70,7 +70,7 @@ console.log(`MapSelection.setOpacity=${opacity}`);
     }
 
     visualize(map: google.maps.Map):Promise<void> {
-        const {wmsMapLayer} = this;
+        const {layerName: wmsMapLayer} = this;
         console.log(`MapSelection.visualize`,this.external);
         if(wmsMapLayer) {
             /*

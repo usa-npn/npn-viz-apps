@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform, Injectable } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { parseExtentDate } from './gridded-common';
+import { ONE_DAY_MILLIS } from '../visualizations/vis-selection';
 
 const ONE_DAY = (24*60*60*1000);
 const JAN_ONE_2010 = new Date(2010,0);
@@ -108,16 +109,42 @@ export class ExtentDatesPipe implements PipeTransform {
     }
 }
 
+export enum DoyTxType {
+    DATE = 'date',
+    DOY_STRING = 'doy', // as used by WMS extents e.g. 1.0
+    LABEL = 'label'
+}
+const DOY_LABEL_FMT = 'MMMM d';
+
 @Pipe({name: 'thirtyYearAvgDayOfYear'})
 export class ThirtyYearAvgDayOfYearPipe implements PipeTransform {
     constructor(private datePipe:DatePipe) {}
 
-    transform(doy:any,returnDate?:boolean):any {
-        if(typeof(doy) === 'string') {
-            doy = parseFloat(doy);
+    transform(input:string | Date,txTo:DoyTxType = DoyTxType.LABEL):any {
+        if(typeof(input) === 'string') {
+            const doy = parseFloat(input);
+            if(!isNaN(doy)) {
+                input = new Date(JAN_ONE_2010.getTime()+((doy-1)*ONE_DAY));
+            }
         }
-        var date = doy instanceof Date ? doy : new Date(JAN_ONE_2010.getTime()+((doy-1)*ONE_DAY));
-        return returnDate ? date : this.datePipe.transform(date,'MMMM d');
+        if (input instanceof Date) {
+            switch(txTo) {
+                case DoyTxType.DATE:
+                    return input;
+                case DoyTxType.LABEL:
+                    return this.datePipe.transform(input,DOY_LABEL_FMT);
+                case DoyTxType.DOY_STRING:
+                    if(input.getFullYear() !== 2010) {
+                        input.setFullYear(2010);
+                    }
+                    input.setHours(0,0,0,0);
+                    const diff = input.getTime() - JAN_ONE_2010.getTime();
+                    const doy = (diff/ONE_DAY_MILLIS)+1.0;
+                    return doy.toFixed(1);
+            }
+        }
+        console.warn(`ThirtyYearAvgDayOfYearPipe.transform unexpected input for translation to "${txTo}"`,input);
+        return input;
     }
 }
 

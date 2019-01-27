@@ -13,6 +13,8 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     opacity:number = 0.75;
     @selectionProperty()
     _styleRange:number[];
+    @selectionProperty()
+    _extentValue:string;
 
     layer:MapLayer;
     legend:MapLayerLegend;
@@ -53,6 +55,32 @@ console.log(`MapSelection.styleRange=${range}`);
         return this._styleRange;
     }
 
+    // returns true if a change was made
+    private updateExtentValue():boolean {
+        if(this.layer && this._extentValue) {
+            const newValue = this.layer.extent.values.reduce((found,v) => found||(v.value === this._extentValue ? v : undefined),undefined);
+            if(!newValue) {
+                console.warn(`Unable to find extent with value "${this._extentValue}`);
+                this._extentValue = undefined;
+            } else if (this.layer.extent.current !== newValue) {
+                this.layer.extent.current = newValue;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    set extentValue(v:string) {
+        this._extentValue = v;
+        if(this.layer && this.updateExtentValue()) {
+            this.layer.bounce();
+        }
+    }
+
+    get extentValue():string {
+        return this._extentValue;
+    }
+
     // using functions here because of the SupportsOpacity interface.
     /** Sets the current opacity (0-1) for this layer. */
     setOpacity(opacity:number) {
@@ -89,6 +117,7 @@ console.log(`MapSelection.setOpacity=${opacity}`);
                             if(layer instanceof WmsMapLayer) {
                                 layer.setStyleRange(this.styleRange);
                             }
+                            this.updateExtentValue();
                             layer.on();
                             return layer.getLegend()
                                 .then(legend => {

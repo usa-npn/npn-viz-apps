@@ -9,6 +9,7 @@ export class PestMapLayer extends MapLayer {
             current: this.newExtentValue(new Date()),
             label: 'Date',
             type: MapLayerExtentType.DATE,
+            values: [] // TODO need to be able to populate values with acceptable selections.
         };
     }
     newExtentValue(date: Date): MapLayerExtentValue {

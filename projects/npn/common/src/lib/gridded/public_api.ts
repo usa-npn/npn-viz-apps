@@ -7,7 +7,7 @@ export * from './wcs-data.service';
 export { SupportsOpacity as WmsMapSupportsOpacity } from './supports-opacity-control.component';
 export * from './google-feature-bounds';
 export * from './gridded-common';
-export { GriddedPipeProvider } from './pipes';
+export { GriddedPipeProvider, DoyTxType } from './pipes';
 export * from './wms-map-layer';
 export * from './wms-map-layer-legend';
 export * from './pest-map-layer';

@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, EventEmitter } from '@angular/core';
+import { Component, Input, EventEmitter } from '@angular/core';
 import { WmsMapLayer, MapLayer } from '../../gridded';
 import { Options } from 'ng5-slider';
 import { MapSelection } from './map-selection';
@@ -46,21 +46,9 @@ export class GriddedRangeSliderControl {
         }
     }
 
-    ngOnChanges(changes:SimpleChanges):void {
-        if(changes.selection && changes.selection.currentValue) {
-            console.log('RangeSliderControl.ngOnChanges',this.selection);
-            // currently only WwmsMapLayer supports style ranges.
-            // and while the instance variable is strongly typed what
-            // gets passed into the component may be something else
-            // (whatever type of layer is on the map)...
-            
-        }
-    }
-
     private lastLayer:MapLayer;
     ngDoCheck():void {
         if(this.selection.layer !== this.lastLayer) {
-            console.log('LAYER CHANGE!!!');
             this.lastLayer = this.selection.layer;
             if(this.selection.layer instanceof WmsMapLayer) {
                 this.selection.layer.getLegend().then(legend => {

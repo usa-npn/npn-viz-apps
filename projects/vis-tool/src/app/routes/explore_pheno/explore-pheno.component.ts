@@ -1,21 +1,19 @@
 import { Component, ViewChildren, QueryList, ComponentFactoryResolver, ViewContainerRef, ViewChild } from "@angular/core";
 import { Observable, Subject } from 'rxjs';
-import { zip, Subscription, merge as mergeObservables } from 'rxjs';
-import { takeUntil, map, filter } from 'rxjs/operators';
+import { zip, merge as mergeObservables } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
     faArrowLeft,
     faArrowRight
-  } from '@fortawesome/pro-light-svg-icons';
+} from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition } from "./interfaces";
 
 import { StepComponent, ControlComponent, SubControlComponent } from './interfaces';
-import { MonitorsDestroy, VisSelection, newGuid } from "@npn/common";
+import { MonitorsDestroy, newGuid } from "@npn/common";
 
-import { VisSelectionStep, VisSelectionSelection, DummyStep, VisSelectionControlComponent } from "./step_controls";
-import { SharingService } from './sharing.service';
-import { ActivatedRoute } from '@angular/router';
+import { VisSelectionStep, VisSelectionSelection, DummyStep } from "./step_controls";
 
 const INIT_STEPS = (steps:VisConfigStep[]) => steps.forEach(s => s.$id = (s.$id||newGuid()));
 
@@ -39,14 +37,9 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     activeStep:VisConfigStep;
     steps:VisConfigStep[];
     activeVisComponent:any;
-    // value never used since unsubscription via takeUntil
-    // but exists to know when to generate the subscription
-    private sharingSubscription:Subscription;
 
     constructor(
-        private componentFactoryResolver:ComponentFactoryResolver,
-        private activedRoute:ActivatedRoute,
-        private sharingService:SharingService
+        private componentFactoryResolver:ComponentFactoryResolver
     ) {
         super();
     }
@@ -61,19 +54,30 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                     }
                 });
             }
-        }
-        this.controlsOpen.next(true);
+        };
         execVisitFunc(this.activeStep,'stepDepart');
         execVisitFunc((this.activeStep = step),'stepVisit');
-        step.$controlInstance.visited = step.$stepInstance.visited = true;
+        step.$controlInstance.visited = step.$stepInstance.visited = true;  
+        if(this.steps.indexOf(step) === 0) {
+            // flag set if the selection control populated this selection from sharing URL args
+            // if that was the case then close the controls, o/w open them
+            this.controlsOpen.next(!this.visSelectionSelection.changeDueToSharing);
+            this.visSelectionSelection.changeDueToSharing = false;
+        } else {
+            this.controlsOpen.next(true);
+        }
         setTimeout(() => this.resize(),500);
     }
 
     ngOnInit() {
         // when main controls state triggered close sub-controls if open
-        this.controlsOpen.pipe(takeUntil(this.componentDestroyed))
+        this.controlsOpen
+            .pipe(takeUntil(this.componentDestroyed))
             .subscribe(() => this.subControlsOpen.next(false));
-        this.visSelectionSelection.changes.pipe(takeUntil(this.componentDestroyed))
+        // when the selected visualization changes update steps 1-n with those
+        // for the selected visualization always leaving  step 0 alone.
+        this.visSelectionSelection.changes
+            .pipe(takeUntil(this.componentDestroyed))
             .subscribe(visDef => {
                 this.activeVis = visDef;
                 this.steps.splice(1,this.steps.length-1);
@@ -86,7 +90,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     ngOnDestroy() {
-        super.ngOnDestroy();
+        super.ngOnDestroy(); // cleanup componentDestroyed
         this.subControlsOpen.complete();
     }
 
@@ -125,14 +129,19 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         // parallel arrays not wonderful but want all controls to actually be in the DOM
         // at the same time (not created/recreated as users navigate steps)
         this.steps.forEach((step,i) => {
-            const stepFactory = this.componentFactoryResolver.resolveComponentFactory(step.stepComponent);
             const stepHost = stepHosts[i];
-            const controlFactory = this.componentFactoryResolver.resolveComponentFactory(step.controlComponent);
             const controlHost = controlHosts[i];
+            const subControlHost = subControlHosts[i];
+            if(i === 0 && stepHost.length) {
+                // step 0 is the visualization selection step, only initialize it once
+                // do not recreate the components over and over.
+                return;
+            }
+            const stepFactory = this.componentFactoryResolver.resolveComponentFactory(step.stepComponent);
+            const controlFactory = this.componentFactoryResolver.resolveComponentFactory(step.controlComponent);
             const subControlFactory = !!step.subControlComponent
                 ? this.componentFactoryResolver.resolveComponentFactory(step.subControlComponent)
                 : null;
-            const subControlHost = subControlHosts[i];
 
             stepHost.clear();
             controlHost.clear();
@@ -177,37 +186,5 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             this.activeVisComponent = visComponent;
             setTimeout(() => this.activeVis.selection.update());
         }
-        if(!this.sharingSubscription) {
-            // this should only happen once but cannot happen until after the steps have been setup
-            this.initializeSharingSubscription();
-        }
-    }
-
-    private initializeSharingSubscription() {
-        this.sharingSubscription = this.activedRoute.paramMap
-            .pipe(
-                map(pm => pm.get('s')),
-                filter(s => !!s),
-                takeUntil(this.componentDestroyed)
-            )
-            .subscribe(s => {
-                const visSelectionControl = this.steps[0].$controlInstance as VisSelectionControlComponent;
-                const selection:VisSelection = this.sharingService.deserialize(s);
-                console.log('shared selection',selection);
-                visSelectionControl.setVisSelection(selection)
-                    // the use of a pause value on this setTimeout does not feel ideal here but the problem is
-                    // the VisSelectionSelection is static, as are the list of visualization definitions
-                    // but ALL steps are re-initialized when a visualization is selected, including visualization selection,
-                    // so the visSelectionControl instance used to populate the selection disppears by virtue of
-                    // the above call and then the new one gets re-focused when the list of steps is re-written.
-                    // so the setting of controlsOpen has no effect until -after- all that happens and the "new"
-                    // step 0 is inserted into the DOM
-                    .then(selected => setTimeout(() => {
-                        this.controlsOpen.next(!selected);
-                        if(selected) {
-                            selection.update();
-                        }
-                    },500)); // close control if the set was successful
-            });
     }
 }

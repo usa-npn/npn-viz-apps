@@ -15,15 +15,19 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy } from "@npn/common";
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
 import { LocationStep } from './location';
 import { LayerStep } from './layer';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntil, map, filter } from 'rxjs/operators';
+import { SharingService } from '../sharing.service';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
+    changeDueToSharing:boolean = false;
 
     private _selected:VisDefinition;
     get selected():VisDefinition { return this._selected; }
@@ -61,7 +65,7 @@ export class VisSelectionStepComponent implements StepComponent {
     </div>
     `
 })
-export class VisSelectionControlComponent implements ControlComponent {
+export class VisSelectionControlComponent extends MonitorsDestroy implements ControlComponent {
     title:string = 'Select visualization';
     selection:VisSelectionSelection;
     infoIcon = faInfoCircle;
@@ -74,13 +78,15 @@ export class VisSelectionControlComponent implements ControlComponent {
         defs: CHARTS
     }];
 
-    private readyResolver:Function;
-    private ready:Promise<void> = new Promise(resolve => this.readyResolver = resolve);
-
-    constructor(private selectionFactory:VisualizationSelectionFactory) {}
+    constructor(
+        private selectionFactory:VisualizationSelectionFactory,
+        private activatedRoute:ActivatedRoute,
+        private sharingService:SharingService
+    ) {
+        super();
+    }
 
     ngOnInit() {
-        console.warn('VisSelectionControlComponent.ngOnInit');
         [...MAPS,...CHARTS].forEach(visDef => {
             if(typeof(visDef.selection) === 'string') {
                 visDef.templateSelection = this.selectionFactory.newSelection({$class:visDef.selection});
@@ -101,21 +107,27 @@ export class VisSelectionControlComponent implements ControlComponent {
                 console.log('selection',visDef.selection);
             }
         });
-        this.readyResolver();
-    }
-
-    setVisSelection(selection:VisSelection):Promise<boolean> {
-        return this.ready
-            .then(() => {
+        // if when loaded there is a selection on the current route then wire it up
+        this.activatedRoute.paramMap
+            .pipe(
+                map(pm => pm.get('s')),
+                filter(s => !!s),
+                takeUntil(this.componentDestroyed)
+            )
+            .subscribe(s => {
+                const selection:VisSelection = this.sharingService.deserialize(s);
+                // find the corresponding definition
                 const visDef = [...MAPS,...CHARTS].find(vd => vd.selection && selection.$class === vd.selection.$class);
-                console.log('setVisSelection:visDef',visDef);
                 if(visDef) {
                     visDef.selection = selection;
-                    this.selection.selected = visDef;
-                    return true;
+                    setTimeout(() => {
+                        this.selection.changeDueToSharing = true;
+                        this.selection.selected = visDef;
+                    });
+                } else {
+                    console.warn('Unable to find visualization for selection',selection);
                 }
-                return false;
-            });
+            })
     }
 }
 

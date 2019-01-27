@@ -1,11 +1,16 @@
 import { Component, Input, PipeTransform, SimpleChanges } from '@angular/core';
-import { MapLayer } from './map-layer';
-import { MapLayerExtentType } from './gridded-common';
-import { GriddedPipeProvider } from './pipes';
+
+import {
+    MapLayer,
+    MapLayerExtentType, MapLayerExtent, MapLayerExtentValue,
+    GriddedPipeProvider
+} from '../../gridded';
 
 import * as d3 from 'd3';
 
-
+// TODO: Important.  These controls are touching the MapLayer object directly.
+// they need to interact with the layer indirectly through its selection o/w nothing will
+// be captured as part of the selection.....
 
 @Component({
     selector: 'extent-control',
@@ -116,11 +121,33 @@ export class ExtentDoyControl {
 @Component({
     selector: 'extent-year-control',
     template: `
-    TODO year extent
+    <h4>Year</h4>
+    <mat-form-field>
+        <mat-select placeholder="Year" [(value)]="selectedExtent">
+            <mat-option *ngFor="let ext of layer.extent.values" [value]="ext">{{ext.label}}</mat-option>
+        </mat-select>
+    </mat-form-field>
     `
 })
 export class ExtentYearControl {
     @Input() layer:MapLayer;
+
+    _selectedExtent:MapLayerExtentValue;
+
+    get selectedExtent():MapLayerExtentValue { return this._selectedExtent; }
+    set selectedExtent(ext:MapLayerExtentValue) {
+        if(this.layer.extent.current = (this._selectedExtent = ext)) {
+            this.layer.bounce();
+        } else {
+            console.warn('unexpected selected extent value',ext);
+        } 
+    }
+
+    ngOnChanges(changes:SimpleChanges):void {
+        if(changes.layer && changes.layer.currentValue) {
+            this._selectedExtent = this.layer.extent.current;
+        }
+    }
 }
 
 

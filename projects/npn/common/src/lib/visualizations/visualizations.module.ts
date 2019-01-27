@@ -24,7 +24,12 @@ import {ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsCompo
 import {ObserverActivitySelectionFactory,ObserverActivityComponent,ObserverActivityControl} from './observer-activity';
 import {ObservationFrequencySelectionFactory,ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent} from './observation-frequency';
 
-import {MapSelectionFactory, MapVisualizationComponent} from './map';
+import {
+    MapSelectionFactory,
+    MapVisualizationComponent,
+    ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
+    GriddedRangeSliderControl
+} from './map';
 
 import {VisualizationComponent} from './visualization.component';
 
@@ -36,6 +41,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,
         MatExpansionModule,MatAutocompleteModule,
         MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule} from '@angular/material';
+import { Ng5SliderModule } from 'ng5-slider';
 
 import {AgmCoreModule} from '@agm/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -53,6 +59,7 @@ import {NpnGriddedModule} from '../gridded';
     MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
     MatExpansionModule,MatAutocompleteModule,
     MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
+    Ng5SliderModule,
     AgmCoreModule,
     FlexLayoutModule,
     NpnCommonModule,NpnGriddedModule
@@ -70,6 +77,9 @@ import {NpnGriddedModule} from '../gridded';
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
+
+      ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
+      GriddedRangeSliderControl
   ],
   exports: [
       ScatterPlotComponent,
@@ -82,7 +92,9 @@ import {NpnGriddedModule} from '../gridded';
       MapVisualizationComponent,
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
-      YearRangeInputComponent
+      YearRangeInputComponent,
+      ExtentControl,
+      GriddedRangeSliderControl
   ],
   providers: [
       DatePipe,

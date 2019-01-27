@@ -6,10 +6,10 @@ export const NULL_DATA = -9999;
 export const ONE_DAY_MILLIS: number = (24 * 60 * 60 * 1000);
 
 export const enum VisSelectionEvent {
-    RESET, // go back to a "clean" slate
-    REDRAW, // assuming you have data simply re-draw with that data
-    UPDATE, // go get new data and reset/redraw
-    RESIZE, // short cut for reset/redraw
+    RESET = 'reset', // go back to a "clean" slate
+    REDRAW = 'redraw', // assuming you have data simply re-draw with that data
+    UPDATE = 'update', // go get new data and reset/redraw
+    RESIZE = 'resize', // short cut for reset/redraw
 }
 
 /*
@@ -241,7 +241,7 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
         // both will get through
         if (this.lastEmit.value !== thisEmit.value || this.lastEmit.ext !== thisEmit.ext || this.lastEmit.when < (thisEmit.when - 500)) {
             this.lastEmit = thisEmit;
-            console.log('letting event through', thisEmit);
+            console.log('letting event through', thisEmit/*, new Error('stack trace')*/);
             this.firstSubscriber.then(() => {
                 super.emit.apply(self, emitArgs);
             });

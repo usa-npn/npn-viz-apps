@@ -1,7 +1,7 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from './base';
 import { StepState, VisConfigStep } from '../interfaces';
-import { Component } from '@angular/core';
-import { NpnMapLayerService, MapSelection } from '@npn/common';
+import { Component, ViewChild } from '@angular/core';
+import { NpnMapLayerService, MapSelection, GriddedRangeSliderControl } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
 
@@ -45,6 +45,7 @@ export class LayerStepComponent extends BaseStepComponent {
     `
 })
 export class LayerControlComponent extends BaseControlComponent {
+    protected defaultPropertyKeys:string[] = ['opacity'];
     selection:MapSelection;
     title:string = 'Select layer';
     layerDefinitions:MapLayerDefs;
@@ -52,6 +53,13 @@ export class LayerControlComponent extends BaseControlComponent {
 
     constructor(private layerService:NpnMapLayerService) {
         super();
+    }
+
+    stepVisit():void {
+        super.stepVisit();
+        if(this.selection.wmsMapLayer) {
+            this.subControlComponent.show();
+        }
     }
 
     layerTitle(layer) {
@@ -77,8 +85,8 @@ export class LayerControlComponent extends BaseControlComponent {
     template: `
     <div *ngIf="selection.layer" class="layer-controls">
         <extent-control [layer]="selection.layer"></extent-control>
-        <supports-opacity-control [supportsOpacity]="selection.layer"></supports-opacity-control>
-        <gridded-range-slider [layer]="selection.layer"></gridded-range-slider>
+        <supports-opacity-control [supportsOpacity]="selection"></supports-opacity-control>
+        <gridded-range-slider [selection]="selection"></gridded-range-slider>
         <p *ngIf="selection.layer.hasAbstract()">{{selection.layer.getAbstract()}}</p>
     </div>
     `,
@@ -90,6 +98,15 @@ export class LayerControlComponent extends BaseControlComponent {
 })
 export class LayerControlSubComponent extends BaseSubControlComponent {
     title:string = 'Taylor your layer';
+    @ViewChild(GriddedRangeSliderControl) rangeSlider:GriddedRangeSliderControl;
+
+    show():void {
+        super.show();
+        // the range slider won't automatically re-layout
+        if(this.rangeSlider) {
+            setTimeout(() => this.rangeSlider.resize());
+        }
+    }
 }
 
 export const LayerStep:VisConfigStep = {

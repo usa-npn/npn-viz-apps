@@ -28,7 +28,7 @@ export class SupportsOpacityControl implements OnChanges {
     }
 
     ngOnChanges(changes:SimpleChanges):void {
-        console.log('WmsMapOpacityControl.ngOnchanges',changes);
+        console.log('SupportsOpacityControl.ngOnchanges',changes);
         if(changes.supportsOpacity && changes.supportsOpacity.currentValue) {
             this.opacity = Math.round(changes.supportsOpacity.currentValue.getOpacity()*100);
         }

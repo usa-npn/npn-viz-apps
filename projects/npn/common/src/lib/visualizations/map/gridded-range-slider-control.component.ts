@@ -1,18 +1,29 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
-import { WmsMapLayer } from './wms-map-layer';
+import { Component, Input, SimpleChanges, EventEmitter } from '@angular/core';
+import { WmsMapLayer, MapLayer } from '../../gridded';
 import { Options } from 'ng5-slider';
+import { MapSelection } from './map-selection';
 
+// TODO the selection object does not change (the layer within it does)
+// so this control is not updating when switching layers
+// also on load from shared URL the layer probably isn't there yet when
+// the selection is available since it's loaded asynchronously so the 
+// control does not render properly
 @Component({
     selector: 'gridded-range-slider',
     template: `
-    <ng5-slider *ngIf="options" [(value)]="min" [(highValue)]="max" [options]="options"></ng5-slider>
+    <ng5-slider *ngIf="options" [(value)]="min" [(highValue)]="max" [options]="options" [manualRefresh]="manualRefresh"></ng5-slider>
     `
 })
 export class GriddedRangeSliderControl {
-    @Input() layer:WmsMapLayer;
+    @Input() selection:MapSelection;
     options:Options;
     _min:number;
     _max:number;
+    manualRefresh:EventEmitter<void> = new EventEmitter();
+
+    resize() {
+        this.manualRefresh.next();
+    }
 
     get max():number { return this._max; }
     set max(m:number) {
@@ -29,23 +40,32 @@ export class GriddedRangeSliderControl {
     private updateRange() {
         if(this.min === this.options.floor && this.max === this.options.ceil) {
             // complete range selected, clear any style range
-            this.layer.setStyleRange(undefined);
+            this.selection.styleRange = undefined;
         } else {
-            this.layer.setStyleRange([this.min,this.max]);
+            this.selection.styleRange = [this.min,this.max];
         }
     }
 
     ngOnChanges(changes:SimpleChanges):void {
-        if(changes.layer && changes.layer.currentValue) {
-            console.log('RangeSliderControl.ngOnChanges',this.layer);
+        if(changes.selection && changes.selection.currentValue) {
+            console.log('RangeSliderControl.ngOnChanges',this.selection);
             // currently only WwmsMapLayer supports style ranges.
             // and while the instance variable is strongly typed what
             // gets passed into the component may be something else
             // (whatever type of layer is on the map)...
-            if(this.layer instanceof WmsMapLayer) {
-                this.layer.getLegend().then(legend => {
+            
+        }
+    }
+
+    private lastLayer:MapLayer;
+    ngDoCheck():void {
+        if(this.selection.layer !== this.lastLayer) {
+            console.log('LAYER CHANGE!!!');
+            this.lastLayer = this.selection.layer;
+            if(this.selection.layer instanceof WmsMapLayer) {
+                this.selection.layer.getLegend().then(legend => {
                     const data = legend.getData();
-                    const existingRange = this.layer.getStyleRange();
+                    const existingRange = this.selection.styleRange;
                     this._min = existingRange ? existingRange[0] : 0;
                     this._max = existingRange ? existingRange[1] : (data.length-1);
                     this.options = {

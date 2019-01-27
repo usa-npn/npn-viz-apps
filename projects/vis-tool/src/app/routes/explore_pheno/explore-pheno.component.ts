@@ -18,7 +18,6 @@ import { SharingService } from './sharing.service';
 import { ActivatedRoute } from '@angular/router';
 
 const INIT_STEPS = (steps:VisConfigStep[]) => steps.forEach(s => s.$id = (s.$id||newGuid()));
-const STEP_ID = (vcr:ViewContainerRef) => (vcr.element.nativeElement.getAttribute('id')||'').replace(/^[^\-]+\-/,'');
 
 @Component({
     templateUrl: './explore-pheno.component.html'
@@ -101,8 +100,8 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     }
 
     resize() {
-        if(this.activeVisComponent && typeof(this.activeVisComponent.resize) === 'function') {
-            this.activeVisComponent.resize();
+        if(this.activeVis) {
+            this.activeVis.selection.resize();
         }
     }
 
@@ -176,7 +175,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const visComponent = (<any>visRef.instance);
             visComponent.selection = this.activeVis.selection;
             this.activeVisComponent = visComponent;
-            setTimeout(() => this.resize());
+            setTimeout(() => this.activeVis.selection.update());
         }
         if(!this.sharingSubscription) {
             // this should only happen once but cannot happen until after the steps have been setup
@@ -203,8 +202,12 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                     // the above call and then the new one gets re-focused when the list of steps is re-written.
                     // so the setting of controlsOpen has no effect until -after- all that happens and the "new"
                     // step 0 is inserted into the DOM
-                    .then(selected => setTimeout(() => this.controlsOpen.next(!selected),500)); // close control if the set was successful
-                
+                    .then(selected => setTimeout(() => {
+                        this.controlsOpen.next(!selected);
+                        if(selected) {
+                            selection.update();
+                        }
+                    },500)); // close control if the set was successful
             });
     }
 }

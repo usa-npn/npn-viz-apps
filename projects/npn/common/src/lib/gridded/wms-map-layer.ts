@@ -109,11 +109,12 @@ export class WmsMapLayer extends MapLayer {
      * 
      * @param range The new style range.
      */
-    setStyleRange(range:number[]) {
+    setStyleRange(range:number[]):Promise<void> {
         if(!(this.styleRange = range)) {
-            return this.setStyle(undefined);
+            this.setStyle(undefined);
+            return Promise.resolve();
         }
-        this.getLegend().then(legend => {
+        return this.getLegend().then(legend => {
             const styleDef = legend.getStyleDefinition(),
                 data = legend.getData(),
                 minQ = data[range[0]].quantity,

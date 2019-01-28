@@ -1,6 +1,6 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from './base';
 import { StepState, VisConfigStep } from '../interfaces';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NpnMapLayerService, MapSelection, GriddedRangeSliderControl } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
@@ -94,10 +94,20 @@ export class LayerControlComponent extends BaseControlComponent {
     .layer-controls {
         width: 400px;
     }
-    `]
+    .layer-controls >p {
+        margin: 12px 0px 0px 0px;
+    }
+    .layer-controls >supports-opacity-control .mat-slider.mat-slider-horizontal {
+        font-weight: 600;
+        display: block;
+        padding-top: 0px;
+        padding-left: 0px;
+    }
+    `],
+    encapsulation:ViewEncapsulation.None
 })
 export class LayerControlSubComponent extends BaseSubControlComponent {
-    title:string = 'Taylor your layer';
+    title:string = 'Tailor your layer';
     @ViewChild(GriddedRangeSliderControl) rangeSlider:GriddedRangeSliderControl;
 
     show():void {

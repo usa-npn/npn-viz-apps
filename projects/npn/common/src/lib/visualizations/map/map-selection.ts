@@ -60,7 +60,9 @@ console.log(`MapSelection.styleRange=${range}`);
         if(this.layer && this._extentValue) {
             const newValue = this.layer.extent.values.reduce((found,v) => found||(v.value === this._extentValue ? v : undefined),undefined);
             if(!newValue) {
-                console.warn(`Unable to find extent with value "${this._extentValue}`);
+                // this is OK if it happens, since we can keep the _extentValue from layer to layer
+                // if the user switches from one layer to another with compatible extents then we can just
+                // re-use it, which seems nice. o/w it should just go back to the "default"
                 this._extentValue = undefined;
             } else if (this.layer.extent.current !== newValue) {
                 this.layer.extent.current = newValue;

@@ -14,7 +14,7 @@ function layerTitle(layer) {
     }
 }
 @Component({
-    template: `{{selection.layer?.getTitle()}}`
+    template: `<div>{{selection.layer?.getTitle()}}</div><div>{{selection.layer?.extent?.current?.label}}</div>`
 })
 export class LayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
@@ -67,10 +67,10 @@ export class LayerControlComponent extends BaseControlComponent {
     }
 
     layerClick(layer:MapLayerDefinition) {
-        this.selection.layerName = this.selection.layerName !== layer.name
-            ? layer.name
-            : undefined;
-        this.selection.redraw();
+        if(this.selection.layerName !== layer.name) {
+            this.selection.layerName = layer.name;
+            this.selection.redraw();
+        }
         if(layer.name) {
             this.subControlComponent.show();
         }

@@ -11,10 +11,6 @@ import {
 import * as d3 from 'd3';
 import { MapSelection } from './map-selection';
 
-// TODO: Important.  These controls are touching the MapLayer object directly.
-// they need to interact with the layer indirectly through its selection o/w nothing will
-// be captured as part of the selection.....
-
 @Component({
     selector: 'extent-control',
     template: `
@@ -35,11 +31,41 @@ export class ExtentControl {
 @Component({
     selector: 'extent-date-control',
     template: `
-    TODO date extent
+    <mat-form-field>
+        <input matInput [matDatepicker]="extentDatePicker" [min]="minDate" [max]="maxDate" [value]="selectedDate"
+            (dateChange)="selectedDate = $event.value">
+        <mat-datepicker-toggle matSuffix [for]="extentDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #extentDatePicker></mat-datepicker>
+    </mat-form-field>
     `
 })
 export class ExtentDateControl {
     @Input() selection:MapSelection;
+
+    _selectedDate:Date;
+    minDate:Date;
+    maxDate:Date;
+
+    set selectedDate(d:Date) {
+        d.setHours(0,0,0,0);
+        this._selectedDate = d;
+        this.selection.extentValue = d.toISOString().replace(/T.*Z$/,'T00:00:00.000Z');
+    }
+    get selectedDate():Date {
+        return this._selectedDate;
+    }
+
+    private lastLayer:MapLayer;
+    ngDoCheck():void {
+        if(this.selection.layer !== this.lastLayer) {
+            const layer = this.lastLayer = this.selection.layer;
+            if(layer) {
+                this.minDate = layer.extent.values[0].date;
+                this.maxDate = layer.extent.values[layer.extent.values.length-1].date;
+                this.selectedDate = layer.extent.current.date;
+            }
+        }
+    }
 }
 
 @Component({

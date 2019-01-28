@@ -1,20 +1,34 @@
 import { MapLayerDefinition, MapLayerExtentType, MapLayerServiceType, MapLayerExtentValue } from './gridded-common';
 import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayer } from './map-layer';
+import { ONE_DAY_MILLIS } from '../visualizations/vis-selection';
+
 export class PestMapLayer extends MapLayer {
     private overlay: google.maps.GroundOverlay;
     constructor(protected map: google.maps.Map, protected layer_def: MapLayerDefinition, protected layerService: NpnMapLayerService) {
         super(map, layer_def, layerService);
+        const currentValue = this.newExtentValue(new Date()).value;
+        const minDateMillis = new Date(new Date().getFullYear() - 1, 0, 1).getTime();
+        const maxDateMillis = new Date(new Date().getTime() + (6*ONE_DAY_MILLIS)).getTime();
+        const values = [];
+        let cMillis = minDateMillis;
+        while(cMillis <= maxDateMillis) {
+            const d = new Date(cMillis);
+            values.push(this.newExtentValue(d));
+            cMillis += ONE_DAY_MILLIS;
+        }
         layer_def.extent = {
-            current: this.newExtentValue(new Date()),
+            current: values.reduce((found,v) => found||(v.value === currentValue ? v : undefined),undefined),
             label: 'Date',
             type: MapLayerExtentType.DATE,
-            values: [] // TODO need to be able to populate values with acceptable selections.
+            values
         };
+
+        console.log('PestMapLayer.extnet',layer_def.extent);
     }
     newExtentValue(date: Date): MapLayerExtentValue {
         date.setHours(0, 0, 0, 0);
-        const value = date.toISOString();
+        const value = date.toISOString().replace(/T.*Z$/,'T00:00:00.000Z');
         return {
             value,
             date,

@@ -40,7 +40,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,
         MatExpansionModule,MatAutocompleteModule,
-        MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule} from '@angular/material';
+        MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
+        MatDatepickerModule, MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material';
 import { Ng5SliderModule } from 'ng5-slider';
 
 import {AgmCoreModule} from '@agm/core';
@@ -58,7 +59,8 @@ import {NpnGriddedModule} from '../gridded';
     FontAwesomeModule,
     MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
     MatExpansionModule,MatAutocompleteModule,
-    MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
+    MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule, MatDatepickerModule,
+    MatNativeDateModule,
     Ng5SliderModule,
     AgmCoreModule,
     FlexLayoutModule,
@@ -107,7 +109,31 @@ import {NpnGriddedModule} from '../gridded';
       ObservationFrequencySelectionFactory,
       MapSelectionFactory,
       // OR one factory to rule them all
-      VisualizationSelectionFactory
+      VisualizationSelectionFactory,
+      {provide: MAT_DATE_FORMATS, useValue: {
+        parse: { dateInput: null },
+        display: {
+          dateInput: {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          },
+          monthYearLabel: {
+            year: "numeric",
+            month: "long"
+          },
+          dateA11yLabel: {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          },
+          monthYearA11yLabel: {
+            year: "numeric",
+            month: "long"
+          }
+        }
+      }
+    }
   ]
 })
 export class VisualizationsModule { }

@@ -19,6 +19,9 @@ export abstract class MapLayer implements SupportsOpacity {
     }
 
     get layerName():string { return this.layer_def.name; }
+    get layerType():MapLayerType {
+        return this.layer_def.type||MapLayerType.STANDARD;
+    }
     get extent():MapLayerExtent { return this.layer_def.extent; }
     get extentType():MapLayerExtentType { 
         return this.layer_def.extent
@@ -63,6 +66,11 @@ export abstract class MapLayer implements SupportsOpacity {
     abstract bounce():MapLayer;
 }
 
+// NOTE: this function replaces all encoded spaces (%20) with '+'
+// this is perhaps a kludge solution to the fact that %20 is three chars while + is one
+// and for some map layers sending a value for sld_body using %20 can result in
+// overflowing the maximum length of a URI breaking thos emaps.  This is a simple 
+// workaround to that issue.
 export function encodeHttpParams(params) {
     if(!params) {
         return '';
@@ -71,7 +79,7 @@ export function encodeHttpParams(params) {
     Object.keys(params).forEach(k => {
         if(params[k]) {
             let ok = encodeURIComponent(k),
-                ov = encodeURIComponent(params[k]);
+                ov = encodeURIComponent(params[k]).replace(/%20/g,'+');
             parts.push(`${ok}=${ov}`);
         }
     });

@@ -4,7 +4,8 @@ import { MapLayerLegend } from './map-layer-legend';
 export class PestMapLayerLegend extends MapLayerLegend {
     redraw(svg: Selection<any, any, any, any>, legendTitle: string): void {
         const legend = this;
-        const width = parseFloat(svg.style('width').replace('px', '')), height = parseFloat(svg.style('height').replace('px', '')),
+        const width = parseFloat(svg.style('width').replace('px', '')),
+              height = parseFloat(svg.style('height').replace('px', '')),
             // only data w/out 'ignore' in them
             data = legend.getData().filter(d => d.original_label.indexOf('ignore') === -1), cell_width = 20, cell_height = 20;
         console.debug('PestMapLegend.svg dimensions', width, height);

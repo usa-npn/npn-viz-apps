@@ -1,10 +1,6 @@
-import { Component, Input, ElementRef, SimpleChanges } from '@angular/core';
+import { Component, Input, ElementRef, SimpleChanges, HostListener, HostBinding } from '@angular/core';
 
-import { MonitorsDestroy } from '../common/index';
 import { MapLayerLegend } from './map-layer-legend';
-
-import { fromEvent } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
 
 import { Selection } from 'd3-selection';
 import * as d3 from 'd3';
@@ -14,16 +10,11 @@ import * as d3 from 'd3';
     template:`
     <svg class="gridded-legend"></svg>
     `,
-    styles:[`
-        :host {
-            display: block;
-        }
-        .gridded-legend {
-            width: 100%;
-        }
-    `]
+    styleUrls:[
+        './map-layer-legend.component.scss'
+    ]
 })
-export class MapLayerLegendComponent extends MonitorsDestroy {
+export class MapLayerLegendComponent {
     @Input()
     legendTitle:string;
     @Input()
@@ -31,27 +22,25 @@ export class MapLayerLegendComponent extends MonitorsDestroy {
 
     private svg: Selection<any,any,any,any>;
 
-    constructor(protected rootElement: ElementRef) {
-        super();
+    constructor(protected rootElement: ElementRef) {}
+
+    @HostBinding('class')
+    get legendClass() {
+        const layer = this.legend ? this.legend.getLayer() : null;
+        return layer
+            ? `${layer.layerType} ${layer.layerName.replace(/:/g,'_')}`
+            : null;
     }
 
     ngAfterViewInit() {
-        console.debug('WmsMapLegendComponent.ngAfterViewInit');
-        fromEvent(window,'resize')
-            .pipe(
-                debounceTime(500),
-                takeUntil(this.componentDestroyed)
-            )
-            .subscribe(event => this.redraw());
         this.svg = d3.select(this.rootElement.nativeElement).select('svg');
-        console.debug('WmsMapLegendComponent:SVG',this.svg);
     }
 
     ngOnChanges(changes:SimpleChanges):void {
-        console.debug('WmsMapLegendComponent.ngOnChanges',changes);
-        setTimeout(() => this.redraw()); // all that can change at the moment is the reference to legend
+        setTimeout(() => this.redraw());
     }
 
+    @HostListener('window:resize')
     redraw() {
         if(this.svg) {
             this.svg.selectAll('g').remove();

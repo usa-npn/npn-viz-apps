@@ -31,6 +31,7 @@ export class ExtentControl {
 @Component({
     selector: 'extent-date-control',
     template: `
+    <h4>Date</h4>
     <mat-form-field>
         <input matInput [matDatepicker]="extentDatePicker" [min]="minDate" [max]="maxDate" [value]="selectedDate"
             (dateChange)="selectedDate = $event.value">

@@ -18,36 +18,52 @@ export abstract class MapLayer implements SupportsOpacity {
         this.griddedUrls = layerService.griddedUrls;
     }
 
-    get layerName():string { return this.layer_def.name; }
-    get layerType():MapLayerType {
-        return this.layer_def.type||MapLayerType.STANDARD;
+    get layerDefinition():MapLayerDefinition { return this.layer_def; }
+
+    get layerName():string {
+        return this.layer_def
+            ? this.layer_def.name
+            : null;
     }
-    get extent():MapLayerExtent { return this.layer_def.extent; }
+    get layerType():MapLayerType {
+        return  this.layer_def && this.layer_def.type
+            ? this.layer_def.type
+            : MapLayerType.STANDARD;
+    }
+    get extent():MapLayerExtent {
+        return this.layer_def
+            ? this.layer_def.extent
+            : null;
+    }
     get extentType():MapLayerExtentType { 
-        return this.layer_def.extent
+        return (this.layer_def && this.layer_def.extent)
             ? this.layer_def.extent.type
             : null;
     }
 
     getTitle() {
-        return this.layer_def.title
+        return (this.layer_def && this.layer_def.title)
             ? this.layer_def.title.replace(/^(.*?)\s+-\s+(.*)$/,'$2')
             : undefined;
     }
 
     hasAbstract() {
-        return !!this.layer_def.abstract;
+        return this.layer_def
+            ? !!this.layer_def.abstract
+            : false;
     }
 
     getAbstract() {
-        return this.layer_def.abstract
+        return (this.layer_def && this.layer_def.abstract)
             ? this.layer_def.abstract.replace(/\s*developer notes.*$/i,'')
             : undefined;
     }
     
     getLegend():Promise<MapLayerLegend> {
-        return this.layerService.getLegend(this.layer_def)
-            .then(legend => legend.setLayer(this))
+        return this.layer_def
+            ? this.layerService.getLegend(this.layer_def)
+                .then(legend => legend.setLayer(this))
+            : Promise.resolve(null);
     }
 
     /**

@@ -2,7 +2,7 @@ import { NetworkAwareVisSelection, selectionProperty, ONE_DAY_MILLIS } from '../
 import { NpnServiceUtils } from '../../common';
 import {
     MapLayerLegend,
-    WmsMapSupportsOpacity,
+    SupportsOpacity,
     googleFeatureBounds,
     WcsDataService,
     GriddedInfoWindowHandler,
@@ -374,7 +374,7 @@ interface WmsMapSelectionData {
     statistics: any;
 };
 
-interface ImageOverlay extends google.maps.OverlayView,WmsMapSupportsOpacity {
+interface ImageOverlay extends google.maps.OverlayView,SupportsOpacity {
     add();
     remove();
 }

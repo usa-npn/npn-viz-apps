@@ -1,7 +1,11 @@
 import { VisSelection, selectionProperty } from '../vis-selection';
-import { MapLayer, NpnMapLayerService, MapLayerLegend } from '../../gridded';
-import { SupportsOpacity } from '@npn/common/gridded/supports-opacity-control.component';
-import { WmsMapLayer } from '@npn/common/gridded/wms-map-layer';
+import {
+    MapLayerProxy,
+    NpnMapLayerService,
+    MapLayerLegend,
+    WmsMapLayer,
+    SupportsOpacity
+} from '../../gridded';
 
 export class MapSelection extends VisSelection implements SupportsOpacity {
     @selectionProperty()
@@ -16,7 +20,7 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     @selectionProperty()
     _extentValue:string;
 
-    layer:MapLayer;
+    layer:MapLayerProxy;
     legend:MapLayerLegend;
 
     constructor(private layerService:NpnMapLayerService) {
@@ -33,7 +37,7 @@ console.log(`MapSelection.layerName=${s}`);
         // since layer could not exist yet.
         if(this.layer && this.layer.layerName !== s) {
             this.layer.off();
-            this.layer = undefined;
+            //this.layer = undefined;
             this.legend = undefined;
             this.styleRange = undefined;
         }
@@ -46,8 +50,8 @@ console.log(`MapSelection.layerName=${s}`);
     set styleRange(range:number[]) {
 console.log(`MapSelection.styleRange=${range}`);
         this._styleRange = range;
-        if(this.layer instanceof WmsMapLayer) {
-            this.layer.setStyleRange(range);
+        if(this.layer && this.layer.proxiedLayer instanceof WmsMapLayer) {
+            this.layer.proxiedLayer.setStyleRange(range);
         }
     }
 
@@ -100,34 +104,25 @@ console.log(`MapSelection.setOpacity=${opacity}`);
     }
 
     visualize(map: google.maps.Map):Promise<void> {
-        const {layerName: wmsMapLayer} = this;
-        console.log(`MapSelection.visualize`,this.external);
-        if(wmsMapLayer) {
-            /*
-            if(this.layer && this.layer.layerName !== s) {
-                this.layer.off();
-                this.layer = undefined;
-                this.legend = undefined;
-                this.styleRange = undefined;
-            }*/
+        const {layerName} = this;
+console.log(`MapSelection.visualize`,this.external);
+        if(layerName) {
             if(!this.layer) {
-                return this.layerService.getLayerDefinition(wmsMapLayer)
-                    .then(layerDef => this.layerService.newLayer(map,layerDef))
-                    .then(layer => {
-                        if(this.layer = layer) {
-                            layer.setOpacity(this.opacity);
-                            if(layer instanceof WmsMapLayer) {
-                                layer.setStyleRange(this.styleRange);
-                            }
-                            this.updateExtentValue();
-                            layer.on();
-                            return layer.getLegend()
-                                .then(legend => {
-                                    this.legend = legend;
-                                });
-                        }
-                    });
+                this.layer = new MapLayerProxy(map,this.layerService);
+                this.layer.setOpacity(this.opacity);
             }
+            return this.layer.setProxiedLayer(layerName)
+                .then(proxiedLayer => {
+                    if(proxiedLayer instanceof WmsMapLayer) {
+                        proxiedLayer.setStyleRange(this.styleRange);
+                    }
+                    this.updateExtentValue();
+                    this.layer.on();
+                    return this.layer.getLegend()
+                        .then(legend => {
+                            this.legend = legend;
+                        });
+                });
         }
         return Promise.resolve();
     }

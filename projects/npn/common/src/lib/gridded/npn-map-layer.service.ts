@@ -43,13 +43,18 @@ export class NpnMapLayerService {
         public griddedUrls:GriddedUrls
     ) {}
 
-    newLayer(map:google.maps.Map,layerDef:MapLayerDefinition):MapLayer {
-        switch(layerDef.type||MapLayerType.STANDARD) {
-            case MapLayerType.STANDARD:
-                return new WmsMapLayer(map,layerDef,this);
-            case MapLayerType.PEST:
-                return new PestMapLayer(map,layerDef,this);
-        }
+    newLayer(map:google.maps.Map,layerName:string):Promise<MapLayer> {
+        return this.getLayerDefinition(layerName)
+            .then(layerDef => {
+                if(layerDef) {
+                    switch(layerDef.type||MapLayerType.STANDARD) {
+                        case MapLayerType.STANDARD:
+                            return new WmsMapLayer(map,layerDef,this);
+                        case MapLayerType.PEST:
+                            return new PestMapLayer(map,layerDef,this);
+                    }
+                }
+            });
     }
 
     // this is separate from WmsLayer itself because FWS apps use

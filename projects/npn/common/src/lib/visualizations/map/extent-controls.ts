@@ -58,8 +58,8 @@ export class ExtentDateControl {
 
     private lastLayer:MapLayer;
     ngDoCheck():void {
-        if(this.selection.layer !== this.lastLayer) {
-            const layer = this.lastLayer = this.selection.layer;
+        if(this.selection.layer && this.selection.layer.proxiedLayer !== this.lastLayer) {
+            const layer = this.lastLayer = this.selection.layer.proxiedLayer;
             if(layer) {
                 this.minDate = layer.extent.values[0].date;
                 this.maxDate = layer.extent.values[layer.extent.values.length-1].date;
@@ -135,8 +135,8 @@ export class ExtentDoyControl {
 
     private lastLayer:MapLayer;
     ngDoCheck():void {
-        if(this.selection.layer !== this.lastLayer) {
-            const layer = this.lastLayer = this.selection.layer;
+        if(this.selection.layer && this.selection.layer.proxiedLayer !== this.lastLayer) {
+            const layer = this.lastLayer = this.selection.layer.proxiedLayer;
             if(layer) {
                 const currentDate = this.thirtyYearAvgDayOfYear.transform(layer.extent.current.value,true);
                 this.setSelectedMonth(this.months[currentDate.getMonth()]);
@@ -170,8 +170,8 @@ export class ExtentYearControl {
 
     private lastLayer:MapLayer;
     ngDoCheck():void {
-        if(this.selection.layer !== this.lastLayer) {
-            const layer = this.lastLayer = this.selection.layer;
+        if(this.selection.layer && this.selection.layer.proxiedLayer !== this.lastLayer) {
+            const layer = this.lastLayer = this.selection.layer.proxiedLayer;
             if(layer) {
                 this.selectedExtent = layer.extent.current;
             }

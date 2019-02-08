@@ -48,9 +48,8 @@ export class GriddedRangeSliderControl {
 
     private lastLayer:MapLayer;
     ngDoCheck():void {
-        if(this.selection.layer !== this.lastLayer) {
-            this.lastLayer = this.selection.layer;
-            if(this.selection.layer instanceof WmsMapLayer) {
+        if(this.selection.layer && this.selection.layer.proxiedLayer !== this.lastLayer) {
+            if((this.lastLayer = this.selection.layer.proxiedLayer) instanceof WmsMapLayer) {
                 this.selection.layer.getLegend().then(legend => {
                     const data = legend.getData();
                     const existingRange = this.selection.styleRange;

@@ -15,6 +15,7 @@ import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 import { YearsControlComponent, YearsStepComponent } from './years';
 import { LocationStepComponent, LocationControlComponent, LocationControlSubComponent } from './location';
 import { LayerStepComponent, LayerControlComponent, LayerControlSubComponent } from './layer';
+import { MapLayerStepComponent, MapLayerControlComponent } from './map-layer';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
@@ -30,6 +31,7 @@ const COMPONENTS:any[] = [
     YearsControlComponent, YearsStepComponent,
     LocationStepComponent, LocationControlComponent, LocationControlSubComponent,
     LayerStepComponent, LayerControlComponent, LayerControlSubComponent,
+    MapLayerStepComponent, MapLayerControlComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,

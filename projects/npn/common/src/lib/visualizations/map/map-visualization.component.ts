@@ -49,7 +49,11 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
     }
 
     protected redraw():void {
-        this.getMap().then(map => this.selection.visualize(map));
+        this.getMap().then(map => this.selection.visualize(map).then(() => {
+            if(this.legend) {
+                this.legend.redraw();
+            }
+        }));
     }
 
     protected update():void {

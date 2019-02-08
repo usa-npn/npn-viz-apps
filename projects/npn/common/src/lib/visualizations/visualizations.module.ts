@@ -28,7 +28,11 @@ import {
     MapSelectionFactory,
     MapVisualizationComponent,
     ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
-    GriddedRangeSliderControl
+    GriddedRangeSliderControl,
+    ConsolidatedMapLayerControlComponent,
+    PestMapLayerControlComponent,
+    TempAccumMapLayerControlComponent,
+    SpringIndexMapLayerControlComponent
 } from './map';
 
 import {VisualizationComponent} from './visualization.component';
@@ -81,7 +85,8 @@ import {NpnGriddedModule} from '../gridded';
       YearRangeInputComponent,
 
       ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
-      GriddedRangeSliderControl
+      GriddedRangeSliderControl,
+      ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent
   ],
   exports: [
       ScatterPlotComponent,
@@ -96,7 +101,8 @@ import {NpnGriddedModule} from '../gridded';
       SpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       ExtentControl,
-      GriddedRangeSliderControl
+      GriddedRangeSliderControl,
+      ConsolidatedMapLayerControlComponent
   ],
   providers: [
       DatePipe,

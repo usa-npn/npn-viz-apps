@@ -109,10 +109,21 @@ export interface MapLayerDefs {
     categories: MapLayerCategory[];
 }
 
+export const CATEGORY_PEST = 'Pests';
+export const CATEGORY_TEMP_ACCUM_30_YR_AVG = 'Temperature Accumulations, Daily 30-year Average';
+export const CATEGORY_TEMP_ACCUM_CURRENT = 'Temperature Accumulations, Current Day';
+export const CATEGORY_TEMP_ACCUM_CURRENT_AK = 'Temperature Accumulations, Current Day, Alaska';
+export const CATEGORY_TEMP_ACCUM_DAILY_ANOM = 'Temperature Accumulations, Daily Anomaly';
+export const CATEGORY_SIX_HIST_ANNUAL = 'Spring Indices, Historical Annual';
+export const CATEGORY_SIX_CURRENT_YEAR = 'Spring Indices, Current Year';
+export const CATEGORY_SIX_CURRENT_YEAR_AK = 'Spring Indices, Current Year, Alaska';
+export const CATEGORY_SIX_DAILY_ANOM = 'Spring Indices, Daily Anomaly';
+export const CATEGORY_SIX_30_YR_AVG = 'Spring Indices, 30-Year Average';
+
 export const MAP_LAYERS:MapLayerDefs = {
     "description": "",
     "categories": [{
-        "name": "Pest maps",
+        "name": CATEGORY_PEST,
         "supports_data": false, // TODO they do support data but...
         "layerBasis": "gdd:agdd_50f",
         "layers": [{
@@ -138,7 +149,7 @@ export const MAP_LAYERS:MapLayerDefs = {
             type: MapLayerType.PEST
         }]
     },{
-        "name": "Temperature Accumulations, Daily 30-year Average",
+        "name": CATEGORY_TEMP_ACCUM_30_YR_AVG,
         "supports_data": false,
         "legend_label_filter": {
             "name": "legendGddUnits",
@@ -159,7 +170,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "gdd:30yr_avg_agdd_50f"
             }]
     },{
-        "name": "Temperature Accumulations, Current Day",
+        "name": CATEGORY_TEMP_ACCUM_CURRENT,
         "supports_data": false,
         "legend_label_filter": {
             "name": "legendGddUnits",
@@ -181,7 +192,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "gdd:agdd_50f"
             }]
     },{
-        "name": "Temperature Accumulations, Current Day, Alaska",
+        "name": CATEGORY_TEMP_ACCUM_CURRENT_AK,
         "supports_data": false,
         "legend_label_filter": {
             "name": "legendGddUnits",
@@ -203,7 +214,7 @@ export const MAP_LAYERS:MapLayerDefs = {
             "name": "gdd:agdd_alaska_50f"
         }]
     },{
-        "name": "Temperature Accumulations, Daily Anomaly",
+        "name": CATEGORY_TEMP_ACCUM_DAILY_ANOM,
         "supports_data": false,
         "legend_label_filter": {
             "name": "legendAgddAnomaly",
@@ -224,7 +235,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "gdd:agdd_anomaly_50f"
             }]
     },{
-        "name": "Spring Indices, Historical Annual",
+        "name": CATEGORY_SIX_HIST_ANNUAL,
         "legend_label_filter": {
             "name": "legendDoy"
         },
@@ -247,7 +258,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "si-x:zabelli_bloom_prism"
             }]
     },{
-        "name": "Spring Indices, Current Year",
+        "name": CATEGORY_SIX_CURRENT_YEAR,
         "legend_label_filter": {
             "name": "legendDoy"
         },
@@ -273,7 +284,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "si-x:zabelli_bloom_ncep"
             }]
     },{
-        "name": "Spring Indices, Current Year, Alaska",
+        "name": CATEGORY_SIX_CURRENT_YEAR_AK,
         "legend_label_filter": {
             "name": "legendDoy"
         },
@@ -300,7 +311,7 @@ export const MAP_LAYERS:MapLayerDefs = {
             "name": "si-x:zabelli_bloom_ncep_alaska"
         }]
     },{
-        "name": "Spring Indices, Daily Anomaly",
+        "name": CATEGORY_SIX_DAILY_ANOM,
         "supports_data": false,
         "legend_label_filter": {
             "name": "legendSixAnomaly"
@@ -314,7 +325,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 "name": "si-x:bloom_anomaly"
             }]
     },{
-        "name": "Spring Indices, 30-Year Average",
+        "name": CATEGORY_SIX_30_YR_AVG,
         "legend_label_filter": {
             "name": "legendDoy"
         },

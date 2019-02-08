@@ -12,6 +12,8 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     $class = 'MapSelection';
 
     @selectionProperty()
+    _layerCategory:string;
+    @selectionProperty()
     _layerName:string;
     @selectionProperty()
     opacity:number = 0.75;
@@ -27,6 +29,12 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
         super();
     }
 
+    set layerCategory(s:string) {
+        // TODO if the category changes, layername, etc. may need clearing.
+        this._layerCategory = s;
+    }
+    get layerCategory():string { return this._layerCategory; }
+
     set layerName(s:string) {
 console.log(`MapSelection.layerName=${s}`);
         this._layerName = s;
@@ -37,6 +45,7 @@ console.log(`MapSelection.layerName=${s}`);
         // since layer could not exist yet.
         if(this.layer && this.layer.layerName !== s) {
             this.layer.off();
+            this.layer.setProxiedLayer(s);
             //this.layer = undefined;
             this.legend = undefined;
             this.styleRange = undefined;
@@ -79,7 +88,7 @@ console.log(`MapSelection.styleRange=${range}`);
     set extentValue(v:string) {
         this._extentValue = v;
         if(this.layer && this.updateExtentValue()) {
-            this.layer.bounce();
+            this.redraw();
         }
     }
 
@@ -110,6 +119,10 @@ console.log(`MapSelection.visualize`,this.external);
             if(!this.layer) {
                 this.layer = new MapLayerProxy(map,this.layerService);
                 this.layer.setOpacity(this.opacity);
+            }
+            if(this.layer.proxiedLayer && this.layer.layerName === layerName) {
+                this.layer.bounce();
+                return Promise.resolve();
             }
             return this.layer.setProxiedLayer(layerName)
                 .then(proxiedLayer => {

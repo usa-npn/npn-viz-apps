@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "ng serve vis-tool",
+    "build": "ng build vis-tool",
+    "build-fws-spring": "ng build fws-spring",
+    "build-fws-dashboard": "ng build fws-dashboard",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

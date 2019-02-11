@@ -120,6 +120,18 @@ export const CATEGORY_SIX_CURRENT_YEAR_AK = 'Spring Indices, Current Year, Alask
 export const CATEGORY_SIX_DAILY_ANOM = 'Spring Indices, Daily Anomaly';
 export const CATEGORY_SIX_30_YR_AVG = 'Spring Indices, 30-Year Average';
 
+/**
+ * Holds all current supported map layers broken down by category.  This structure
+ * originated with the original visualization tool and is very meaningful in that
+ * commonality in configuration can be configured on the parent category for a given
+ * layer and optionally over-ridden below that (for this like pipes to translate values to
+ * strings, etc.).
+ * 
+ * IMPORTANT: See `visualizations/map/consolidated-map-layer-control.component.ts`
+ * for the temp accumulations and six layers that code relies on the order
+ * of the indexes of the nested layers for those two sets so do NOT change that
+ * here.
+ */
 export const MAP_LAYERS:MapLayerDefs = {
     "description": "",
     "categories": [{

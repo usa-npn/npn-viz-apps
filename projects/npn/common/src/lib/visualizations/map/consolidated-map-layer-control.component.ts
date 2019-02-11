@@ -113,6 +113,9 @@ export class PestMapLayerControlComponent {
     }
 }
 
+const LOWER_44_CENTER:number[] = [38.535680, -99.248833];
+const AK_CENTER:number[] = [64.559308, -141.465422];
+
 enum TEMP_ACCUM_BASE {
     DAILY_30Y_AVG = 'Daily 30-year Average',
     CUR_DAY = 'Current Day',
@@ -242,6 +245,9 @@ export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
             this.selection.layerName = categories[categoryName].layers[degreesIndex].name;
             this.selection.redraw();
         });
+        this.alaska.valueChanges
+        .pipe(takeUntil(this.componentDestroyed))
+        .subscribe(ak => this.selection.center = ak ? AK_CENTER : LOWER_44_CENTER);
     }
 }
 
@@ -382,5 +388,8 @@ export class SpringIndexMapLayerControlComponent extends MonitorsDestroy {
             this.selection.layerName = categories[categoryName].layers[lorbIndex].name;
             this.selection.redraw();
         });
+        this.alaska.valueChanges
+        .pipe(takeUntil(this.componentDestroyed))
+        .subscribe(ak => this.selection.center = ak ? AK_CENTER : LOWER_44_CENTER);
     }
 }

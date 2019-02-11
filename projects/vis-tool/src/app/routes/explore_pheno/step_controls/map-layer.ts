@@ -4,17 +4,26 @@ import { StepState, VisConfigStep } from '../interfaces';
 import { MapSelection } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 
-function layerTitle(layer) {
+const LAYER_TITLE_SPLIT_REGEX = /(,|\s-\s)/;
+export function getLayerTitle(layer) {
     if(layer) {
-        const ds = layer.title.indexOf('- ');
-        return ds !== -1
-            ? layer.title.substring(ds+2)
-            : layer.title;
+        let t = layer.title;
+        if(t) {
+            return t.split(LAYER_TITLE_SPLIT_REGEX)
+                .filter(s => !LAYER_TITLE_SPLIT_REGEX.test(s)) // odd, no mentionof delimiters being returned whne using regex
+                .map(s => s.trim())
+                .join("\n");
+        }
     }
 }
-
 @Component({
-    template: `<div>{{selection.layer?.getTitle()}}</div><div>{{selection.layer?.extent?.current?.label}}</div>`
+    template: `<pre>{{getTitle()}}</pre><div>{{selection.layer?.extent?.current?.label}}</div>`,
+    styles: [`
+    pre {
+        margin: 0px;
+        font-family: inherit;
+    }
+    `]
 })
 export class MapLayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
@@ -25,8 +34,8 @@ export class MapLayerStepComponent extends BaseStepComponent {
             : StepState.AVAILABLE;
     }
 
-    layerTitle(layer) {
-        return layerTitle(layer);
+    getTitle() {
+        return getLayerTitle(this.selection.layer);
     }
 }
 

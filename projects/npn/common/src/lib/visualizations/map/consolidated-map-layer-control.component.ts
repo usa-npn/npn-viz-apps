@@ -21,14 +21,14 @@ import { startWith, takeUntil } from 'rxjs/operators';
 import { MonitorsDestroy } from '@npn/common/common';
 
 const CATEGORY_PESTS = CATEGORY_PEST;
-const CATEGORY_TEMP_ACCUMULATIONS = 'Temperature Accumulations';
+const CATEGORY_TEMP_ACCUMULATIONS = 'Daily Temperature Accumulations';
 const CATEGORY_SPRING_INDICES = 'Spring Indices';
 
 @Component({
     selector: 'consolidated-map-layer-control',
     template: `
     <mat-form-field>
-        <mat-select placeholder="Layer type" [(ngModel)]="selection.layerCategory" (selectionChange)="selection.layerName = null;">
+        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="selection.layerName = null;">
             <mat-option [value]="null"></mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
             <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>

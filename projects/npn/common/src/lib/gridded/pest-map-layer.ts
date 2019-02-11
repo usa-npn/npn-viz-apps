@@ -67,7 +67,7 @@ export class PestMapLayer extends MapLayer {
         return this;
     }
     on(): PestMapLayer {
-        //TODO Analytics.trackEvent('gridded-layer','on',this.getTitle());
+        //TODO Analytics.trackEvent('gridded-layer','on',this.title);
         return this._on();
     }
     private _off(): PestMapLayer {
@@ -78,7 +78,7 @@ export class PestMapLayer extends MapLayer {
         return this;
     }
     off(): PestMapLayer {
-        //TODO Analytics.trackEvent('gridded-layer','off',this.getTitle());
+        //TODO Analytics.trackEvent('gridded-layer','off',this.title);
         return this._off();
     }
     bounce(): PestMapLayer {

@@ -40,10 +40,9 @@ export abstract class MapLayer implements SupportsOpacity {
             ? this.layer_def.extent.type
             : null;
     }
-
-    getTitle() {
+    get title():string {
         return (this.layer_def && this.layer_def.title)
-            ? this.layer_def.title.replace(/^(.*?)\s+-\s+(.*)$/,'$2')
+            ? this.layer_def.title // this.layer_def.title.replace(/^(.*?)\s+-\s+(.*)$/,'$2')
             : undefined;
     }
 

@@ -62,13 +62,13 @@ export class WmsMapLayer extends MapLayer {
         }
     }
     on(): WmsMapLayer {
-        //TODO Analytics.trackEvent('gridded-layer','on',this.getTitle());
+        //TODO Analytics.trackEvent('gridded-layer','on',this.title);
         this.map.overlayMapTypes.push(this.googleLayer);
         return this;
     }
     off(): WmsMapLayer {
         if (this.map.overlayMapTypes.getLength()) {
-            //TODO Analytics.trackEvent('gridded-layer','off',this.getTitle());
+            //TODO Analytics.trackEvent('gridded-layer','off',this.title);
             this.map.overlayMapTypes.pop();
         }
         // TODO deal with pest map which is a google.maps.GroundOverlay

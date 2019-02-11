@@ -4,7 +4,9 @@ import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NpnMapLayerService, MapSelection, GriddedRangeSliderControl } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
+import { getLayerTitle } from './map-layer';
 
+const LAYER_TITLE_SPLIT_REGEX = /(,|\s-\s)/;
 function layerTitle(layer) {
     if(layer) {
         const ds = layer.title.indexOf('- ');
@@ -14,7 +16,13 @@ function layerTitle(layer) {
     }
 }
 @Component({
-    template: `<div>{{selection.layer?.getTitle()}}</div><div>{{selection.layer?.extent?.current?.label}}</div>`
+    template: `<pre>{{getTitle()}}</pre><div>{{selection.layer?.extent?.current?.label}}</div>`,
+    styles: [`
+    pre {
+        margin: 0px;
+        font-family: inherit;
+    }
+    `]
 })
 export class LayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
@@ -25,8 +33,8 @@ export class LayerStepComponent extends BaseStepComponent {
             : StepState.AVAILABLE;
     }
 
-    layerTitle(layer) {
-        return layerTitle(layer);
+    getTitle() {
+        return getLayerTitle(this.selection.layer);
     }
 }
 

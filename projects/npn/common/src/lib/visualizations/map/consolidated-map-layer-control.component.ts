@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MapSelection } from './map-selection';
 import {
     NpnMapLayerService,
@@ -19,6 +19,7 @@ import { FormControl } from '@angular/forms';
 import { merge } from 'rxjs';
 import { startWith, takeUntil } from 'rxjs/operators';
 import { MonitorsDestroy } from '@npn/common/common';
+import { GriddedRangeSliderControl } from './gridded-range-slider-control.component';
 
 const CATEGORY_PESTS = CATEGORY_PEST;
 const CATEGORY_TEMP_ACCUMULATIONS = 'Daily Temperature Accumulations';
@@ -71,6 +72,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
 export class ConsolidatedMapLayerControlComponent {
     @Input() selection:MapSelection;
     layerDefinitions:MapLayerDefs;
+    @ViewChild(GriddedRangeSliderControl) rangeSlider:GriddedRangeSliderControl;
 
     CATEGORY_PESTS = CATEGORY_PESTS;
     CATEGORY_TEMP_ACCUMULATIONS = CATEGORY_TEMP_ACCUMULATIONS;
@@ -121,7 +123,7 @@ enum TEMP_ACCUM_BASE {
     template: `
     <div class="base-ak">
         <mat-form-field class="base-layer">
-            <mat-select placeholder="Base layer" [formControl]="baseLayer">
+            <mat-select placeholder="Layer" [formControl]="baseLayer">
                 <mat-option *ngFor="let b of baseOpts" [value]="b">{{b}}</mat-option>
             </mat-select>
         </mat-form-field>
@@ -258,7 +260,7 @@ enum SIX_LORB {
     template: `
     <div class="base-ak">
         <mat-form-field class="base-layer">
-            <mat-select placeholder="Base layer" [formControl]="baseLayer">
+            <mat-select placeholder="Layer" [formControl]="baseLayer">
                 <mat-option *ngFor="let b of baseOpts" [value]="b">{{b}}</mat-option>
             </mat-select>
         </mat-form-field>

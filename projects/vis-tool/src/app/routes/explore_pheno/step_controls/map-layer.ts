@@ -1,7 +1,7 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { StepState, VisConfigStep } from '../interfaces';
-import { MapSelection } from '@npn/common';
+import { MapSelection, ConsolidatedMapLayerControlComponent } from '@npn/common';
 import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 
 const LAYER_TITLE_SPLIT_REGEX = /(,|\s-\s)/;
@@ -46,6 +46,14 @@ export class MapLayerControlComponent extends BaseControlComponent {
     protected defaultPropertyKeys:string[] = ['opacity'];
     selection:MapSelection;
     title:string = 'Select layer';
+    @ViewChild(ConsolidatedMapLayerControlComponent) layerControl:ConsolidatedMapLayerControlComponent;
+
+    stepVisit():void {
+        super.stepVisit();
+        if(this.layerControl.rangeSlider) {
+            this.layerControl.rangeSlider.resize();
+        }
+    }
 }
 
 export const MapLayerStep:VisConfigStep = {

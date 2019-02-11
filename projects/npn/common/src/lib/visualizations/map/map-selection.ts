@@ -21,7 +21,12 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     _styleRange:number[];
     @selectionProperty()
     _extentValue:string;
+    @selectionProperty()
+    _center:number[]; // lat,lng
+    @selectionProperty()
+    _zoom:number;
 
+    private map:google.maps.Map;
     layer:MapLayerProxy;
     legend:MapLayerLegend;
 
@@ -108,6 +113,22 @@ console.log(`MapSelection.setOpacity=${opacity}`);
     /** Gets the current opacity for this layer. */
     getOpacity():number { return this.opacity; }
 
+    get center():number[] { return this._center; }
+    set center(latLng:number[]) {
+        this._center = latLng;
+        if(this.map && latLng && latLng.length === 2) {
+            this.map.setCenter(new google.maps.LatLng(latLng[0],latLng[1]));
+        }
+    }
+
+    get zoom():number { return this._zoom; }
+    set zoom(z:number) {
+        this._zoom = z;
+        if(this.map && z !== this.map.getZoom()) {
+            this.map.setZoom(z);
+        }
+    }
+
     isValid():boolean {
         return true;
     }
@@ -115,6 +136,27 @@ console.log(`MapSelection.setOpacity=${opacity}`);
     visualize(map: google.maps.Map):Promise<void> {
         const {layerName} = this;
 console.log(`MapSelection.visualize`,this.external);
+        if(this.map !== map) {
+            this.map = map;
+            const latLng = this._center;
+            if(latLng && latLng.length === 2) {
+                this.map.setCenter(new google.maps.LatLng(latLng[0],latLng[1]));
+            }
+            if(this._zoom) {
+                this.map.setZoom(this._zoom);
+            }
+            // this is perhaps a bit weird to have these listeners here
+            // rather than outside but it allows us to more cleanly access
+            // the "private" member properties are based upon.
+            map.addListener('center_changed',() => {
+                const latLng = this.map.getCenter();
+                this._center = [
+                    latLng.lat(),
+                    latLng.lng()
+                ];
+            });
+            map.addListener('zoom_changed',() => this._zoom = this.map.getZoom());
+        }
         if(layerName) {
             if(!this.layer) {
                 this.layer = new MapLayerProxy(map,this.layerService);

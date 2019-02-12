@@ -1,7 +1,74 @@
 import { Selection } from 'd3-selection';
-import { MapLayerLegend } from './map-layer-legend';
+import { MapLayerLegend, GriddedPointData } from './map-layer-legend';
+import { Observable, from } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
+
+interface PestDescription {
+    species: string;
+    lowerThreshold?: number;
+    upperThreshold?: number;
+    startMonthDay?: string;
+    agddMethod?: string;
+}
 
 export class PestMapLayerLegend extends MapLayerLegend {
+
+    private getPestDescription():Promise<PestDescription> {
+        const species = this.getLayer().title;
+        return this.wcsDataService.serviceUtils.cachedGet(
+            this.wcsDataService.serviceUtils.dataApiUrl('/v0/agdd/pestDescriptions')
+        ).then((descriptions:PestDescription[]) => descriptions.find(d => d.species === species));
+    }
+
+    getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {
+        return from(this.getPestDescription())
+            .pipe(
+                switchMap(pest => {
+                    if(pest && pest.lowerThreshold && pest.startMonthDay && pest.agddMethod) {
+                        const layer = this.getLayer();
+                        // special case WRT gridded data for this pest.
+                        const params:any = {
+                            climateProvider: 'NCEP',
+                            temperatureUnit: 'fahrenheit',
+                            startDate: layer.extent.current.date.getFullYear()+`-${pest.startMonthDay}`,
+                            endDate: layer.extent.current.date.toISOString().replace(/T.*$/,''),
+                            latitude: `${latLng.lat()}`,
+                            longitude: `${latLng.lng()}`
+                        };
+                        if(!pest.upperThreshold) {
+                            params.base = `${pest.lowerThreshold}`;
+                        } else {
+                            params.lowerThreshold = `${pest.lowerThreshold}`;
+                            params.upperThreshold = `${pest.upperThreshold}`;
+                        }
+                        return from(
+                            this.wcsDataService.serviceUtils.get(
+                                this.wcsDataService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod}/pointTimeSeries`),
+                                params
+                            )
+                        ).pipe(
+                            map(response => {
+                                const {timeSeries} = response;
+                                if(timeSeries) {
+                                    const point = timeSeries.length
+                                        ? timeSeries[timeSeries.length-1].agdd
+                                        : 0;
+                                    const legendData = this.getPointData(point);
+                                    const formatted = this.formatPointData(point);
+                                    const result = {point,legendData,formatted}
+                                    console.log('PestMapLayerLegend: custom gridded result',result);
+                                    return result;
+                                }
+                                return null;
+                            })
+                        );
+                    }
+                    return super.getGriddedPointData(latLng);
+                })
+            )
+    }
+
+
     redraw(svg: Selection<any, any, any, any>, legendTitle: string): void {
         const legend = this;
         const width = parseFloat(svg.style('width').replace('px', '')),

@@ -36,7 +36,7 @@ export const DESTINATION_POINT = (latLng:google.maps.LatLng,brng:number,dist:num
 
 @Injectable()
 export class WcsDataService {
-    constructor(private serviceUtils:NpnServiceUtils) {}
+    constructor(public serviceUtils:NpnServiceUtils) {}
 
     newInfoWindowHandler(map:google.maps.Map) {
         return new GriddedInfoWindowHandler(this,map);

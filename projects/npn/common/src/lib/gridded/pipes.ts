@@ -11,7 +11,7 @@ const JAN_ONE_THIS_YEAR = new Date((new Date()).getFullYear(),0);
 export class LegendGddUnitsPipe implements PipeTransform {
     constructor(private decimalPipe:DecimalPipe) {}
     transform(n:number,includeUnits?:boolean) {
-        return this.decimalPipe.transform(n,'1.0')+(includeUnits ? ' AGDD' : '');
+        return this.decimalPipe.transform(n,'1.0-0')+(includeUnits ? ' AGDD' : '');
     }
 }
 

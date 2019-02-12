@@ -34,6 +34,8 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
         super();
     }
 
+    get activeLayer():boolean { return !!this.layer && !!this.layerName; }
+
     set layerCategory(s:string) {
         // TODO if the category changes, layername, etc. may need clearing.
         this._layerCategory = s;

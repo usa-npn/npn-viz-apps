@@ -23,8 +23,7 @@ export class PestMapLayer extends MapLayer {
             type: MapLayerExtentType.DATE,
             values
         };
-
-        console.log('PestMapLayer.extnet',layer_def.extent);
+        console.log('PestMapLayer.extent',layer_def.extent);
     }
     newExtentValue(date: Date): MapLayerExtentValue {
         date.setHours(0, 0, 0, 0);
@@ -39,7 +38,8 @@ export class PestMapLayer extends MapLayer {
                         params.date = value.substring(0, 10);
                         break;
                     case MapLayerServiceType.WCS:
-                        console.warn('TODO pest map args to WCS requests');
+                        params.subset = params.subset||[];
+                        params.subset.push(`http://www.opengis.net/def/axis/OGC/0/time("${value}")`);
                         break;
                 }
             }

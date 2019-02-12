@@ -18,6 +18,11 @@ export interface NpnLayerFilterDef {
     values?: any[];
 }
 
+export enum MapLayerType {
+    STANDARD = 'standard',
+    PEST = 'pest'
+}
+
 interface NpnLayerCommon {
     name: string;
     layerBasis?: string;
@@ -40,6 +45,8 @@ interface NpnLayerCommon {
     supports_time_series?: boolean;
     /** if `supports_data` is true (or unspecified) the indicates that a given layer should only support plotting of data for the year of the currently selected extent on it (default false). */
     current_year_only?: boolean;
+    /** defaults to `WmsLayerType.STANDARD` */
+    type?: MapLayerType;
 }
 
 export enum MapLayerServiceType {
@@ -85,19 +92,14 @@ export interface MapLayerStyle {
     legend: string; // URL
 }
 
-export enum MapLayerType {
-    STANDARD = 'standard',
-    PEST = 'pest'
-}
-
 export interface MapLayerDefinition extends NpnLayerCommon {
-    /** defaults to `WmsLayerType.STANDARD` */
-    type?: MapLayerType;
     title?: string;
     abstract?: string;
     extent?: MapLayerExtent;
     bbox?: MapLayerBoundingBox;
     style?: MapLayerStyle;
+    /** A place for special map implementations to put special info... */
+    meta?: any;
 }
 
 export interface MapLayerCategory extends NpnLayerCommon {
@@ -138,27 +140,64 @@ export const MAP_LAYERS:MapLayerDefs = {
         "name": CATEGORY_PEST,
         "supports_data": false, // TODO they do support data but...
         "layerBasis": "gdd:agdd_50f",
+        "legend_label_filter": {
+            "name": "legendGddUnits",
+            "args": [false]
+        },
+        "gridded_label_filter": {
+            "name": "legendGddUnits",
+            "args": [true]
+        },
+        type: MapLayerType.PEST,
         "layers": [{
-            name: 'emerald_ash_borer',
-            title: 'Emerald Ash Borer',
-            type: MapLayerType.PEST
-        },{
             name: 'apple_maggot',
             title: 'Apple Maggot',
-            type: MapLayerType.PEST
+            abstract: 'Apple maggot larvae cause damage to ripening fruit. If left untreated, these pest insects can spread across the entire tree. These insects primarily affect apple trees, but can also impact plum, apricot, pear, cherry and hawthorn trees. <a href="https://www.usanpn.org/data/forecasts/Apple_maggot" target="_blank">Learn more</a>'
+        },{
+            name: 'asian_longhorned_beetle',
+            title: 'Asian Longhorned Beetle',
+            abstract: 'As a generalist pest, Asian longhorned beetle poses a great potential threat to eastern forests. It is currently contained in three small quarantined areas (a fourth was recently eradicated). Burning firewood where you buy it is critical to stopping the spread of this pest. <a href="https://www.usanpn.org/data/forecasts/Asian_Longhorned_beetle" target="_blank">Learn more</a>'
+        },{
+            name: 'bagworm',
+            title: 'Bagworm',
+            abstract: 'Bagworm caterpillars defoliate over 50 families of evergreen and deciduous trees and shrubs, primarily arborvitae, juniper, pine, and spruce. Stripping of leaves and needles is most noticeable in uppermost parts of plants. If left untreated, these pests are capable of extensive defoliation which can cause branch dieback or death. <a href="https://www.usanpn.org/data/forecasts/Bagworm" target="_blank">Learn more</a>'
+        },{
+            name: 'bronze_birch_borer',
+            title: 'Bronze Birch Borer',
+            abstract: 'Bronze birch borer frequently kills birch trees by boring into the wood. <a href="https://www.usanpn.org/data/forecasts/Bronze_birch_borer" target="_blank">Learn more</a>'
+        },{
+            name: 'eastern_tent_caterpillar',
+            title: 'Eastern Tent Caterpillar',
+            abstract: 'Eastern Tent Caterpillars are a native moth and while they can defoliate trees, the trees rarely die as a consequence. <a href="https://www.usanpn.org/data/forecasts/Eastern_tent_caterpillar" target="_blank">Learn more</a>'
+        },{
+            name: 'emerald_ash_borer',
+            title: 'Emerald Ash Borer',
+            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
+        },{
+            name: 'gypsy_moth',
+            title: 'Gypsy Moth',
+            abstract: 'European gypsy moth caterpillars feed on deciduous trees, causing major defoliation and tree mortality. They are considered one of the worst forest pests in the United States. <a href="https://www.usanpn.org/data/forecasts/Gypsy_moth" target="_blank">Learn more</a>'
         },{
             name: 'hemlock_woolly_adelgid',
             layerBasis: 'gdd:agdd', // based on a different map than the others.
             title: 'Hemlock Woolly Adelgid',
-            type: MapLayerType.PEST
+            abstract: 'Hemlock woolly adelgid can be deadly to hemlock trees and, in the eastern United States, lacks enemies that keep their populations in check. Researchers wish to identify the optimal window to release insect predators; you can support this effort by observing hemlock woolly adelgid life cycle stages using Nature’s Notebook. <a href="https://www.usanpn.org/data/forecasts/HWA" target="_blank">Learn more</a>'
         },{
-            name: 'winter_moth',
-            title: 'Winter Moth',
-            type: MapLayerType.PEST
+            name: 'magnolia_scale',
+            title: 'Magnolia Scale',
+            abstract: 'Magnolia scale is a pest native to the Eastern United States that affects magnolia trees and tulip trees. They cause stress to their host trees by removing sap which can lead to yellowing leaves, twig dieback, and even death. <a href="https://www.usanpn.org/data/forecasts/Magnolia_scale" target="_blank">Learn more</a>'
         },{
             name: 'lilac_borer',
             title: 'Lilac Borer',
-            type: MapLayerType.PEST
+            abstract: 'Lilac borer is a clear-wing moth that can damage lilac, ash, and privet trees and shrubs by burrowing into the heartwood. <a href="https://www.usanpn.org/data/forecasts/Lilac_borer" target="_blank">Learn more</a>'
+        },{
+            name: 'pine_needle_scale',
+            title: 'Pine Needle Scale',
+            abstract: 'Pine needle scale is a native pest that affects ornamental pines and Christmas tree plantations. <a href="https://www.usanpn.org/data/forecasts/Pine_needle_scale" target="_blank">Learn more</a>'
+        },{
+            name: 'winter_moth',
+            title: 'Winter Moth',
+            abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>'
         }]
     },{
         "name": CATEGORY_TEMP_ACCUM_30_YR_AVG,

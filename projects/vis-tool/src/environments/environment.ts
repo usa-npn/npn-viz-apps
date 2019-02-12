@@ -6,7 +6,8 @@ const npnConfiguration:NpnConfiguration = {
   //dataApiRoot: 'https://data-dev.usanpn.org:3006',
   dataApiRoot: 'https://data.usanpn.org:3006',
   dataApiUseStatisticsCache: false,
-  geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+  //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+  geoServerRoot: 'https://geoserver.usanpn.org/geoserver'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

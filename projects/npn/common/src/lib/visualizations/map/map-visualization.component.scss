@@ -32,4 +32,18 @@
             }
         }
     }
+
+    .gridded-info {
+        display: flex;
+        align-items: center;
+        .legend-swatch {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #aaa;
+        }
+        .point-formatted {
+            font-size: 1.25em;
+            padding-left: .5em;
+        }
+    }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpParams } from '@angular/common/http';
+import { HttpParams, HttpParameterCodec } from '@angular/common/http';
 
 import * as $jq_ from 'jquery';
 const $jq = $jq_;
@@ -74,10 +74,10 @@ export class WcsDataService {
         // will need to change when upgrading Angular version and moving to HttpClient
         let urlParams:URLSearchParams = new URLSearchParams('',new GhQueryEncoder());
         */
-        let params = new HttpParams();
+        let params = new HttpParams({encoder:new CustomEncoder()});
         Object.keys(wcsArgs).filter(key => key !== 'subset').forEach(key => params = params.set(key,wcsArgs[key]));
         wcsArgs.subset.forEach(v => params = params.append('subset',v));
-        return this.serviceUtils.http.get<string>(`${this.serviceUtils.config.geoServerRoot}/wcs`,{params:params})
+        return this.serviceUtils.http.get(`${this.serviceUtils.config.geoServerRoot}/wcs`,{params,responseType:'text'})
             .pipe(
                 map(response => {
                     let wcsData = $jq($jq.parseXML(response)),
@@ -89,6 +89,24 @@ export class WcsDataService {
             )
     }
 }
+
+class CustomEncoder implements HttpParameterCodec {
+    encodeKey(key: string): string {
+      return encodeURIComponent(key);
+    }
+  
+    encodeValue(value: string): string {
+      return encodeURIComponent(value);
+    }
+  
+    decodeKey(key: string): string {
+      return decodeURIComponent(key);
+    }
+  
+    decodeValue(value: string): string {
+      return decodeURIComponent(value);
+    }
+  }
 
 /*
 class GhQueryEncoder extends QueryEncoder {
@@ -103,6 +121,11 @@ class GhQueryEncoder extends QueryEncoder {
 }
 */
 
+/**
+ * IMPORTANT: This is code that came from the legacy application and is currently still used by some FWS
+ * applications (clipped-wms-map).  The functionality has been re-implemented within `MapLayerLegend`
+ * and this class should probably be re-visited/removed
+ */
 export class GriddedInfoWindowHandler {
     infoWindow:google.maps.InfoWindow;
     constructor(private dataService:WcsDataService,private map:google.maps.Map) {}

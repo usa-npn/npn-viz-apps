@@ -95,7 +95,7 @@ export class LayerControlComponent extends BaseControlComponent {
         <extent-control [selection]="selection"></extent-control>
         <supports-opacity-control [supportsOpacity]="selection"></supports-opacity-control>
         <gridded-range-slider [selection]="selection"></gridded-range-slider>
-        <p *ngIf="selection.layer.hasAbstract()">{{selection.layer.getAbstract()}}</p>
+        <p *ngIf="selection.layer.hasAbstract()" [innerHTML]="selection.layer.getAbstract()"></p>
     </div>
     `,
     styles:[`

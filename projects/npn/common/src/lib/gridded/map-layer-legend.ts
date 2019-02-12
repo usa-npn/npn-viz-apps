@@ -5,13 +5,22 @@ import { MapLayer } from './map-layer';
 import { GriddedPipeProvider } from './pipes';
 
 import { Selection } from 'd3-selection';
-import { MapLayerDefinition } from './gridded-common';
+import { MapLayerDefinition, MapLayerServiceType } from './gridded-common';
+import { WcsDataService } from './wcs-data.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface LegendData {
     color: string;
     quantity: number;
     original_label: string;
     label: string;
+}
+
+export interface GriddedPointData {
+    point: number;
+    legendData: LegendData;
+    formatted: string;
 }
 
 const IDENTITY = d => d;
@@ -24,7 +33,8 @@ export abstract class MapLayerLegend {
     private data:LegendData[];
     private length:number;
 
-    constructor(protected griddedPipes:GriddedPipeProvider,
+    constructor(protected wcsDataService:WcsDataService,
+                protected griddedPipes:GriddedPipeProvider,
                 protected color_map:any,
                 /*
                 NOTE: per the original implementation which binds extents directly into the definition this is public
@@ -108,11 +118,11 @@ export abstract class MapLayerLegend {
         return this.data.map(d => d.original_label);
     }
 
-    formatPointData(q) {
+    formatPointData(q):string {
         return (this.gformat||this.lformat)(q,q);
     }
 
-    getPointData(q) {
+    getPointData(q):LegendData {
         var i,d,n;
         for(i = 0; i < this.data.length; i++) {
             d = this.data[i];
@@ -120,10 +130,43 @@ export abstract class MapLayerLegend {
             if(q == d.quantity) {
                 return d;
             }
-            if(n && q >= d.quantity && q < n.quantity) {
+            if(i === 0 && q < d.quantity) { // first cell (presumably 0-N)
                 return d;
             }
+            if(!n && q > d.quantity) { // last cell
+                return d;
+            }
+            if(n && q >= d.quantity && q < n.quantity) {
+                return n;
+            }
         }
+    }
+
+    getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {
+        const augment = (params:any) => {
+            if(this.layer.extent && this.layer.extent.current) {
+                this.layer.extent.current.addToParams(params,MapLayerServiceType.WCS)
+            }
+        };
+        return this.wcsDataService.getGriddedData(
+            this.layer.layerBasis,
+            latLng,
+            5,
+            augment
+        ).pipe(
+            map((tuples:number[]) => {
+                console.log(`MapLayerLegend: gridded tuples`,tuples);
+                const point = tuples && tuples.length ? tuples[0] : undefined;
+                if(point === -9999 || isNaN(point)) {
+                    return null;
+                }
+                const legendData = this.getPointData(point);
+                const formatted = this.formatPointData(point);
+                const result = {point,legendData,formatted};
+                console.log('MapLayerLegend: gridded result',result);
+                return result;
+            })
+        );
     }
 
     abstract redraw(svg:Selection<any,any,any,any>,legendTitle:string):void;

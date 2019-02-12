@@ -29,6 +29,7 @@ import { GriddedPipeProvider } from './pipes';
 import { MapLayerLegend } from './map-layer-legend';
 import { PestMapLayerLegend } from "./pest-map-layer-legend";
 import { WmsMapLayerLegend } from "./wms-map-layer-legend";
+import { WcsDataService } from './wcs-data.service';
 
 const DEEP_COPY = (o) => JSON.parse(JSON.stringify(o));
 
@@ -39,6 +40,7 @@ export class NpnMapLayerService {
 
     constructor(
         public serviceUtils:NpnServiceUtils,
+        public wcsDataService:WcsDataService,
         public griddedPipes:GriddedPipeProvider,
         public griddedUrls:GriddedUrls
     ) {}
@@ -100,13 +102,17 @@ export class NpnMapLayerService {
                     if(color_map.length !== 0) {
                         switch(layerDef.type||MapLayerType.STANDARD) {
                             case MapLayerType.STANDARD:
-                                l = new WmsMapLayerLegend(this.griddedPipes,
+                                l = new WmsMapLayerLegend(
+                                    this.wcsDataService,
+                                    this.griddedPipes,
                                     $jq(color_map.toArray()[0]),
                                     layerDef,
                                     legend_data);
                                 break;
                             case MapLayerType.PEST:
-                                l = new PestMapLayerLegend(this.griddedPipes,
+                                l = new PestMapLayerLegend(
+                                    this.wcsDataService,
+                                    this.griddedPipes,
                                     $jq(color_map.toArray()[0]),
                                     layerDef,
                                     legend_data);

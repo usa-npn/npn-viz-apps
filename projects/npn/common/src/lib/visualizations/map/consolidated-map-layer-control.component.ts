@@ -41,11 +41,11 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
         <temp-accum-map-layer-control *ngSwitchCase="CATEGORY_TEMP_ACCUMULATIONS" [selection]="selection" [layerDefinitions]="layerDefinitions"></temp-accum-map-layer-control>
         <spring-index-map-layer-control *ngSwitchCase="CATEGORY_SPRING_INDICES" [selection]="selection" [layerDefinitions]="layerDefinitions"></spring-index-map-layer-control>
     </div>
-    <div *ngIf="selection.layer && selection.layerName" class="layer-controls">
+    <div *ngIf="selection.activeLayer" class="layer-controls">
         <extent-control [selection]="selection"></extent-control>
         <supports-opacity-control [supportsOpacity]="selection"></supports-opacity-control>
         <gridded-range-slider [selection]="selection"></gridded-range-slider>
-        <p *ngIf="selection.layer.hasAbstract()">{{selection.layer.getAbstract()}}</p>
+        <p *ngIf="selection.layer.hasAbstract()" [innerHTML]="selection.layer.getAbstract()"></p>
     </div>
     `,
     styles:[`

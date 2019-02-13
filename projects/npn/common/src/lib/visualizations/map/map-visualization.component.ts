@@ -81,7 +81,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
     mapClick($event:MouseEvent) {
         const {lat,lng} = $event.coords;
         console.log(`mapClick lat=${lat} lng=${lng}`)
-        if(this.selection.activeLayer  && this.selection.legend) {
+        if(this.selection.layer  && this.selection.legend) {
             this.selection.legend.getGriddedPointData(new google.maps.LatLng(lat,lng))
                 .subscribe(data => {
                     if(data) {

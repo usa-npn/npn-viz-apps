@@ -21,7 +21,7 @@ export abstract class MapLayer implements SupportsOpacity {
     get layerDefinition():MapLayerDefinition { return this.layer_def; }
 
     get layerBasis():string {
-        return this.layer_def
+        return this.layer_def && this.layer_def.layerBasis
             ? this.layer_def.layerBasis
             : this.layerName;
     }

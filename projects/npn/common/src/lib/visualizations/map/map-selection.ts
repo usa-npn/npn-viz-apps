@@ -1,6 +1,6 @@
 import { VisSelection, selectionProperty } from '../vis-selection';
 import {
-    MapLayerProxy,
+    MapLayer,
     NpnMapLayerService,
     MapLayerLegend,
     WmsMapLayer,
@@ -27,14 +27,12 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     _zoom:number;
 
     private map:google.maps.Map;
-    layer:MapLayerProxy;
+    layer:MapLayer;
     legend:MapLayerLegend;
 
     constructor(private layerService:NpnMapLayerService) {
         super();
     }
-
-    get activeLayer():boolean { return !!this.layer && !!this.layerName; }
 
     set layerCategory(s:string) {
         // TODO if the category changes, layername, etc. may need clearing.
@@ -45,16 +43,12 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     set layerName(s:string) {
 console.log(`MapSelection.layerName=${s}`);
         this._layerName = s;
-        // TODO should this happen here or in visualize.
-        // seems like if the layer name changes then that's
-        // the appropriate time to reset a layer on the map
-        // and if deserializing from external this should be OK
-        // since layer could not exist yet.
         if(this.layer && this.layer.layerName !== s) {
             this.layer.off();
-            this.layer.setProxiedLayer(s);
-            //this.layer = undefined;
+            this.layer = undefined;
             this.legend = undefined;
+            // TODO allow propagation of styleRange
+            // when switching layers
             this.styleRange = undefined;
         }
     }
@@ -66,8 +60,8 @@ console.log(`MapSelection.layerName=${s}`);
     set styleRange(range:number[]) {
 console.log(`MapSelection.styleRange=${range}`);
         this._styleRange = range;
-        if(this.layer && this.layer.proxiedLayer instanceof WmsMapLayer) {
-            this.layer.proxiedLayer.setStyleRange(range);
+        if(this.layer && this.layer instanceof WmsMapLayer) {
+            this.layer.setStyleRange(range);
         }
     }
 
@@ -161,25 +155,20 @@ console.log(`MapSelection.visualize`,this.external);
         }
         if(layerName) {
             if(!this.layer) {
-                this.layer = new MapLayerProxy(map,this.layerService);
-                this.layer.setOpacity(this.opacity);
-            }
-            if(this.layer.proxiedLayer && this.layer.layerName === layerName) {
+                this.layerService.newLayer(map,layerName)
+                    .then(layer => {
+                        this.layer = layer;
+                        layer.setOpacity(this.opacity);
+                        if(layer instanceof WmsMapLayer) {
+                            layer.setStyleRange(this.styleRange);
+                        }
+                        this.updateExtentValue();
+                        layer.on();
+                        return this.layer.getLegend().then(legend => this.legend = legend);
+                    })
+            } else {
                 this.layer.bounce();
-                return Promise.resolve();
             }
-            return this.layer.setProxiedLayer(layerName)
-                .then(proxiedLayer => {
-                    if(proxiedLayer instanceof WmsMapLayer) {
-                        proxiedLayer.setStyleRange(this.styleRange);
-                    }
-                    this.updateExtentValue();
-                    this.layer.on();
-                    return this.layer.getLegend()
-                        .then(legend => {
-                            this.legend = legend;
-                        });
-                });
         }
         return Promise.resolve();
     }

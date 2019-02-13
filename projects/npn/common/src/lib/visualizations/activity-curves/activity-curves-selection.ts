@@ -40,7 +40,16 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     @selectionProperty()
     private _dataPoints:boolean = true;
     defaultFrequency = ACTIVITY_FREQUENCIES[0];
-    @selectionProperty()
+    @selectionProperty({
+        ser: d => d,
+        des: d => {
+            // when deserializing re-align with the actual metric object
+            // so equality checks elsewhere work.
+            return !!d
+                ? ACTIVITY_FREQUENCIES.find(af => d.value === af.value)
+                : d;
+        }
+    })
     private _frequency:ActivityFrequency = ACTIVITY_FREQUENCIES[0];
     @selectionProperty({
         ser: d => d ? d.external : undefined,

@@ -12,7 +12,16 @@ export class ActivityCurve {
 
     @selectionProperty()
     private _species:Species;
-    @selectionProperty()
+    @selectionProperty({
+        ser: d => d,
+        des: d => {
+            // when deserializing re-align with the actual metric object
+            // so equality checks elsewhere work.
+            return !!d
+                ? ALL_METRICS.find(m => m.id === d.id)
+                : d;
+        }
+    })
     private _metric;
     @selectionProperty()
     private _phenophase:Phenophase;
@@ -394,3 +403,10 @@ export const ACTIVITY_CURVE_KINGDOM_METRICS = {
                 valueFormat: DECIMAL
             }])
         };
+
+const ALL_METRICS = Object.keys(ACTIVITY_CURVE_KINGDOM_METRICS).reduce((arr,key) =>{
+    ACTIVITY_CURVE_KINGDOM_METRICS[key]
+        .filter(metric => arr.indexOf(metric) !== -1)
+        .forEach(metric => arr.push(metric));
+    return arr;
+},[]);

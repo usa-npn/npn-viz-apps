@@ -116,6 +116,10 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     ngOnInit() {
         this.speciesControl = new FormControl(this.species,this.requiredValidator)
         this.colorControl = new FormControl(this.color,this.requiredValidator);
+        if(this.disabled) {
+            this.speciesControl.disable();
+            this.colorControl.disable();
+        }
         this.filteredSpecies = this.speciesControl.valueChanges
             .pipe(
                 debounceTime(500),
@@ -152,7 +156,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     }
 
     ngOnChanges(changes:SimpleChanges) {
-        if(changes.disabled) {
+        if(changes.disabled && this.speciesControl && this.colorControl) {
             if(changes.disabled.currentValue) {
                 this.speciesControl.disable();
                 this.colorControl.disable();
@@ -203,7 +207,11 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     }
     set species(s:Species) {
         if(!s || typeof(s) === 'object') { // might as well use any
-            if(s !== this.speciesValue) {
+            // the first check makes sure we're not changing say from
+            // null to udnefined or vice-versa, this is perhaps a workaround
+            // but there was a common "changed after detection" error that was
+            // happening related to species going from undefined to null.
+            if((!!s || !!this.speciesValue) && s !== this.speciesValue) {
                 let oldValue = this.speciesValue;
                 this.speciesChange.emit(this.speciesValue = s);
                 this.onSpeciesChange.emit({

@@ -3,6 +3,17 @@ import {Component,Input} from '@angular/core';
 import {INTERPOLATE} from './activity-curve';
 import {ActivityCurvesSelection,ActivityFrequency,ACTIVITY_FREQUENCIES} from './activity-curves-selection';
 
+export const ACTIVITY_CURVES_INTERPOLATES = [{
+    value: INTERPOLATE.linear,
+    label: 'Linear'
+},{
+    value: INTERPOLATE.monotone,
+    label: 'Monotone',
+},{
+    value: INTERPOLATE.stepAfter,
+    label: 'Step after'
+}];
+
 @Component({
     selector: 'activity-curves-control',
     template: `
@@ -46,14 +57,5 @@ export class ActivityCurvesControlComponent {
     selection: ActivityCurvesSelection;
 
     frequencies:ActivityFrequency[] =  ACTIVITY_FREQUENCIES;
-    interpolates:any[] = [{
-            value: INTERPOLATE.linear,
-            label: 'Linear'
-        },{
-            value: INTERPOLATE.monotone,
-            label: 'Monotone',
-        },{
-            value: INTERPOLATE.stepAfter,
-            label: 'Step after'
-        }];
+    interpolates:any[] = ACTIVITY_CURVES_INTERPOLATES;
 }

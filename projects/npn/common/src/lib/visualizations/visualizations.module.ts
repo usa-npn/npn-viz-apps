@@ -91,7 +91,7 @@ import {NpnGriddedModule} from '../gridded';
   exports: [
       ScatterPlotComponent,
       ScatterPlotControls,
-      ActivityCurvesComponent,ActivityCurvesControlComponent,
+      ActivityCurvesComponent,CurveControlComponent,ActivityCurvesControlComponent,
       ObserverActivityComponent,ObserverActivityControl,
       ObservationFrequencyComponent,ObservationFrequencyControl,
       CalendarComponent,CalendarControlComponent,

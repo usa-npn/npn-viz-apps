@@ -7,7 +7,8 @@ import {
     NpnGriddedModule,
     ScatterPlotComponent,
     CalendarComponent,
-    MapVisualizationComponent } from '@npn/common';
+    MapVisualizationComponent, 
+    ActivityCurvesComponent} from '@npn/common';
 
 import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
 import { DummyStepComponent, DummyControlComponent } from './dummy';
@@ -20,6 +21,9 @@ import { MapLayerStepComponent, MapLayerControlComponent } from './map-layer';
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
 import { StartEndLegacySpeciesPhenoColorStepComponent, YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent } from './legacy-species-pheno-color';
+
+import { ActivityCurvesStepComponent, ActivityCurvesControlComponent } from './activity-curves';
+import { ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent } from './activity-curves-misc';
 
 // all of the components of this module have to be entryComponents
 // since they are all dynamically inserted into the application.
@@ -35,6 +39,8 @@ const COMPONENTS:any[] = [
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,
+    ActivityCurvesStepComponent, ActivityCurvesControlComponent,
+    ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent,
 
     StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
 ];
@@ -42,7 +48,8 @@ const ENTRY_COMPONENTS:any[] = [
     ...COMPONENTS,
     ScatterPlotComponent,
     CalendarComponent,
-    MapVisualizationComponent
+    MapVisualizationComponent,
+    ActivityCurvesComponent
 ];
 
 @NgModule({

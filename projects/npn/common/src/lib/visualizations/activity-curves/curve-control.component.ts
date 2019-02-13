@@ -1,9 +1,10 @@
-import {Component,Input,Output,EventEmitter} from '@angular/core';
+import {Component,Input,Output,EventEmitter, SimpleChanges} from '@angular/core';
 import {FormControl,Validators} from '@angular/forms';
 
-import {Species} from '../../common';
+import {Species, MonitorsDestroy} from '../../common';
 import {ActivityCurve,ACTIVITY_CURVE_KINGDOM_METRICS} from './activity-curve';
 import {ActivityCurvesSelection} from './activity-curves-selection';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'curve-selection-control',
@@ -12,7 +13,7 @@ import {ActivityCurvesSelection} from './activity-curves-selection';
     </species-phenophase-input>
 
     <mat-form-field class="year-input">
-        <mat-select [placeholder]="'Year'+(required ? ' *':'')" [(ngModel)]="curve.year" [disabled]="disabled" [formControl]="yearControl">
+        <mat-select [placeholder]="'Year'+(required ? ' *':'')" [formControl]="yearControl">
             <mat-option *ngFor="let y of validYears" [value]="y">{{y}}</mat-option>
         </mat-select>
         <mat-error *ngIf="yearControl.errors && yearControl.errors.required">Year is required</mat-error>
@@ -33,7 +34,7 @@ import {ActivityCurvesSelection} from './activity-curves-selection';
         }
     `]
 })
-export class CurveControlComponent {
+export class CurveControlComponent extends MonitorsDestroy {
     @Input()
     required:boolean = true;
     @Input()
@@ -43,16 +44,7 @@ export class CurveControlComponent {
     @Input()
     curve: ActivityCurve;
 
-    yearControl:FormControl = new FormControl(null,/*Validators.required*/(c) => {
-        if(this.required && !c.value) {
-            return {
-                required: true
-            };
-        }
-        return null;
-    });
-
-
+    yearControl:FormControl;
 
     validYears:number[] = (function() {
         let thisYear = (new Date()).getFullYear(),
@@ -63,4 +55,31 @@ export class CurveControlComponent {
         }
         return years;
     })();
+
+    ngOnInit() {
+        this.yearControl = new FormControl(this.curve.year,/*Validators.required*/(c) => {
+            if(this.required && !c.value) {
+                return {
+                    required: true
+                };
+            }
+            return null;
+        });
+        if(this.disabled) {
+            this.yearControl.disable();
+        }
+        this.yearControl.valueChanges
+            .pipe(takeUntil(this.componentDestroyed))
+            .subscribe(y => this.curve.year = y);
+    }
+
+    ngOnChanges(changes:SimpleChanges):void {
+        if(changes.disabled && this.yearControl) {
+            if(changes.disabled.currentValue) {
+                this.yearControl.disable();
+            } else {
+                this.yearControl.enable();
+            }
+        }
+    }    
 }

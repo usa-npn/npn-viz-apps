@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent } from "@npn/common";
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
@@ -24,6 +24,8 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntil, map, filter } from 'rxjs/operators';
 import { SharingService } from '../sharing.service';
 import { MapLayerStep } from './map-layer';
+import { ActivityCurvesStep } from './activity-curves';
+import { ActivityCurvesMiscStep } from './activity-curves-misc';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -126,45 +128,42 @@ export const VisSelectionStep:VisConfigStep = {
     controlComponent: VisSelectionControlComponent
 };
 
-const DEV_SELECTION = {
-    isValid: () => false
-};
-
 const VIS_DEFINITIONS:VisDefinition[] = [
     {
         title: 'Map',
         icon: faMapMarker,
         fullScreen: true,
         selection: 'MapSelection',
-        steps:[MapLayerStep,LayerStep /*TODO remove generic LayerStep*/,LocationStep],
-        component: MapVisualizationComponent
+        component: MapVisualizationComponent,
+        steps:[MapLayerStep,LayerStep /*TODO remove generic LayerStep*/,LocationStep]
     },
     {
         title: 'Scatter plot',
         icon: faChartNetwork,
         selection: 'ScatterPlotSelection',
+        component: ScatterPlotComponent,
         steps:[
             StartEndStep,
             StartEndLegacySpeciesPhenoColorStep,
             ScatterPlotMiscStep
-        ],
-        component: ScatterPlotComponent
+        ]
     },
     {
         title: 'Activity curve',
         icon: faChartLine,
-        selection: DEV_SELECTION,
-        templateSelection: {},
+        selection: 'ActivityCurvesSelection',
+        component: ActivityCurvesComponent,
+        steps:[ActivityCurvesStep,ActivityCurvesMiscStep]
     },
     {
         title: 'Calendar',
         icon: faCalendarAlt,
         selection: 'CalendarSelection',
+        component: CalendarComponent,
         steps:[
             YearsStep,
             YearsLegacySpeciesPhenoColorStep,
             CalendarMiscStep
-        ],
-        component: CalendarComponent
+        ]
     }
 ];

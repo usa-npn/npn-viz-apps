@@ -34,14 +34,16 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     $class:string = 'ActivityCurvesSelection';
 
     private headers = {'Content-Type':'application/x-www-form-urlencoded'};
+    defaultInterpolate = INTERPOLATE.monotone;
     @selectionProperty()
     private _interpolate: INTERPOLATE = INTERPOLATE.monotone;
     @selectionProperty()
     private _dataPoints:boolean = true;
+    defaultFrequency = ACTIVITY_FREQUENCIES[0];
     @selectionProperty()
     private _frequency:ActivityFrequency = ACTIVITY_FREQUENCIES[0];
     @selectionProperty({
-        ser: d => d.external,
+        ser: d => d ? d.external : undefined,
         des: d => {
             let ac = new ActivityCurve();
             ac.external = d;
@@ -61,13 +63,17 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         });
     }
 
+    hasValidCurve():boolean {
+        return (this.curves||[]).reduce((valid,curve) => (valid||curve.isValid()),false);
+    }
+
     isValid(): boolean {
-        return this.curves[0].isValid();
+        return  !!this._interpolate && !!this._frequency && this.hasValidCurve();
     }
 
     private updateCheck(requiresUpdate?:boolean) {
-        let anyValid = this.curves[0].isValid() || this.curves[1].isValid(),
-            anyPlotted = this.curves[0].plotted() || this.curves[1].plotted();
+        const anyValid = this.hasValidCurve();
+        const anyPlotted = (this.curves||[]).reduce((plotted,curve) => (plotted||curve.plotted()),false);
         if(requiresUpdate) {
             if(anyValid) {
                 this.update();
@@ -109,7 +115,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set curves(cs:ActivityCurve[]) {
         this._curves = cs;
-        cs.forEach(c => {
+        (cs||[]).forEach(c => {
             c.selection = this;
             c.interpolate = this._interpolate;
             c.dataPoints = this._dataPoints;

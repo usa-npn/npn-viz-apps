@@ -73,6 +73,9 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
 
     private usingCommonMetric() {
         let selection = this.selection;
+        if(!(selection.curves||[]).length) {
+            return undefined;
+        }
         // there are always two curves in the selection, the question is whether they are
         // valid and share a metric
         if((selection.curves[0].isValid() && !selection.curves[1].isValid()) ||
@@ -106,7 +109,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('width',100)
                 .attr('height',55),*/
             r = 5, vpad = 4;
-            selection.curves.reduce((cnt,c) => {
+            (selection.curves||[]).reduce((cnt,c) => {
                     var row;
                     if(c.plotted()) {
                         row = legend.append('g')
@@ -150,13 +153,13 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('x',0)
                 .text('hover doy');
         let focusOff = () => {
-                selection.curves.forEach(function(c) { delete c.doyFocus; });
+                (selection.curves||[]).forEach(function(c) { delete c.doyFocus; });
                 hover.style('display','none');
                 this.updateLegend();
             },
             focusOn = () => {
                 // only turn on if something has been plotted
-                if(selection.curves.reduce(function(plotted,c){
+                if((selection.curves||[]).reduce(function(plotted,c){
                         return plotted||c.plotted();
                     },false)) {
                     hover.style('display',null);
@@ -169,7 +172,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 xCoord = coords[0],
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
-                dataPoint = selection.curves.reduce(function(dp,curve){
+                dataPoint = (selection.curves||[]).reduce(function(dp,curve){
                     if(!dp && curve.plotted()) {
                         dp = curve.data().reduce(function(found,point){
                             return found||(doy >= point.start_doy && doy <= point.end_doy ? point : undefined);
@@ -184,7 +187,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .text(dataPoint ?
                     self.legendDoyPipe.transform(dataPoint.start_doy)+' - '+self.legendDoyPipe.transform(dataPoint.end_doy) :
                     self.legendDoyPipe.transform(doy));
-            selection.curves.forEach(function(c) { c.doyFocus = doy; });
+            (selection.curves||[]).forEach(function(c) { c.doyFocus = doy; });
             self.updateLegend();
         }
         svg.append('rect')
@@ -210,7 +213,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         this.x = scaleLinear().range([0,sizing.width]).domain([1,365]);
         this.xAxis = axisBottom<number>(this.x).tickFormat(DATE_FMT);
 
-        selection.curves.forEach(c => c.x(this.x).y(this.newY()));
+        (selection.curves||[]).forEach(c => c.x(this.x).y(this.newY()));
 
         chart.append('g')
              .attr('class','chart-title')
@@ -250,11 +253,11 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 },[])),
                 y = this.newY().domain(PAD_DOMAIN(domain,commonMetric));
             console.debug('ActivityCurves.common domain',domain);
-            selection.curves.forEach(function(c){
+            (selection.curves||[]).forEach(function(c){
                 c.y(y);
             });
         } else {
-            selection.curves.forEach(c => {
+            (selection.curves||[]).forEach(c => {
                 // re-initialize y in case a previous plot re-used the same y
                 // each has an independent domain
                 if(c.isValid()) {
@@ -263,36 +266,38 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
             });
         }
 
-        chart.append('g')
-            .attr('class', 'y axis left')
-            .call(selection.curves[0].axis())
-            .append('text')
-            .attr('class','axis-title')
-            .attr('transform', 'rotate(-90)')
-            .attr('y', '0')
-            .attr('dy','-4em')
-            .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
-            .attr('fill','#000')
-            .style('text-anchor', 'middle')
-            .text(selection.curves[0].axisLabel());
-
-        if(!commonMetric && selection.curves[1].isValid()) {
-            selection.curves[1].orient = 'right';
+        if((selection.curves||[]).length) {
             chart.append('g')
-                .attr('class', 'y axis right')
-                .attr('transform','translate('+sizing.width+')')
-                .call(selection.curves[1].axis())
+                .attr('class', 'y axis left')
+                .call(selection.curves[0].axis())
                 .append('text')
                 .attr('class','axis-title')
                 .attr('transform', 'rotate(-90)')
                 .attr('y', '0')
-                .attr('dy','4em')
+                .attr('dy','-4em')
                 .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
+                .attr('fill','#000')
                 .style('text-anchor', 'middle')
-                .text(selection.curves[1].axisLabel());
+                .text(selection.curves[0].axisLabel());
+
+            if(!commonMetric && selection.curves[1].isValid()) {
+                selection.curves[1].orient = 'right';
+                chart.append('g')
+                    .attr('class', 'y axis right')
+                    .attr('transform','translate('+sizing.width+')')
+                    .call(selection.curves[1].axis())
+                    .append('text')
+                    .attr('class','axis-title')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', '0')
+                    .attr('dy','4em')
+                    .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
+                    .style('text-anchor', 'middle')
+                    .text(selection.curves[1].axisLabel());
+            }
         }
 
-        let xTickConfig = X_TICK_CFG[selection.frequency.value];
+        let xTickConfig = X_TICK_CFG[(selection.frequency||selection.defaultFrequency).value];
         this.xAxis.tickValues(xTickConfig.values);
         chart.append('g')
             .attr('class', 'x axis')
@@ -316,7 +321,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         // if not using a common metric (two y-axes)
         // then color the ticks/labels in alignment with their
         // corresponding curve for clarity.
-        if(!commonMetric) {
+        if((selection.curves||[]).length && !commonMetric) {
             chart.selectAll('g.y.axis.left g.tick text')
                 .style('fill',selection.curves[0].color);
             chart.selectAll('g.y.axis.left text.axis-title')
@@ -329,7 +334,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         this.commonUpdates();
 
         // draw the curves
-        selection.curves.forEach(function(c) {
+        (selection.curves||[]).forEach(function(c) {
             c.draw(chart);
         });
 

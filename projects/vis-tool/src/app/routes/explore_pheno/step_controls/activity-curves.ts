@@ -40,24 +40,34 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <div class="curve one" *ngIf="selection.curves?.length > 0">
-        <label [ngStyle]="{'color': selection.curves[0].color}">Curve 1</label>
-        <curve-selection-control [selection]="selection" [curve]="selection.curves[0]"></curve-selection-control>
-    </div>
-    <div class="curve two" *ngIf="selection.curves?.length > 1">
-        <label [ngStyle]="{'color': selection.curves[1].color}">Curve 2</label>
-        <curve-selection-control [selection]="selection"  [curve]="selection.curves[1]" [disabled]="!selection.curves[0].isValid()" [required]="false"></curve-selection-control>
+    <div class="curves">
+        <div class="curve one" *ngIf="selection.curves?.length > 0">
+            <label [ngStyle]="{'color': selection.curves[0].color}">Curve 1</label>
+            <curve-selection-control [selection]="selection" [curve]="selection.curves[0]"></curve-selection-control>
+        </div>
+        <div class="curve two" *ngIf="selection.curves?.length > 1">
+            <label [ngStyle]="{'color': selection.curves[1].color}">Curve 2</label>
+            <curve-selection-control [selection]="selection"  [curve]="selection.curves[1]" [disabled]="!selection.curves[0].isValid()" [required]="false"></curve-selection-control>
+        </div>
     </div>
     `,
     encapsulation: ViewEncapsulation.None,
     styles:[`
+    .curves {
+        min-width: 275px;
+    }
+    .curves,
     .curve,
     curve-selection-control,
     species-phenophase-input {
         display: flex;
         flex-direction: column;
+        flex-grow: 1;
     }
-    species-phenophase-input .species-input {
+    species-phenophase-input .species-input,
+    species-phenophase-input .phenophase-input,
+    .metric-input
+     {
         width: 100% !important;
     }
     `]

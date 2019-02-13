@@ -68,7 +68,9 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
 
     isValid(): boolean {
-        return  !!this._interpolate && !!this._frequency && this.hasValidCurve();
+        return  typeof(this._interpolate) === 'number' && // is a numeric based enum with a 0
+            !!this._frequency &&
+            this.hasValidCurve();
     }
 
     private updateCheck(requiresUpdate?:boolean) {

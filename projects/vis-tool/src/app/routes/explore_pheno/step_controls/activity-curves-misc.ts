@@ -12,10 +12,9 @@ import { faBars } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     template: `
-    <div class="misc"  *ngIf="visited">
+    <div class="misc"  *ngIf="selection.isValid()">
         <div><label>Date Interval</label> {{selection.frequency?.label}}</div>
         <div><label>Line Interpolation</label> {{interpolate}}</div>
-        
     </div>
     `,
     styles: [`
@@ -46,6 +45,9 @@ export class ActivityCurvesMiscStepComponent extends BaseStepComponent {
     }
 
     get state():StepState {
+        if(this.selection.isValid()) {
+            return StepState.COMPLETE;
+        }
         return this.selection.hasValidCurve()
             ? this.visited
                 ? StepState.COMPLETE

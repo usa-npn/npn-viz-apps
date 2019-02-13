@@ -10,7 +10,6 @@ import {
     faMapMarker,
     faChartNetwork,
     faCalendarAlt,
-    faThermometerHalf,
     faInfoCircle
 } from '@fortawesome/pro-light-svg-icons';
 
@@ -53,16 +52,11 @@ export class VisSelectionStepComponent implements StepComponent {
 
 @Component({
     template: `
-    <div>
-        <div *ngFor="let cat of categories">
-            <h4>{{cat.title}}</h4>
-            <div class="vis-selectors" *ngFor="let v of cat.defs">
-                <button mat-raised-button (click)="selection.selected = v;" [color]="selection.selected === v ? 'accent' : null" [ngClass]="{selected: selection.selected === v}">
-                    <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
-                </button>
-                <div class="info"><fa-icon [icon]="infoIcon"></fa-icon></div>
-            </div>
-        </div>
+    <div class="vis-selectors" *ngFor="let v of definitions">
+        <button mat-raised-button (click)="selection.selected = v;" [color]="selection.selected === v ? 'accent' : null" [ngClass]="{selected: selection.selected === v}">
+            <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
+        </button>
+        <div class="info"><fa-icon [icon]="infoIcon"></fa-icon></div>
     </div>
     `
 })
@@ -71,13 +65,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     selection:VisSelectionSelection;
     infoIcon = faInfoCircle;
 
-    categories:any[] = [{
-        title: 'maps',
-        defs: MAPS
-    },{
-        title: 'charts',
-        defs: CHARTS
-    }];
+    definitions:VisDefinition[] = VIS_DEFINITIONS;
 
     constructor(
         private selectionFactory:VisualizationSelectionFactory,
@@ -88,7 +76,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     }
 
     ngOnInit() {
-        [...MAPS,...CHARTS].forEach(visDef => {
+        VIS_DEFINITIONS.forEach(visDef => {
             if(typeof(visDef.selection) === 'string') {
                 visDef.templateSelection = this.selectionFactory.newSelection({$class:visDef.selection});
                 visDef.selection = this.selectionFactory.newSelection({$class:visDef.selection});
@@ -118,7 +106,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
             .subscribe(s => {
                 const selection:VisSelection = this.sharingService.deserialize(s);
                 // find the corresponding definition
-                const visDef = [...MAPS,...CHARTS].find(vd => vd.selection && selection.$class === vd.selection.$class);
+                const visDef = VIS_DEFINITIONS.find(vd => vd.selection && selection.$class === vd.selection.$class);
                 if(visDef) {
                     visDef.selection = selection;
                     setTimeout(() => {
@@ -142,43 +130,41 @@ const DEV_SELECTION = {
     isValid: () => false
 };
 
-const MAPS:VisDefinition[] = [{
-    title: 'Map',
-    icon: faMapMarker,
-    fullScreen: true,
-    selection: 'MapSelection',
-    steps:[MapLayerStep,LayerStep /*TODO remove generic LayerStep*/,LocationStep],
-    component: MapVisualizationComponent
-},{
-    title: 'Spring onset',
-    icon: faThermometerHalf,
-    selection: DEV_SELECTION,
-    templateSelection: {},
-}];
-
-const CHARTS:VisDefinition[] = [{
-    title: 'Scatter plot',
-    icon: faChartNetwork,
-    selection: 'ScatterPlotSelection',
-    steps:[
-        StartEndStep,
-        StartEndLegacySpeciesPhenoColorStep,
-        ScatterPlotMiscStep
-    ],
-    component: ScatterPlotComponent
-},{
-    title: 'Activity curve',
-    icon: faChartLine,
-    selection: DEV_SELECTION,
-    templateSelection: {},
-},{
-    title: 'Calendar',
-    icon: faCalendarAlt,
-    selection: 'CalendarSelection',
-    steps:[
-        YearsStep,
-        YearsLegacySpeciesPhenoColorStep,
-        CalendarMiscStep
-    ],
-    component: CalendarComponent
-}];
+const VIS_DEFINITIONS:VisDefinition[] = [
+    {
+        title: 'Map',
+        icon: faMapMarker,
+        fullScreen: true,
+        selection: 'MapSelection',
+        steps:[MapLayerStep,LayerStep /*TODO remove generic LayerStep*/,LocationStep],
+        component: MapVisualizationComponent
+    },
+    {
+        title: 'Scatter plot',
+        icon: faChartNetwork,
+        selection: 'ScatterPlotSelection',
+        steps:[
+            StartEndStep,
+            StartEndLegacySpeciesPhenoColorStep,
+            ScatterPlotMiscStep
+        ],
+        component: ScatterPlotComponent
+    },
+    {
+        title: 'Activity curve',
+        icon: faChartLine,
+        selection: DEV_SELECTION,
+        templateSelection: {},
+    },
+    {
+        title: 'Calendar',
+        icon: faCalendarAlt,
+        selection: 'CalendarSelection',
+        steps:[
+            YearsStep,
+            YearsLegacySpeciesPhenoColorStep,
+            CalendarMiscStep
+        ],
+        component: CalendarComponent
+    }
+];

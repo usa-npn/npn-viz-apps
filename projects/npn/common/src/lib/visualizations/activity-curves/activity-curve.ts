@@ -238,7 +238,10 @@ export class ActivityCurve {
     }
 
     isValid():boolean {
-        return this.species && this.phenophase && this.year && this.metric;
+        return !!this.species &&
+            !!this.phenophase &&
+            !!this.year &&
+            !!this.metric;
     }
 
     plotted(): boolean {
@@ -406,7 +409,7 @@ export const ACTIVITY_CURVE_KINGDOM_METRICS = {
 
 const ALL_METRICS = Object.keys(ACTIVITY_CURVE_KINGDOM_METRICS).reduce((arr,key) =>{
     ACTIVITY_CURVE_KINGDOM_METRICS[key]
-        .filter(metric => arr.indexOf(metric) !== -1)
+        .filter(metric => arr.indexOf(metric) === -1)
         .forEach(metric => arr.push(metric));
     return arr;
 },[]);

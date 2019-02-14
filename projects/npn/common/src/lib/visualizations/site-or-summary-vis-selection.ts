@@ -40,7 +40,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         return keep;
     }
 
-    getData(): Promise<Array<any>> {
+    getData(): Promise<any[]> {
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }

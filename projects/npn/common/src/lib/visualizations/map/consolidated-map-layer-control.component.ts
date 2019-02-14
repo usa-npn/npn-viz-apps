@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MapSelection } from './map-selection';
 import {
     NpnMapLayerService,
@@ -28,7 +28,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
 @Component({
     selector: 'consolidated-map-layer-control',
     template: `
-    <mat-form-field>
+    <mat-form-field class="layer-category">
         <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="selection.layerName = null;">
             <mat-option [value]="null"></mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
@@ -52,7 +52,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     :host {
         display: block;
     }
-    :host > mat-form-field {
+    mat-form-field.layer-category {
         display: block;
     }
     .layer-controls {
@@ -67,7 +67,8 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
         padding-top: 0px;
         padding-left: 0px;
     }
-    `]
+    `],
+    encapsulation: ViewEncapsulation.None
 })
 export class ConsolidatedMapLayerControlComponent {
     @Input() selection:MapSelection;

@@ -17,6 +17,8 @@ import { YearsControlComponent, YearsStepComponent } from './years';
 import { LocationStepComponent, LocationControlComponent, LocationControlSubComponent } from './location';
 import { LayerStepComponent, LayerControlComponent, LayerControlSubComponent } from './layer';
 import { MapLayerStepComponent, MapLayerControlComponent } from './map-layer';
+import { MapYearStepComponent, MapYearControlComponent } from './map-year';
+import { MapSpeciesPhenoStepComponent, MapSpeciesPhenoControlComponent } from './map-species-phenophase';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
@@ -36,6 +38,8 @@ const COMPONENTS:any[] = [
     LocationStepComponent, LocationControlComponent, LocationControlSubComponent,
     LayerStepComponent, LayerControlComponent, LayerControlSubComponent,
     MapLayerStepComponent, MapLayerControlComponent,
+    MapYearStepComponent, MapYearControlComponent,
+    MapSpeciesPhenoStepComponent, MapSpeciesPhenoControlComponent,
 
     ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent,
     CalendarMiscStepComponent, CalendarMiscControlComponent,

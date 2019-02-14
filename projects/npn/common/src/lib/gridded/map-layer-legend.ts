@@ -5,7 +5,7 @@ import { MapLayer } from './map-layer';
 import { GriddedPipeProvider } from './pipes';
 
 import { Selection } from 'd3-selection';
-import { MapLayerDefinition, MapLayerServiceType } from './gridded-common';
+import { MapLayerDefinition, MapLayerServiceType, MapLayerExtentType } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';

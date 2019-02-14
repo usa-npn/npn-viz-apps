@@ -6,6 +6,10 @@ import { faLayerGroup } from '@fortawesome/pro-light-svg-icons';
 import { MapLayerDefs, MapLayerDefinition } from '@npn/common/gridded/gridded-common';
 import { getLayerTitle } from './map-layer';
 
+// NOTE: This step/control are not currently in use but still compiled into the application
+// and taking up space...  It would be nice to keep the code around but before release
+// these should perhaps be excluded from the possible list of entryComponents so that
+// tree shaking can exclude them...
 const LAYER_TITLE_SPLIT_REGEX = /(,|\s-\s)/;
 function layerTitle(layer) {
     if(layer) {

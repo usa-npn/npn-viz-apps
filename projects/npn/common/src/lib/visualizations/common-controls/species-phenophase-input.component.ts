@@ -30,7 +30,7 @@ const COLORS = [
     </mat-form-field>
 
     <mat-form-field class="phenophase-input">
-        <mat-select placeholder="Phenophase" [(ngModel)]="phenophase" [disabled]="disabled || !phenophaseList.length">
+        <mat-select placeholder="Phenophase" [(ngModel)]="phenophaseBinding" [disabled]="disabled || !phenophaseList.length">
           <mat-option *ngFor="let p of phenophaseList" [value]="p">{{p.phenophase_name}}</mat-option>
         </mat-select>
     </mat-form-field>
@@ -137,7 +137,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
                 // load up the available species
                 this.speciesService.getAllSpecies(params)
                     .then(species => {
-                        this.speciesList = species.sort((a,b) => {
+                        species.sort((a,b) => {
                             if(a.number_observations < b.number_observations) {
                                 return 1;
                             }
@@ -146,6 +146,14 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
                             }
                             return 0;
                         });
+                        if(this.speciesValue) {
+                            for(let i = 0; i < species.length; i++) {
+                                if(this.speciesValue.species_id === species[i].species_id) {
+                                    species[i] = this.speciesValue;
+                                }
+                            }
+                        }
+                        this.speciesList = species;
                     });
             });
         this.colorControl.valueChanges.pipe(takeUntil(this.componentDestroyed))
@@ -205,6 +213,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     get species():Species {
         return this.speciesValue;
     }
+    private initialSpeciesSet:boolean = true;
     set species(s:Species) {
         if(!s || typeof(s) === 'object') { // might as well use any
             // the first check makes sure we're not changing say from
@@ -213,22 +222,40 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
             // happening related to species going from undefined to null.
             if((!!s || !!this.speciesValue) && s !== this.speciesValue) {
                 let oldValue = this.speciesValue;
-                this.speciesChange.emit(this.speciesValue = s);
-                this.onSpeciesChange.emit({
-                    oldValue: oldValue,
-                    newValue: this.speciesValue
-                });
-                this.phenophase = undefined;
+                this.speciesValue = s;
+                if(!this.initialSpeciesSet) {
+                    this.speciesChange.emit(this.speciesValue);
+                    this.onSpeciesChange.emit({
+                        oldValue: oldValue,
+                        newValue: this.speciesValue
+                    });
+                }
                 this.phenophaseList = [];
                 if(s) {
                     this.speciesService.getPhenophases(s,this.startYear,this.endYear)
                         .then(phenophases => {
+                            let found = false;
+                            if(this.phenophase) {
+                                for(let i = 0; i < phenophases.length; i++) {
+                                    found =(this.phenophase.phenophase_id === phenophases[i].phenophase_id)
+                                    if(found) {
+                                        phenophases[i] = this.phenophase;
+                                        break;
+                                    }
+                                }
+                                if(!found) {
+                                    this.phenophase = undefined;
+                                }
+                            }
                             this.phenophaseList = phenophases;
-                            this.phenophase = this.phenophaseList[0];
+                            if(!found) {
+                                this.phenophaseBinding = this.phenophaseList[0];
+                            }
                         });
                 }
             }
         }
+        this.initialSpeciesSet = false;
     }
 
     @Input('phenophase')
@@ -236,6 +263,13 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
         return this.phenophaseValue;
     }
     set phenophase(p:Phenophase) {
+        this.phenophaseValue = p;
+    }
+
+    get phenophaseBinding():Phenophase {
+        return this.phenophaseValue;
+    }
+    set phenophaseBinding(p:Phenophase) {
         if(p !== this.phenophaseValue) {
             let oldValue = this.phenophaseValue;
             this.phenophaseChange.emit(this.phenophaseValue = p);

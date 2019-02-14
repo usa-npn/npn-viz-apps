@@ -1,4 +1,4 @@
-import { VisSelection, selectionProperty } from '../vis-selection';
+import { selectionProperty } from '../vis-selection';
 import {
     MapLayer,
     NpnMapLayerService,
@@ -6,8 +6,23 @@ import {
     WmsMapLayer,
     SupportsOpacity
 } from '../../gridded';
+import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
+import { NpnServiceUtils, Species, Phenophase } from '@npn/common/common';
+import { HttpParams } from '@angular/common/http';
 
-export class MapSelection extends VisSelection implements SupportsOpacity {
+export interface MapSelectionPlot {
+    species: Species;
+    phenophase: Phenophase;
+}
+
+/**
+ * Note: This type of selection contains more functionality than the underlying visualization
+ * will care to make use of.  I.e. if `individualPhenometrics` is set to true then summarized
+ * data would be used and if `networkIds` were populated on the selection they would be used
+ * 
+ * @dynamic
+ */
+export class MapSelection extends SiteOrSummaryVisSelection implements SupportsOpacity {
     @selectionProperty()
     $class = 'MapSelection';
 
@@ -26,12 +41,33 @@ export class MapSelection extends VisSelection implements SupportsOpacity {
     @selectionProperty()
     _zoom:number;
 
+    @selectionProperty() // vis supports a single year of data
+    year:number;
+    @selectionProperty()
+    plots:MapSelectionPlot[] = []; // up to 3
+
     private map:google.maps.Map;
     layer:MapLayer;
     legend:MapLayerLegend;
 
-    constructor(private layerService:NpnMapLayerService) {
-        super();
+    constructor(private layerService:NpnMapLayerService,protected serviceUtils:NpnServiceUtils) {
+        super(serviceUtils);
+    }
+
+    toURLSearchParams():HttpParams {
+        let params = new HttpParams()
+            .set('request_src','npn-vis-map')
+            .set('start_date',`${this.year}-01-01`)
+            .set('end_date',`${this.year}-12-31`);
+        this.validPlots.forEach((p,i) => {
+            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                           .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+        });
+        return this.addNetworkParams(params);
+    }
+
+    get validPlots():MapSelectionPlot[] {
+        return (this.plots||[]).filter(p => (!!p.species && !!p.phenophase));
     }
 
     set layerCategory(s:string) {
@@ -129,9 +165,9 @@ console.log(`MapSelection.setOpacity=${opacity}`);
         return true;
     }
 
-    visualize(map: google.maps.Map):Promise<void> {
+    updateLayer(map: google.maps.Map):Promise<void> {
         const {layerName} = this;
-console.log(`MapSelection.visualize`,this.external);
+console.log(`MapSelection.updateLayer`,this.external);
         if(this.map !== map) {
             this.map = map;
             const latLng = this._center;
@@ -155,7 +191,7 @@ console.log(`MapSelection.visualize`,this.external);
         }
         if(layerName) {
             if(!this.layer) {
-                this.layerService.newLayer(map,layerName)
+                return this.layerService.newLayer(map,layerName)
                     .then(layer => {
                         this.layer = layer;
                         layer.setOpacity(this.opacity);
@@ -164,12 +200,20 @@ console.log(`MapSelection.visualize`,this.external);
                         }
                         this.updateExtentValue();
                         layer.on();
-                        return this.layer.getLegend().then(legend => this.legend = legend);
-                    })
+                        return this.layer.getLegend().then(legend => {this.legend = legend});
+                    });
             } else {
                 this.layer.bounce();
             }
         }
         return Promise.resolve();
+    }
+
+    getData():Promise<any[]> {
+        // this vis is "always" valid since you don't have to plot
+        // anything if you don't want to.
+        return this.year && this.validPlots.length
+            ? super.getData()
+            : Promise.resolve([]);
     }
 }

@@ -93,7 +93,10 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
      */
     private updateMarkers() {
         const {legend} = this.selection;
-        if(!legend || legend !== this.lastUpdateLegend) {
+        if(
+           (!legend || legend !== this.lastUpdateLegend) || // if the legend changed
+           (this.markers.length && !this.markers[0].cloned) // OR the markers are "new" (!cloned) so haven't been colored
+           ) {
             this.lastUpdateLegend = legend;
             this.markers = (this.markers||[]).map(m => {
                 m = m.clone();
@@ -194,7 +197,7 @@ class MapVisMarker {
     title:string;
     records:MapVisRecord[];
 
-    constructor(public record:MapVisRecord,public icon:google.maps.Symbol) {
+    constructor(public record:MapVisRecord,public icon:google.maps.Symbol,public cloned?:boolean) {
         this.records = [record];
     }
 
@@ -210,7 +213,7 @@ class MapVisMarker {
     get doy():number { return this.record.mean_first_yes_doy; }
 
     clone():MapVisMarker {
-        const clone = new MapVisMarker(this.record,this.icon);
+        const clone = new MapVisMarker(this.record,this.icon,true);
         clone.records = this.records.slice();
         return clone;
     }

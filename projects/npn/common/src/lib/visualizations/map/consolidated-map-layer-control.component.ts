@@ -29,7 +29,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     selector: 'consolidated-map-layer-control',
     template: `
     <mat-form-field class="layer-category">
-        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="selection.layerName = null;">
+        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="categoryChange()">
             <mat-option [value]="null"></mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
             <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>
@@ -86,6 +86,11 @@ export class ConsolidatedMapLayerControlComponent {
     ngOnInit() {
         this.layerService.getLayerDefinitions().then((defs:MapLayerDefs) => this.layerDefinitions = defs);
     }
+
+    categoryChange() {
+        this.selection.layerName = null;
+        this.selection.redraw();
+    }
 }
 
 @Component({
@@ -111,6 +116,10 @@ export class PestMapLayerControlComponent {
 
     ngOnInit() {
         this.layers = this.layerDefinitions.categories.find(c => c.name === CATEGORY_PEST).layers;
+        if(!this.selection.layerName) {
+            this.selection.layerName = this.layers[0].name;
+            this.selection.redraw();
+        }
     }
 }
 

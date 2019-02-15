@@ -83,6 +83,10 @@ export class MapYearControlComponent extends BaseControlComponent {
                     }
                 });
             }
+        } else if (!this.lastLayer) {
+            if(this.yearControl.disabled) {
+                this.yearControl.enable();
+            }
         }
     }
 }

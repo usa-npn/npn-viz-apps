@@ -4,6 +4,7 @@
     $primary: map-get($theme,primary);
     $accent: map-get($theme,accent);
     $warn: map-get($theme,warn);
+    $accent2: map-get($theme,accent2);
 
     #visualizationContainer {
         map-visualization {
@@ -19,4 +20,12 @@
             }
         }
     }
+
+    #explorePhenoSteps {
+        // icons for the map species/phenophase selection step
+        .step-host .plot svg.icon {
+            fill: mat-color($accent2);
+        }
+    }
+
 }

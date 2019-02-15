@@ -8,7 +8,7 @@ import { faCrow } from '@fortawesome/pro-light-svg-icons';
     template: `
     <div *ngFor="let plot of selection.validPlots; index as i" class="plot">
         <svg class="icon" viewBox="0 0 22 22">
-            <path fill="steelblue" [attr.d]="iconPaths[i]"></path>
+            <path [attr.d]="iconPaths[i]"></path>
         </svg>
         <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
     </div>

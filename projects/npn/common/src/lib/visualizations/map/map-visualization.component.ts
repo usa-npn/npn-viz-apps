@@ -60,6 +60,10 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
         this.getMapResolver(map);
     }
 
+    /**
+     * triggered by window re-sizes and other UI logic when available screen
+     * real-estate may have changed.
+     */
     protected resize():void {
         console.log('MapVisualization.resize');
         if(this.legend) {
@@ -81,6 +85,12 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
     }
 
     private lastUpdateLegend:MapLayerLegend;
+    /**
+     * If the underlying legend coloring markers has changed since the last update
+     * then re-create all markers with new colors.  Markers have to be recreated
+     * since the underlying angular library won't update them if their references
+     * do not change (does not logically deep watch the contents of each marker).
+     */
     private updateMarkers() {
         const {legend} = this.selection;
         if(!legend || legend !== this.lastUpdateLegend) {
@@ -116,8 +126,8 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                     .filter(d => d.mean_first_yes_doy !== -9999) // throw out invalid means
                     .sort((a,b) => a.mean_first_yes_doy - b.mean_first_yes_doy); // sort ascending by doy
                 const speciesIds = this.selection.validPlots.map(p => `${p.species.species_id}`);
-                console.log(`MapVisualization: data.length=${data.length}`,data);
-                const bySiteMap:BySiteMap = {};
+                console.log(`MapVisualization: data.length=${data.length} (filtered)`);
+                const bySiteMap:BySiteMap = {}; // to consolidate multiple species/phenos at a given station/marker
                 this.markers = data.reduce((arr,d) => {
                         if(bySiteMap[d.site_id]) {
                             bySiteMap[d.site_id].addRecord(d);
@@ -128,8 +138,8 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                         }
                         return arr;
                     },[]);
+                console.log(`MapVisualization: markers.length=${this.markers.length}`);
                 this.redraw();
-                console.log(`MapVisualization.markers (${this.markers.length})`,this.markers);
             });
         });
     }

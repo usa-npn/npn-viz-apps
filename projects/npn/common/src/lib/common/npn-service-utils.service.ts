@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CacheService } from './cache-service';
+import { CacheService } from './cache.service';
 
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';
 

@@ -2,9 +2,10 @@ import { NgModule, InjectionToken } from '@angular/core';
 import { BrowserModule }    from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
-import { CacheService } from './cache-service';
+import { CacheService } from './cache.service';
 import { SpeciesService } from './species.service';
 import { NetworkService } from './network.service';
+import { StationService } from './station.service';
 
 import { SpeciesTitlePipe } from './species-title.pipe';
 import { DoyPipe } from './doy.pipe';
@@ -39,6 +40,7 @@ export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
         CacheService,
         SpeciesService,
         NetworkService,
+        StationService,
         NpnServiceUtils,
         SpeciesTitlePipe,
         DatePipe,

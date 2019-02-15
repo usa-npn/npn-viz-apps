@@ -12,3 +12,4 @@ export * from './wms-map-layer';
 export * from './wms-map-layer-legend';
 export * from './pest-map-layer';
 export * from './pest-map-layer-legend';
+export * from './default-map-layer-legend';

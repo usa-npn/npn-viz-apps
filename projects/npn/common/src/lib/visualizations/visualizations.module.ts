@@ -32,7 +32,8 @@ import {
     ConsolidatedMapLayerControlComponent,
     PestMapLayerControlComponent,
     TempAccumMapLayerControlComponent,
-    SpringIndexMapLayerControlComponent
+    SpringIndexMapLayerControlComponent,
+    MapVisualizationMarkerIw
 } from './map';
 
 import {VisualizationComponent} from './visualization.component';
@@ -86,7 +87,7 @@ import {NpnGriddedModule} from '../gridded';
 
       ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
       GriddedRangeSliderControl,
-      ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent
+      ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent,MapVisualizationMarkerIw
   ],
   exports: [
       ScatterPlotComponent,

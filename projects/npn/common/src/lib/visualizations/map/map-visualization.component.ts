@@ -31,7 +31,12 @@ import { Species, Phenophase } from '@npn/common/common';
                 <agm-marker *ngFor="let m of markers"
                     [latitude]="m.latitude" [longitude]="m.longitude"
                     [iconUrl]="m.icon"
-                    [title]="m.title"></agm-marker>
+                    [title]="m.title" (markerClick)="selectedMarker = m"></agm-marker>
+                <agm-info-window
+                    [isOpen]="!!selectedMarker" (infoWindowClose)="selectedMarker = null"
+                    [latitude]="selectedMarker?.latitude" [longitude]="selectedMarker?.longitude">
+                    <map-visualization-marker-iw [marker]="selectedMarker" [selection]="selection"></map-visualization-marker-iw>
+                </agm-info-window>
             </agm-map>
             <map-layer-legend *ngIf="!thumbnail && selection.legend" [legend]="selection.legend"></map-layer-legend>
         </div>
@@ -49,6 +54,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
     griddedData:GriddedPointData;
 
     markers:MapVisMarker[];
+    selectedMarker:MapVisMarker;
 
     constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
         super(rootElement,media);
@@ -161,6 +167,10 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                 });
         }
     }
+
+    markerClick(marker:MapVisMarker) {
+        console.log('MapVisualization.markerClick',marker);
+    }
 }
 
 export const MAP_VIS_SVG_PATHS:string[] = [
@@ -193,7 +203,7 @@ interface MapVisRecord extends Species,Phenophase {
     // lots of other stuff
 }
 
-class MapVisMarker {
+export class MapVisMarker {
     title:string;
     records:MapVisRecord[];
 

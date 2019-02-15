@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 
-import { CacheService } from './cache-service';
 import { Species } from './species';
 import { Phenophase } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';

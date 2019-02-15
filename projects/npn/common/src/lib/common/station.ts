@@ -1,0 +1,35 @@
+export interface Station {
+    site_id:number;
+    site_type:string;
+    site_name:string;
+    state:string;
+    latitude:number;
+    longitude:number;
+    lat_long_datum:string;
+    lat_long_source:string;
+    elevation_in_meters:number;
+    elevation_source:string;
+    degree_of_development_surrounding_site:string;
+    landscape_description:string;
+    proximity_to_road:string;
+    proximity_to_permanent_water:string;
+    area_of_site:string;
+    type_of_forest_at_site:string;
+    presence_of_slope:string;
+    location_relative_to_slope:string;
+    slope_aspect:string;
+    presence_of_domesticated_cats:string;
+    presence_of_domesticated_dogs:string;
+    presence_of_domesticated_animals:string;
+    presence_of_garden:number;
+    presence_of_bird_feeder:string;
+    presence_of_nesting_box:string;
+    presence_of_fruit:string;
+    presence_of_birdbath:string;
+    presence_of_other_features_designed_to_attact_animals:string;
+    site_comments:string;
+    site_registration_date:string;
+    num_individuals:number;
+    num_records:number;
+    group_name:string;
+}

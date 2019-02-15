@@ -7,7 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div class="misc"  *ngIf="visited">
+    <div class="misc" *ngIf="complete">
         <div><label>Display negative data</label> {{selection.negative ? 'Yes' : 'No'}}</div>
     </div>
     `,

@@ -8,7 +8,7 @@ import { FormControl } from '@angular/forms';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-    template: `<div *ngIf="visited">{{selection.year}}</div>`,
+    template: `<div *ngIf="complete">{{selection.year}}</div>`,
 
 })
 export class MapYearStepComponent extends BaseStepComponent {

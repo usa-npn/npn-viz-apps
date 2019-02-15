@@ -17,6 +17,12 @@ export abstract class BaseStepComponent extends ComponentBase implements StepCom
             ? StepState.AVAILABLE
             : StepState.UNAVAILABLE;
     }
+
+    get complete():boolean {
+        return this.selection.$shared
+            ? true
+            : this.state === StepState.COMPLETE;
+    }
 }
 
 export class BaseControlComponent extends ComponentBase implements ControlComponent {

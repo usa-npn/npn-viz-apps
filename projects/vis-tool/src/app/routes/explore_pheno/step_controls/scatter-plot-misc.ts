@@ -7,7 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 
 @Component({
     template: `
-    <div class="misc"  *ngIf="visited">
+    <div class="misc" *ngIf="complete">
         <div><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
         <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
         <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>

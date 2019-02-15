@@ -14,7 +14,9 @@ export class StepIconComponent {
         return this.active
             ? StepState.ACTIVE
             : this.step && this.step.$stepInstance
-                ? this.step.$stepInstance.state
+                ? this.step.$stepInstance.selection && this.step.$stepInstance.selection.$shared // see step_controls/vis-selection.ts
+                    ? StepState.COMPLETE
+                    : this.step.$stepInstance.state
                 : null;
     }
 }

@@ -108,6 +108,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
             )
             .subscribe(s => {
                 const selection:VisSelection = this.sharingService.deserialize(s);
+                selection.$shared = true;
                 // find the corresponding definition
                 const visDef = VIS_DEFINITIONS.find(vd => vd.selection && selection.$class === vd.selection.$class);
                 if(visDef) {
@@ -137,7 +138,7 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'MapSelection',
         component: MapVisualizationComponent,
         steps:[
-            LocationStep,
+            /*LocationStep,*/
             MapLayerStep,
             MapYearStep,
             MapSpeciesPhenoStep

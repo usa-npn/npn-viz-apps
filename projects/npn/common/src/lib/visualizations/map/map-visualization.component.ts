@@ -12,10 +12,8 @@ import { Species, Phenophase } from '@npn/common/common';
     selector: 'map-visualization',
     template: `
     <div class="vis-container">
-        <div class="vis-working" *ngIf="selection.working">
-            <npn-logo spin="false"></npn-logo>
-        </div>
         <div class="map-wrapper">
+            <npn-logo class="working" *ngIf="selection.working" spin="true"></npn-logo>
             <agm-map (mapReady)="mapReady($event)" 
                 [streetViewControl]="false"  [styles]="mapStyles" [scrollwheel]="false"
                 (mapClick)="mapClick($event)">

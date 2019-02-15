@@ -42,7 +42,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     _zoom:number;
 
     @selectionProperty() // vis supports a single year of data
-    year:number;
+    _year:number;
     @selectionProperty()
     plots:MapSelectionPlot[] = []; // up to 3
 
@@ -64,6 +64,14 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
                            .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
         });
         return this.addNetworkParams(params);
+    }
+
+    get year():number {
+        return this._year;
+    }
+    set year(y:number) {
+        this._year = y;
+        this.update();
     }
 
     get validPlots():MapSelectionPlot[] {
@@ -214,8 +222,13 @@ console.log(`MapSelection.updateLayer`,this.external);
     getData():Promise<any[]> {
         // this vis is "always" valid since you don't have to plot
         // anything if you don't want to.
-        return this.year && this.validPlots.length
+        this.working = true;
+        return (this.year && this.validPlots.length
             ? super.getData()
-            : Promise.resolve([]);
+            : Promise.resolve([]))
+            .then(results => {
+                this.working = false;
+                return results;
+            });
     }
 }

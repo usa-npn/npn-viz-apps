@@ -105,7 +105,6 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
      */
     protected update():void {
         console.log('MapVisualization.update');
-        this.redraw();
         this.markers = [];
         this.getMap().then(() => { // just to make sure the google apis are loaded
             this.selection.getData().then((data:MapVisRecord[]) => {
@@ -129,7 +128,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                         }
                         return arr;
                     },[]);
-                this.updateMarkers();
+                this.redraw();
                 console.log(`MapVisualization.markers (${this.markers.length})`,this.markers);
             });
         });

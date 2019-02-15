@@ -19,7 +19,6 @@ import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep }
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
 import { LocationStep } from './location';
-import { LayerStep } from './layer';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil, map, filter } from 'rxjs/operators';
 import { SharingService } from '../sharing.service';

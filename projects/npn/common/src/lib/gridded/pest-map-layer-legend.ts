@@ -1,7 +1,8 @@
 import { Selection } from 'd3-selection';
-import { MapLayerLegend, GriddedPointData } from './map-layer-legend';
+import { MapLayerLegend } from './map-layer-legend';
 import { Observable, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
+import { GriddedPointData } from './gridded-common';
 
 interface PestDescription {
     species: string;

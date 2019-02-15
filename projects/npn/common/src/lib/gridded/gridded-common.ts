@@ -111,6 +111,19 @@ export interface MapLayerDefs {
     categories: MapLayerCategory[];
 }
 
+export interface LegendData {
+    color: string;
+    quantity: number;
+    original_label: string;
+    label: string;
+}
+
+export interface GriddedPointData {
+    point: number;
+    legendData: LegendData;
+    formatted: string;
+}
+
 export const CATEGORY_PEST = 'Pests';
 export const CATEGORY_TEMP_ACCUM_30_YR_AVG = 'Temperature Accumulations, Daily 30-year Average';
 export const CATEGORY_TEMP_ACCUM_CURRENT = 'Temperature Accumulations, Current Day';

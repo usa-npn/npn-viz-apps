@@ -5,23 +5,10 @@ import { MapLayer } from './map-layer';
 import { GriddedPipeProvider } from './pipes';
 
 import { Selection } from 'd3-selection';
-import { MapLayerDefinition, MapLayerServiceType, MapLayerExtentType } from './gridded-common';
+import { MapLayerDefinition, MapLayerServiceType, LegendData, GriddedPointData, MapLayerType } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-export interface LegendData {
-    color: string;
-    quantity: number;
-    original_label: string;
-    label: string;
-}
-
-export interface GriddedPointData {
-    point: number;
-    legendData: LegendData;
-    formatted: string;
-}
 
 const IDENTITY = d => d;
 
@@ -29,26 +16,25 @@ export abstract class MapLayerLegend {
     private layer:MapLayer;
     private lformat:Function;
     private gformat:Function;
-    private title_data:any;
+    private title_data:LegendData;
     private data:LegendData[];
-    private length:number;
 
     constructor(protected wcsDataService:WcsDataService,
                 protected griddedPipes:GriddedPipeProvider,
-                protected color_map:any,
+                protected color_map:(any|LegendData[]),
                 /*
                 NOTE: per the original implementation which binds extents directly into the definition this is public
                 may want to later revisit some abstraction, used externally via WmsMapLegendComponent
                  */
                 public ldef:MapLayerDefinition,
                 protected styleDefinition:any) {
-            console.log('WmsMapLegend.color_map',color_map);
-            console.log('WmsMapLegend.ldef',ldef);
-            console.log('WmsMapLegend.styleDefinition',styleDefinition);
+            console.log('MapLayerLegend.color_map',color_map);
+            console.log('MapLayerLegend.ldef',ldef);
+            console.log('MapLayerLegend.styleDefinition',styleDefinition);
             let get_filter = (filter_def) => {
                 let pipe = this.griddedPipes.get(filter_def.name);
                 if(!pipe) {
-                    console.error(`WmsMapLegend: Unable to find pipe named ${filter_def.name}`);
+                    console.error(`MapLayerLegend: Unable to find pipe named ${filter_def.name}`);
                 }
                 return function(l,q) {
                     let args = [q];
@@ -60,25 +46,29 @@ export abstract class MapLayerLegend {
             };
             this.lformat = ldef.legend_label_filter ? get_filter(ldef.legend_label_filter) : IDENTITY;
             this.gformat = ldef.gridded_label_filter ? get_filter(ldef.gridded_label_filter) : undefined;
-            let entries = color_map.find('ColorMapEntry');
-            if(entries.length === 0) {
-                entries = color_map.find('sld\\:ColorMapEntry');
+            let data:LegendData[];
+            if(Array.isArray(color_map)) {
+                data = color_map;
+            } else {
+                let entries = color_map.find('ColorMapEntry');
+                if(entries.length === 0) {
+                    entries = color_map.find('sld\\:ColorMapEntry');
+                }
+                data = entries.toArray().reduce((arr,entry,i) => {
+                    var e = $jq(entry),
+                        q = parseFloat(e.attr('quantity')),
+                        l = e.attr('label');
+                    arr.push({
+                        color: e.attr('color'),
+                        quantity: q,
+                        original_label: l,
+                        label: i === 0 ? l : this.lformat(l,q) // why the special case for index 0?
+                    });
+                    return arr;
+                },[]);
             }
-            let data = entries.toArray().reduce((arr,entry,i) => {
-                var e = $jq(entry),
-                    q = parseFloat(e.attr('quantity')),
-                    l = e.attr('label');
-                arr.push({
-                    color: e.attr('color'),
-                    quantity: q,
-                    original_label: l,
-                    label: i === 0 ? l : this.lformat(l,q) // why the special case for index 0?
-                });
-                return arr;
-            },[]);
             this.title_data = data[0];
             this.data = data.slice(1);
-            this.length = this.data.length;
     }
 
     setLayer(l:MapLayer):MapLayerLegend {
@@ -88,6 +78,18 @@ export abstract class MapLayerLegend {
 
     getLayer():MapLayer {
         return this.layer;
+    }
+
+    get layerType():MapLayerType {
+        return this.layer
+            ? this.layer.layerType
+            : null;
+    }
+
+    get layerName():string {
+        return this.layer 
+            ? this.layer.layerName
+            : null;
     }
 
     getData():LegendData[] {
@@ -130,14 +132,8 @@ export abstract class MapLayerLegend {
             if(q == d.quantity) {
                 return d;
             }
-            if(i === 0 && q < d.quantity) { // first cell (presumably 0-N)
-                return d;
-            }
-            if(!n && q > d.quantity) { // last cell
-                return d;
-            }
             if(n && q >= d.quantity && q < n.quantity) {
-                return n;
+                return d;
             }
         }
     }

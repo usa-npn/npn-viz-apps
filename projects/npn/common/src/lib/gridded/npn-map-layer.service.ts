@@ -30,6 +30,7 @@ import { MapLayerLegend } from './map-layer-legend';
 import { PestMapLayerLegend } from "./pest-map-layer-legend";
 import { WmsMapLayerLegend } from "./wms-map-layer-legend";
 import { WcsDataService } from './wcs-data.service';
+import { DefaultMapLayerLegend } from './default-map-layer-legend';
 
 const DEEP_COPY = (o) => JSON.parse(JSON.stringify(o));
 
@@ -59,6 +60,14 @@ export class NpnMapLayerService {
             });
     }
 
+    getDefaultLegend():MapLayerLegend {
+        const key = 'DEFAULT';
+        if(this.legends[key]) {
+            return this.legends[key];
+        }
+        return (this.legends[key] = new DefaultMapLayerLegend(this.griddedPipes));
+    }
+    
     // this is separate from WmsLayer itself because FWS apps use
     // legends separate from layers (for now).  If the clipped stuff
     // is worked into a sub-class of NpnMapLayer then this should likely

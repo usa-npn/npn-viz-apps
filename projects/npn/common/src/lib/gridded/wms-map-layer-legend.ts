@@ -110,12 +110,14 @@ export class WmsMapLayerLegend extends MapLayerLegend {
                 legend_title += `, ${legend.ldef.extent.current.label}`;
             }
         }
+        if(!!legend_title) {
+            svg.append('g').append('text').attr('dx', 5)
+                .attr('dy', 100 + top_pad)
+                .attr('font-size', '18px')
+                .attr('text-anchor', 'right').text(legend_title);
+        }
         svg.append('g').append('text').attr('dx', 5)
-            .attr('dy', 100 + top_pad)
-            .attr('font-size', '18px')
-            .attr('text-anchor', 'right').text(legend_title);
-        svg.append('g').append('text').attr('dx', 5)
-            .attr('dy', 118 + top_pad)
+            .attr('dy', (!!legend_title ? 118 : 85) + top_pad)
             .attr('font-size', '11px')
             .attr('text-anchor', 'right').text('USA National Phenology Network, www.usanpn.org');
     }

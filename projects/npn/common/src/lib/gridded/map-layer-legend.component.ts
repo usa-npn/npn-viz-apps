@@ -26,10 +26,8 @@ export class MapLayerLegendComponent {
 
     @HostBinding('class')
     get legendClass() {
-        const layer = this.legend ? this.legend.getLayer() : null;
-        return layer
-            ? `${layer.layerType} ${layer.layerName.replace(/:/g,'_')}`
-            : null;
+        const {layerType,layerName} = this.legend;
+        return `${layerType||''} ${layerName ? layerName.replace(/:/g,'_') : ''}`;
     }
 
     ngAfterViewInit() {

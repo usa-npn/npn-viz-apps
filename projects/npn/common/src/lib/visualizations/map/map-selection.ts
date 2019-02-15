@@ -205,6 +205,8 @@ console.log(`MapSelection.updateLayer`,this.external);
             } else {
                 this.layer.bounce();
             }
+        } else {
+            this.legend = this.layerService.getDefaultLegend();
         }
         return Promise.resolve();
     }

@@ -36,6 +36,11 @@ import {
     MapVisualizationMarkerIw
 } from './map';
 
+import {
+  AgddTimeSeriesSelectionFactory,
+  AgddTimeSeriesComponent
+} from './agdd-time-series';
+
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
@@ -87,7 +92,8 @@ import {NpnGriddedModule} from '../gridded';
 
       ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
       GriddedRangeSliderControl,
-      ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent,MapVisualizationMarkerIw
+      ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent,MapVisualizationMarkerIw,
+      AgddTimeSeriesComponent
   ],
   exports: [
       ScatterPlotComponent,
@@ -103,7 +109,8 @@ import {NpnGriddedModule} from '../gridded';
       YearRangeInputComponent,
       ExtentControl,
       GriddedRangeSliderControl,
-      ConsolidatedMapLayerControlComponent
+      ConsolidatedMapLayerControlComponent,
+      AgddTimeSeriesComponent
   ],
   providers: [
       DatePipe,
@@ -115,6 +122,7 @@ import {NpnGriddedModule} from '../gridded';
       ObserverActivitySelectionFactory,
       ObservationFrequencySelectionFactory,
       MapSelectionFactory,
+      AgddTimeSeriesSelectionFactory,
       // OR one factory to rule them all
       VisualizationSelectionFactory,
       {provide: MAT_DATE_FORMATS, useValue: {

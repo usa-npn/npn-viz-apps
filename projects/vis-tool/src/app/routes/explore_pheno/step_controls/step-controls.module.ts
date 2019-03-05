@@ -8,7 +8,8 @@ import {
     ScatterPlotComponent,
     CalendarComponent,
     MapVisualizationComponent, 
-    ActivityCurvesComponent} from '@npn/common';
+    ActivityCurvesComponent,
+    AgddTimeSeriesComponent } from '@npn/common';
 
 import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
 import { DummyStepComponent, DummyControlComponent } from './dummy';
@@ -53,7 +54,8 @@ const ENTRY_COMPONENTS:any[] = [
     ScatterPlotComponent,
     CalendarComponent,
     MapVisualizationComponent,
-    ActivityCurvesComponent
+    ActivityCurvesComponent,
+    AgddTimeSeriesComponent
 ];
 
 @NgModule({

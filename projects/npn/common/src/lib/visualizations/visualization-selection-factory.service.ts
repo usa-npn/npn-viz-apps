@@ -1,13 +1,14 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-import {VisSelection} from './vis-selection';
-import {ScatterPlotSelection,ScatterPlotSelectionFactory} from './scatter-plot';
-import {CalendarSelection,CalendarSelectionFactory} from './calendar';
-import {ActivityCurvesSelection,ActivityCurvesSelectionFactory} from './activity-curves';
-import {ObserverActivitySelection,ObserverActivitySelectionFactory} from './observer-activity';
-import {ObservationFrequencySelection,ObservationFrequencySelectionFactory} from './observation-frequency';
-import {ClippedWmsMapSelection,ClippedWmsMapSelectionFactory} from './clipped-wms-map';
+import { VisSelection } from './vis-selection';
+import { ScatterPlotSelection, ScatterPlotSelectionFactory } from './scatter-plot';
+import { CalendarSelection, CalendarSelectionFactory } from './calendar';
+import { ActivityCurvesSelection, ActivityCurvesSelectionFactory } from './activity-curves';
+import { ObserverActivitySelection, ObserverActivitySelectionFactory } from './observer-activity';
+import { ObservationFrequencySelection, ObservationFrequencySelectionFactory } from './observation-frequency';
+import { ClippedWmsMapSelection, ClippedWmsMapSelectionFactory } from './clipped-wms-map';
 import { MapSelectionFactory, MapSelection } from './map';
+import { AgddTimeSeriesSelection, AgddTimeSeriesSelectionFactory } from './agdd-time-series';
 
 @Injectable()
 export class VisualizationSelectionFactory {
@@ -19,7 +20,8 @@ export class VisualizationSelectionFactory {
                 private observer: ObserverActivitySelectionFactory,
                 private observationFreq: ObservationFrequencySelectionFactory,
                 private clippedWmsMap: ClippedWmsMapSelectionFactory,
-                private map: MapSelectionFactory
+                private map: MapSelectionFactory,
+                private agddTime:AgddTimeSeriesSelectionFactory
 
     ) {
         this.factoryMap.CalendarSelection = calendar;
@@ -29,6 +31,7 @@ export class VisualizationSelectionFactory {
         this.factoryMap.ObservationFrequencySelection = observationFreq;
         this.factoryMap.ClippedWmsMapSelection = clippedWmsMap;
         this.factoryMap.MapSelection = map;
+        this.factoryMap.AgddTimeSeriesSelection = agddTime;
     }
 
     newCalendarSelection():CalendarSelection {
@@ -57,6 +60,10 @@ export class VisualizationSelectionFactory {
 
     newMapSelection(): MapSelection {
         return this.map.newSelection();
+    }
+
+    newAgddTimeSeriesSelection(): AgddTimeSeriesSelection {
+        return this.agddTime.newSelection();
     }
 
     cloneSelection(selection:VisSelection): VisSelection {

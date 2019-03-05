@@ -10,11 +10,12 @@ import {
     faMapMarker,
     faChartNetwork,
     faCalendarAlt,
-    faInfoCircle
+    faInfoCircle,
+    faClock
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent, AgddTimeSeriesComponent } from "@npn/common";
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
@@ -172,5 +173,12 @@ const VIS_DEFINITIONS:VisDefinition[] = [
             YearsLegacySpeciesPhenoColorStep,
             CalendarMiscStep
         ]
+    },
+    {
+        title: 'AGDD Time Series',
+        icon: faClock,
+        selection: 'AgddTimeSeriesSelection',
+        component: AgddTimeSeriesComponent,
+        steps: []
     }
 ];

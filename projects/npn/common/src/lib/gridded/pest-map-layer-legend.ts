@@ -3,30 +3,15 @@ import { MapLayerLegend } from './map-layer-legend';
 import { Observable, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { GriddedPointData } from './gridded-common';
-
-interface PestDescription {
-    species: string;
-    lowerThreshold?: number;
-    upperThreshold?: number;
-    startMonthDay?: string;
-    agddMethod?: string;
-}
+import { PestDescription, PestMapLayer } from './pest-map-layer';
 
 export class PestMapLayerLegend extends MapLayerLegend {
-
-    private getPestDescription():Promise<PestDescription> {
-        const species = this.getLayer().title;
-        return this.wcsDataService.serviceUtils.cachedGet(
-            this.wcsDataService.serviceUtils.dataApiUrl('/v0/agdd/pestDescriptions')
-        ).then((descriptions:PestDescription[]) => descriptions.find(d => d.species === species));
-    }
-
     getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {
-        return from(this.getPestDescription())
+        const layer:PestMapLayer = this.getLayer() as PestMapLayer;
+        return from(layer.getPestDescription())
             .pipe(
                 switchMap(pest => {
                     if(pest && pest.lowerThreshold && pest.startMonthDay && pest.agddMethod) {
-                        const layer = this.getLayer();
                         // special case WRT gridded data for this pest.
                         const params:any = {
                             climateProvider: 'NCEP',
@@ -68,7 +53,6 @@ export class PestMapLayerLegend extends MapLayerLegend {
                 })
             )
     }
-
 
     redraw(svg: Selection<any, any, any, any>, legendTitle: string): void {
         const legend = this;

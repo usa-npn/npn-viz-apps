@@ -165,31 +165,56 @@ export const MAP_LAYERS:MapLayerDefs = {
         "layers": [{
             name: 'apple_maggot',
             title: 'Apple Maggot',
-            abstract: 'Apple maggot larvae cause damage to ripening fruit. If left untreated, these pest insects can spread across the entire tree. These insects primarily affect apple trees, but can also impact plum, apricot, pear, cherry and hawthorn trees. <a href="https://www.usanpn.org/data/forecasts/Apple_maggot" target="_blank">Learn more</a>'
+            abstract: 'Apple maggot larvae cause damage to ripening fruit. If left untreated, these pest insects can spread across the entire tree. These insects primarily affect apple trees, but can also impact plum, apricot, pear, cherry and hawthorn trees. <a href="https://www.usanpn.org/data/forecasts/Apple_maggot" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 900
+            }
         },{
             name: 'asian_longhorned_beetle',
             title: 'Asian Longhorned Beetle',
-            abstract: 'As a generalist pest, Asian longhorned beetle poses a great potential threat to eastern forests. It is currently contained in three small quarantined areas (a fourth was recently eradicated). Burning firewood where you buy it is critical to stopping the spread of this pest. <a href="https://www.usanpn.org/data/forecasts/Asian_Longhorned_beetle" target="_blank">Learn more</a>'
+            abstract: 'As a generalist pest, Asian longhorned beetle poses a great potential threat to eastern forests. It is currently contained in three small quarantined areas (a fourth was recently eradicated). Burning firewood where you buy it is critical to stopping the spread of this pest. <a href="https://www.usanpn.org/data/forecasts/Asian_Longhorned_beetle" target="_blank">Learn more</a>',
+            meta: {
+                agddSupports30YearAvg: false,
+                agddDefaultThreshold: 690
+            }
         },{
             name: 'bagworm',
             title: 'Bagworm',
-            abstract: 'Bagworm caterpillars defoliate over 50 families of evergreen and deciduous trees and shrubs, primarily arborvitae, juniper, pine, and spruce. Stripping of leaves and needles is most noticeable in uppermost parts of plants. If left untreated, these pests are capable of extensive defoliation which can cause branch dieback or death. <a href="https://www.usanpn.org/data/forecasts/Bagworm" target="_blank">Learn more</a>'
+            abstract: 'Bagworm caterpillars defoliate over 50 families of evergreen and deciduous trees and shrubs, primarily arborvitae, juniper, pine, and spruce. Stripping of leaves and needles is most noticeable in uppermost parts of plants. If left untreated, these pests are capable of extensive defoliation which can cause branch dieback or death. <a href="https://www.usanpn.org/data/forecasts/Bagworm" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 600
+            }
         },{
             name: 'bronze_birch_borer',
             title: 'Bronze Birch Borer',
-            abstract: 'Bronze birch borer frequently kills birch trees by boring into the wood. <a href="https://www.usanpn.org/data/forecasts/Bronze_birch_borer" target="_blank">Learn more</a>'
+            abstract: 'Bronze birch borer frequently kills birch trees by boring into the wood. <a href="https://www.usanpn.org/data/forecasts/Bronze_birch_borer" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 450
+            }
         },{
             name: 'eastern_tent_caterpillar',
             title: 'Eastern Tent Caterpillar',
-            abstract: 'Eastern Tent Caterpillars are a native moth and while they can defoliate trees, the trees rarely die as a consequence. <a href="https://www.usanpn.org/data/forecasts/Eastern_tent_caterpillar" target="_blank">Learn more</a>'
+            abstract: 'Eastern Tent Caterpillars are a native moth and while they can defoliate trees, the trees rarely die as a consequence. <a href="https://www.usanpn.org/data/forecasts/Eastern_tent_caterpillar" target="_blank">Learn more</a>',
+            meta: {
+                agddSupports30YearAvg: false,
+                agddDefaultThreshold: 90
+            }
         },{
             name: 'emerald_ash_borer',
             title: 'Emerald Ash Borer',
-            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
+            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 450
+            }
         },{
             name: 'gypsy_moth',
             title: 'Gypsy Moth',
-            abstract: 'European gypsy moth caterpillars feed on deciduous trees, causing major defoliation and tree mortality. They are considered one of the worst forest pests in the United States. <a href="https://www.usanpn.org/data/forecasts/Gypsy_moth" target="_blank">Learn more</a>'
+            abstract: 'European gypsy moth caterpillars feed on deciduous trees, causing major defoliation and tree mortality. They are considered one of the worst forest pests in the United States. <a href="https://www.usanpn.org/data/forecasts/Gypsy_moth" target="_blank">Learn more</a>',
+            meta: {
+                agddSupports30YearAvg: false,
+                agddBaseTemp: 37.4,
+                agddDefaultThreshold: 571
+            }
         },{
             name: 'hemlock_woolly_adelgid',
             layerBasis: 'gdd:agdd', // based on a different map than the others.
@@ -198,19 +223,32 @@ export const MAP_LAYERS:MapLayerDefs = {
         },{
             name: 'magnolia_scale',
             title: 'Magnolia Scale',
-            abstract: 'Magnolia scale is a pest native to the Eastern United States that affects magnolia trees and tulip trees. They cause stress to their host trees by removing sap which can lead to yellowing leaves, twig dieback, and even death. <a href="https://www.usanpn.org/data/forecasts/Magnolia_scale" target="_blank">Learn more</a>'
+            abstract: 'Magnolia scale is a pest native to the Eastern United States that affects magnolia trees and tulip trees. They cause stress to their host trees by removing sap which can lead to yellowing leaves, twig dieback, and even death. <a href="https://www.usanpn.org/data/forecasts/Magnolia_scale" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 1938
+            }
         },{
             name: 'lilac_borer',
             title: 'Lilac Borer',
-            abstract: 'Lilac borer is a clear-wing moth that can damage lilac, ash, and privet trees and shrubs by burrowing into the heartwood. <a href="https://www.usanpn.org/data/forecasts/Lilac_borer" target="_blank">Learn more</a>'
+            abstract: 'Lilac borer is a clear-wing moth that can damage lilac, ash, and privet trees and shrubs by burrowing into the heartwood. <a href="https://www.usanpn.org/data/forecasts/Lilac_borer" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 500
+            }
         },{
             name: 'pine_needle_scale',
             title: 'Pine Needle Scale',
-            abstract: 'Pine needle scale is a native pest that affects ornamental pines and Christmas tree plantations. <a href="https://www.usanpn.org/data/forecasts/Pine_needle_scale" target="_blank">Learn more</a>'
+            abstract: 'Pine needle scale is a native pest that affects ornamental pines and Christmas tree plantations. <a href="https://www.usanpn.org/data/forecasts/Pine_needle_scale" target="_blank">Learn more</a>',
+            meta: {
+                agddSupports30YearAvg: false,
+                agddDefaultThreshold: 298
+            }
         },{
             name: 'winter_moth',
             title: 'Winter Moth',
-            abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>'
+            abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 20
+            }
         }]
     },{
         "name": CATEGORY_TEMP_ACCUM_30_YR_AVG,

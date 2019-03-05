@@ -3,6 +3,14 @@ import { NpnMapLayerService } from './npn-map-layer.service';
 import { MapLayer } from './map-layer';
 import { ONE_DAY_MILLIS } from '../visualizations/vis-selection';
 
+export interface PestDescription {
+    species: string;
+    lowerThreshold?: number;
+    upperThreshold?: number;
+    startMonthDay?: string;
+    agddMethod?: string;
+}
+
 export class PestMapLayer extends MapLayer {
     private overlay: google.maps.GroundOverlay;
     constructor(protected map: google.maps.Map, protected layer_def: MapLayerDefinition, protected layerService: NpnMapLayerService) {
@@ -83,5 +91,20 @@ export class PestMapLayer extends MapLayer {
     }
     bounce(): PestMapLayer {
         return this._off()._on();
+    }
+
+    getPestDescription():Promise<PestDescription> {
+        const species = this.title;
+        return this.layerService.serviceUtils.cachedGet(
+            this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestDescriptions')
+        ).then((descriptions:PestDescription[]) => descriptions.find(d => d.species === species));
+    }
+
+    getTimeSeriesUrl():Promise<string> {
+        return this.getPestDescription()
+            .then(pest => pest.agddMethod
+                    ? this.layerService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod}/pointTimeSeries`)
+                    : this.layerService.serviceUtils.apiUrl('/npn_portal/stations/getTimeSeries.json')
+                );
     }
 }

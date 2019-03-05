@@ -274,7 +274,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
                 xCoord = coords[0],
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
-                lineKeys = Object.keys(data),
+                lineKeys = Object.keys(data).filter(k => !!data[k]),
                 temps;
             hoverLine.attr('transform','translate('+xCoord+')');
             temps = lineKeys.reduce(function(map,key) {
@@ -366,6 +366,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
         Object.keys(this.data)
             .filter(key => !!this.data[key])
             .forEach(key => this.addLine(key));
+        this.updateTitle();
     }
 
     private _reset:boolean = false;

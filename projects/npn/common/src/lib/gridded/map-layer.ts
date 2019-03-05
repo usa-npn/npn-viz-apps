@@ -18,6 +18,16 @@ export abstract class MapLayer implements SupportsOpacity {
         this.griddedUrls = layerService.griddedUrls;
     }
 
+    /**
+     * Callers are responsible for turning a layer off
+     * before switching the underlying map and turning it back on.
+     * 
+     * @param map The new map.
+     */
+    setMap(map:google.maps.Map) {
+        this.map = map;
+    }
+
     get layerDefinition():MapLayerDefinition { return this.layer_def; }
 
     get layerBasis():string {

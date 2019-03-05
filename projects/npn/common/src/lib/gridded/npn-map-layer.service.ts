@@ -31,6 +31,7 @@ import { PestMapLayerLegend } from "./pest-map-layer-legend";
 import { WmsMapLayerLegend } from "./wms-map-layer-legend";
 import { WcsDataService } from './wcs-data.service';
 import { DefaultMapLayerLegend } from './default-map-layer-legend';
+import { MapsAPILoader } from '@agm/core';
 
 const DEEP_COPY = (o) => JSON.parse(JSON.stringify(o));
 
@@ -43,11 +44,13 @@ export class NpnMapLayerService {
         public serviceUtils:NpnServiceUtils,
         public wcsDataService:WcsDataService,
         public griddedPipes:GriddedPipeProvider,
-        public griddedUrls:GriddedUrls
+        public griddedUrls:GriddedUrls,
+        private mapsApiLoader: MapsAPILoader
     ) {}
 
     newLayer(map:google.maps.Map,layerName:string):Promise<MapLayer> {
-        return this.getLayerDefinition(layerName)
+        return this.mapsApiLoader.load()
+            .then(() => this.getLayerDefinition(layerName)
             .then(layerDef => {
                 if(layerDef) {
                     switch(layerDef.type||MapLayerType.STANDARD) {
@@ -57,7 +60,7 @@ export class NpnMapLayerService {
                             return new PestMapLayer(map,layerDef,this);
                     }
                 }
-            });
+            }));
     }
 
     getDefaultLegend():MapLayerLegend {

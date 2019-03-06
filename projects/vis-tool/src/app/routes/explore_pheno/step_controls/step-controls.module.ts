@@ -27,6 +27,7 @@ import { StartEndLegacySpeciesPhenoColorStepComponent, YearsLegacySpeciesPhenoCo
 
 import { ActivityCurvesStepComponent, ActivityCurvesControlComponent } from './activity-curves';
 import { ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent } from './activity-curves-misc';
+import { AgddTsMiscStepComponent, AgddTsMiscControlComponent } from './agdd-ts-misc';
 
 // all of the components of this module have to be entryComponents
 // since they are all dynamically inserted into the application.
@@ -46,6 +47,8 @@ const COMPONENTS:any[] = [
     CalendarMiscStepComponent, CalendarMiscControlComponent,
     ActivityCurvesStepComponent, ActivityCurvesControlComponent,
     ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent,
+
+    AgddTsMiscStepComponent, AgddTsMiscControlComponent,
 
     StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
 ];

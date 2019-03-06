@@ -365,7 +365,10 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
         this.chart.selectAll('path.gdd').remove();
         Object.keys(this.data)
             .filter(key => !!this.data[key])
-            .forEach(key => this.addLine(key));
+            .forEach(key => {
+                this.removeLine(key);
+                this.addLine(key)
+            });
         this.updateTitle();
     }
 

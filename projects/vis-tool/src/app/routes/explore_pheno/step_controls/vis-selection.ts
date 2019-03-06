@@ -28,6 +28,7 @@ import { ActivityCurvesStep } from './activity-curves';
 import { ActivityCurvesMiscStep } from './activity-curves-misc';
 import { MapYearStep } from './map-year';
 import { MapSpeciesPhenoStep } from './map-species-phenophase';
+import { AgddTsMiscStep } from './agdd-ts-misc';
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -179,6 +180,8 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         icon: faClock,
         selection: 'AgddTimeSeriesSelection',
         component: AgddTimeSeriesComponent,
-        steps: []
+        steps: [
+            AgddTsMiscStep
+        ]
     }
 ];

@@ -61,7 +61,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
     private _showLastYear:boolean = false;
     @selectionProperty()
     private _threshold:number = 1000; // TODO if layer gets involved this "default" will be based on the layer
-    thresholdCeiling:number = 1000;
+    thresholdCeiling:number = 20000;
     @selectionProperty()
     private _doy:number;
 
@@ -137,8 +137,10 @@ export class AgddTimeSeriesSelection extends VisSelection {
      */
     private get end():Date {
         if(!this._end) {
-            // if the 
             const {layer} = this;
+            if(!layer) {
+                return new Date((new Date).getFullYear(),11,31);
+            }
             const current = layer.extent.current.date;
             const extentYear = current.getFullYear();
             if(extentYear === (new Date()).getFullYear()) {
@@ -153,6 +155,11 @@ export class AgddTimeSeriesSelection extends VisSelection {
     }
     private _start:Date;
     private get start():Date {
+        const {layer} = this;
+        if(!layer) {
+            // don't cache
+            return new Date(this.end.getFullYear(),0,1);
+        }
         return this._start||(this._start = new Date(this.end.getFullYear(),0,1));
     }
 
@@ -200,11 +207,16 @@ export class AgddTimeSeriesSelection extends VisSelection {
     }
 
     /** Whether or not the range of the time series can support previous data. */
-    private get lastYearValid():boolean {
+    get lastYearValid():boolean {
         return (this.start.getFullYear()-1) >= 2016; // time series data starts in 2016
     }
 
-    get showLastYear():boolean { return this._showLastYear; }
+    get showLastYear():boolean {
+        if(this.layer) {
+            return this.lastYearValid ? this._showLastYear : false;
+        }
+        return this._showLastYear;
+    }
     set showLastYear(b:boolean) {
         this._showLastYear = b;
         this.update();

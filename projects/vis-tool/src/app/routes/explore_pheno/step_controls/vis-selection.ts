@@ -28,6 +28,7 @@ import { ActivityCurvesStep } from './activity-curves';
 import { ActivityCurvesMiscStep } from './activity-curves-misc';
 import { MapYearStep } from './map-year';
 import { MapSpeciesPhenoStep } from './map-species-phenophase';
+import { AgddTsLayerPointStep } from './agdd-ts-layer-point';
 import { AgddTsMiscStep } from './agdd-ts-misc';
 
 export class VisSelectionSelection {
@@ -181,6 +182,7 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'AgddTimeSeriesSelection',
         component: AgddTimeSeriesComponent,
         steps: [
+            AgddTsLayerPointStep,
             AgddTsMiscStep
         ]
     }

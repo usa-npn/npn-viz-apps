@@ -28,6 +28,10 @@ export abstract class MapLayer implements SupportsOpacity {
         this.map = map;
     }
 
+    getMap():google.maps.Map {
+        return this.map;
+    }
+
     get layerDefinition():MapLayerDefinition { return this.layer_def; }
 
     get layerBasis():string {

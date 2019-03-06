@@ -28,4 +28,21 @@
         }
     }
 
+    #explorePhenoSubControls.full-screen {
+        width: 100%;
+        .drawer-contents {
+            padding: 0px;
+        }
+        .control-host.full-screen {
+            width: 100%;
+            height: 100%;
+            ng-component,
+            .agm-map-container-inner {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+
 }

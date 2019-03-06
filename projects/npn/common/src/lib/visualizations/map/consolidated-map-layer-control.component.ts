@@ -61,12 +61,6 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     .layer-controls >p {
         margin: 12px 0px 0px 0px;
     }
-    .layer-controls >supports-opacity-control .mat-slider.mat-slider-horizontal {
-        font-weight: 600;
-        display: block;
-        padding-top: 0px;
-        padding-left: 0px;
-    }
     `],
     encapsulation: ViewEncapsulation.None
 })

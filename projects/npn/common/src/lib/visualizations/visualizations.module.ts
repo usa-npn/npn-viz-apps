@@ -38,7 +38,8 @@ import {
 
 import {
   AgddTimeSeriesSelectionFactory,
-  AgddTimeSeriesComponent
+  AgddTimeSeriesComponent,
+  AgddTsMapLayerControl
 } from './agdd-time-series';
 
 import {VisualizationComponent} from './visualization.component';
@@ -93,7 +94,7 @@ import {NpnGriddedModule} from '../gridded';
       ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
       GriddedRangeSliderControl,
       ConsolidatedMapLayerControlComponent,PestMapLayerControlComponent,TempAccumMapLayerControlComponent,SpringIndexMapLayerControlComponent,MapVisualizationMarkerIw,
-      AgddTimeSeriesComponent
+      AgddTimeSeriesComponent, AgddTsMapLayerControl
   ],
   exports: [
       ScatterPlotComponent,
@@ -110,7 +111,7 @@ import {NpnGriddedModule} from '../gridded';
       ExtentControl,
       GriddedRangeSliderControl,
       ConsolidatedMapLayerControlComponent,
-      AgddTimeSeriesComponent
+      AgddTimeSeriesComponent, AgddTsMapLayerControl
   ],
   providers: [
       DatePipe,

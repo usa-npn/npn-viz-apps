@@ -11,6 +11,11 @@ import {
 import * as d3 from 'd3';
 import { MapSelection } from './map-selection';
 
+export interface HasLayerSelection {
+    layer:MapLayer;
+    extentValue:string;
+}
+
 @Component({
     selector: 'extent-control',
     template: `
@@ -22,7 +27,7 @@ import { MapSelection } from './map-selection';
     `
 })
 export class ExtentControl {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerSelection;
     date = MapLayerExtentType.DATE;
     year = MapLayerExtentType.YEAR;
     doy = MapLayerExtentType.DOY;
@@ -41,7 +46,7 @@ export class ExtentControl {
     `
 })
 export class ExtentDateControl {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerSelection;
 
     _selectedDate:Date;
     minDate:Date;
@@ -96,7 +101,7 @@ export class ExtentDateControl {
     `]
 })
 export class ExtentDoyControl {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerSelection;
 
     thirtyYearAvgDayOfYear:PipeTransform;
     baseYear:number;
@@ -158,7 +163,7 @@ export class ExtentDoyControl {
     `
 })
 export class ExtentYearControl {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerSelection;
 
     _selectedExtent:MapLayerExtentValue;
 

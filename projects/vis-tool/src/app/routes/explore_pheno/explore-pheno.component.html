@@ -45,14 +45,18 @@
                 </mat-drawer>
                 <mat-drawer-content>
                     <mat-drawer-container autosize>
-                        <mat-drawer mode="over" [opened]="subControlsOpen$ | async" (openChange)="resize()" disableClose="true" id="explorePhenoSubControls">
+                        <mat-drawer mode="over" [opened]="subControlsOpen$ | async" (openChange)="resize()" disableClose="true" id="explorePhenoSubControls" [ngClass]="{'full-screen':activeStep && activeStep.$subControlInstance && activeStep.$subControlInstance.$fullScreen}">
                             <div class="drawer-title">
                                 <div class="title-caret"></div>
                                 <div class="title-inner">{{activeStep?.$subControlInstance?.title||activeStep?.title}}</div>
                                 <div class="close-control" (click)="subControlsOpen.next(false)"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
                             </div>
                             <div class="drawer-contents">
-                                <div *ngFor="let step of steps; last as isLast, index as stepIndex" [ngClass]="{'control-host':true,'active-step':(!!step.subControlComponent && (step === activeStep))}">
+                                <div *ngFor="let step of steps; last as isLast, index as stepIndex" [ngClass]="{
+                                    'control-host':true,
+                                    'active-step':(!!step.subControlComponent && (step === activeStep)),
+                                    'full-screen':(!!step.subControlComponent && !!step.$subControlInstance && step.$subControlInstance.$fullScreen)
+                                }">
                                     <div #subControlHost class="component-anchor"  id="subctrl-{{step.$id}}"></div>
                                 </div>
                             </div>

@@ -38,7 +38,7 @@ export class WmsMapLayer extends MapLayer {
         this.wmsArgs = { ...BASE_WMS_ARGS, ...{ layers: layer_def.name } };
         this.googleLayer = new google.maps.ImageMapType({
             getTileUrl: (coord: google.maps.Point, zoom: number) => {
-                let proj = map.getProjection(), zfactor = Math.pow(2, zoom), top = proj.fromPointToLatLng(new google.maps.Point(coord.x * BOX_SIZE / zfactor, coord.y * BOX_SIZE / zfactor)), bot = proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * BOX_SIZE / zfactor, (coord.y + 1) * BOX_SIZE / zfactor)), ctop = srsConversion(top), cbot = srsConversion(bot), base = {};
+                let proj = this.map.getProjection(), zfactor = Math.pow(2, zoom), top = proj.fromPointToLatLng(new google.maps.Point(coord.x * BOX_SIZE / zfactor, coord.y * BOX_SIZE / zfactor)), bot = proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * BOX_SIZE / zfactor, (coord.y + 1) * BOX_SIZE / zfactor)), ctop = srsConversion(top), cbot = srsConversion(bot), base = {};
                 if (this.extent && this.extent.current) {
                     this.extent.current.addToParams(base, MapLayerServiceType.WMS);
                 }

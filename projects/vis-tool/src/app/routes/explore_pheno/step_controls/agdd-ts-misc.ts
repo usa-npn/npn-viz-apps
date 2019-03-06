@@ -11,7 +11,7 @@ import { takeUntil } from 'rxjs/operators';
     template: `
     <div class="misc" *ngIf="complete">
         <div><label>AGDD Threshold</label> {{selection.threshold | number:'1.0-0'}}&deg;</div>
-        <div><label>Days of year</label> Jan 1 - {{selection.doy | legendDoy}}</div>
+        <div><label>Show days of year</label> Jan 1 - {{selection.doy | legendDoy}}</div>
         <div><label>Show last year</label> {{selection.showLastYear ? 'Yes' : 'No'}}</div>
     </div>
     `,

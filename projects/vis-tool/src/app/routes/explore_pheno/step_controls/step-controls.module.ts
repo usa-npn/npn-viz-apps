@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 
 import { MaterialModule } from '../../../material';
+import { AgmCoreModule } from '@agm/core';
 import {
     VisualizationsModule,
     NpnCommonModule,
@@ -27,7 +28,10 @@ import { StartEndLegacySpeciesPhenoColorStepComponent, YearsLegacySpeciesPhenoCo
 
 import { ActivityCurvesStepComponent, ActivityCurvesControlComponent } from './activity-curves';
 import { ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent } from './activity-curves-misc';
+
+import { AgddTsLayerPointStepComponent, AgddTsLayerPointControlComponent, AgddTsLayerPointSubControlComponent } from './agdd-ts-layer-point';
 import { AgddTsMiscStepComponent, AgddTsMiscControlComponent } from './agdd-ts-misc';
+
 
 // all of the components of this module have to be entryComponents
 // since they are all dynamically inserted into the application.
@@ -48,6 +52,7 @@ const COMPONENTS:any[] = [
     ActivityCurvesStepComponent, ActivityCurvesControlComponent,
     ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent,
 
+    AgddTsLayerPointStepComponent, AgddTsLayerPointControlComponent, AgddTsLayerPointSubControlComponent,
     AgddTsMiscStepComponent, AgddTsMiscControlComponent,
 
     StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
@@ -64,6 +69,7 @@ const ENTRY_COMPONENTS:any[] = [
 @NgModule({
     imports: [
         MaterialModule,
+        AgmCoreModule,
         VisualizationsModule,
         NpnCommonModule,
         NpnGriddedModule

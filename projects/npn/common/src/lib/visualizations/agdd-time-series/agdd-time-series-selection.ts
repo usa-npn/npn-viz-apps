@@ -3,6 +3,7 @@ import { NpnServiceUtils } from '@npn/common/common';
 
 import * as d3 from 'd3';
 import { MapLayer, NpnMapLayerService, PestMapLayer } from '@npn/common/gridded';
+import { Subject } from 'rxjs';
 
 const DATE_FORMAT = d3.timeFormat('%Y-%m-%d');
 export const DATA_FUNC = (d:TimeSeriesDataPoint):number => !!d.agdd ? d.agdd : d.point_value;
@@ -44,10 +45,6 @@ export const AGDD_COLORS = {
 
 const GDD_AGDD_LAYER_NAME = 'gdd:agdd';
 
-/**
- * @todo remove used of cachedGet
- * @todo persist current extent date
- */
 export class AgddTimeSeriesSelection extends VisSelection {
     @selectionProperty()
     $class:string = 'AgddTimeSeriesSelection';
@@ -55,12 +52,14 @@ export class AgddTimeSeriesSelection extends VisSelection {
     @selectionProperty()
     private _latLng:number[];
     @selectionProperty()
-    private _layerName:string;
+    private _layerName:string = GDD_AGDD_LAYER_NAME;
+    @selectionProperty()
+    private _extentValue:string;
 
     @selectionProperty()
     private _showLastYear:boolean = false;
     @selectionProperty()
-    private _threshold:number = 1000; // TODO if layer gets involved this "default" will be based on the layer
+    private _threshold:number;
     thresholdCeiling:number = 20000;
     @selectionProperty()
     private _doy:number;
@@ -72,14 +71,30 @@ export class AgddTimeSeriesSelection extends VisSelection {
     }
 
     isValid():boolean {
-        return true; // TODO
+        return !!this._layerName && !!this.latLng && this.latLng.length === 2;
     }
 
-    get layerName():string { return this._layerName||GDD_AGDD_LAYER_NAME; }
+    private _monitorLayerChange:Subject<string>;
+    monitorLayerChange():Subject<string> {
+        if(!this._monitorLayerChange) {
+            this._monitorLayerChange = new Subject();
+        }
+        return this._monitorLayerChange;
+    }
+
+    endMonitorLayerChange():void {
+        if(this._monitorLayerChange) {
+            this._monitorLayerChange.complete();
+            this._monitorLayerChange = undefined;
+        }
+    }
+
+    get layerName():string { return this._layerName; }
     set layerName(l:string) {
         this._layerName = l;
         if(this.layer && this.layer.layerName !== l) {
             this.layer.off(); // shouldn't be necessary
+            this._getLayer = undefined;
             this.layer = undefined;
             this._start = undefined;
             this._end = undefined;
@@ -89,6 +104,34 @@ export class AgddTimeSeriesSelection extends VisSelection {
             this._timeSeriesUrl = undefined;
             this._selectedParamsBasis = undefined;
         }
+        if(this._monitorLayerChange) {
+            this._monitorLayerChange.next(this._layerName);
+        }
+        this.update();
+    }
+
+    private updateExtentValue() {
+        if(this.layer && this._extentValue) {
+            const newValue = this.layer.extent.values.reduce((found,v) => found||(v.value === this._extentValue ? v : undefined),undefined);
+            if(newValue && this.layer.extent.current !== newValue) {
+                this.layer.extent.current = newValue;
+                if(this.layer.getMap()) {
+                    this.layer.bounce();
+                }
+            }
+        }
+    }
+
+    get extentValue():string { return this._extentValue; }
+    set extentValue(v:string) {
+        this._extentValue = v;
+        this._start = undefined;
+        this._end = undefined;
+        this._selectedData = undefined;
+        this._averageData = undefined;
+        this._previousData = undefined;
+        this.updateExtentValue();
+        this.update();
     }
 
     /**
@@ -100,14 +143,20 @@ export class AgddTimeSeriesSelection extends VisSelection {
      * If the selection does not have an associated layerName the
      * resulting Promise will be rejected immediately.
      */
+    _getLayer:Promise<MapLayer>;
     getLayer():Promise<MapLayer> {
         if(!this.layerName) {
             return Promise.reject();
         }
-        return this.layer
-            ? Promise.resolve(this.layer)
-            : this.layerService.newLayer(null,this.layerName)
-                .then(layer => this.layer = layer);
+        if(!this._getLayer) {
+            this._getLayer = this.layerService.newLayer(null,this.layerName)
+                .then(layer => this.layer = layer)
+                .then(layer => {
+                    this.updateExtentValue();
+                    return layer;
+                });
+        }
+        return this._getLayer;
     }
 
     /**
@@ -203,6 +252,9 @@ export class AgddTimeSeriesSelection extends VisSelection {
     get latLng():number[] { return this._latLng; }
     set latLng(ltlng:number[]) {
         this._latLng = ltlng;
+        this._selectedData = undefined;
+        this._averageData = undefined;
+        this._previousData = undefined;
         this.update();
     }
 
@@ -236,7 +288,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             const [latitude,longitude] = this.latLng;
             // this doesn't feel quite robust enough
             const layer = this.baseTemp === 32 ? 'gdd:30yr_avg_agdd' : 'gdd:30yr_avg_agdd_50f';
-            this._averageData = this.serviceUtils.cachedGet(
+            this._averageData = this.serviceUtils.get(
                 this.serviceUtils.apiUrl('/npn_portal/stations/getTimeSeries.json'),
                 {latitude,longitude,layer})
                 .then(data => data as TimeSeriesDataPoint[])
@@ -306,7 +358,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
                 this.selectedParams
             ]).then(results => {
                 const [timeSeriesUrl,selectedParams] = results;
-                return this.serviceUtils.cachedGet(timeSeriesUrl,selectedParams)
+                return this.serviceUtils.get(timeSeriesUrl,selectedParams)
                     .then(data => data as TimeSeriesDataPoint[])
                     .then(data => ({
                         data,
@@ -335,7 +387,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             ]).then(results => {
                 const [timeSeriesUrl,selectedParams] = results;
                 const params = {...selectedParams,startDate,start_date,endDate,end_date};
-                return this.serviceUtils.cachedGet(timeSeriesUrl,params)
+                return this.serviceUtils.get(timeSeriesUrl,params)
                     .then(data => data as TimeSeriesDataPoint[])
                     .then(data => ({
                         data,
@@ -352,7 +404,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
         this.working = true;
         return this.getLayer()
             .then(layer => {
-                this._latLng = [25.240821110543152,-80.56457375588832]; // TODO remove dev values.
+                //this._latLng = [25.240821110543152,-80.56457375588832]; // TODO remove dev values.
                 //this._showLastYear = true;
                 const promises = [this.selectedData()];
                 if(this.show30YearAverage) {

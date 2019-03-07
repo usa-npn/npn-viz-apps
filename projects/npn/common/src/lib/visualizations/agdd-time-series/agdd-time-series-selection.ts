@@ -124,6 +124,8 @@ export class AgddTimeSeriesSelection extends VisSelection {
             this._previousData = undefined;
             this._timeSeriesUrl = undefined;
             this._selectedParamsBasis = undefined;
+            // let the layer initially dictate threshold
+            delete this._threshold;
         }
         if(this._monitorLayerChange) {
             this._monitorLayerChange.next(this._layerName);
@@ -290,7 +292,6 @@ export class AgddTimeSeriesSelection extends VisSelection {
         this._selectedData = undefined;
         this._averageData = undefined;
         this._previousData = undefined;
-console.warn(`latLng.update valid=${this.isValid()}`);
         this.update();
     }
 
@@ -307,7 +308,6 @@ console.warn(`latLng.update valid=${this.isValid()}`);
     }
     set showLastYear(b:boolean) {
         this._showLastYear = b;
-console.warn(`showLastYear.update valid=${this.isValid()}`);
         this.update();
     }
 
@@ -316,7 +316,13 @@ console.warn(`showLastYear.update valid=${this.isValid()}`);
     get doy():number { return this._doy||365; }
     set doy(d:number) {
         this._doy = d;
-        this.redraw();
+        // this is kind of a workaround but redraws update
+        // the bounds of the axes and for some reason inconsistently
+        // lines go wonky, resize re-writes the entire visualization
+        // and the problem does not occur then
+        // doing this since not sufficient time to better understand.
+        //this.redraw();
+        this.resize();
     }
 
     private _averageData:Promise<AgddTimeSeriesDataHolder>;

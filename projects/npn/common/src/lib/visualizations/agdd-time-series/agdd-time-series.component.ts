@@ -49,33 +49,35 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
         super(rootElement,media);
     }
 
-    private addLine(key:string) {
-        const {data,chart,line} = this;
-        if(data[key] && data[key].data) {
-            chart.append('path')
-                .attr('class','gdd '+key)
-                .attr('fill','none')
-                .attr('stroke',data[key].color)
-                .attr('stroke-linejoin','round')
-                .attr('stroke-linecap','round')
-                .attr('stroke-width',1.5)
-                .attr('d',line(data[key].filtered||data[key].data));
-            data[key].plotted = true;
-            this.updateLegend();
-        }
+    private removeLines() {
+        const {data,chart} = this;
+        chart.selectAll('path.gdd').remove();
+        Object.keys(data)
+            .filter(key => !!data[key])
+            .forEach(key => delete data[key].plotted);
+        this.updateLegend();
     }
 
-    private removeLine(key:string) {
-        const {data,chart} = this;
-        if(data[key]) {
-            chart.selectAll('path.gdd.'+key).remove();
-            delete data[key].plotted;
-            this.updateLegend();
-        }
+    private addLines() {
+        const {data,chart,line} = this;
+        Object.keys(data)
+            .filter(key => !!data[key])
+            .forEach(key => {
+                chart.append('path')
+                    .attr('class','gdd '+key)
+                    .attr('fill','none')
+                    .attr('stroke',data[key].color)
+                    .attr('stroke-linejoin','round')
+                    .attr('stroke-linecap','round')
+                    .attr('stroke-width',1.5)
+                    .attr('d',line(data[key].filtered||data[key].data));
+                data[key].plotted = true;
+            });
+        this.updateLegend();
     }
 
     private updateTitle() {
-        console.log('AGDD: updateTitle');
+        //console.log('AGDD: updateTitle');
         const {chart,sizing,selection} = this;
         const title = chart.select('.chart-title');
         title.selectAll('*').remove();
@@ -97,7 +99,8 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
     }
 
     private updateAxes() {
-        console.log('AGDD: updateAxes');
+        //console.log('AGDD: updateAxes');
+        this.removeLines();
         const {data,chart,sizing,y,yAxis,x,xAxis,selection} = this;
         let {yMax} = this;
         const lineKeys = Object.keys(data).filter(key => !!data[key]);
@@ -109,43 +112,27 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
                 },[]);
             selection.thresholdCeiling = Math.round(yMax = d3.max(maxes));
             yMax = yMax*1.05;
-            yAxis.scale(y.domain([0,yMax]));
-            
-            // updathe x-axis as necessary
             const doy = selection.doy;
-            const oldDomain = x.domain();
-            const newDomain = [1,doy];
-            xAxis.scale(x.domain(newDomain));
+
+            // update x/y axis
+            yAxis.scale(y.domain([0,yMax]));
+            xAxis.scale(x.domain([1,doy]));
+
             // filter or unfilter the data depending on doy
             Object.keys(data)
                 .filter(key => !!data[key])
-                .forEach(key => {
-                    if(doy === 365) {
-                        delete data[key].filtered;
-                    } else {
-                        data[key].filtered = data[key].data.filter(d => d.doy <= doy)
-                    }
-                });
+                .forEach(key => data[key].filtered = doy < 365
+                        ? data[key].filtered = data[key].data.filter(d => d.doy <= doy)
+                        : undefined);
 
-            // if this happens we need to re-draw all lines that have been plotted
-            // because the domain of our axis just changed
-            if(!oldDomain || oldDomain[1] !== newDomain[1]) {
-                lineKeys.forEach(key => {
-                    if(data[key].plotted) {
-                        this.removeLine(key);
-                        this.addLine(key);
-                    }
-                });
-            }
-
+            this.addLines();
             // update the position of the threshold line
-            // TODO if the visualization is reduced to a limited
-            // part of the year the threshold may be off the visualization
-            // need to check on this.
-            const yCoord = this.y(this.selection.threshold);
-            this.thresholdLine.attr('y1',yCoord).attr('y2',yCoord);
+            const yCoord = this.y(selection.threshold);
+            this.thresholdLine
+                .attr('y1',yCoord).attr('y2',yCoord)
+                // hide the threshold line if it's off the axis
+                .style('display',selection.threshold > selection.thresholdCeiling ? 'none' : null);
         }
-
         chart.selectAll('g .axis').remove();
         chart.append('g')
             .attr('class', 'y axis')
@@ -172,7 +159,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
     }
 
     private updateLegend(): void {
-        console.log('AGDD: updateLegend');
+        //console.log('AGDD: updateLegend');
         const chart = this.chart;
         chart.selectAll('g.legend').remove();
         const legend = chart.append('g')
@@ -206,6 +193,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
                 }
                 return cnt;
             }, 0);
+        rect.style('display',plotCnt === 0 ? 'none' : null);
         if (plotCnt < 3) {
             rect.attr('height', 45);
         } else if (plotCnt > 3) {
@@ -272,7 +260,6 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
             let coords = d3.mouse(this),
                 data = self.data,
                 xCoord = coords[0],
-                yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
                 lineKeys = Object.keys(data).filter(k => !!data[k]),
                 temps;
@@ -306,7 +293,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
             },{});
             const idFunc = d => d.doy;
             
-            console.debug('temps for doy '+doy,temps);
+            //console.debug('temps for doy '+doy,temps);
             doyValue.text(`${doy} (${DATE_FMT(doy)})`);
             Object.keys(infos).forEach(function(key) {
                 var temp,diff,avgDoy,diffDoy,text,i;
@@ -360,21 +347,13 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
     }
 
     protected redrawSvg(): void {
-        console.log('AGDD: redrawSvg');
+        //console.log('AGDD: redrawSvg');
         this.updateAxes();
-        this.chart.selectAll('path.gdd').remove();
-        Object.keys(this.data)
-            .filter(key => !!this.data[key])
-            .forEach(key => {
-                this.removeLine(key);
-                this.addLine(key)
-            });
         this.updateTitle();
     }
 
-    private _reset:boolean = false;
     public reset():void {
-        console.log('AGDD: reset');
+        //console.log('AGDD: reset');
         super.reset();
         const {chart,sizing,yMax} = this;
         chart.append('g').attr('class','chart-title');
@@ -400,22 +379,23 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
             .attr('x1',this.x(1))
             .attr('y1',this.y(this.yMax))
             .attr('x2',this.x(365))
-            .attr('y2',this.y(yMax));
+            .attr('y2',this.y(yMax))
+            .style('display','none');
         
         this.hover();
         this.updateAxes();
         this.commonUpdates();
-        this._reset = true;
     }
 
     protected update():void {
-        console.log('AGDD: update');
-        if(!this._reset) { // update before init
-            this.reset(); // would like to be able to avoid but
-        }
+        //console.log('AGDD: update');
+        this._data = undefined;
+        this.reset(); // would like to be able to avoid but
         this.selection.data()
             .then(d => this._data = d)
-            .then(d => console.log('AGDD data',d))
-            .then(() => this.redraw());
+            .then(() => {
+                this.reset();
+                this.redraw();
+            });
     }
 }

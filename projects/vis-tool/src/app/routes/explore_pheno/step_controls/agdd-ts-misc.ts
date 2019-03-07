@@ -60,7 +60,6 @@ export class AgddTsMiscControlComponent extends BaseControlComponent {
     stepVisit():void {
         super.stepVisit();
         this.selection.resume();
-        this.selection.reset();
         this.selection.update();
     }
 }

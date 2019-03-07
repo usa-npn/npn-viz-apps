@@ -23,6 +23,7 @@ import { faMapMarkerAlt } from '@fortawesome/pro-light-svg-icons';
     }
     label {
         font-weight: 600;
+        margin-right: 5px;
     }
     label:after {
         content: ':';
@@ -48,7 +49,17 @@ export class AgddTsLayerPointStepComponent extends BaseStepComponent {
 }
 
 @Component({
-    template: `<agdd-ts-map-layer-control [selection]="selection" [map]="map"></agdd-ts-map-layer-control>`
+    template: `
+    <agdd-ts-map-layer-control [selection]="selection" [map]="map"></agdd-ts-map-layer-control>
+    <p class="point-instructions" *ngIf="selection.latLng?.length !== 2">Drop a point on the map to visualize AGDD Time Series data at a given location.</p>
+    `,
+    styles:[`
+    .point-instructions {
+        max-width: 400px;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    `]
 })
 export class AgddTsLayerPointControlComponent extends BaseControlComponent {
     title:string = 'Select layer/point';
@@ -58,7 +69,6 @@ export class AgddTsLayerPointControlComponent extends BaseControlComponent {
 
     stepVisit():void {
         super.stepVisit();
-        console.log(`AgddTsLayerPointControlComponent.stepVisit`);
         this.selection.pause();
         // not sure why the delay is necessary
         setTimeout(() => this.subControlComponent.show(),500);

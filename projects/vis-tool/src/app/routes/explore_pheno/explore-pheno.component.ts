@@ -184,7 +184,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
             const visComponent = (<any>visRef.instance);
             visComponent.selection = this.activeVis.selection;
             this.activeVisComponent = visComponent;
-            setTimeout(() => this.activeVis.selection.update());
+            setTimeout(() => this.activeVis.selection.update(),750);
         }
     }
 }

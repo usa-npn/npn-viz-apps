@@ -2,8 +2,11 @@ import { VisSelection, selectionProperty } from '../vis-selection';
 import { NpnServiceUtils } from '@npn/common/common';
 
 import * as d3 from 'd3';
-import { MapLayer, NpnMapLayerService, PestMapLayer } from '@npn/common/gridded';
+import { MapLayer, NpnMapLayerService, PestMapLayer, CATEGORY_PEST } from '@npn/common/gridded';
 import { Subject } from 'rxjs';
+
+export const CATEGORY_PESTS = CATEGORY_PEST;
+export const CATEGORY_TEMP_ACCUMULATIONS = 'Daily Temperature Accumulations';
 
 const DATE_FORMAT = d3.timeFormat('%Y-%m-%d');
 export const DATA_FUNC = (d:TimeSeriesDataPoint):number => !!d.agdd ? d.agdd : d.point_value;
@@ -14,9 +17,21 @@ const DOY_MAP = (data:TimeSeriesDataPoint[]) => data.reduce((map,d) => {
 
 export interface TimeSeriesDataPoint {
     agdd?: number;
+    gdd?: number;
     point_value: number;
     doy: number;
     date?: string;
+}
+
+const COERCE_TIME_SERIES_RESPONSE = (data):TimeSeriesDataPoint[] => {
+    if(data && Array.isArray(data.timeSeries)) { // pointTimeSeries response
+        return data.timeSeries as TimeSeriesDataPoint[];
+    }
+    if(data && !Array.isArray(data)) {
+        console.warn('HANDLE_TIME_SERIES_RESPONSE data not array')
+        return [];
+    }
+    return data as TimeSeriesDataPoint[];
 }
 
 export interface AgddTimeSeriesDataHolder {
@@ -51,6 +66,8 @@ export class AgddTimeSeriesSelection extends VisSelection {
 
     @selectionProperty()
     private _latLng:number[];
+    @selectionProperty()
+    _layerCategory:string = CATEGORY_TEMP_ACCUMULATIONS;
     @selectionProperty()
     private _layerName:string = GDD_AGDD_LAYER_NAME;
     @selectionProperty()
@@ -107,8 +124,15 @@ export class AgddTimeSeriesSelection extends VisSelection {
         if(this._monitorLayerChange) {
             this._monitorLayerChange.next(this._layerName);
         }
+console.warn(`layerName.update valid=${this.isValid()}`);
         this.update();
     }
+
+    set layerCategory(s:string) {
+        this._layerCategory = s;
+        //this.layerName = null;
+    }
+    get layerCategory():string { return this._layerCategory; }
 
     private updateExtentValue() {
         if(this.layer && this._extentValue) {
@@ -124,14 +148,19 @@ export class AgddTimeSeriesSelection extends VisSelection {
 
     get extentValue():string { return this._extentValue; }
     set extentValue(v:string) {
-        this._extentValue = v;
-        this._start = undefined;
-        this._end = undefined;
-        this._selectedData = undefined;
-        this._averageData = undefined;
-        this._previousData = undefined;
-        this.updateExtentValue();
-        this.update();
+        // TODO extent changes only require an update if the
+        // "end" date changed as a result.
+        if(v !== this._extentValue) {
+            this._extentValue = v;
+            this._start = undefined;
+            this._end = undefined;
+            this._selectedData = undefined;
+            this._averageData = undefined;
+            this._previousData = undefined;
+            this.updateExtentValue();
+console.warn(`extentValue.update valid=${this.isValid()}`);
+            this.update();
+        }
     }
 
     /**
@@ -255,6 +284,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
         this._selectedData = undefined;
         this._averageData = undefined;
         this._previousData = undefined;
+console.warn(`latLng.update valid=${this.isValid()}`);
         this.update();
     }
 
@@ -271,6 +301,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
     }
     set showLastYear(b:boolean) {
         this._showLastYear = b;
+console.warn(`showLastYear.update valid=${this.isValid()}`);
         this.update();
     }
 
@@ -291,7 +322,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             this._averageData = this.serviceUtils.get(
                 this.serviceUtils.apiUrl('/npn_portal/stations/getTimeSeries.json'),
                 {latitude,longitude,layer})
-                .then(data => data as TimeSeriesDataPoint[])
+                .then(COERCE_TIME_SERIES_RESPONSE)
                 .then(data => ({
                     data,
                     doyMap: DOY_MAP(data),
@@ -359,7 +390,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             ]).then(results => {
                 const [timeSeriesUrl,selectedParams] = results;
                 return this.serviceUtils.get(timeSeriesUrl,selectedParams)
-                    .then(data => data as TimeSeriesDataPoint[])
+                    .then(COERCE_TIME_SERIES_RESPONSE)
                     .then(data => ({
                         data,
                         doyMap: DOY_MAP(data),
@@ -388,7 +419,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
                 const [timeSeriesUrl,selectedParams] = results;
                 const params = {...selectedParams,startDate,start_date,endDate,end_date};
                 return this.serviceUtils.get(timeSeriesUrl,params)
-                    .then(data => data as TimeSeriesDataPoint[])
+                    .then(COERCE_TIME_SERIES_RESPONSE)
                     .then(data => ({
                         data,
                         doyMap: DOY_MAP(data),

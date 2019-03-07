@@ -52,7 +52,7 @@ export class AgddTsLayerPointStepComponent extends BaseStepComponent {
 })
 export class AgddTsLayerPointControlComponent extends BaseControlComponent {
     title:string = 'Select layer/point';
-    defaultPropertyKeys:string[] = ['layerName'];
+    defaultPropertyKeys:string[] = ['layerCategory','layerName'];
     subControlComponent:AgddTsLayerPointSubControlComponent;
     map;
 

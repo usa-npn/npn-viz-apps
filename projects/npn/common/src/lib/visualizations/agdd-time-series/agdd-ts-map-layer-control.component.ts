@@ -1,12 +1,27 @@
 import { Component, Input, SimpleChanges, NgZone } from '@angular/core';
-import { AgddTimeSeriesSelection } from './agdd-time-series-selection';
+import {
+    AgddTimeSeriesSelection,
+    CATEGORY_PESTS,
+    CATEGORY_TEMP_ACCUMULATIONS
+} from './agdd-time-series-selection';
 import { MonitorsDestroy } from '@npn/common/common';
 import { takeUntil, startWith } from 'rxjs/operators';
-import { MapLayer } from '@npn/common/gridded';
+import { MapLayer, NpnMapLayerService, MapLayerDefinition, MapLayerDefs } from '@npn/common/gridded';
 
 @Component({
     selector: 'agdd-ts-map-layer-control',
     template: `
+    <mat-form-field class="layer-category">
+        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="categoryChange()">
+            <mat-option [value]="null"></mat-option>
+            <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
+            <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div [ngSwitch]="selection.layerCategory" *ngIf="selection.layerCategory && layerDefinitions">
+        <pest-map-layer-control *ngSwitchCase="CATEGORY_PESTS" [selection]="selection" [layerDefinitions]="layerDefinitions"></pest-map-layer-control>
+        <temp-accum-map-layer-control *ngSwitchCase="CATEGORY_TEMP_ACCUMULATIONS" [selection]="selection" [layerDefinitions]="layerDefinitions" agddTimeSeries="true"></temp-accum-map-layer-control>
+    </div>
     <div *ngIf="selection.layer" class="layer-controls">
         <extent-control [selection]="selection"></extent-control>
         <supports-opacity-control [supportsOpacity]="selection.layer"></supports-opacity-control>
@@ -32,17 +47,21 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
     @Input() selection: AgddTimeSeriesSelection;
     @Input() map;/*:google.maps.Map;*/
 
+    layerDefinitions:MapLayerDefs;
+
+    CATEGORY_PESTS = CATEGORY_PESTS;
+    CATEGORY_TEMP_ACCUMULATIONS = CATEGORY_TEMP_ACCUMULATIONS;
     marker;
     layer:MapLayer;
-    
     private mapResolver;
     private getMap = new Promise<google.maps.Map>(resolve => this.mapResolver = resolve);
 
-    constructor(private zone:NgZone){
+    constructor(private layerService:NpnMapLayerService,private zone:NgZone){
         super();
     }
 
     ngOnInit() {
+        this.layerService.getLayerDefinitions().then((defs:MapLayerDefs) => this.layerDefinitions = defs);
         const {selection,componentDestroyed} = this;
         // would be nice to just watch the selection but updates only come through if a selection is valid
         componentDestroyed.subscribe(() => selection.endMonitorLayerChange());
@@ -105,5 +124,9 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
         if(changes && changes.map && changes.map.currentValue) {
             this.mapResolver(changes.map.currentValue);
         }
+    }
+
+    categoryChange() {
+
     }
 }

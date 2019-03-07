@@ -79,8 +79,9 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     }
 
     set layerCategory(s:string) {
-        // TODO if the category changes, layername, etc. may need clearing.
         this._layerCategory = s;
+        this.layerName = null;
+        this.redraw();
     }
     get layerCategory():string { return this._layerCategory; }
 

@@ -21,6 +21,17 @@ import { startWith, takeUntil } from 'rxjs/operators';
 import { MonitorsDestroy } from '@npn/common/common';
 import { GriddedRangeSliderControl } from './gridded-range-slider-control.component';
 
+// these components were written for the map visualization
+// but they overlap in functionality with the AGDD Time Series
+// requirements so as opposed to using MapSelection|AgddTimeSeriesSelection
+// for the shared controls using a separate interface
+// just so that it's clear (not using Agdd here to avoid circular dependencies).
+interface HasLayerVisSelection {
+    layerName:string;
+    redraw: () => void;
+    center?: number[];
+}
+
 const CATEGORY_PESTS = CATEGORY_PEST;
 const CATEGORY_TEMP_ACCUMULATIONS = 'Daily Temperature Accumulations';
 const CATEGORY_SPRING_INDICES = 'Spring Indices';
@@ -29,7 +40,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     selector: 'consolidated-map-layer-control',
     template: `
     <mat-form-field class="layer-category">
-        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="categoryChange()">
+        <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory">
             <mat-option [value]="null"></mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
             <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>
@@ -80,11 +91,6 @@ export class ConsolidatedMapLayerControlComponent {
     ngOnInit() {
         this.layerService.getLayerDefinitions().then((defs:MapLayerDefs) => this.layerDefinitions = defs);
     }
-
-    categoryChange() {
-        this.selection.layerName = null;
-        this.selection.redraw();
-    }
 }
 
 @Component({
@@ -103,7 +109,7 @@ export class ConsolidatedMapLayerControlComponent {
     `]
 })
 export class PestMapLayerControlComponent {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerVisSelection;
     @Input() layerDefinitions:MapLayerDefs;
 
     layers:MapLayerDefinition[];
@@ -134,7 +140,7 @@ enum TEMP_ACCUM_BASE {
                 <mat-option *ngFor="let b of baseOpts" [value]="b">{{b}}</mat-option>
             </mat-select>
         </mat-form-field>
-        <mat-checkbox [formControl]="alaska">Alaska</mat-checkbox>
+        <mat-checkbox *ngIf="!!alaska" [formControl]="alaska">Alaska</mat-checkbox>
     </div>
     <mat-form-field>
         <mat-select placeholder="Degree base" [formControl]="degreeBase">
@@ -158,8 +164,9 @@ enum TEMP_ACCUM_BASE {
     `]
 })
 export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
-    @Input() selection:MapSelection;
+    @Input() selection:HasLayerVisSelection;
     @Input() layerDefinitions:MapLayerDefs;
+    @Input() agddTimeSeries:boolean = false;
 
     baseLayer:FormControl;
     baseOpts = [TEMP_ACCUM_BASE.DAILY_30Y_AVG,TEMP_ACCUM_BASE.CUR_DAY,TEMP_ACCUM_BASE.DAILY_ANOM];
@@ -202,29 +209,32 @@ export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
         }
         console.log(`TempAccumMapLayerControlComponent: initBaseValue="${initBaseValue}" initDegValue=${initDegValue} initAkValue=${initAkValue}`);
         this.baseLayer = new FormControl(initBaseValue);
+        if(this.agddTimeSeries) {
+            this.baseLayer.disable();
+        }
         this.degreeBase = new FormControl(initDegValue);
-        this.alaska = new FormControl(initAkValue);
-
-        this.baseLayer.valueChanges
+        if(!this.agddTimeSeries) {
+            this.alaska = new FormControl(initAkValue);
+            this.baseLayer.valueChanges
+                .pipe(
+                    startWith(this.baseLayer.value),
+                    takeUntil(this.componentDestroyed)
+                )
+                .subscribe(baseLayer => {
+                    if(baseLayer === TEMP_ACCUM_BASE.CUR_DAY) {
+                        this.alaska.enable();
+                    } else {
+                        this.alaska.disable();
+                        if(this.alaska.value) {
+                            this.alaska.setValue(false);
+                        }
+                    }
+                });
+        }
+        (this.alaska
+            ? merge( this.baseLayer.valueChanges,this.degreeBase.valueChanges,this.alaska.valueChanges)
+            : merge( this.baseLayer.valueChanges,this.degreeBase.valueChanges))
         .pipe(
-            startWith(this.baseLayer.value),
-            takeUntil(this.componentDestroyed)
-        )
-        .subscribe(baseLayer => {
-            if(baseLayer === TEMP_ACCUM_BASE.CUR_DAY) {
-                this.alaska.enable();
-            } else {
-                this.alaska.disable();
-                if(this.alaska.value) {
-                    this.alaska.setValue(false);
-                }
-            }
-        });
-        merge(
-            this.baseLayer.valueChanges,
-            this.degreeBase.valueChanges,
-            this.alaska.valueChanges
-        ).pipe(
             startWith(null),
             takeUntil(this.componentDestroyed)
         ).subscribe(() => {
@@ -233,7 +243,7 @@ export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
             // IMPORTANT: in gridded-comomon for all temp accumulations layer sets there are two
             // layers, the first is 32 degree and the second is 50 degree
             const degreesIndex = degrees === 32 ? 0 : 1;
-            const ak:boolean = this.alaska.value;
+            const ak:boolean = this.alaska ? this.alaska.value : false;
             let categoryName = null;
             switch(base) {
                 case TEMP_ACCUM_BASE.DAILY_30Y_AVG:
@@ -249,9 +259,11 @@ export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
             this.selection.layerName = categories[categoryName].layers[degreesIndex].name;
             this.selection.redraw();
         });
-        this.alaska.valueChanges
-        .pipe(takeUntil(this.componentDestroyed))
-        .subscribe(ak => this.selection.center = ak ? AK_CENTER : LOWER_44_CENTER);
+        if(this.alaska) {
+            this.alaska.valueChanges
+                .pipe(takeUntil(this.componentDestroyed))
+                .subscribe(ak => this.selection.center = ak ? AK_CENTER : LOWER_44_CENTER);
+        }
     }
 }
 

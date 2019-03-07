@@ -68,7 +68,7 @@ export class CalendarMiscStepComponent extends BaseStepComponent {
 })
 export class CalendarMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior'
-    protected defaultPropertyKeys:string[] = ['negative','fontSizeDelta','labelOffset','bandPadding'];
+    protected defaultPropertyKeys:string[] = ['negative','negativeColor','fontSizeDelta','labelOffset','bandPadding'];
     selection: CalendarSelection;
     axis = AXIS;
 

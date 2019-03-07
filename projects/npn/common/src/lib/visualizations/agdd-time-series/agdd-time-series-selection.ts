@@ -2,7 +2,7 @@ import { VisSelection, selectionProperty } from '../vis-selection';
 import { NpnServiceUtils } from '@npn/common/common';
 
 import * as d3 from 'd3';
-import { MapLayer, NpnMapLayerService, PestMapLayer, CATEGORY_PEST } from '@npn/common/gridded';
+import { MapLayer, NpnMapLayerService, PestMapLayer, CATEGORY_PEST, MapLayerLegend } from '@npn/common/gridded';
 import { Subject } from 'rxjs';
 
 export const CATEGORY_PESTS = CATEGORY_PEST;
@@ -59,6 +59,8 @@ export const AGDD_COLORS = {
 };
 
 const GDD_AGDD_LAYER_NAME = 'gdd:agdd';
+export const DEFAULT_AGDD_LAYER_CATEGORY = CATEGORY_TEMP_ACCUMULATIONS;
+export const DEFAULT_AGDD_LAYER_NAME = GDD_AGDD_LAYER_NAME;
 
 export class AgddTimeSeriesSelection extends VisSelection {
     @selectionProperty()
@@ -67,9 +69,9 @@ export class AgddTimeSeriesSelection extends VisSelection {
     @selectionProperty()
     private _latLng:number[];
     @selectionProperty()
-    _layerCategory:string = CATEGORY_TEMP_ACCUMULATIONS;
+    _layerCategory:string = DEFAULT_AGDD_LAYER_CATEGORY;
     @selectionProperty()
-    private _layerName:string = GDD_AGDD_LAYER_NAME;
+    private _layerName:string = DEFAULT_AGDD_LAYER_NAME;
     @selectionProperty()
     private _extentValue:string;
 
@@ -82,6 +84,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
     private _doy:number;
 
     layer:MapLayer;
+    legend:MapLayerLegend;
 
     constructor(private layerService:NpnMapLayerService,protected serviceUtils:NpnServiceUtils) {
         super();
@@ -113,6 +116,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             this.layer.off(); // shouldn't be necessary
             this._getLayer = undefined;
             this.layer = undefined;
+            this.legend = null;
             this._start = undefined;
             this._end = undefined;
             this._selectedData = undefined;
@@ -124,7 +128,6 @@ export class AgddTimeSeriesSelection extends VisSelection {
         if(this._monitorLayerChange) {
             this._monitorLayerChange.next(this._layerName);
         }
-console.warn(`layerName.update valid=${this.isValid()}`);
         this.update();
     }
 
@@ -148,7 +151,9 @@ console.warn(`layerName.update valid=${this.isValid()}`);
 
     get extentValue():string { return this._extentValue; }
     set extentValue(v:string) {
-        // TODO extent changes only require an update if the
+        // technically changes to extent that result in a year
+        // change require an update, but during population
+        // of layer/extent, etc. the selection should be paused
         // "end" date changed as a result.
         if(v !== this._extentValue) {
             this._extentValue = v;
@@ -158,7 +163,6 @@ console.warn(`layerName.update valid=${this.isValid()}`);
             this._averageData = undefined;
             this._previousData = undefined;
             this.updateExtentValue();
-console.warn(`extentValue.update valid=${this.isValid()}`);
             this.update();
         }
     }
@@ -182,6 +186,8 @@ console.warn(`extentValue.update valid=${this.isValid()}`);
                 .then(layer => this.layer = layer)
                 .then(layer => {
                     this.updateExtentValue();
+                    // on aside get legend but still return layer
+                    layer.getLegend().then(l => this.legend = l);
                     return layer;
                 });
         }

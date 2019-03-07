@@ -138,6 +138,23 @@ export const REJECT_INVALID_SELECTION = 'invalid selection';
  *
  * Note: EventEmitter does not have an unsubscribe (though it, today, extends RxJs Subject)
  * so technically does.  Should perhaps consider not extending Angular's EventEmitter
+ * 
+ * Note: Within the current set of visualizations there are two distinct ways that events
+ * are triggered.  Earlier visualizations would have controls populate values on a selection
+ * and then based on knowledge about how the visualization worked the controls themselves
+ * would call update or redraw.  This meant that controls contained more logic and more
+ * internal knowledge about how a specific visualization functions (which properties might
+ * just alter the appearance of a visualization, redraw, versus what type of change might
+ * require the visualization to go back to the server to get new data).  Newer visualization
+ * implementations move that knowledge into the selection via the use of setters/getters
+ * which can simplify controls many times simply allowing them to use two-way data binding
+ * between a control and the selection itself.  The `pause`/`resume` functionality was added
+ * to help with these types of implementations when special cases arise to avoid any attached
+ * visualization components from doing work (e.g. population of defaults or cooperating
+ * selection properties)
+ * 
+ * @todo review use of `editMode` flag to see if it can be removed (maybe using `pause`/`resume` instead).
+ * 
  * @dynamic
  */
 export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
@@ -160,6 +177,7 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     // is being built.
     editMode: boolean = false;
     updateSent: boolean = false;
+    private _paused:boolean = false;
     [x: string]: any;
 
     readonly INVALID_SELECTION = REJECT_INVALID_SELECTION;
@@ -171,7 +189,21 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     });
 
     get external() { return GET_EXTERNAL.apply(this, arguments); }
-    set external(o) { SET_EXTERNAL.apply(this, arguments); }
+    set external(o) {
+        this.pause();
+        try {
+            SET_EXTERNAL.apply(this, arguments);
+        } finally {
+            this.resume();
+        }
+    }
+
+    /** @returns {boolean} true if events are paused. */
+    isPaused():boolean { return this._paused; }
+    /** Pauses even propagation so update/redraw, etc. will have no effect until resumed. */
+    pause() { this._paused = true; }
+    /** Resumes event propagation. */
+    resume() { this._paused = false; }
 
     /**
      * Instruct the visualization to go back to a "clean" slate
@@ -203,7 +235,6 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
     update(): void {
         if(this.isValid()) {
             this.emit(VisSelectionEvent.UPDATE);
-            this.updateSent = true;
         }
     }
 
@@ -223,6 +254,9 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
 
     // make sure no events go out until there is at least one subscriber to receive them.
     emit(value?: VisSelectionEvent) {
+        if(this._paused) {
+            return;
+        }
         var self = this,
             emitArgs = arguments,
             thisEmit: any = {
@@ -241,9 +275,12 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
         // both will get through
         if (this.lastEmit.value !== thisEmit.value || this.lastEmit.ext !== thisEmit.ext || this.lastEmit.when < (thisEmit.when - 500)) {
             this.lastEmit = thisEmit;
-            console.log('letting event through', thisEmit/*, new Error('stack trace')*/);
+            console.log('letting event through', thisEmit/*, new Error(`${thisEmit.value}: stack trace`)*/);
             this.firstSubscriber.then(() => {
                 super.emit.apply(self, emitArgs);
+                if(thisEmit.value === VisSelectionEvent.UPDATE) {
+                    this.updateSent = true;
+                }
             });
         } else {
             console.log('pruned out redundant event', thisEmit);

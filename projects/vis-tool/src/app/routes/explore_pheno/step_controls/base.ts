@@ -36,11 +36,16 @@ export class BaseControlComponent extends ComponentBase implements ControlCompon
     stepVisit():void {
         if(!this.visited) {
             this.visited = true;
-            (this.defaultPropertyKeys||[]).forEach(key => {
-                if(this.selection[key] === undefined) {
-                    this.selection[key] = this.definition.templateSelection[key];
-                }
-            })
+            this.selection.pause();
+            try {
+                (this.defaultPropertyKeys||[]).forEach(key => {
+                    if(this.selection[key] === undefined) {
+                        this.selection[key] = this.definition.templateSelection[key];
+                    }
+                })
+            } finally {
+                this.selection.resume();
+            }
             // console.log('ControlComponent: after populating defaults');
             // console.log('ControlComponent: selection',this.selection);
             // console.log('ControlComponent: templateSelection',this.definition.templateSelection);

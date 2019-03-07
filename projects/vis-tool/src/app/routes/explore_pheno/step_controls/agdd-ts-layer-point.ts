@@ -59,6 +59,7 @@ export class AgddTsLayerPointControlComponent extends BaseControlComponent {
     stepVisit():void {
         super.stepVisit();
         console.log(`AgddTsLayerPointControlComponent.stepVisit`);
+        this.selection.pause();
         // not sure why the delay is necessary
         setTimeout(() => this.subControlComponent.show(),500);
     }
@@ -70,14 +71,11 @@ export class AgddTsLayerPointControlComponent extends BaseControlComponent {
         <agm-map [streetViewControl]="false" [styles]="mapStyles" [scrollwheel]="false"
         [latitude]="latitude" [longitude]="longitude" [zoom]="zoom"
         (mapReady)="controlComponent.map = $event;"></agm-map>
+        <map-layer-legend *ngIf="!thumbnail && selection.legend" [legend]="selection.legend"></map-layer-legend>
     </div>
     `,
-    styles:[`
-    .map-wrapper {
-        width: 100%;
-        height: 100%;
-    }
-    `]
+    // might be nicer if this type of CSS were simply global
+    styleUrls:['../../../../../../npn/common/src/lib/visualizations/map/map-visualization.component.scss']
 })
 export class AgddTsLayerPointSubControlComponent extends BaseSubControlComponent {
     title:string = 'Select layer/point';

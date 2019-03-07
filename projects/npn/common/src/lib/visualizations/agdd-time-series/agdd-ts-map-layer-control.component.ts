@@ -2,18 +2,18 @@ import { Component, Input, SimpleChanges, NgZone } from '@angular/core';
 import {
     AgddTimeSeriesSelection,
     CATEGORY_PESTS,
-    CATEGORY_TEMP_ACCUMULATIONS
+    CATEGORY_TEMP_ACCUMULATIONS,
+    DEFAULT_AGDD_LAYER_NAME
 } from './agdd-time-series-selection';
 import { MonitorsDestroy } from '@npn/common/common';
 import { takeUntil, startWith } from 'rxjs/operators';
-import { MapLayer, NpnMapLayerService, MapLayerDefinition, MapLayerDefs } from '@npn/common/gridded';
+import { MapLayer, NpnMapLayerService, MapLayerDefinition, MapLayerDefs, CATEGORY_PEST } from '@npn/common/gridded';
 
 @Component({
     selector: 'agdd-ts-map-layer-control',
     template: `
     <mat-form-field class="layer-category">
         <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory" (selectionChange)="categoryChange()">
-            <mat-option [value]="null"></mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
             <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>
         </mat-select>
@@ -48,6 +48,7 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
     @Input() map;/*:google.maps.Map;*/
 
     layerDefinitions:MapLayerDefs;
+    pests:MapLayerDefinition[];
 
     CATEGORY_PESTS = CATEGORY_PESTS;
     CATEGORY_TEMP_ACCUMULATIONS = CATEGORY_TEMP_ACCUMULATIONS;
@@ -61,7 +62,10 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
     }
 
     ngOnInit() {
-        this.layerService.getLayerDefinitions().then((defs:MapLayerDefs) => this.layerDefinitions = defs);
+        this.layerService.getLayerDefinitions().then((defs:MapLayerDefs) => {
+            this.layerDefinitions = defs;
+            this.pests = this.layerDefinitions.categories.find(c => c.name === CATEGORY_PEST).layers;
+        });
         const {selection,componentDestroyed} = this;
         // would be nice to just watch the selection but updates only come through if a selection is valid
         componentDestroyed.subscribe(() => selection.endMonitorLayerChange());
@@ -89,7 +93,7 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
 
         this.getMap.then(map => {
             const updateLatLng = event => {
-                console.log(`AgddTsMapLayerControl.updateLatLng`,event);
+                console.log(`AgddTsMapLayerControl.updateLatLng ${event.latLng.lat()},${event.latLng.lng()}`);
                 this.zone.run(() => {
                     selection.latLng = [
                         event.latLng.lat(),
@@ -127,6 +131,8 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
     }
 
     categoryChange() {
-
+        this.selection.layerName = this.selection.layerCategory === CATEGORY_PESTS
+            ? this.pests[0].name
+            : DEFAULT_AGDD_LAYER_NAME;
     }
 }

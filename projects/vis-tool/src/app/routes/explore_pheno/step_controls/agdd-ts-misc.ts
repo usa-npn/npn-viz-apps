@@ -36,9 +36,9 @@ export class AgddTsMiscStepComponent extends BaseStepComponent {
     selection:AgddTimeSeriesSelection;
 
     get state():StepState {
-        return this.visited
-            ? StepState.COMPLETE
-            : StepState.AVAILABLE;
+        return this.selection.isValid()
+            ? this.visited ? StepState.COMPLETE : StepState.AVAILABLE
+            : StepState.UNAVAILABLE;
     }
 }
 
@@ -59,7 +59,9 @@ export class AgddTsMiscControlComponent extends BaseControlComponent {
 
     stepVisit():void {
         super.stepVisit();
-        console.log(`LAST YEAR VALID? ${this.selection.lastYearValid}`);
+        this.selection.resume();
+        this.selection.reset();
+        this.selection.update();
     }
 }
 

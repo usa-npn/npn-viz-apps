@@ -1,27 +1,50 @@
-# NpnApps
+# Npn Vis Apps
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.3.
+This project contains three applications and the core library of shared functionality.
+
+- `projects/npn/common` is the `@npm/common` shared library.
+- `projects/vis-tool` is the core visualization tool.
+- `projects/fws-dashboard` is the FWS dashboard application.
+- `projects fws-spring` is the FWS status of spring application.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+To run the development server on your local machine run `npm start` and once compiled navigate to `http://localhost:4200/`.
 
-## Code scaffolding
+This is strictly for the visualization tool.  The two `fws-*` projects require a running Drupal system to serve them up and so must be compiled or "watched" into the appropriate locations on that Drupal site.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Building
 
-## Build
+All compiled applications will be compiled into a corresponding sub-directory of the `dist` directory.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### The Vis Tool
 
-## Running unit tests
+`npm run build`
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### FWS Dashboard
 
-## Running end-to-end tests
+`npm run build-fws-dashboard`
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Or a development watch (the extra `--` in the middle of the command is important):
 
-## Further help
+`npm run build-fws-dashboard -- --output-path <path to drupal>/modules/custom/fws_dashboard/app --watch`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+(or remove `--watch` to compile production copy directly into the Drupal instance.)
+
+### FWS Spring
+
+`npm run build-fws-spring`
+
+Or a development watch (the extra `--` in the middle of the command is important):
+
+`npm run build-fws-spring -- --output-path <path to drupal>/modules/custom/fws_dashboard/spring --watch`
+
+(or remove `--watch` to compile production copy directly into the Drupal instance.)
+
+## Notes
+
+Typically a development build vs. a production build will communicate with different services (dev vs. production).  These kinds of configuration differences are compiled into the application via the environment files.
+
+For example:
+- `projects/vis-tool/src/environments/environment.ts` is the configuration of a development build.
+- `projects/vis-tool/src/environments/environment.prod.ts` is the configuration of a production build.

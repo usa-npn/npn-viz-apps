@@ -2,7 +2,7 @@
 
 This project contains three applications and the core library of shared functionality.
 
-- `projects/npn/common` is the `@npm/common` shared library.
+- `projects/npn/common` is the `@npn/common` shared library.
 - `projects/vis-tool` is the core visualization tool.
 - `projects/fws-dashboard` is the FWS dashboard application.
 - `projects fws-spring` is the FWS status of spring application.

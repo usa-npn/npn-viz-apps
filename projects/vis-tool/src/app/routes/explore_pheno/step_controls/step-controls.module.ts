@@ -31,6 +31,7 @@ import { ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent } f
 
 import { AgddTsLayerPointStepComponent, AgddTsLayerPointControlComponent, AgddTsLayerPointSubControlComponent } from './agdd-ts-layer-point';
 import { AgddTsMiscStepComponent, AgddTsMiscControlComponent } from './agdd-ts-misc';
+import { BoundaryStepComponent, BoundaryControlComponent, BoundarySubControlComponent } from './boundary';
 
 
 // all of the components of this module have to be entryComponents
@@ -55,7 +56,8 @@ const COMPONENTS:any[] = [
     AgddTsLayerPointStepComponent, AgddTsLayerPointControlComponent, AgddTsLayerPointSubControlComponent,
     AgddTsMiscStepComponent, AgddTsMiscControlComponent,
 
-    StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent
+    StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent,
+    BoundaryStepComponent, BoundaryControlComponent, BoundarySubControlComponent
 ];
 const ENTRY_COMPONENTS:any[] = [
     ...COMPONENTS,

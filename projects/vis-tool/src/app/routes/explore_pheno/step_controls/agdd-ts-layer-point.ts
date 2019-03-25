@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { StepState, VisConfigStep } from '../interfaces';
 import { getLayerTitle } from './map-layer';
 import { faMapMarkerAlt } from '@fortawesome/pro-light-svg-icons';
+import { MAP_STYLES } from '@npn/common';
 
 @Component({
     template: `
@@ -95,23 +96,7 @@ export class AgddTsLayerPointSubControlComponent extends BaseSubControlComponent
     longitude: number = -97.61142369999999
     zoom: number = 4;
 
-    mapStyles: any[] = [{
-        featureType: 'poi',
-        elementType: 'labels',
-        stylers: [{ visibility: 'off' }]
-    }, {
-        featureType: 'transit.station',
-        elementType: 'labels',
-        stylers: [{ visibility: 'off' }]
-    },
-    {
-        featureType: 'poi.park',
-        stylers: [{ visibility: 'off' }]
-    },
-    {
-        featureType: 'landscape',
-        stylers: [{ visibility: 'off' }]
-    }];
+    mapStyles: any[] = MAP_STYLES;
 }
 
 export const AgddTsLayerPointStep:VisConfigStep = {

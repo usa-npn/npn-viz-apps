@@ -12,6 +12,7 @@ import { MapLayerLegendComponent } from './map-layer-legend.component';
 import { SupportsOpacityControl } from './supports-opacity-control.component';
 import { GriddedUrls } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
+import { BoundaryService } from './boundary.service';
 
 import {
     LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
@@ -46,7 +47,8 @@ import {
         ThirtyYearAvgDayOfYearPipe, GriddedPipeProvider,
         NpnMapLayerService,
         GriddedUrls,
-        WcsDataService
+        WcsDataService,
+        BoundaryService
     ]
 })
 export class NpnGriddedModule { }

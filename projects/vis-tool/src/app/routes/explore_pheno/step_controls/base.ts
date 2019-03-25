@@ -54,6 +54,8 @@ export class BaseControlComponent extends ComponentBase implements ControlCompon
 }
 
 export class BaseSubControlComponent extends ComponentBase implements SubControlComponent {
+    $fullScreen:boolean = false;
+    $closeDisabled:boolean = false;
     visibility:Subject<boolean> = new Subject();
 
     show() {

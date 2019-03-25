@@ -30,6 +30,7 @@ import { MapYearStep } from './map-year';
 import { MapSpeciesPhenoStep } from './map-species-phenophase';
 import { AgddTsLayerPointStep } from './agdd-ts-layer-point';
 import { AgddTsMiscStep } from './agdd-ts-misc';
+import { BoundaryStep } from "./boundary";
 
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
@@ -141,7 +142,7 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'MapSelection',
         component: MapVisualizationComponent,
         steps:[
-            /*LocationStep,*/
+            BoundaryStep,
             MapLayerStep,
             MapYearStep,
             MapSpeciesPhenoStep

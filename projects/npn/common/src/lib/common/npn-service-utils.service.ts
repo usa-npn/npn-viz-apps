@@ -4,6 +4,9 @@ import { CacheService } from './cache.service';
 
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';
 
+/**
+ * @todo rename dataApi[2], etc. (along with NpnConfiguration) to be more meaningful.
+ */
 @Injectable()
 export class NpnServiceUtils {
     constructor(public http: HttpClient,
@@ -17,6 +20,10 @@ export class NpnServiceUtils {
 
     public dataApiUrl(suffix: string) {
         return `${this.config.dataApiRoot}${suffix}`;
+    }
+
+    public dataApiUrl2(suffix: string) {
+        return `${this.config.dataApiRoot2}${suffix}`;
     }
 
     public geoServerUrl(suffix: string) {

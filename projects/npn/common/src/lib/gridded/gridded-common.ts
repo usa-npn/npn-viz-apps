@@ -1,6 +1,24 @@
 import {Inject,Injectable} from '@angular/core';
 import {NPN_CONFIGURATION,NpnConfiguration} from '../common/index';
 
+export const MAP_STYLES:any[] = [{
+    featureType: 'poi',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+}, {
+    featureType: 'transit.station',
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+},
+{
+    featureType: 'poi.park',
+    stylers: [{ visibility: 'off' }]
+},
+{
+    featureType: 'landscape',
+    stylers: [{ visibility: 'off' }]
+}];
+
 const EXTENT_DATE_FMT_REGEX = /^(\d\d\d\d)-0?(\d+)-0?(\d+)/;
 
 export function parseExtentDate(s:string):Date {

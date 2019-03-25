@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { VisSelection, VisSelectionEvent } from './vis-selection';
 import { VisualizationBaseComponent, VisualizationSizing, VisualizationMargins } from './visualization-base.component';
+import { MAP_STYLES } from '../gridded';
 
 /*
 IMPORTANT: see not in VisualizationBaseComponent
@@ -22,23 +23,7 @@ export class MapVisualizationBaseComponent extends VisualizationBaseComponent {
         this.getMapResolver = resolve;
     });
 
-    mapStyles: any[] = [{
-        featureType: 'poi',
-        elementType: 'labels',
-        stylers: [{ visibility: 'off' }]
-    }, {
-        featureType: 'transit.station',
-        elementType: 'labels',
-        stylers: [{ visibility: 'off' }]
-    },
-    {
-        featureType: 'poi.park',
-        stylers: [{ visibility: 'off' }]
-    },
-    {
-        featureType: 'landscape',
-        stylers: [{ visibility: 'off' }]
-    }];
+    mapStyles: any[] = MAP_STYLES;
 
     mapReady(map: google.maps.Map): void {
         map.addListener('resize', () => {

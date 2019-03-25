@@ -42,6 +42,12 @@
                     padding-left: $drawer-padding;
                     padding-right: $drawer-padding;
                 }
+                .close-control.disabled {
+                    pointer-events: none;
+                    >fa-icon {
+                        display: none;
+                    }
+                }
             }
             .drawer-contents {
                 flex-grow: 1;

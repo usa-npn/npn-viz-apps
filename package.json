@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve vis-tool",
-    "build": "ng build vis-tool",
+    "start": "ng serve vis-tool --base-href /vis-tool",
+    "build": "ng build vis-tool --base-href /vis-tool",
     "build-fws-spring": "ng build fws-spring",
     "build-fws-dashboard": "ng build fws-dashboard",
     "test": "ng test",

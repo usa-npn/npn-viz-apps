@@ -14,6 +14,7 @@ import { RoutePath } from '../../route-path';
 import { VisSelection } from '@npn/common';
 import { SharingService } from './sharing.service';
 import { MatSnackBar } from '@angular/material';
+import { Location } from '@angular/common';
 
 @Component({
     selector: `share-visualization`,
@@ -42,6 +43,7 @@ export class ShareControlComponent extends MonitorsDestroy implements StepCompon
 
     constructor(
         private router:Router,
+        private location:Location,
         private sharingService:SharingService,
         private snackBar:MatSnackBar
     ) {
@@ -68,7 +70,7 @@ export class ShareControlComponent extends MonitorsDestroy implements StepCompon
 
     shareToClipboard() {
         const urlTree = this.router.createUrlTree([RoutePath.EXPLORE_PHENO,{s:this.serialize()}]);
-        const url = this.router.serializeUrl(urlTree);
+        const url = this.location.prepareExternalUrl(this.router.serializeUrl(urlTree));
         this.copyToClipboard(`${window.location.origin}${url}`);
         this.snackBar.open('Link copied to the clipboard.');
     }

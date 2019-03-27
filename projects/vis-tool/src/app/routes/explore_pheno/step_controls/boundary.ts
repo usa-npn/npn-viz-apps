@@ -11,7 +11,7 @@ import { scaleOrdinal, schemeCategory20 } from 'd3';
 
 @Component({
     template: `
-    {{controlComponent.selectedFeature?.getProperty('name')}}
+    {{label}}
     `
 })
 export class BoundaryStepComponent extends BaseStepComponent {
@@ -22,6 +22,14 @@ export class BoundaryStepComponent extends BaseStepComponent {
         return this.selection.isValid()
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
+    }
+
+    get label():string {
+        return typeof(this.selection.boundaryId) === 'number'
+            ? !!this.controlComponent.selectedFeature
+                ? this.controlComponent.selectedFeature.getProperty('name')
+                : 'loading ...'
+            : '';
     }
 }
 
@@ -65,6 +73,7 @@ const ZOOM: number = 4;
     `]
 })
 export class BoundaryControlComponent extends BaseControlComponent {
+    working:boolean = false;
     title:string = 'Select boundary type';
     subControlComponent:BoundarySubControlComponent;
     mapPromiseResolver;
@@ -108,6 +117,14 @@ export class BoundaryControlComponent extends BaseControlComponent {
             )
             .subscribe(boundaryTypeId => {
                 console.log(`BoundaryControlComponent.boundaryTypeId=${boundaryTypeId}`);
+                if(this.selection.boundaryTypeId !== boundaryTypeId) {
+                    this.boundary.setValue(
+                        this.selection.boundaryId = undefined,
+                        {emitEvent: false}
+                    );
+                    this.selectedFeature = undefined;
+                    this.focusSelectedFeature();
+                }
                 this.selection.boundaryTypeId = boundaryTypeId;
                 const promise = typeof(boundaryTypeId) === 'number'
                     ? this.loadBoundaries(boundaryTypeId)
@@ -164,6 +181,7 @@ export class BoundaryControlComponent extends BaseControlComponent {
     }
 
     loadBoundaries(typeId:number):Promise<any> {
+        this.working = true;
         return Promise.all([
             this.mapPromise,
             this.boundaryService.getBoundaries(typeId).toPromise(),
@@ -179,7 +197,7 @@ export class BoundaryControlComponent extends BaseControlComponent {
                 }));
             map.data.setStyle(f => f.getProperty(STYLE_KEY));
             console.log(`BoundaryControlComponent.loadBoundaries complete.`);
-            return;
+            this.working = false;
         });
     }
 
@@ -209,6 +227,9 @@ export class BoundaryControlComponent extends BaseControlComponent {
 @Component({
     template:`
     <div class="map-wrapper">
+        <div class="vis-working" *ngIf="controlComponent.working">
+            <npn-logo spin="false"></npn-logo>
+        </div>
         <agm-map [streetViewControl]="false" [styles]="mapStyles" [scrollwheel]="false"
         [latitude]="latitude" [longitude]="longitude" [zoom]="zoom"
         (mapReady)="controlComponent.initMap($event);"></agm-map>
@@ -220,7 +241,7 @@ export class BoundaryControlComponent extends BaseControlComponent {
 export class BoundarySubControlComponent extends BaseSubControlComponent {
     title:string = 'Select boundary';
     $fullScreen:boolean = true;
-    //$closeDisabled:boolean = true;
+    $closeDisabled:boolean = true;
 
     latitude: number = LAT;
     longitude: number = LNG;

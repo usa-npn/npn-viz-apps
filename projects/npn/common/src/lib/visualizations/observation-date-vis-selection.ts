@@ -36,7 +36,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         protected serviceUtils:NpnServiceUtils,
         protected speciesTitle: SpeciesTitlePipe
     ) {
-        super();
+        super(serviceUtils);
     }
 
     isValid(): boolean {

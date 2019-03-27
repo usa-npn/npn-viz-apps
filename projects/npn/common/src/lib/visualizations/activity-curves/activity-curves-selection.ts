@@ -62,7 +62,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     private _curves:ActivityCurve[];
 
     constructor(protected serviceUtils:NpnServiceUtils,protected datePipe: DatePipe) {
-        super();
+        super(serviceUtils);
         this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
             let c = new ActivityCurve();
             c.id = i;

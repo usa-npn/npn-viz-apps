@@ -61,7 +61,7 @@ export class ShareControlComponent extends MonitorsDestroy implements StepCompon
         fromEvent(window,'keypress')
             .pipe(takeUntil(this.componentDestroyed))
             .subscribe((ke:KeyboardEvent) => {
-                if(ke.ctrlKey && ke.shiftKey && ke.key === 'C') {
+                if(ke.ctrlKey && ke.shiftKey && ke.key === 'S') {
                     this.copyToClipboard(JSON.stringify(this.selection.external,null,2));
                     this.snackBar.open('Selection copied to the clipboard.');
                 }

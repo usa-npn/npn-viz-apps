@@ -1,21 +1,22 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from "./base";
-import { MAP_STYLES, BoundaryService, BoundaryType, Boundary, googleFeatureBounds } from "@npn/common";
+import { MAP_STYLES, BoundaryService, BoundaryType, Boundary, googleFeatureBounds, StationAwareVisSelection } from "@npn/common";
 import { VisConfigStep, StepState } from "../interfaces";
-import { faLayerGroup } from "@fortawesome/pro-light-svg-icons";
+import { faDrawPolygon } from "@fortawesome/pro-light-svg-icons";
 import { Component, NgZone } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Observable } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { takeUntil, startWith } from "rxjs/operators";
 
 import { scaleOrdinal, schemeCategory20 } from 'd3';
 
 @Component({
     template: `
-    step details
+    {{controlComponent.selectedFeature?.getProperty('name')}}
     `
 })
 export class BoundaryStepComponent extends BaseStepComponent {
     title:string = 'Boundary';
+    controlComponent:BoundaryControlComponent; 
 
     get state():StepState {
         return this.selection.isValid()
@@ -25,13 +26,18 @@ export class BoundaryStepComponent extends BaseStepComponent {
 }
 
 const STYLE_KEY = '$style';
-const SELECTED_OPACITY = 1.0;
-const DEFAULT_OPACITY = 0.65;
-const BASE_BOUNDARY_STYLE = {
-    clickable: true,
-    fillOpacity: DEFAULT_OPACITY,
-    strokeColor: '#fff',
+const SELECTED_STYLES = {
+    fillOpacity: 1.0,
+    strokeWeight: 4
+};
+const DEFAULT_STYLES = {
+    fillOpacity: 0.35,
     strokeWeight: 1
+};
+const BASE_BOUNDARY_STYLE = {
+    ...DEFAULT_STYLES,
+    clickable: true,
+    strokeColor: '#fff',
 };
 const LAT: number = 38.8402805;
 const LNG: number = -97.61142369999999
@@ -65,12 +71,15 @@ export class BoundaryControlComponent extends BaseControlComponent {
     mapPromise:Promise<google.maps.Map> = new Promise(resolve => this.mapPromiseResolver = resolve);
 
     boundaryTypes:Observable<BoundaryType[]>;
-    boundaryType:FormControl = new FormControl();
+    boundaryType:FormControl;
 
-    boundary:FormControl = new FormControl();
+    boundary:FormControl;
     boundaries:Boundary[];
     features:google.maps.Data.Feature[];
+    selectedFeature:google.maps.Data.Feature;
     colors = scaleOrdinal<number,string>(schemeCategory20);
+
+    selection:StationAwareVisSelection;
 
     constructor(private boundaryService:BoundaryService,private zone:NgZone){
         super();
@@ -88,40 +97,56 @@ export class BoundaryControlComponent extends BaseControlComponent {
     }
 
     ngOnInit() {
+        this.boundaryType = new FormControl(this.selection.boundaryTypeId);
         this.boundaryTypes = this.boundaryService.getBoundaryTypes();
-        // TODO init FormControls from selection
-
+        this.boundary = new FormControl();
+        
         this.boundaryType.valueChanges
-            .pipe(takeUntil(this.componentDestroyed))
-            .subscribe(typeId => this.loadBoundaries(typeId));
+            .pipe(
+                startWith(this.selection.boundaryTypeId),
+                takeUntil(this.componentDestroyed)
+            )
+            .subscribe(boundaryTypeId => {
+                console.log(`BoundaryControlComponent.boundaryTypeId=${boundaryTypeId}`);
+                this.selection.boundaryTypeId = boundaryTypeId;
+                const promise = typeof(boundaryTypeId) === 'number'
+                    ? this.loadBoundaries(boundaryTypeId)
+                    : this.removeBoundaries()
+                promise.then(() => {
+                    console.log(`BoundaryControlComponent boundaries loaded or removed`);
+                    // this is for load time logic, don't want to update
+                    // the FormControl until all the possible boundaries are
+                    // loaded
+                    if(this.selection.boundaryId && !this.boundary.value) {
+                        this.boundary.setValue(this.selection.boundaryId);
+                    }
+                });
+            });
 
         this.boundary.valueChanges
             .pipe(takeUntil(this.componentDestroyed))
             .subscribe(boundaryId => this.mapPromise.then(map => {
-                    console.log(`selected boundaryId=${boundaryId}`);
+                    console.log(`BoundaryControlComponent.boundaryId=${boundaryId}`);
+                    this.selection.boundaryId = boundaryId;
                     const haveBoundaryId = typeof(boundaryId) === 'number';
-                    const selectedFeature = this.features.reduce((found,f) => {
+                    this.selectedFeature = this.features.reduce((found,f) => {
                             const style:any = f.getProperty(STYLE_KEY);
                             const isSelected = !found && haveBoundaryId && f.getProperty('boundary_id') === boundaryId;
                             if(isSelected) {
                                 found = f;
                             }
-                            style.fillOpacity = isSelected
-                                ? SELECTED_OPACITY
-                                : DEFAULT_OPACITY;
+                            const styles = isSelected
+                                ? SELECTED_STYLES
+                                : DEFAULT_STYLES;
+                            Object.keys(styles).forEach(k => style[k] = styles[k]);
                             return found;
                         },undefined);
                     map.data.setStyle(f => f.getProperty(STYLE_KEY));
-                    if(selectedFeature) {
-                        map.fitBounds(googleFeatureBounds(selectedFeature));
-                    } else {
-                        map.setZoom(ZOOM);
-                        map.setCenter(new google.maps.LatLng(LAT,LNG));
-                    }
+                    this.focusSelectedFeature();
                 }));
     }
 
-    removeBoundaries() {
+    removeBoundaries():Promise<any> {
         return this.mapPromise.then(map => new Promise(resolve => {
             let featureCount = this.features
                 ? this.features.length
@@ -138,8 +163,8 @@ export class BoundaryControlComponent extends BaseControlComponent {
         }));
     }
 
-    loadBoundaries(typeId:number) {
-        Promise.all([
+    loadBoundaries(typeId:number):Promise<any> {
+        return Promise.all([
             this.mapPromise,
             this.boundaryService.getBoundaries(typeId).toPromise(),
             this.removeBoundaries()
@@ -153,12 +178,31 @@ export class BoundaryControlComponent extends BaseControlComponent {
                     fillColor: this.colors((20+i)%20)
                 }));
             map.data.setStyle(f => f.getProperty(STYLE_KEY));
+            console.log(`BoundaryControlComponent.loadBoundaries complete.`);
+            return;
+        });
+    }
+
+    focusSelectedFeature() {
+        const {selectedFeature} = this;
+        return this.mapPromise.then(map => {
+            if(selectedFeature) {
+                map.fitBounds(googleFeatureBounds(selectedFeature));
+            } else {
+                map.setZoom(ZOOM);
+                map.setCenter(new google.maps.LatLng(LAT,LNG));
+            }
         });
     }
 
     stepVisit():void {
         super.stepVisit();
-        setTimeout(() => this.subControlComponent.show(),500);
+        setTimeout(() => {
+            this.subControlComponent.show();
+            if(this.selectedFeature) {
+                this.focusSelectedFeature();
+            }
+        },500);
     }
 }
 
@@ -176,7 +220,7 @@ export class BoundaryControlComponent extends BaseControlComponent {
 export class BoundarySubControlComponent extends BaseSubControlComponent {
     title:string = 'Select boundary';
     $fullScreen:boolean = true;
-    $closeDisabled:boolean = true;
+    //$closeDisabled:boolean = true;
 
     latitude: number = LAT;
     longitude: number = LNG;
@@ -186,7 +230,7 @@ export class BoundarySubControlComponent extends BaseSubControlComponent {
 }
 
 export const BoundaryStep:VisConfigStep = {
-    icon: faLayerGroup,
+    icon: faDrawPolygon,
     stepComponent: BoundaryStepComponent,
     controlComponent: BoundaryControlComponent,
     subControlComponent: BoundarySubControlComponent

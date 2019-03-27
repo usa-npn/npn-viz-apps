@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { NpnServiceUtils } from "../common";
 import { Observable, from } from "rxjs";
 import { map } from 'rxjs/operators';
-import { Geometry, FeatureCollection } from "geojson";
+import { Geometry } from "geojson";
 
 
 export interface BoundaryType {
@@ -39,6 +39,8 @@ export class BoundaryService {
         return this.serviceUtils.http.get<Boundary []>(
             this.serviceUtils.dataApiUrl2(`${BOUNDARY_API_ROOT}`),
             {params:{type_id:`"${typeId}"`}}
+        ).pipe(
+            map(boundaries => (boundaries||[]).sort((a,b) => a.name.localeCompare(b.name)))
         );
     }
 

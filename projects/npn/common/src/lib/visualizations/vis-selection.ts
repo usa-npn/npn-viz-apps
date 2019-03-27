@@ -1,5 +1,5 @@
 import { EventEmitter } from '@angular/core';
-import { newGuid } from '../common';
+import { newGuid, NpnServiceUtils } from '../common';
 import { HttpParams } from '@angular/common/http';
 
 export const NULL_DATA = -9999;
@@ -313,11 +313,39 @@ export abstract class NetworkAwareVisSelection extends VisSelection {
 export abstract class StationAwareVisSelection extends NetworkAwareVisSelection {
     @selectionProperty()
     stationIds?: any[] = [];
+    @selectionProperty()
+    boundaryTypeId?:number;
+    @selectionProperty()
+    _boundaryId?:number;
+
+    constructor(protected serviceUtils:NpnServiceUtils) {
+        super();
+    }
+
+    set boundaryId(bid:number) {
+        this._boundaryId = bid;
+        this.update();
+    }
+
+    get boundaryId():number {
+        return this._boundaryId;
+    }
 
     addNetworkParams(params: HttpParams): Promise<HttpParams> {
         return super.addNetworkParams(params)
             .then(params => {
-                (this.stationIds || []).forEach((id, i) => params = params.set(`station_ids[${i}]`, `${id}`));
+                if(typeof(this.boundaryId) === 'number') {
+                    return this.serviceUtils.cachedGet(
+                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
+                        {boundary_id:this.boundaryId}
+                    )
+                    .then(stationIds => {
+                        const allStationIds = (this.stationIds||[]).concat(stationIds||[]);
+                        allStationIds.forEach((id, i) => params = params.set(`station_id[${i}]`, `${id}`));
+                        return params;
+                    });
+                }
+                (this.stationIds || []).forEach((id, i) => params = params.set(`station_id[${i}]`, `${id}`));
                 return params;
             });
     }

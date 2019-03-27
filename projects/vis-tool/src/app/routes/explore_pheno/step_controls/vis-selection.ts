@@ -154,6 +154,7 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'ScatterPlotSelection',
         component: ScatterPlotComponent,
         steps:[
+            BoundaryStep,
             StartEndStep,
             StartEndLegacySpeciesPhenoColorStep,
             ScatterPlotMiscStep
@@ -164,7 +165,11 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         icon: faChartLine,
         selection: 'ActivityCurvesSelection',
         component: ActivityCurvesComponent,
-        steps:[ActivityCurvesStep,ActivityCurvesMiscStep]
+        steps:[
+            BoundaryStep,
+            ActivityCurvesStep,
+            ActivityCurvesMiscStep
+        ]
     },
     {
         title: 'Calendar',
@@ -172,6 +177,7 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'CalendarSelection',
         component: CalendarComponent,
         steps:[
+            BoundaryStep,
             YearsStep,
             YearsLegacySpeciesPhenoColorStep,
             CalendarMiscStep

@@ -11,7 +11,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     filterDisclaimer: string;
 
     constructor(protected serviceUtils:NpnServiceUtils) {
-        super();
+        super(serviceUtils);
     }
 
     abstract toURLSearchParams(): Promise<HttpParams>;

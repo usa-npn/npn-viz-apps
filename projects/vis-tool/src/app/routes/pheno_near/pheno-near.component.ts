@@ -37,6 +37,10 @@ export class PhenoNearComponent {
         tagline: 'How did maple leaf colors stack up between 2017 and 2018?',
         selection: MAPLES_COLORS_2017_2018
     },{
+      title: 'Minnesota red maples 2016',
+      tagline: 'Just red maples on a map',
+      selection: MN_RED_MAPLES_2016
+    },{
         title: 'Local observations',
         tagline: 'What species are citizen scientists tracking in my area?'
     },{
@@ -58,6 +62,42 @@ export class PhenoNearComponent {
         }
     }
 }
+
+const MN_RED_MAPLES_2016 = {
+  "$class": "MapSelection",
+  "guid": "08e61546-319d-4908-a449-945b521b9960",
+  "meta": {},
+  "networkIds": [],
+  "stationIds": [],
+  "individualPhenometrics": false,
+  "opacity": 0.75,
+  "plots": [
+    {
+      "species": {
+        "common_name": "red maple",
+        "genus": "Acer",
+        "species": "rubrum",
+        "kingdom": "Plantae",
+        "species_id": 3,
+        "number_observations": 664416
+      },
+      "phenophase": {
+        "phenophase_id": 371,
+        "phenophase_name": "Breaking leaf buds",
+        "phenophase_category": "Leaves",
+        "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+        "phenophase_additional_definition": "",
+        "seq_num": 10,
+        "color": "Green1",
+        "abundance_category": -1,
+        "raw_abundance": false
+      }
+    }
+  ],
+  "boundaryTypeId": 1,
+  "boundaryId": 13,
+  "year": 2016
+};
 
 const MAPLES_BLB_2017_2018 = {
     "$class": "ScatterPlotSelection",

@@ -104,7 +104,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return this.plots.filter(p => p.color && p.species && p.phenophase);
     }
 
-    toURLSearchParams(): HttpParams {
+    toURLSearchParams(): Promise<HttpParams> {
         let params = new HttpParams()
             .set('climate_data','1')
             .set('request_src','npn-vis-scatter-plot')

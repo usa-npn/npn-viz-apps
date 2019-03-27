@@ -49,7 +49,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         });
     }
 
-    toURLSearchParams(): HttpParams {
+    toURLSearchParams(): Promise<HttpParams> {
         let params = new HttpParams()
             .set('request_src', this.requestSrc);
         this.years.forEach((y, i) => {
@@ -115,10 +115,9 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
-        const params = this.toURLSearchParams();
-        const url = this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json');
         this.working = true;
-        return this.serviceUtils.cachedPost(url,params.toString())
+        return this.toURLSearchParams()
+            .then(params => this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json'),params.toString())
             .then(arr => {
                 this.working = false;
                 return arr;
@@ -126,6 +125,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             .catch(err => {
                 this.working = false;
                 this.handleError(err);
-            });
+            }));
+        ;
     }
 }

@@ -14,7 +14,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         super();
     }
 
-    abstract toURLSearchParams(): HttpParams;
+    abstract toURLSearchParams(): Promise<HttpParams>;
 
     private filterSuspectSummaryData(d) {
         var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
@@ -44,7 +44,6 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
-        const params = this.toURLSearchParams(); // TODO "addCommonParams"
         const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
         const filterLqd = this.individualPhenometrics
             ? (data) => { // summary
@@ -85,14 +84,15 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 return filtered;
             };
         this.working = true;
-        return this.serviceUtils.cachedPost(url,params.toString())
-                .then((arr:any[]) => {
-                    this.working = false;
-                    return filterLqd(arr);
-                })
-                .catch(err => {
-                    this.working = false;
-                    this.handleError(err);
-                });
+        return this.toURLSearchParams()
+            .then(params => this.serviceUtils.cachedPost(url,params.toString())
+            .then((arr:any[]) => {
+                this.working = false;
+                return filterLqd(arr);
+            })
+            .catch(err => {
+                this.working = false;
+                this.handleError(err);
+            }));
     }
 }

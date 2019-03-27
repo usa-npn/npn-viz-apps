@@ -301,13 +301,9 @@ export abstract class NetworkAwareVisSelection extends VisSelection {
     @selectionProperty()
     networkIds?: any[] = [];
 
-    addNetworkParams(params: any): any {
-        if (params instanceof HttpParams) {
-            (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
-        } else if (params && typeof (params) === 'object') {
-            (this.networkIds || []).forEach((id, i) => params[`network_id[${i}]`] = `${id}`);
-        }
-        return params;
+    addNetworkParams(params: HttpParams): Promise<HttpParams> {
+        (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
+        return Promise.resolve(params);
     }
 }
 
@@ -318,13 +314,11 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     @selectionProperty()
     stationIds?: any[] = [];
 
-    addNetworkParams(params: any): any {
-        super.addNetworkParams(params);
-        if (params instanceof HttpParams) {
-            (this.stationIds || []).forEach((id, i) => params = params.set(`station_ids[${i}]`, `${id}`));
-        } else if (params && typeof (params) === 'object') {
-            (this.stationIds || []).forEach((id, i) => params[`station_ids[${i}]`] = `${id}`);
-        }
-        return params;
+    addNetworkParams(params: HttpParams): Promise<HttpParams> {
+        return super.addNetworkParams(params)
+            .then(params => {
+                (this.stationIds || []).forEach((id, i) => params = params.set(`station_ids[${i}]`, `${id}`));
+                return params;
+            });
     }
 }

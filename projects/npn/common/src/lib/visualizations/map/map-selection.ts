@@ -54,7 +54,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         super(serviceUtils);
     }
 
-    toURLSearchParams():HttpParams {
+    toURLSearchParams():Promise<HttpParams> {
         let params = new HttpParams()
             .set('request_src','npn-vis-map')
             .set('start_date',`${this.year}-01-01`)

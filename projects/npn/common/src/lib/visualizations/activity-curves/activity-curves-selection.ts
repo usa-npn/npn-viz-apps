@@ -147,28 +147,29 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     loadCurveData(): Promise<any> {
         this.working = true;
-        let promises:Promise<any[]>[] = this.curves
-            .filter(c => c.data(null).isValid())
-            .map(c => {
-                const params = this.addNetworkParams(new HttpParams()
-                    .set('request_src','npn-vis-activity-curves')
-                    .set('start_date',`${c.year}-01-01`)
-                    .set('end_date',this.endDate(c.year))
-                    .set('frequency',`${this.frequency.value}`)
-                    .set('species_id[0]',`${c.species.species_id}`)
-                    .set('phenophase_id[0]',`${c.phenophase.phenophase_id}`));
-                const url = this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json');
-                return this.serviceUtils.cachedPost(url,params.toString())
-                    .then(data => c.data(data));
-            });
-
-        return Promise.all(promises)
-            .then(() => this.working = false)
-            .catch(err => {
-                this.working = false;
-                //throw err;
-                this.handleError(err);
-            });
+        return this.addNetworkParams(new HttpParams()
+                .set('request_src','npn-vis-activity-curves')
+                .set('frequency',`${this.frequency.value}`)
+            ).then((baseParams:HttpParams) => {
+                const promises:Promise<any[]>[] = this.curves
+                    .filter(c => c.data(null).isValid())
+                    .map(c => {
+                        const curveParams = baseParams
+                            .set('start_date',`${c.year}-01-01`)
+                            .set('end_date',this.endDate(c.year))
+                            .set('species_id[0]',`${c.species.species_id}`)
+                            .set('phenophase_id[0]',`${c.phenophase.phenophase_id}`);
+                        return this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json'),curveParams.toString())
+                            .then(data => c.data(data));
+                    });
+                    return Promise.all(promises)
+                        .then(() => this.working = false)
+                        .catch(err => {
+                            this.working = false;
+                            //throw err;
+                            this.handleError(err);
+                        });
+            });        
     }
 
     protected handleError(error: any): void {

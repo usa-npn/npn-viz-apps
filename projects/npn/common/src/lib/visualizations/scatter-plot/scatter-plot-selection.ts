@@ -73,8 +73,24 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         }
     })
     plots:ScatterPlotSelectionPlot[] = [];
+    @selectionProperty()
+    _minDoy:number = 1;
+    @selectionProperty()
+    _maxDoy:number = 365;
 
     private d3DateFormat = d3.timeFormat('%x');
+
+    get minDoy():number { return this._minDoy; }
+    set minDoy(doy:number) {
+        this._minDoy = doy;
+        this.redraw();
+    }
+
+    get maxDoy():number { return this._maxDoy; }
+    set maxDoy(doy:number) {
+        this._maxDoy = doy;
+        this.redraw();
+    }
 
     set axis(a:any) {
         if(a) {
@@ -153,12 +169,18 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                 return map;
             },{}),
             startYear = this.start,
+            minDoy = this.minDoy,
+            maxDoy = this.maxDoy,
             result = data.filter((d,i) => {
                 if(!(d.color = colorMap[colorKey(d)])) {
                     // this can happen if a phenophase id spans two species but is only plotted for one
                     // e.g. boxelder/breaking leaf buds, boxelder/unfolding leaves, red maple/breaking leaf buds
                     // the service will return data for 'red maple/unfolding leaves' but the user hasn't requested
                     // that be plotted so we need to discard this data.
+                    return false;
+                }
+                const doy = this.getDoy(d);
+                if(doy < minDoy || doy > maxDoy) {
                     return false;
                 }
                 d.id = i;
@@ -171,7 +193,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                 }
                 // this is the day # that will get plotted 1 being the first day of the start_year
                 // 366 being the first day of start_year+1, etc.
-                d.day_in_range = ((d.fyy-startYear)*365)+this.getDoy(d);
+                d.day_in_range = ((d.fyy-startYear)*365)+doy;
                 return true;
             });
         this.working = false;

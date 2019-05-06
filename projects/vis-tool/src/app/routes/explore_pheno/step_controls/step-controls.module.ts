@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 
 import { MaterialModule } from '../../../material';
 import { AgmCoreModule } from '@agm/core';
+import { Ng5SliderModule } from 'ng5-slider';
 import {
     VisualizationsModule,
     NpnCommonModule,
@@ -72,6 +73,7 @@ const ENTRY_COMPONENTS:any[] = [
     imports: [
         MaterialModule,
         AgmCoreModule,
+        Ng5SliderModule,
         VisualizationsModule,
         NpnCommonModule,
         NpnGriddedModule

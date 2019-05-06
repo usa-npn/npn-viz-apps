@@ -110,11 +110,8 @@ export class ScatterPlotMiscControlComponent extends BaseControlComponent {
                 // tick 1st of each Month
                 ticksArray: [1,32,60,91,121,152,182,213,244,274,305,335,365],
                 showTicks: true,
-                showSelectionBar: true,
                 vertical: true,
-                translate: doy => {
-                    return this.doyPipe.transform(doy)+ ` (${doy})`;
-                }
+                translate: doy => this.doyPipe.transform(doy)+ ` (${doy})`
             };
             this.selection.redraw();
         }

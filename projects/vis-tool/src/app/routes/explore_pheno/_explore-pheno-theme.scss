@@ -263,6 +263,7 @@
 
             #noActiveVis {
                 npn-logo {
+                    width: 200px; // not square, just resize in one direction.
                     .swirl-top,
                     .swirl-left,
                     .swirl-right {

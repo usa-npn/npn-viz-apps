@@ -11,9 +11,9 @@ import {
 import { VisConfigStep, VisDefinition } from "./interfaces";
 
 import { StepComponent, ControlComponent, SubControlComponent } from './interfaces';
-import { MonitorsDestroy, newGuid } from "@npn/common";
+import { MonitorsDestroy, newGuid, VisualizationSelectionFactory } from "@npn/common";
 
-import { VisSelectionStep, VisSelectionSelection, DummyStep } from "./step_controls";
+import { VisSelectionStep, VisSelectionSelection, DummyStep, resetVisDefinition } from "./step_controls";
 
 const INIT_STEPS = (steps:VisConfigStep[]) => steps.forEach(s => s.$id = (s.$id||newGuid()));
 
@@ -39,7 +39,8 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
     activeVisComponent:any;
 
     constructor(
-        private componentFactoryResolver:ComponentFactoryResolver
+        private componentFactoryResolver:ComponentFactoryResolver,
+        private selectionFactory:VisualizationSelectionFactory
     ) {
         super();
     }
@@ -109,7 +110,14 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         }
     }
 
+    currentHosts;
+    reset() {
+        resetVisDefinition(this.activeVis,this.selectionFactory);
+        this.setupSteps(this.currentHosts);
+    }
+
     private setupSteps(hosts) {
+        this.currentHosts = hosts;
         const [steps,controls,subs] = hosts;
         const stepHosts:ViewContainerRef[] = steps.toArray();
         const controlHosts:ViewContainerRef[] = controls.toArray();

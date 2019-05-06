@@ -32,6 +32,40 @@ import { AgddTsLayerPointStep } from './agdd-ts-layer-point';
 import { AgddTsMiscStep } from './agdd-ts-misc';
 import { BoundaryStep } from "./boundary";
 
+/**
+ * This function is exported to allow the UI reset functionality to put a definition
+ * back in its initial "clean" state.  If it has what it needs it will unconditionally
+ * create a new selection and clean out any selection specific properties,
+ * 
+ * @param visDef The visualization definition.
+ * @param selectionFactory Factory for constructing new empty selections.
+ */
+export function resetVisDefinition(visDef:VisDefinition,selectionFactory:VisualizationSelectionFactory) {
+    if(typeof(visDef.selection) === 'string' || !!visDef.templateSelection) {
+        const $class = !!visDef.templateSelection
+            ? visDef.templateSelection.$class
+            : visDef.selection; // string
+        if(!visDef.templateSelection) {
+            visDef.templateSelection = selectionFactory.newSelection({$class});
+        }
+        visDef.selection = selectionFactory.newSelection({$class});
+        const externalTemplate = visDef.templateSelection.external;
+        Object.keys(externalTemplate)
+            .filter(k => ['guid','meta','$class'].indexOf(k) === -1)
+            .forEach(key => {
+                const val = visDef.selection[key];
+                if(val !== null) {
+                    // leave empty arrays alone
+                    if(!Array.isArray(val) || val.length) {
+                        visDef.selection[key] = undefined;
+                    }
+                }
+            });
+        /*console.log('template',visDef.templateSelection);
+        console.log('selection',visDef.selection);*/
+    }
+}
+
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
     changeDueToSharing:boolean = false;
@@ -83,26 +117,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     }
 
     ngOnInit() {
-        VIS_DEFINITIONS.forEach(visDef => {
-            if(typeof(visDef.selection) === 'string') {
-                visDef.templateSelection = this.selectionFactory.newSelection({$class:visDef.selection});
-                visDef.selection = this.selectionFactory.newSelection({$class:visDef.selection});
-                const externalTemplate = visDef.templateSelection.external;
-                Object.keys(externalTemplate)
-                    .filter(k => ['guid','meta','$class'].indexOf(k) === -1)
-                    .forEach(key => {
-                        const val = visDef.selection[key];
-                        if(val !== null) {
-                            // leave empty arrays alone
-                            if(!Array.isArray(val) || val.length) {
-                                visDef.selection[key] = undefined;
-                            }
-                        }
-                    });
-                console.log('template',visDef.templateSelection);
-                console.log('selection',visDef.selection);
-            }
-        });
+        VIS_DEFINITIONS.forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
         // if when loaded there is a selection on the current route then wire it up
         this.activatedRoute.paramMap
             .pipe(

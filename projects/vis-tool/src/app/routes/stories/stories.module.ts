@@ -2,17 +2,17 @@ import { NgModule } from "@angular/core";
 
 import { MaterialModule } from '../../material';
 
-import { PhenoNearComponent } from './pheno-near.component';
+import { StoriesComponent } from './stories.component';
 
 @NgModule({
     imports: [
         MaterialModule
     ],
     declarations: [
-        PhenoNearComponent
+        StoriesComponent
     ],
     exports: [
-        PhenoNearComponent
+        StoriesComponent
     ]
 })
 export class PhenoNearModule {}

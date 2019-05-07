@@ -4,16 +4,16 @@ import { Routes, RouterModule } from '@angular/router';
 import { RoutePath } from './route-path';
 import {
     ExplorePhenoComponent,
-    PhenoNearComponent,
+    StoriesComponent,
     SettingsComponent
 } from './routes';
 
 const ROUTES:Routes = [{
     path: '',
-    component: PhenoNearComponent
+    component: StoriesComponent
 },{
-    path: RoutePath.PHENO_NEAR,
-    component: PhenoNearComponent
+    path: RoutePath.STORIES,
+    component: StoriesComponent
 },{
     path: RoutePath.EXPLORE_PHENO,
     component: ExplorePhenoComponent

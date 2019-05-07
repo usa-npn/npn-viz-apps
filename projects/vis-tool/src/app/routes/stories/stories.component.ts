@@ -10,7 +10,7 @@ interface CannedVisualization {
 }
 @Component({
     template: `
-    <div id="phenoNearMe">
+    <div id="stories">
         <div class="top">
             <mat-form-field class="zip-code" color="warn">
                 <input matInput placeholder="Enter your zip code" type="text" />
@@ -27,7 +27,7 @@ interface CannedVisualization {
     </div>
     `
 })
-export class PhenoNearComponent {
+export class StoriesComponent {
     cannedVisualizations:CannedVisualization[] = [{
         title: 'Maple bud out 2017 vs 2018',
         tagline: 'How did maples budding out stack up between 2017 and 2018?',

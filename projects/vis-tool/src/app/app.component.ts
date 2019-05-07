@@ -42,7 +42,7 @@ export class AppComponent {
   routeTheme:AppTheme;
 
   menuItems:MenuItem[] = [{
-    routerLink: RoutePath.PHENO_NEAR,
+    routerLink: RoutePath.STORIES,
     icon: faStreetView,
     title: 'Phenology near me',
     caption: 'Seasons and cycles in my area',

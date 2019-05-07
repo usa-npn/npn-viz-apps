@@ -9,46 +9,26 @@
     #stories {
         width: 100%;
         height: 100%;
-        background: url('assets/leaves.jpg');
         background-size: cover;
-
-        display: flex;
-        flex-direction: column;
-        .top {
-            padding-bottom: 20px;
-            flex-basis: 33%;
-            display: flex;
-            align-items: flex-end;
-            .zip-code {
-                flex-basis: 40%;
-                margin: 0px auto;
-                .mat-form-field-wrapper {
-                    $background: map-get($theme, background);
-                    $bg-color: mat-color($background, background);
-                    background-color: rgba($bg-color,0.75);
-                }
-                .mat-form-field-flex {
-                    height: 60px;
-                    font-size: 2.5em;
-                    text-align: center;
-                    .mat-form-field-infix {
-                        padding: .5em 0;
-                    }
-                }
-            }
-        }        
-        .bottom {
+        .story-list {
+            // TODO
+            height: 100%;
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
             justify-content: center;
             padding: 0px;
-            >.canned-vis-wrapper {
+            margin: 0px;
+            >.story-wrapper {
                 display:flex;
                 flex-basis: 45%;
                 padding: 10px;
                 list-style: none;
-                .canned-vis {
+                .story {
                     padding: .75em;
+                    box-shadow: 5px 5px 5px rgba(0,0,0,.5);
+                    border-radius: 4px;
+                    border: 1px solid transparent;
                     background-color: mat-contrast($primary,500);
                     color: mat-color($primary,500);
                     display: flex;
@@ -64,8 +44,9 @@
                         flex: 1 0 auto;
                     }
                     &:hover {
-                        background-color: mat-color($primary,100);
-                        color: mat-contrast($primary,100);
+                        background-color: mat-color($accent2,50);
+                        color: mat-contrast($accent2,50);
+                        border-color: mat-color($accent,500);
                         cursor: pointer;
                     }
                 }

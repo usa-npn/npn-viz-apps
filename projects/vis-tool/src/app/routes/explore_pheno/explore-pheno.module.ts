@@ -8,7 +8,6 @@ import { ShareControlComponent } from './share-control.component';
 import { ExplorePhenoComponent } from './explore-pheno.component';
 import { StepControlsModule } from './step_controls';
 
-import { SharingService } from './sharing.service';
 import { ResetControlComponent } from './reset-control.component';
 
 @NgModule({
@@ -25,9 +24,6 @@ import { ResetControlComponent } from './reset-control.component';
     ],
     exports: [
         ExplorePhenoComponent
-    ],
-    providers: [
-        SharingService
     ]
 })
 export class ExplorePhenoModule {}

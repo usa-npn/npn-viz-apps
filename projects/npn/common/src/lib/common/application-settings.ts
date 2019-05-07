@@ -7,10 +7,13 @@ export enum SpeciesTitleFormat {
     ScientificName = 'scientific-name'
 };
 
-interface AppSettings {
-    filterLqdSummary: boolean;
-    numDaysQualityFilter: number;
-    speciesTitleFormat: SpeciesTitleFormat;
+export interface AppSettings {
+    /** Whether or not to filter less precise data. */
+    filterLqdSummary?: boolean;
+    /** E.g. 7 || 14 || 30 */
+    numDaysQualityFilter?: number;
+    /** 'common-name' || 'scientific-name */
+    speciesTitleFormat?: SpeciesTitleFormat;
 }
 
 /**
@@ -18,7 +21,7 @@ interface AppSettings {
  * This is just a class and not an `@Injectable` service because it has
  * no `@Injectable` dependencies so it's just more simple.
  */
-class ApplicationSettings {
+class ApplicationSettings implements AppSettings {
     private settings:AppSettings = {
         filterLqdSummary: true,
         numDaysQualityFilter: 30,

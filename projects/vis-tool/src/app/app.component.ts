@@ -4,11 +4,11 @@ import { filter } from 'rxjs/operators';
 
 import {
   IconDefinition,
-  faStreetView,
-  faMapMarkedAlt,
   faArrowLeft,
   faCogs,
-  faCode
+  faCode,
+  faBooks,
+  faChartLine
 } from '@fortawesome/pro-light-svg-icons';
 
 import { RoutePath } from './route-path';
@@ -43,16 +43,16 @@ export class AppComponent {
 
   menuItems:MenuItem[] = [{
     routerLink: RoutePath.STORIES,
-    icon: faStreetView,
-    title: 'Phenology near me',
-    caption: 'Seasons and cycles in my area',
+    icon: faBooks,
+    title: 'Seasonal Stories',
+    caption: 'Quick access to curated visualizations',
     navExpandedWhenActive: true,
     theme: AppTheme.DARK
   },{
     routerLink: RoutePath.EXPLORE_PHENO,
-    icon: faMapMarkedAlt,
-    title: 'Explore phenological findings',
-    caption: 'Plant, animal and phenophase charts and maps',
+    icon: faChartLine,
+    title: 'Data Explorer',
+    caption: 'Select data & create visualizations',
     navExpandedWhenActive: false,
     theme: AppTheme.LIGHT
   },{

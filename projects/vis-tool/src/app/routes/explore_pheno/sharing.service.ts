@@ -1,54 +1,68 @@
 import { Injectable } from '@angular/core';
 
 import * as pako from 'pako';
-import { VisSelection, VisualizationSelectionFactory, APPLICATION_SETTINGS } from '@npn/common';
+import { VisSelection, APPLICATION_SETTINGS, AppSettings } from '@npn/common';
 
-interface Shared {
-    external: any;
-    settings?:  any;
+export interface Shared {
+    external:any;
+    description?:string;
+    settings?:AppSettings;
 }
 
 @Injectable()
 export class SharingService {
-    constructor(private visSelectionFactory:VisualizationSelectionFactory) {}
-
     /**
-     * Serializes a VisSelection to a string.
+     * Serializes a VisSelection to a string.  Current application
+     * settings will be included.
      * 
      * @param selection The `VisSelection` to serialized.
-     * @param includeSettings Wether or not the result should contain the current application settings.
      */
-    serialize(selection:VisSelection,includeSettings:boolean = false) {
-        return this.serializeExternal(selection.external,includeSettings);
+    serializeSelection(selection:VisSelection) {
+        const external = selection.external;
+        const settings = {...APPLICATION_SETTINGS} as AppSettings;
+        return this.serialize({external,settings});
     }
 
     /**
-     * Serializes a VisSelection to a string (starting with its external form).
+     * Serializes a `Shared` object to a string.
      * 
-     * @param external The external form of a `VisSelection`
-     * @param includeSettings Whether or not the result should contain the current application settings.
+     * @param shared The `shared` object to serialize.
      */
-    serializeExternal(external:any,includeSettings:boolean = false) {
-        const o:Shared = {
-            external: external
-        };
-        if(includeSettings) {
-            o.settings = {...APPLICATION_SETTINGS};
-        }
-        return window.btoa(pako.deflate(JSON.stringify(o),{to:'string'}));
+    serialize(shared:Shared) {
+        return this.deflate(JSON.stringify(shared));
     }
-    
+
     /**
      * Deserializes a previously serialized selection.
      * _Note:_ If the deserialized result contains application settings the application settings will be updated.
      * 
      * @param serialized A serialized string produced by `serialize` or `serializeExternal`.
      */
-    deserialize(serialized:string):VisSelection {
-        const o:Shared = JSON.parse(pako.inflate(window.atob(serialized), {to: 'string'}));
-        Object.keys(o.settings||{}).forEach(key => {
-            APPLICATION_SETTINGS[key] = o.settings[key];
-        });
-        return this.visSelectionFactory.newSelection(o.external);
+    deserialize(serialized:string):Shared {
+        const o:Shared = JSON.parse(this.inflate(serialized));
+        if(o.settings) {
+            setTimeout(() => {
+                Object.keys(o.settings).forEach(key => {
+                    APPLICATION_SETTINGS[key] = o.settings[key];
+                });
+            });
+        }
+        return o;
+    }
+
+    /**
+     * deflates and codes a string.
+     * @param inflated The inflated string.
+     */
+    deflate(inflated:string):string {
+        return window.btoa(pako.deflate(inflated,{to:'string'}))
+    }
+
+    /**
+     * decodes and inflates a string.
+     * @param deflated The deflated string.
+     */
+    inflate(deflated:string):string {
+        return pako.inflate(window.atob(deflated), {to: 'string'})
     }
 }

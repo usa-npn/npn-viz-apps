@@ -17,6 +17,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { NpnCommonModule, NpnConfiguration, NPN_CONFIGURATION } from '@npn/common';
 import { AgmCoreModule } from '@agm/core';
 import { environment } from '../environments/environment';
+// local services to make sure they're singleton's
+import { SharingService } from './routes/explore_pheno/sharing.service';
+import { StoriesService } from './routes/stories/stories.service';
 
 export function npnConfigurationFactory():NpnConfiguration {
   return environment.npnConfiguration;
@@ -44,7 +47,9 @@ export function npnConfigurationFactory():NpnConfiguration {
   ],
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 }},
-    {provide: NPN_CONFIGURATION, useFactory: npnConfigurationFactory }
+    {provide: NPN_CONFIGURATION, useFactory: npnConfigurationFactory },
+    SharingService,
+    StoriesService
   ],
   bootstrap: [AppComponent]
 })

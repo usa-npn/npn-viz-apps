@@ -22,7 +22,7 @@ import { CalendarMiscStep } from './calendar-misc';
 import { LocationStep } from './location';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil, map, filter } from 'rxjs/operators';
-import { SharingService } from '../sharing.service';
+import { SharingService, Shared } from '../sharing.service';
 import { MapLayerStep } from './map-layer';
 import { ActivityCurvesStep } from './activity-curves';
 import { ActivityCurvesMiscStep } from './activity-curves-misc';
@@ -126,7 +126,8 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
                 takeUntil(this.componentDestroyed)
             )
             .subscribe(s => {
-                const selection:VisSelection = this.sharingService.deserialize(s);
+                const shared:Shared = this.sharingService.deserialize(s);
+                const selection:VisSelection = this.selectionFactory.newSelection(shared.external);
                 selection.$shared = true;
                 // find the corresponding definition
                 const visDef = VIS_DEFINITIONS.find(vd => vd.selection && selection.$class === vd.selection.$class);

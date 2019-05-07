@@ -4,12 +4,7 @@
     </div>
     <div class="chart-container">
         <visualization-download *ngIf="!thumbnail && !mobileMode" svgWrapperId="{{id}}" filename="{{filename}}"></visualization-download>
-        <div [class]="clazz" id="{{id}}" [hidden]="thumbnailSrc"><svg class="svg-visualization"></svg></div>
-        <div [hidden]="!thumbnailSrc">
-            <canvas class="thumbnail-canvas" style="display: none;"></canvas>
-            <img class="thumbnail-image" />
-        </div>
-
+        <div [class]="clazz" id="{{id}}"><svg class="svg-visualization"></svg></div>
     </div>
     <div *ngIf="disclaimer && !thumbnail" class="vis-disclaimer">{{disclaimer}}</div>
 </div>

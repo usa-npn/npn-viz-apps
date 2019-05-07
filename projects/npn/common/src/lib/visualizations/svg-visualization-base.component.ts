@@ -36,7 +36,6 @@ export class SvgVisualizationBaseComponent extends VisualizationBaseComponent {
     margins: VisualizationMargins = DEFAULT_MARGINS;
 
     protected minWidth: number = 700;
-    thumbnailSrc: any;
 
     baseFontSize(withPx?: boolean): number | string {
         let fs = FONT_SIZE;
@@ -143,46 +142,17 @@ export class SvgVisualizationBaseComponent extends VisualizationBaseComponent {
         let sizeInfo = this.sizing,
             w = sizeInfo.width + sizeInfo.margin.left + sizeInfo.margin.right;
         if (w === this.minWidth) {
+            // If the resulting width matches the minWidth then the realestate to draw the
+            // SVG is at or below the minWidth.  Attempting to render visualizations too small
+            // results in unusable/cramped results so when we reach this break point draw the
+            // visualization scaled to its minimum size and scale it down (shrink everything)
             let native = this.rootElement.nativeElement as HTMLElement,
                 svg = native.querySelector('svg.svg-visualization') as SVGElement,
                 wrappedSvg = d3.select(svg),
-                cHeight = +wrappedSvg.attr('height'),
+                h = sizeInfo.height + sizeInfo.margin.bottom + sizeInfo.margin.top,
                 aspectMult = sizeInfo.scaledWidth / this.minWidth;
             wrappedSvg.attr('width', sizeInfo.scaledWidth);
-            wrappedSvg.attr('height', Math.round(cHeight * aspectMult));
-            /*  MSIE has issues with this approach of using an image so
-                instead scaling the SVG down which seems better.
-                TODO: The markup supporting the PNG approach remains
-            let native = this.rootElement.nativeElement as HTMLElement,
-                svg = native.querySelector('svg.svg-visualization') as SVGElement,
-                wrappedSvg = d3.select(svg),
-                canvas = native.querySelector('canvas.thumbnail-canvas') as HTMLCanvasElement,
-                img = native.querySelector('img.thumbnail-image') as HTMLImageElement,
-                wrappedImg = d3.select(img),
-                h = sizeInfo.height + sizeInfo.margin.top + sizeInfo.margin.bottom;
-            console.debug('SvgVisualizationBaseComponent: minWidth hit, replacing with generated thumbnail image.');
-            wrappedSvg.attr('version',1.1)
-                .attr('xmlns', 'http://www.w3.org/2000/svg');
-            let svgParent = svg.parentNode as HTMLElement,
-                html = svgParent.innerHTML;
-            canvas.width = +wrappedSvg.attr('width');
-            canvas.height = +wrappedSvg.attr('height');
-            wrappedImg.attr('width',sizeInfo.scaledWidth);
-            try {
-                let context = canvas.getContext('2d'),
-                    image = new Image();
-                image.setAttribute('crossOrigin','anonymous');
-                image.onload = () => {
-                    context.drawImage(image,0,0);
-                    this.thumbnailSrc = img.src = canvas.toDataURL('image/png');
-                };
-                image.src = 'data:image/svg+xml;base64,'+ window.btoa(html);
-            } catch(imageError) {
-                console.error(imageError);
-            }
-            */
-        } else {
-            this.thumbnailSrc = undefined;
+            wrappedSvg.attr('height', Math.round(h * aspectMult));
         }
     }
 

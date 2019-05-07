@@ -252,7 +252,7 @@ const CONFIGURATION:StoriesConfiguration = {
         "description": `
         <p>Red and sugar maples in latin</p>
         <p><img src='https://cf.ltkcdn.net/garden/images/std/189484-200x266-Fall-Sugar-Maple.jpg' alt='maple' /></p>
-        <p>That there is a picture of a mpale tree...</p>
+        <p>That there is a picture of a maple tree...</p>
         `,
         "settings": {
             "speciesTitleFormat": SpeciesTitleFormat.ScientificName

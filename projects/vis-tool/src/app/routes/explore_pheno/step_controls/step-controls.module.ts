@@ -13,7 +13,7 @@ import {
     ActivityCurvesComponent,
     AgddTimeSeriesComponent } from '@npn/common';
 
-import { VisSelectionControlComponent, VisSelectionStepComponent } from './vis-selection';
+import { VisSelectionControlComponent, VisSelectionStepComponent, SharedVisualizationDescriptionComponent } from './vis-selection';
 import { DummyStepComponent, DummyControlComponent } from './dummy';
 import { StartEndControlComponent, StartEndStepComponent } from './start-end';
 import { YearsControlComponent, YearsStepComponent } from './years';
@@ -39,7 +39,7 @@ import { BoundaryStepComponent, BoundaryControlComponent, BoundarySubControlComp
 // since they are all dynamically inserted into the application.
 // rather than cut/pasting everythign just define the list once
 const COMPONENTS:any[] = [
-    VisSelectionControlComponent, VisSelectionStepComponent,
+    VisSelectionControlComponent, VisSelectionStepComponent, SharedVisualizationDescriptionComponent,
     DummyStepComponent, DummyControlComponent,
     StartEndControlComponent, StartEndStepComponent,
     YearsControlComponent, YearsStepComponent,

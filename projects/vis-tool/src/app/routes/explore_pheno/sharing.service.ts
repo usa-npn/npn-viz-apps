@@ -4,9 +4,12 @@ import * as pako from 'pako';
 import { VisSelection, APPLICATION_SETTINGS, AppSettings } from '@npn/common';
 
 export interface Shared {
+    /** The external form of the `VisSelection` to  display */
     external:any;
-    description?:string;
+    /** Any settings you want applied. */
     settings?:AppSettings;
+    /** Any other properties sub-interfaces might include */
+    [x:string]: any;
 }
 
 @Injectable()

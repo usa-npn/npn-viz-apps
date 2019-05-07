@@ -1,24 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
-import { SharingService } from '../explore_pheno/sharing.service';
+import { SharingService, Shared } from '../explore_pheno/sharing.service';
 import { RoutePath } from '../../route-path';
-import { AppSettings, SpeciesTitleFormat } from '@npn/common';
+import { SpeciesTitleFormat } from '@npn/common';
 
 /**
  * Defines a story to place on the interface.
  */
-export interface Story {
+export interface Story extends Shared {
     /** The story title */
     title: string;
     /** The tagline to display below the title */
     tagline: string;
     /** A long description (HTML) to place in a dialog when opening the story */
     description?: string;
-    /** The external form of the `VisSelection` to  display */
-    selection: any;
-    /** Any settings you want applied. */
-    settings?:AppSettings;
 }
 
 export interface StoriesConfiguration {
@@ -43,11 +39,7 @@ export class StoriesService {
     visit(story:Story):Promise<boolean> {
         return this.router.navigate([
             RoutePath.EXPLORE_PHENO,
-            {s: this.sharingService.serialize({
-                external: story.selection,
-                description: story.description,
-                settings: story.settings
-            })}
+            {s: this.sharingService.serialize(story)}
         ]);
     }
 }
@@ -257,17 +249,29 @@ const CONFIGURATION:StoriesConfiguration = {
     "stories":[{
         "title": 'Maple bud out 2017 vs 2018',
         "tagline": 'Will change species title format to scientific...',
+        "description": `
+        <p>Red and sugar maples in latin</p>
+        <p><img src='https://cf.ltkcdn.net/garden/images/std/189484-200x266-Fall-Sugar-Maple.jpg' alt='maple' /></p>
+        <p>That there is a picture of a mpale tree...</p>
+        `,
         "settings": {
             "speciesTitleFormat": SpeciesTitleFormat.ScientificName
         },
-        "selection": MAPLES_BLB_2017_2018
+        "external": MAPLES_BLB_2017_2018
     },{
         "title": 'Maple colors 2017 vs 2018',
         "tagline": 'How did maple leaf colors stack up between 2017 and 2018?',
-        "selection": MAPLES_COLORS_2017_2018
+        "description": `
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vestibulum risus ipsum, vel accumsan dolor suscipit ac. Nunc sit amet magna ex. Phasellus posuere tincidunt nisi, et pulvinar mauris tempor a. Cras egestas justo vitae arcu pellentesque suscipit. Sed sodales, dolor quis ultrices blandit, libero sapien ultricies urna, sit amet posuere ligula tortor a magna. Aenean sit amet nisl eu eros tristique suscipit. Quisque convallis pharetra dignissim. Suspendisse potenti. Cras in accumsan tortor. Nunc mollis euismod ante, et ullamcorper nibh condimentum vitae. Sed malesuada, dolor ac consequat facilisis, enim magna consequat nisi, vitae iaculis mi urna et elit. Aliquam erat volutpat.</p>
+        <p>Pellentesque eu felis accumsan, cursus dui eget, congue sem. Mauris orci mauris, accumsan vel ullamcorper ac, feugiat ut felis. Nam egestas arcu magna, vel pellentesque purus consequat et. Nam eleifend, tortor a aliquam aliquam, lacus arcu consectetur nulla, eu molestie velit dui eu ligula. Maecenas tincidunt interdum sapien id hendrerit. Proin a lorem aliquet lectus tincidunt facilisis et at augue. Nulla eget porta velit. Mauris facilisis molestie convallis.</p>
+        `,
+        "external": MAPLES_COLORS_2017_2018
     },{
         "title": 'Red vs Sugar activity 2017',
         "tagline": 'Who had more activity?',
-        "selection": MAPLES_ACTIVITY_2017
+        "description": `
+        <p>Integer vel dui tellus. Pellentesque gravida nunc vel varius sollicitudin. Etiam sed arcu libero. Phasellus commodo luctus quam, non posuere massa fermentum nec. Aenean in rutrum lectus, ac accumsan eros. Ut suscipit sit amet magna eu laoreet. Praesent tincidunt velit nec turpis facilisis, vel finibus velit accumsan.</p>
+        `,
+        "external": MAPLES_ACTIVITY_2017
     }]
 };

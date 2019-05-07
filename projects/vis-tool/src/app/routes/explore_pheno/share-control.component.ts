@@ -69,14 +69,10 @@ export class ShareControlComponent extends MonitorsDestroy implements StepCompon
     }
 
     shareToClipboard() {
-        const urlTree = this.router.createUrlTree([RoutePath.EXPLORE_PHENO,{s:this.serialize()}]);
+        const urlTree = this.router.createUrlTree([RoutePath.EXPLORE_PHENO,{s:this.sharingService.serialize(this.selection,true)}]);
         const url = this.location.prepareExternalUrl(this.router.serializeUrl(urlTree));
         this.copyToClipboard(`${window.location.origin}${window.location.pathname}${url}`);
         this.snackBar.open('Link copied to the clipboard.');
-    }
-
-    private serialize() {
-        return this.sharingService.serialize(this.selection);
     }
 
     private copyToClipboard(val: string){

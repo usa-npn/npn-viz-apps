@@ -47,7 +47,7 @@ export class AppComponent {
     title: 'Seasonal Stories',
     caption: 'Quick access to curated visualizations',
     navExpandedWhenActive: true,
-    theme: AppTheme.DARK
+    theme: AppTheme.LIGHT
   },{
     routerLink: RoutePath.EXPLORE_PHENO,
     icon: faChartLine,

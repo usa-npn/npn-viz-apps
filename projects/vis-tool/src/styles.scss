@@ -34,15 +34,12 @@ $app-light-theme: map-merge($app-light-base-theme,(accent2:$accent2-palette));
 @include app-component-theme($app-dark-theme);
 
 @import './app/routes/explore_pheno/explore-pheno-theme';
-@import './app/routes/stories/stories-theme';
 @import './app/routes/settings/settings-theme';
 @import './app/select-tree/select-tree-theme';
 
 body {
     margin: 0px;
     padding: 0px;
-
-    @include stories-theme($app-dark-theme);
 
     #applicationRouterOutlet {
         &.light {

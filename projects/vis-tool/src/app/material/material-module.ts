@@ -13,6 +13,8 @@ import {
     MatSliderModule,
     MatRadioModule,
     MatBottomSheetModule,
+    MatGridListModule,
+    MatCardModule
  } from "@angular/material";
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -41,7 +43,9 @@ import { SelectTreeModule } from '../select-tree';
         MatInputModule,
         MatSliderModule,
         MatRadioModule,
-        MatBottomSheetModule
+        MatBottomSheetModule,
+        MatGridListModule,
+        MatCardModule
     ],
     exports: [
         CommonModule, FormsModule, ReactiveFormsModule,
@@ -59,7 +63,9 @@ import { SelectTreeModule } from '../select-tree';
         MatInputModule,
         MatSliderModule,
         MatRadioModule,
-        MatBottomSheetModule
+        MatBottomSheetModule,
+        MatGridListModule,
+        MatCardModule
     ]
 })
 export class MaterialModule {

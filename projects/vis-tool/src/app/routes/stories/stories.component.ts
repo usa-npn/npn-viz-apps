@@ -4,17 +4,36 @@ import { Observable } from 'rxjs';
 
 @Component({
     template: `
-    <div id="stories" *ngIf="configuration | async as cfg">
-        <ul class="story-list" [ngStyle]="{background: 'url('+(cfg.backgroundImage||'assets/leaves.jpg')+')'}">
-            <li class="story-wrapper" *ngFor="let story of cfg.stories">
-                <div class="story" (click)="storiesService.visit(story)">
-                    <div class="title">{{story.title}}</div>
-                    <p class="tagline">{{story.tagline}}</p>
-                </div>
-            </li>
-        </ul>
+    <div class="stories" *ngIf="configuration | async as cfg" [ngStyle]="{background: 'url('+(cfg.backgroundImage||'assets/leaves.jpg')+')'}">
+        <mat-grid-list cols="2" rowHeight="150px" gutterSize="20px">
+            <!-- just to push other content down -->
+            <mat-grid-tile colspan="2">&nbsp;</mat-grid-tile>
+            <mat-grid-tile *ngFor="let story of cfg.stories">
+                <mat-card>
+                    <mat-card-title>{{story.title}}</mat-card-title>
+                    <mat-card-subtitle>{{story.tagline}}</mat-card-subtitle>
+                    <mat-card-actions>
+                        <button mat-button (click)="storiesService.visit(story)">See visualization</button>
+                    </mat-card-actions>
+                </mat-card>
+            </mat-grid-tile>
+        </mat-grid-list>
     </div>
-    `
+    `,
+    styles:[`
+    .stories {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+    }
+    .stories mat-grid-list {
+        width: 95%;
+        margin: auto;
+    }
+    .stories mat-card {
+        width: 100%;
+    }
+    `]
 })
 export class StoriesComponent {
     configuration:Observable<StoriesConfiguration>;

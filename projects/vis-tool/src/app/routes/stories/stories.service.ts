@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { SharingService, Shared } from '../explore_pheno/sharing.service';
 import { RoutePath } from '../../route-path';
 import { SpeciesTitleFormat } from '@npn/common';
+import { HttpClient } from '@angular/common/http';
+import { GeocoderResponse } from './google-geocoder';
+import { environment } from '../../../environments/environment';
+import { map } from 'rxjs/operators';
 
 /**
  * Defines a story to place on the interface.
@@ -28,12 +32,14 @@ export interface StoriesConfiguration {
 export class StoriesService {
 
     constructor(
+        private http:HttpClient,
         private router:Router,
         private sharingService:SharingService
     ) {}
 
     getConfiguration():Observable<StoriesConfiguration> {
-        return of(CONFIGURATION);
+        // parse/stringify so that we're not modifying the underling objects.
+        return of(JSON.parse(JSON.stringify(CONFIGURATION)));
     }
 
     visit(story:Story):Promise<boolean> {
@@ -41,6 +47,22 @@ export class StoriesService {
             RoutePath.EXPLORE_PHENO,
             {s: this.sharingService.serialize(story)}
         ]);
+    }
+
+    geoCodeZip(zip:string):Observable<number []> {
+        return this.http.get<GeocoderResponse>(`https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${environment.googleMapsApiKey}`)
+          .pipe(
+            map(response => {
+              if(response.status !== 'OK') {
+                throw new Error(`${response.status} : ${response.error_message}`);
+              }
+              if(!response.results.length) {
+                throw new Error(`Geocoding for zip ${zip} returned no results`);
+              }
+              const {location} = response.results[0].geometry;
+              return [location.lat,location.lng];
+            })
+          );
     }
 }
 
@@ -241,6 +263,20 @@ const MAPLES_ACTIVITY_2017 = {
     ]
 };
 
+const TIME_SERIES_MAY_8 = {
+  "$class": "AgddTimeSeriesSelection",
+  "guid": "7ae58e6c-4318-41d9-a2fb-1f4a5e1c3497",
+  "meta": {},
+  "layerCategory": "Daily Temperature Accumulations",
+  "layerName": "gdd:agdd",
+  "extentValue": "2019-05-08T00:00:00.000Z",
+  /*"latLng": [
+    44.12534339967215,
+    -91.71142735875947
+  ],*/
+  "doy": 160
+};
+
 // MOCK configuration to be replaced by a server side JSON or similar.
 const CONFIGURATION:StoriesConfiguration = {
     /* supply a new image to change the background image like below.
@@ -273,5 +309,12 @@ const CONFIGURATION:StoriesConfiguration = {
         <p>Integer vel dui tellus. Pellentesque gravida nunc vel varius sollicitudin. Etiam sed arcu libero. Phasellus commodo luctus quam, non posuere massa fermentum nec. Aenean in rutrum lectus, ac accumsan eros. Ut suscipit sit amet magna eu laoreet. Praesent tincidunt velit nec turpis facilisis, vel finibus velit accumsan.</p>
         `,
         "external": MAPLES_ACTIVITY_2017
+    },{
+      "title": "AGDD Where you are for May 8 2019",
+      "tagline": "How much temperature has accumulated?",
+      "description": `
+      <p>Heat accumulation in the spring is commonly used to predict the timing of phenological transitions in plants and animals.  Read more about it <a href="https://www.usanpn.org/data/agdd_maps" target="_blank">here</a>.</p>
+      `,
+      "external": TIME_SERIES_MAY_8
     }]
 };

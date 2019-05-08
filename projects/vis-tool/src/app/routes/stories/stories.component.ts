@@ -13,7 +13,9 @@ import { Observable } from 'rxjs';
                     <mat-card-title>{{story.title}}</mat-card-title>
                     <mat-card-subtitle>{{story.tagline}}</mat-card-subtitle>
                     <mat-card-actions>
-                        <button mat-button (click)="storiesService.visit(story)">See visualization</button>
+                        <geocode-zip *ngIf="story.external.$class === 'AgddTimeSeriesSelection'" [external]="story.external"></geocode-zip>
+                        <button mat-button (click)="storiesService.visit(story)"
+                            [disabled]="story.external.$class === 'AgddTimeSeriesSelection' && story.external.latLng?.length !== 2">See visualization</button>
                     </mat-card-actions>
                 </mat-card>
             </mat-grid-tile>

@@ -3,11 +3,20 @@
 @import './step_controls/vis-theme';
 
 @mixin explore-pheno-theme($theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+    $accent2: map-get($theme,accent2);
+    // mat-sheets dark themed contaiing links are a very bad color
+    // without sufficient contrast
+    .mat-bottom-sheet-container {
+        a,
+        a:visited {
+            color: mat-contrast($primary,500);
+        }
+    }
     #explorePhenologicalFindings {
-        $primary: map-get($theme,primary);
-        $accent: map-get($theme,accent);
-        $warn: map-get($theme,warn);
-        $accent2: map-get($theme,accent2);
+
     
         $step-title-bg: mat-color($primary,800);
         $drawer-title-height: 36px;

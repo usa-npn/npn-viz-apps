@@ -1,15 +1,22 @@
-import {Component,Input,Output,EventEmitter, SimpleChanges} from '@angular/core';
-import {FormControl,Validators} from '@angular/forms';
+import {Component,Input,SimpleChanges} from '@angular/core';
+import {FormControl} from '@angular/forms';
 
-import {Species, MonitorsDestroy} from '../../common';
-import {ActivityCurve,ACTIVITY_CURVE_KINGDOM_METRICS} from './activity-curve';
+import {MonitorsDestroy} from '../../common';
+import {ActivityCurve} from './activity-curve';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'curve-selection-control',
     template: `
-    <species-phenophase-input [(species)]="curve.species" [(phenophase)]="curve.phenophase" [selection]="selection" [disabled]="disabled" [required]="required">
+    <species-phenophase-input
+        [(species)]="curve.species"
+        [(phenophase)]="curve.phenophase"
+        [(color)]="curve.color"
+        [gatherColor]="gatherColor"
+        [selection]="selection"
+        [disabled]="disabled"
+        [required]="required">
     </species-phenophase-input>
 
     <mat-form-field class="year-input">
@@ -35,6 +42,8 @@ import { takeUntil } from 'rxjs/operators';
     `]
 })
 export class CurveControlComponent extends MonitorsDestroy {
+    @Input()
+    gatherColor:boolean = false;
     @Input()
     required:boolean = true;
     @Input()

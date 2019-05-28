@@ -31,7 +31,7 @@ export class ActivityCurve {
     private _metrics;
 
     @selectionProperty()
-    color:string;
+    _color:string;
     orient:string;
 
     doyFocus:number;
@@ -78,6 +78,14 @@ export class ActivityCurve {
         this.reset();
         this._phenophase = p;
         this.updateCheck(true);
+    }
+
+    get color():string {
+        return this._color;
+    }
+    set color(c:string) {
+        this._color = c;
+        this.updateCheck(false);
     }
 
     get metric() {
@@ -281,8 +289,9 @@ export class ActivityCurve {
             datas = [[]],
             x,y,i,d,dn,line,
             r = 3;
-        chart.selectAll('path.curve.curve-'+self.id).remove();
-        chart.selectAll('circle.curve-point.curve-point-'+self.id).remove();
+        chart.selectAll(`g.curve.curve-${self.id}`).remove();
+        const g = chart.append('g')
+            .attr('class',`curve curve-${self.id}`);
         if(data && data.length) {
             // detect any gaps in the data, break it into multiple curves/points
             // to plot
@@ -317,7 +326,7 @@ export class ActivityCurve {
             datas.forEach(function(curve_data,i){
                 if(curve_data.length === 1 || self.dataPoints) {
                     curve_data.forEach(function(d){
-                        chart.append('circle')
+                        g.append('circle')
                             .attr('class','curve-point curve-point-'+self.id)
                             .attr('r',r)
                             .attr('fill',self.color)
@@ -326,7 +335,7 @@ export class ActivityCurve {
                     });
                 }
                 if(curve_data.length > 1) {
-                    chart.append('path')
+                    g.append('path')
                         .attr('class','curve curve-'+self.id)
                         .attr('fill','none')
                         .attr('stroke',self.color)

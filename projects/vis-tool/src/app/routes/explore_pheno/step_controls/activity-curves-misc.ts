@@ -15,6 +15,7 @@ import { faBars } from '@fortawesome/pro-light-svg-icons';
     <div class="misc"  *ngIf="selection.isValid()">
         <div><label>Date Interval</label> {{selection.frequency?.label}}</div>
         <div><label>Line Interpolation</label> {{interpolate}}</div>
+        <div><label>Show Data Points</label> {{selection.dataPoints ? 'Yes' : 'No'}}</div>
     </div>
     `,
     styles: [`
@@ -72,6 +73,8 @@ export class ActivityCurvesMiscStepComponent extends BaseStepComponent {
             <mat-option *ngFor="let i of interpolates" [value]="i.value">{{i.label}}</mat-option>
         </mat-select>
     </mat-form-field>
+
+    <mat-checkbox [(ngModel)]="selection.dataPoints">Show data points</mat-checkbox>
     `,
     styles:[`
     :host {
@@ -83,7 +86,7 @@ export class ActivityCurvesMiscStepComponent extends BaseStepComponent {
 export class ActivityCurvesMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior';
     selection: ActivityCurvesSelection;
-    protected defaultPropertyKeys:string[] = ['interpolate','frequency'];
+    protected defaultPropertyKeys:string[] = ['interpolate','frequency','dataPoints'];
 
     frequencies:ActivityFrequency[] = ACTIVITY_FREQUENCIES;
     interpolates:any[] = ACTIVITY_CURVES_INTERPOLATES;

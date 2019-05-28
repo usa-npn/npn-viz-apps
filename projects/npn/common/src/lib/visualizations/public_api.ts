@@ -9,3 +9,4 @@ export * from './observer-activity/public_api';
 export * from './observation-frequency/public_api';
 export * from './agdd-time-series/public_api';
 export * from './map/public_api';
+export * from './common-controls';

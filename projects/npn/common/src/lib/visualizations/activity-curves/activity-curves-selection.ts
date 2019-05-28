@@ -33,7 +33,6 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     @selectionProperty()
     $class:string = 'ActivityCurvesSelection';
 
-    private headers = {'Content-Type':'application/x-www-form-urlencoded'};
     defaultInterpolate = INTERPOLATE.monotone;
     @selectionProperty()
     private _interpolate: INTERPOLATE = INTERPOLATE.monotone;
@@ -101,7 +100,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     set frequency(f:ActivityFrequency) {
         this._frequency = f;
         // any change in frequency invalidates any data held by curves
-        this.curves.forEach(c => c.data(null));
+        (this._curves||[]).forEach(c => c.data(null));
         this.updateCheck(true);
     }
 
@@ -111,7 +110,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set interpolate(i:INTERPOLATE) {
         this._interpolate = i;
-        this.curves.forEach(c => c.interpolate = i);
+        (this._curves||[]).forEach(c => c.interpolate = i);
         this.updateCheck();
     }
 
@@ -119,14 +118,18 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         return this._interpolate;
     }
 
+    get dataPoints():boolean {
+        return this._dataPoints;
+    }
     set dataPoints(dp:boolean) {
         this._dataPoints = dp;
-        this.curves.forEach(c => c.dataPoints = dp);
+        (this._curves||[]).forEach(c => c.dataPoints = dp);
+        this.updateCheck(false);
     }
 
     set curves(cs:ActivityCurve[]) {
         this._curves = cs;
-        this.curves.forEach(c => {
+        (this._curves||[]).forEach(c => {
             c.selection = this;
             c.interpolate = this._interpolate;
             c.dataPoints = this._dataPoints;
@@ -134,11 +137,11 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
 
     get curves():ActivityCurve[] {
-        return this._curves||[];
+        return this._curves;
     }
 
     get validCurves():ActivityCurve[] {
-        return this.curves.filter(c => c.isValid());
+        return (this._curves||[]).filter(c => c.isValid());
     }
 
     private endDate(year) {

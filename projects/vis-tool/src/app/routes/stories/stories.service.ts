@@ -204,7 +204,7 @@ const MAPLES_ACTIVITY_2017 = {
     "curves": [
       {
         "id": 0,
-        "color": "#0000ff",
+        "color": "#1f77b4",
         "species": {
           "common_name": "red maple",
           "genus": "Acer",
@@ -233,7 +233,7 @@ const MAPLES_ACTIVITY_2017 = {
       },
       {
         "id": 1,
-        "color": "orange",
+        "color": "#ff7f0e",
         "year": 2017,
         "species": {
           "common_name": "sugar maple",

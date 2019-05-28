@@ -1,6 +1,7 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { IconDefinition } from '@fortawesome/pro-light-svg-icons';
 import { Subject } from 'rxjs';
+import { VisSelection } from '@npn/common';
 
 export enum StepState {
     ACTIVE = 'active',
@@ -110,6 +111,10 @@ export interface VisDefinition {
      * re-populate defaults when a step is first visited.
      */
     templateSelection?: any;
+    /**
+     * An optional function to perform initialization of a selection's template.
+     */
+    initializeTemplateSelection?:(s:VisSelection) => void;
     /**
      * The selection object specific to this visualization.
      * When defined initially the value should be the string containing the

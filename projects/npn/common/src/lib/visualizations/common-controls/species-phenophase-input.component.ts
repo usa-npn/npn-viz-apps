@@ -4,10 +4,10 @@ import {FormControl} from '@angular/forms';
 import {Observable,Subject} from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 
-import {Species,speciesComparator,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
+import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
 import {VisSelection} from '../vis-selection';
 
-const COLORS = [
+export const SPECIES_PHENO_INPUT_COLORS = [
   '#1f77b4','#ff7f0e','#2ca02c','#d62728','#222299', '#c51b8a',  '#8c564b', '#637939', '#843c39',
   '#5254a3','#636363',
   '#bcbd22', '#7b4173','#e7ba52', '#222299',  '#f03b20', '#1b9e77','#e377c2',  '#ef8a62', '#91cf60', '#9467bd'
@@ -83,7 +83,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
     @Output() colorChange = new EventEmitter<String>();
     colorValue:string;
     @Output() onColorChange = new EventEmitter<any>();
-    colorList:string[] = COLORS;
+    colorList:string[] = SPECIES_PHENO_INPUT_COLORS;
 
     requiredValidator = (c) => {
         if(this.required && !c.disabled && !c.value) {

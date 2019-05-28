@@ -1,19 +1,17 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
 import { Component, ViewEncapsulation } from '@angular/core';
-import { ActivityCurvesSelection } from '@npn/common';
+import { ActivityCurvesSelection, ActivityCurve, SPECIES_PHENO_INPUT_COLORS } from '@npn/common';
 import { VisConfigStep, StepState } from '../interfaces';
 import { faChartLine } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     template: `
-    <div *ngFor="let c of selection.curves; index as i">
-        <div *ngIf="c.isValid()" class="curve curve-{{i}}"
-            [ngStyle]="{'border-left-color':c.color}">
-            <div>{{c.species | speciesTitle}}</div>
-            <div>{{c.phenophase.phenophase_name}}</div>
-            <div>{{c.year}}</div>
-            <div>{{c.metric.label}}</div>
-        </div>
+    <div class="curve" *ngFor="let c of selection.validCurves; index as i"
+        [ngStyle]="{'border-left-color':c.color}">
+        <div>{{c.species | speciesTitle}}</div>
+        <div>{{c.phenophase.phenophase_name}}</div>
+        <div>{{c.year}}</div>
+        <div>{{c.metric.label}}</div>
     </div>
     `,
     styles:[`
@@ -21,9 +19,10 @@ import { faChartLine } from '@fortawesome/pro-light-svg-icons';
         border-left-style: solid;
         border-left-width: 3px;
         padding-left: 5px;
-    }
-    .curve-0 {
         margin-bottom: 5px;
+    }
+    :host>.curve:last-of-type {
+        margin-bottom: 0px;
     }
     `]
 })
@@ -40,24 +39,20 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <div class="curves">
-        <div class="curve one" *ngIf="selection.curves?.length > 0">
-            <label [ngStyle]="{'color': selection.curves[0].color}">Curve 1</label>
-            <curve-selection-control [selection]="selection" [curve]="selection.curves[0]"></curve-selection-control>
-        </div>
-        <div class="curve two" *ngIf="selection.curves?.length > 1">
-            <label [ngStyle]="{'color': selection.curves[1].color}">Curve 2</label>
-            <curve-selection-control [selection]="selection"  [curve]="selection.curves[1]" [disabled]="!selection.curves[0].isValid()" [required]="false"></curve-selection-control>
-        </div>
+    <mat-expansion-panel  *ngFor="let curve of selection.curves; index as i" [expanded]="i < 2">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <label [ngStyle]="{'color': curve.color}">Curve {{i+1}}</label>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <curve-selection-control [selection]="selection"  [curve]="curve" [required]="i === 0" [gatherColor]="true"></curve-selection-control>
+    </mat-expansion-panel>
+    <div class="add-holder">
+        <button mat-button [disabled]="!allValid" (click)="addCurve()">Add curve</button>
     </div>
     `,
     encapsulation: ViewEncapsulation.None,
     styles:[`
-    .curves {
-        min-width: 275px;
-    }
-    .curves,
-    .curve,
     curve-selection-control,
     species-phenophase-input {
         display: flex;
@@ -70,6 +65,10 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
      {
         width: 100% !important;
     }
+    .add-holder {
+        margin: 10px 0px;
+        text-align: right;
+    }
     `]
 })
 export class ActivityCurvesControlComponent extends BaseControlComponent {
@@ -77,6 +76,18 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
     selection: ActivityCurvesSelection;
     protected defaultPropertyKeys:string[] = ['curves'];
 
+    get allValid():boolean {
+        return this.selection.curves.reduce((valid,c) => valid && c.isValid(), this.selection.curves[0].isValid());
+    }
+
+    addCurve() {
+        const curve = new ActivityCurve();
+        curve.id = this.selection.curves.length;
+        curve.color = SPECIES_PHENO_INPUT_COLORS[curve.id];
+        curve.interpolate = this.selection.curves[0].interpolate;
+        curve.selection = this.selection;
+        this.selection.curves.push(curve);
+    }
 }
 
 export const ActivityCurvesStep:VisConfigStep = {

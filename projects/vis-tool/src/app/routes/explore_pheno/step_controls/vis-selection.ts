@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/pro-light-svg-icons';
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
-import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent, AgddTimeSeriesComponent } from "@npn/common";
+import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent, AgddTimeSeriesComponent, SPECIES_PHENO_INPUT_COLORS, ActivityCurvesSelection, ActivityCurve } from "@npn/common";
 import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
@@ -45,8 +45,10 @@ export function resetVisDefinition(visDef:VisDefinition,selectionFactory:Visuali
         const $class = !!visDef.templateSelection
             ? visDef.templateSelection.$class
             : visDef.selection; // string
-        if(!visDef.templateSelection) {
-            visDef.templateSelection = selectionFactory.newSelection({$class});
+        // always recreate template
+        visDef.templateSelection = selectionFactory.newSelection({$class});
+        if(visDef.initializeTemplateSelection) {
+            visDef.initializeTemplateSelection(visDef.templateSelection);
         }
         visDef.selection = selectionFactory.newSelection({$class});
         const externalTemplate = visDef.templateSelection.external;
@@ -198,6 +200,12 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         icon: faChartLine,
         selection: 'ActivityCurvesSelection',
         component: ActivityCurvesComponent,
+        initializeTemplateSelection(selection:ActivityCurvesSelection) {
+            const curve0 = new ActivityCurve();
+            curve0.color = SPECIES_PHENO_INPUT_COLORS[0];
+            curve0.id = 0;
+            selection.curves = [curve0];
+        },
         steps:[
             BoundaryStep,
             ActivityCurvesStep,

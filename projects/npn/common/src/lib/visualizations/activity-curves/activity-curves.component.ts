@@ -12,6 +12,7 @@ import { ActivityCurvesSelection } from './activity-curves-selection';
 import { Axis, axisBottom } from 'd3-axis';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
+import { ActivityCurve } from './activity-curve';
 
 const ROOT_DATE = new Date(2010,0);
 const D3_DATE_FMT = d3.timeFormat('%m/%d');
@@ -71,17 +72,31 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         super(rootElement,media);
     }
 
+    /**
+     * Organizes the valid curves into a map of metric to curves using that metric.
+     */
+    private byMetric() {
+        return this.selection.validCurves.reduce((map,c) => {
+            map[c.metric.id] = map[c.metric.id]||{
+                metric: c.metric,
+                curves: []
+            };
+            map[c.metric.id].curves.push(c);
+            return map;
+        },{});
+    }
+
+    /**
+     * Tests to see if the curves are all using the same metric.
+     */
     private usingCommonMetric() {
-        let selection = this.selection;
-        if(!(selection.curves||[]).length) {
-            return undefined;
-        }
-        // there are always two curves in the selection, the question is whether they are
-        // valid and share a metric
-        if((selection.curves[0].isValid() && !selection.curves[1].isValid()) ||
-            (selection.curves[0].isValid() && selection.curves[1].isValid() && selection.curves[0].metricId() === selection.curves[1].metricId())) {
-            return selection.curves[0].metric;
-        }
+        const validCurves = this.selection.validCurves;
+        // could be byMetric().length === 1 but this could be more performant
+        return validCurves.length > 0
+            // all curves using same metric.
+            ? validCurves.reduce((metric,curve) => metric === curve.metric ? metric : undefined,
+                validCurves[0].metric)
+            : undefined;
     }
 
     private newY() {
@@ -90,43 +105,56 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     }
 
     private updateLegend(): void {
-        let chart = this.chart;
+        const {chart,sizing,selection} = this;
         chart.select('.legend').remove();
-        let sizing = this.sizing,
-            selection = this.selection,
-            commonMetric = this.usingCommonMetric(),
-            legend = chart.append('g')
-              .attr('class','legend')
-              // the 150 below was picked just based on the site of the 'Activity Curves' title
-              .attr('transform','translate(150,-'+(sizing.margin.top-10)+')') // relative to the chart, not the svg
-              .style('font-size','1em'),
-            /* legend labels can differ greatly in length, don't try to put them
-               inside a box that will be impossible to size correctly
-            rect = legend.append('rect')
-                .style('fill','white')
-                .style('stroke','black')
-                .style('opacity','0.8')
-                .attr('width',100)
-                .attr('height',55),*/
-            r = 5, vpad = 4;
-            (selection.curves||[]).reduce((cnt,c) => {
-                    var row;
-                    if(c.plotted()) {
-                        row = legend.append('g')
-                            .attr('class','legend-item curve-'+c.id)
-                            .attr('transform','translate(10,'+(((cnt+1)*(this.baseFontSize() as number))+(cnt*vpad))+')');
-                        row.append('circle')
-                            .attr('r',r)
-                            .attr('fill',c.color);
-                        row.append('text')
-                            .style('font-size', this.baseFontSize(true))
-                            .attr('x',(2*r))
-                            .attr('y',(r/2))
-                            .text(c.legendLabel(!commonMetric));
-                        cnt++;
+        const commonMetric = this.usingCommonMetric();
+        const legend = chart.append('g')
+                .attr('class','legend')
+                // the 150 below was picked just based on the site of the 'Activity Curves' title
+                .attr('transform',`translate(135,-${sizing.margin.top-10})`) // relative to the chart, not the svg
+                .style('font-size','1em');
+        const r = 5, vpad = 4;
+        
+        let rowIndex = 0;
+        let inRow = 0;
+        let xTrans = 0;
+        const maxInRow = 3;
+        selection.validCurves.forEach((c) => {
+                if(c.plotted()) {
+                    const yTrans = (((inRow+1)*(this.baseFontSize() as number))+(inRow*vpad));
+                    const legendItem = legend.append('g')
+                        .attr('class',`legend-item curve-${c.id} row-${rowIndex}`)
+                        .attr('transform',`translate(${xTrans},${yTrans})`);
+                    legendItem.append('circle')
+                        .attr('r',r)
+                        .attr('fill',c.color);
+                    legendItem.append('text')
+                        .style('font-size', this.baseFontSize(true))
+                        .attr('x',(2*r))
+                        .attr('y',(r/2))
+                        .text(c.legendLabel(!commonMetric));
+                    if(++inRow === maxInRow) {
+                        const items = legend.selectAll(`.legend-item.row-${rowIndex}`);
+                        // based on children added calculate the current row width
+                        // and add it to how far we move items in the x direction
+                        let maxWidth = 0;
+                        items.each(function() {
+                            let w = 0;
+                            d3.select(this)
+                                .selectAll('*')
+                                .each(function() {
+                                    w += (this as any).clientWidth;
+                                });
+                            if(w > maxWidth) {
+                                maxWidth = w;
+                            }
+                        });
+                        rowIndex++;
+                        xTrans += maxWidth;
+                        inRow = 0;
                     }
-                    return cnt;
-                },0);
+                }
+            });
     }
 
     private hover():void {
@@ -153,26 +181,27 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('x',0)
                 .text('hover doy');
         let focusOff = () => {
-                (selection.curves||[]).forEach(function(c) { delete c.doyFocus; });
+                selection.validCurves.forEach(function(c) { delete c.doyFocus; });
                 hover.style('display','none');
                 this.updateLegend();
             },
             focusOn = () => {
                 // only turn on if something has been plotted
-                if((selection.curves||[]).reduce(function(plotted,c){
+                if(selection.validCurves.reduce(function(plotted,c){
                         return plotted||c.plotted();
                     },false)) {
                     hover.style('display',null);
                 }
             };
 
-        // left as function due to d3's use of this
+        // left as function due to d3's use of `this`
         function updateFocus() {
             let coords = d3.mouse(this),
                 xCoord = coords[0],
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
-                dataPoint = (selection.curves||[]).reduce(function(dp,curve){
+                validCurves = selection.validCurves,
+                dataPoint = validCurves.reduce(function(dp,curve){
                     if(!dp && curve.plotted()) {
                         dp = curve.data().reduce(function(found,point){
                             return found||(doy >= point.start_doy && doy <= point.end_doy ? point : undefined);
@@ -187,7 +216,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .text(dataPoint ?
                     self.legendDoyPipe.transform(dataPoint.start_doy)+' - '+self.legendDoyPipe.transform(dataPoint.end_doy) :
                     self.legendDoyPipe.transform(doy));
-            (selection.curves||[]).forEach(function(c) { c.doyFocus = doy; });
+            validCurves.forEach(function(c) { c.doyFocus = doy; });
             self.updateLegend();
         }
         svg.append('rect')
@@ -213,7 +242,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         this.x = scaleLinear().range([0,sizing.width]).domain([1,365]);
         this.xAxis = axisBottom<number>(this.x).tickFormat(DATE_FMT);
 
-        (selection.curves||[]).forEach(c => c.x(this.x).y(this.newY()));
+        selection.validCurves.forEach(c => c.x(this.x).y(this.newY()));
 
         chart.append('g')
              .attr('class','chart-title')
@@ -230,72 +259,47 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     protected update(): void {
         this.reset();
         let selection = this.selection;
-        selection.loadCurveData().then(() => {
-            this.redraw();
-        });
+        selection.loadCurveData().then(() => this.redraw());
     }
 
     protected redrawSvg(): void {
         let chart = this.chart,
             sizing = this.sizing,
             selection = this.selection,
-            commonMetric = this.usingCommonMetric();
+            validCurves = selection.validCurves;
 
         chart.selectAll('g .axis').remove();
 
-        if(commonMetric) {
-            // both use the same y-axis domain needs to include all valid curve's data
-            let domain = d3.extent(selection.curves.reduce(function(arr,c){
-                    if(c.isValid()) {
-                        arr = arr.concat(c.domain());
-                    }
-                    return arr;
-                },[])),
-                y = this.newY().domain(PAD_DOMAIN(domain,commonMetric));
-            console.debug('ActivityCurves.common domain',domain);
-            (selection.curves||[]).forEach(function(c){
-                c.y(y);
-            });
-        } else {
-            (selection.curves||[]).forEach(c => {
-                // re-initialize y in case a previous plot re-used the same y
-                // each has an independent domain
-                if(c.isValid()) {
-                    c.y(this.newY().domain(PAD_DOMAIN(c.domain(),c.metric)));
-                }
-            });
-        }
+        const mapped = this.byMetric();
+        const metricIds = Object.keys(mapped);
+        metricIds.forEach(metricId => {
+            const metric = mapped[metricId].metric;
+            const curves:ActivityCurve[] = mapped[metricId].curves;
+            
+            // build domain that encapsulates all curves using a given metric
+            const domain = d3.extent(curves.reduce((arr,c) => arr.concat(c.domain()),[]));
+            const y = this.newY().domain(PAD_DOMAIN(domain,metric));
+            curves.forEach(c => c.y(y));
+        });
 
-        if((selection.curves||[]).length) {
+        metricIds.forEach((metricId,index) => {
+            const orientation = index === 0 ? 'left' : 'right';
+            const primaryCurve:ActivityCurve = mapped[metricId].curves[0];
+            primaryCurve.orient = orientation;
             chart.append('g')
-                .attr('class', 'y axis left')
-                .call(selection.curves[0].axis())
+                .attr('class', `y axis ${orientation} ${metricId}`)
+                .attr('transform',`translate(${orientation === 'left' ? 0 : sizing.width})`)
+                .call(primaryCurve.axis())
                 .append('text')
-                .attr('class','axis-title')
-                .attr('transform', 'rotate(-90)')
-                .attr('y', '0')
-                .attr('dy','-4em')
-                .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
-                .attr('fill','#000')
-                .style('text-anchor', 'middle')
-                .text(selection.curves[0].axisLabel());
-
-            if(!commonMetric && selection.curves[1].isValid()) {
-                selection.curves[1].orient = 'right';
-                chart.append('g')
-                    .attr('class', 'y axis right')
-                    .attr('transform','translate('+sizing.width+')')
-                    .call(selection.curves[1].axis())
-                    .append('text')
                     .attr('class','axis-title')
                     .attr('transform', 'rotate(-90)')
                     .attr('y', '0')
-                    .attr('dy','4em')
+                    .attr('dy',`${orientation === 'left' ? '-' : ''}4em`)
                     .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
                     .style('text-anchor', 'middle')
-                    .text(selection.curves[1].axisLabel());
-            }
-        }
+                    .attr('fill','#000')
+                    .text(primaryCurve.axisLabel());
+        });
 
         let xTickConfig = X_TICK_CFG[(selection.frequency||selection.defaultFrequency).value];
         this.xAxis.tickValues(xTickConfig.values);
@@ -318,25 +322,19 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('dy','4em');
         }
 
-        // if not using a common metric (two y-axes)
-        // then color the ticks/labels in alignment with their
-        // corresponding curve for clarity.
-        if((selection.curves||[]).length && !commonMetric) {
-            chart.selectAll('g.y.axis.left g.tick text')
-                .style('fill',selection.curves[0].color);
-            chart.selectAll('g.y.axis.left text.axis-title')
-                .style('fill',selection.curves[0].color);
-            chart.selectAll('g.y.axis.right g.tick text')
-                .style('fill',selection.curves[1].color);
-            chart.selectAll('g.y.axis.right text.axis-title')
-                .style('fill',selection.curves[1].color);
-        }
+        // if a given metric just has a single curve then color its axis to match
+        metricIds.forEach(metricId => {
+            const curves:ActivityCurve[] = mapped[metricId].curves;
+            if(curves.length === 1) {
+                const axis = chart.select(`g.y.axis.${metricId}`);
+                ['g.tick text','text.axis-title'].forEach(subSelect => axis.selectAll(subSelect).style('fill',curves[0].color))
+            }
+        });
+
         this.commonUpdates();
 
         // draw the curves
-        (selection.curves||[]).forEach(function(c) {
-            c.draw(chart);
-        });
+        validCurves.forEach(c => c.draw(chart));
 
         this.updateLegend();
         this.hover();

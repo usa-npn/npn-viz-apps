@@ -73,7 +73,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
 
     hasValidCurve():boolean {
-        return (this.curves||[]).reduce((valid,curve) => (valid||curve.isValid()),false);
+        return this.validCurves.length > 0;
     }
 
     isValid(): boolean {
@@ -84,7 +84,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     private updateCheck(requiresUpdate?:boolean) {
         const anyValid = this.hasValidCurve();
-        const anyPlotted = (this.curves||[]).reduce((plotted,curve) => (plotted||curve.plotted()),false);
+        const anyPlotted = this.curves.reduce((plotted,curve) => (plotted||curve.plotted()),false);
         if(requiresUpdate) {
             if(anyValid) {
                 this.update();
@@ -101,7 +101,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     set frequency(f:ActivityFrequency) {
         this._frequency = f;
         // any change in frequency invalidates any data held by curves
-        (this._curves||[]).forEach(c => c.data(null));
+        this.curves.forEach(c => c.data(null));
         this.updateCheck(true);
     }
 
@@ -111,7 +111,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set interpolate(i:INTERPOLATE) {
         this._interpolate = i;
-        (this._curves||[]).forEach(c => c.interpolate = i);
+        this.curves.forEach(c => c.interpolate = i);
         this.updateCheck();
     }
 
@@ -121,12 +121,12 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set dataPoints(dp:boolean) {
         this._dataPoints = dp;
-        (this._curves||[]).forEach(c => c.dataPoints = dp);
+        this.curves.forEach(c => c.dataPoints = dp);
     }
 
     set curves(cs:ActivityCurve[]) {
         this._curves = cs;
-        (cs||[]).forEach(c => {
+        this.curves.forEach(c => {
             c.selection = this;
             c.interpolate = this._interpolate;
             c.dataPoints = this._dataPoints;
@@ -134,7 +134,11 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
 
     get curves():ActivityCurve[] {
-        return this._curves;
+        return this._curves||[];
+    }
+
+    get validCurves():ActivityCurve[] {
+        return this.curves.filter(c => c.isValid());
     }
 
     private endDate(year) {

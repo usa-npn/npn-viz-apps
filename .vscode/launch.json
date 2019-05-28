@@ -7,6 +7,17 @@
         {
             "type": "chrome",
             "request": "launch",
+            "name": "Vis tool",
+            "url": "http://localhost:4200/vis-tool",
+            "webRoot": "/Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${workspaceFolder}/projects/fws-dashboard/*",
+                "webpack:///../npn/common/*": "${workspaceFolder}/projects/npn/common/*"
+            }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
             "name": "Refuge dashboard app",
             "url": "http://fwstest.loc:8888/arctic-nwr",
             "webRoot": "/Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",

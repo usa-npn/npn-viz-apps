@@ -111,7 +111,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         const legend = chart.append('g')
                 .attr('class','legend')
                 // the 150 below was picked just based on the site of the 'Activity Curves' title
-                .attr('transform',`translate(135,-${sizing.margin.top-10})`) // relative to the chart, not the svg
+                .attr('transform',`translate(90,-${sizing.margin.top-10})`) // relative to the chart, not the svg
                 .style('font-size','1em');
         const r = 5, vpad = 4;
         
@@ -139,11 +139,11 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                         // and add it to how far we move items in the x direction
                         let maxWidth = 0;
                         items.each(function() {
-                            let w = 0;
+                            let w = (r*2)+10; // diameter of circle plue some padding
                             d3.select(this)
-                                .selectAll('*')
+                                .selectAll('text')
                                 .each(function() {
-                                    w += (this as any).clientWidth;
+                                    w += (this as any).getBBox().width;
                                 });
                             if(w > maxWidth) {
                                 maxWidth = w;
@@ -250,6 +250,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
              .attr('y', '0')
              .attr('dy','-3em')
              .attr('x', '0')
+             .attr('dx','-3em')
              .style('text-anchor','start')
              .style('font-size','18px')
              .text('Activity Curves');

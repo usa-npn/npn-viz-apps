@@ -1,4 +1,4 @@
-import {Component,Input,SimpleChanges} from '@angular/core';
+import {Component,Input,SimpleChanges, Output, EventEmitter} from '@angular/core';
 import {FormControl} from '@angular/forms';
 
 import {MonitorsDestroy} from '../../common';
@@ -16,7 +16,8 @@ import { takeUntil } from 'rxjs/operators';
         [gatherColor]="gatherColor"
         [selection]="selection"
         [disabled]="disabled"
-        [required]="required">
+        [required]="required"
+        (onSpeciesChange)="onSpeciesChange.next($event)">
     </species-phenophase-input>
 
     <mat-form-field class="year-input">
@@ -27,7 +28,7 @@ import { takeUntil } from 'rxjs/operators';
     </mat-form-field>
 
     <mat-form-field class="metric-input">
-        <mat-select placeholder="Metric" [(ngModel)]="curve.metric" [disabled]="!curve.validMetrics.length" [disabled]="disabled">
+        <mat-select placeholder="Metric" [(ngModel)]="metric" [disabled]="!curve.validMetrics.length" [disabled]="disabled">
             <mat-option *ngFor="let m of curve.validMetrics" [value]="m">{{m.label}}</mat-option>
         </mat-select>
     </mat-form-field>
@@ -53,7 +54,21 @@ export class CurveControlComponent extends MonitorsDestroy {
     @Input()
     curve: ActivityCurve;
 
+    @Output()
+    onSpeciesChange = new EventEmitter<any>();
+    @Output()
+    onMetricChange = new EventEmitter<any>();
+
     yearControl:FormControl;
+
+    get metric():any {
+        return this.curve.metric;
+    }
+    set metric(metric:any) {
+        const oldValue = this.curve.metric;
+        const newValue = this.curve.metric = metric;
+        this.onMetricChange.next({oldValue,newValue});
+    }
 
     validYears:number[] = (function() {
         let thisYear = (new Date()).getFullYear(),

@@ -28,10 +28,11 @@ export class ActivityCurve {
     @selectionProperty()
     private _year:number;
 
+    private _originalMetrics;
     private _metrics;
 
     @selectionProperty()
-    _color:string;
+    private _color:string;
     orient:string;
 
     doyFocus:number;
@@ -104,7 +105,10 @@ export class ActivityCurve {
         this.reset();
         this._species = s;
         this.phenophase = undefined;
-        this._metrics = this._species && this._species.kingdom  ? (ACTIVITY_CURVE_KINGDOM_METRICS[this._species.kingdom]||[]) : [];
+        this._metrics = this._species && this._species.kingdom 
+            ? (ACTIVITY_CURVE_KINGDOM_METRICS[this._species.kingdom]||[])
+            : [];
+        this._originalMetrics = this._metrics;
         if(this._metric && this._metrics.indexOf(this._metric) === -1) {
             // previous metric has become invalid
             delete this.metric;
@@ -116,6 +120,31 @@ export class ActivityCurve {
 
     get validMetrics() {
         return (this._metrics||[]);
+    }
+
+    /**
+     * Puts all valid metrics back if they were overridden
+     */
+    overrideValidMetricsReset() {
+        this._metrics = this._originalMetrics;
+    }
+
+    /**
+     * Change which metrics are selectable.  This codes does NOT validate
+     * the input it should only ever be a subset of the originally valid
+     * metrics.
+     * 
+     * @param valid The new set of valid metrics.
+     */
+    overrideValidMetrics(valid:any[]) {
+        this._metrics = valid;
+        if(this._metric && this._metrics.indexOf(this._metric) === -1) {
+            // previous metric has become invalid
+            delete this._metric;
+            if(this.selection) {
+                this.selection.redraw();
+            }
+        }
     }
 
     /**

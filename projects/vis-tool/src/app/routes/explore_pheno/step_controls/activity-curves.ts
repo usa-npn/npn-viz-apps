@@ -42,7 +42,7 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
     <mat-expansion-panel  *ngFor="let curve of selection.curves; index as i" [expanded]="i < 2">
         <mat-expansion-panel-header>
             <mat-panel-title>
-                <label [ngStyle]="{'color': curve.color}">Curve {{i+1}} <span *ngIf="!curve.isValid()">(invalid)</span></label>
+                <label [ngStyle]="{'color': curve.color}">Curve {{i+1}} <span *ngIf="!curve.isValid()">(incomplete)</span></label>
             </mat-panel-title>
         </mat-expansion-panel-header>
         <curve-selection-control

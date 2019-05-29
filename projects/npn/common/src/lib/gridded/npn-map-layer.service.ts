@@ -20,7 +20,8 @@ import {
     MapLayerExtentType,
     WMS_VERSION,
     MapLayerType,
-    MapLayerServiceType
+    MapLayerServiceType,
+    MapLayerDefinitionMap
 } from './gridded-common';
 import { MapLayer } from './map-layer';
 import { PestMapLayer } from "./pest-map-layer";
@@ -136,8 +137,14 @@ export class NpnMapLayerService {
         });
     }
 
+    private getLayerOverrides():Promise<MapLayerDefinitionMap> {
+        return this.serviceUtils.cachedGet(this.serviceUtils.dataApiUrl2('/npn-map-layer-overrides.json'))
+            // on any error (e.g. 404 not fond) return an empty document.
+            .catch(err => ({}));
+    }
+
     getLayerDefinitions():Promise<MapLayerDefs> {
-        function mergeLayersIntoConfig(wms_layer_defs) {
+        function mergeLayersIntoConfig(wms_layer_defs,overrides) {
             let result = DEEP_COPY(MAP_LAYERS),
                 base_description = result.description;
             result.categories.forEach(function(category){
@@ -149,7 +156,7 @@ export class NpnMapLayerService {
                 base_config.description = base_config.description||base_description;
                 category.layers = category.layers.map(l => {
                     let base_copy = DEEP_COPY(base_config);
-                    return {...base_copy,...wms_layer_defs[l.name],...l};
+                    return {...base_copy,...wms_layer_defs[l.name],...l,...overrides[l.name]||{}};
                 });
             });
             return result;
@@ -157,13 +164,17 @@ export class NpnMapLayerService {
         if(this.layerDefs) {
             return Promise.resolve(this.layerDefs);
         }
-        return this.serviceUtils.cachedGet(this.griddedUrls.wmsCapabilitiesUrl,null,true/*as text*/)
-            .then(xml => {
+        return Promise.all([
+                this.serviceUtils.cachedGet(this.griddedUrls.wmsCapabilitiesUrl,null,true/*as text*/),
+                this.getLayerOverrides()
+            ]).then(results => {
+                const [xml,overrides] = results;
                 let wms_capabilities = $jq($jq.parseXML(xml));
                 console.debug('WmsMapLayerService:capabilities',wms_capabilities);
                 let wms_layer_defs = this._getLayers(wms_capabilities.find('Layer'));
                 console.debug('WmsMapLayerService:wms layer definitions',wms_layer_defs);
-                this.layerDefs = mergeLayersIntoConfig(wms_layer_defs);
+                console.debug('WmsMapLayerService:wms layer overrides',overrides);
+                this.layerDefs = mergeLayersIntoConfig(wms_layer_defs,overrides);
                 console.debug('WmsMapLayerService:layer definitions',this.layerDefs);
                 return this.layerDefs;
             });

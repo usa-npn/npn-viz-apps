@@ -120,6 +120,11 @@ export interface MapLayerDefinition extends NpnLayerCommon {
     meta?: any;
 }
 
+// definition of separate over-rides document
+export interface MapLayerDefinitionMap {
+    [name:string]: MapLayerDefinition;
+}
+
 export interface MapLayerCategory extends NpnLayerCommon {
     layers: MapLayerDefinition[];
 }

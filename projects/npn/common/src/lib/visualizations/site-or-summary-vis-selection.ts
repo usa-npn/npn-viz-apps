@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { APPLICATION_SETTINGS, NpnServiceUtils } from '../common';
+import { NpnServiceUtils } from '../common';
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
@@ -10,9 +10,9 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     @selectionProperty()
     filterDisclaimer: string;
     @selectionProperty()
-    _filterLqdSummary: boolean = APPLICATION_SETTINGS.filterLqdSummary;
+    _filterLqdSummary: boolean = true;
     @selectionProperty()
-    _numDaysQualityFilter:number = APPLICATION_SETTINGS.numDaysQualityFilter;
+    _numDaysQualityFilter:number = 30;
 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super(serviceUtils);

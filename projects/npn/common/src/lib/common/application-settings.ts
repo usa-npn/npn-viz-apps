@@ -8,10 +8,6 @@ export enum SpeciesTitleFormat {
 };
 
 export interface AppSettings {
-    /** Whether or not to filter less precise data. */
-    filterLqdSummary?: boolean;
-    /** E.g. 7 || 14 || 30 */
-    numDaysQualityFilter?: number;
     /** 'common-name' || 'scientific-name */
     speciesTitleFormat?: SpeciesTitleFormat;
 }
@@ -23,16 +19,8 @@ export interface AppSettings {
  */
 class ApplicationSettings implements AppSettings {
     private settings:AppSettings = {
-        filterLqdSummary: true,
-        numDaysQualityFilter: 30,
         speciesTitleFormat: SpeciesTitleFormat.CommonName
     };
-
-    get filterLqdSummary():boolean { return this.settings.filterLqdSummary; }
-    set filterLqdSummary(b:boolean) { this.settings.filterLqdSummary = b; }
-
-    get numDaysQualityFilter():number { return this.settings.numDaysQualityFilter; }
-    set numDaysQualityFilter(n:number) { this.settings.numDaysQualityFilter = n; }
 
     get speciesTitleFormat():SpeciesTitleFormat { return this.settings.speciesTitleFormat; }
     set speciesTitleFormat(f:SpeciesTitleFormat) { this.settings.speciesTitleFormat = f; }

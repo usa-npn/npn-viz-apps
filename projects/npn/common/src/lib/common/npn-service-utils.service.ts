@@ -59,6 +59,27 @@ export class NpnServiceUtils {
             });
     }
 
+    /**
+     * Allows a client to populate the cache with an object as would
+     * be done by `cachedGet` or `cachedPost` so that subsequent calls
+     * to either return this cached object.  This is useful in cases where
+     * an error response from a server should be replaced with a default
+     * (e.g. 404 cache a default for some resource).
+     * 
+     * @param url 
+     * @param data 
+     * @param paramsOrBody 
+     */
+    public cachedSet(url:string,data:any,paramsOrBody?:any):any {
+        paramsOrBody = paramsOrBody || {};
+        const cacheKey = {
+            u: url,
+            params: paramsOrBody
+        };
+        this.cache.set(cacheKey,data);
+        return data;
+    }
+
     public post(url:string,body:string):Promise<any> {
         return this.http.post(url,body,{headers: {'Content-Type':'application/x-www-form-urlencoded'}}).toPromise();
     }

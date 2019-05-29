@@ -17,7 +17,7 @@ import {
 } from '@npn/common/gridded';
 import { FormControl } from '@angular/forms';
 import { merge } from 'rxjs';
-import { startWith, takeUntil } from 'rxjs/operators';
+import { startWith, takeUntil, debounceTime } from 'rxjs/operators';
 import { MonitorsDestroy } from '@npn/common/common';
 import { GriddedRangeSliderControl } from './gridded-range-slider-control.component';
 
@@ -236,6 +236,7 @@ export class TempAccumMapLayerControlComponent extends MonitorsDestroy {
             : merge( this.baseLayer.valueChanges,this.degreeBase.valueChanges))
         .pipe(
             startWith(null),
+            debounceTime(250),
             takeUntil(this.componentDestroyed)
         ).subscribe(() => {
             const base:TEMP_ACCUM_BASE = this.baseLayer.value;

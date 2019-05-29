@@ -11,8 +11,41 @@ export interface PestDescription {
     agddMethod?: string;
 }
 
+/**
+ * Wrapper for google.maps.GroundOverlay creation/interaction to allow
+ * the on/off methods of the PestMapLayer to be synchronous even though
+ * the creating of the underlying GroundOverlay is asynchronous.
+ * I.e. the app may want to turn "off" a layer before it's actually "on"
+ */
+class GroundOverlayWrapper {
+    private overlayReadyResolver;
+    private overlayReady:Promise<google.maps.GroundOverlay> = new Promise(resolve => this.overlayReadyResolver = resolve);
+    constructor(data:Promise<any>,private opacity:number,private map:google.maps.Map) {
+        data.then(response => {
+            const { bbox, clippedImage } = response;
+            const [west, south, east, north] = bbox;
+            const overlay = new google.maps.GroundOverlay(clippedImage, { north, south, east, west }, { clickable: false });
+            overlay.setOpacity(this.opacity);
+            overlay.setMap(this.map);
+            this.overlayReadyResolver(overlay);
+        });
+    }
+
+    on() {
+        this.overlayReady.then(overlay => overlay.setMap(this.map));
+    }
+
+    off() {
+        this.overlayReady.then(overlay => overlay.setMap(null));
+    }
+
+    setOpacity(opacity:number) {
+        this.overlayReady.then(overlay => overlay.setOpacity(this.opacity = opacity));
+    }
+}
+
 export class PestMapLayer extends MapLayer {
-    private overlay: google.maps.GroundOverlay;
+    private overlay: GroundOverlayWrapper;
     constructor(protected map: google.maps.Map, protected layer_def: MapLayerDefinition, protected layerService: NpnMapLayerService) {
         super(map, layer_def, layerService);
         const currentValue = this.newExtentValue(new Date()).value;
@@ -64,14 +97,8 @@ export class PestMapLayer extends MapLayer {
             species: this.layer_def.title
         };
         this.layer_def.extent.current.addToParams(params, MapLayerServiceType.WMS);
-        this.layerService.serviceUtils.get(this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestMap'), params).then(response => {
-            const { bbox, clippedImage } = response;
-            const [west, south, east, north] = bbox;
-            this.overlay = new google.maps.GroundOverlay(clippedImage, { north, south, east, west }, { clickable: false });
-            // TODO maybe control opacity generically??
-            this.overlay.setOpacity(this.opacity);
-            this.overlay.setMap(this.map);
-        });
+        this.overlay = new GroundOverlayWrapper(this.layerService.serviceUtils.get(this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestMap'), params),this.opacity,this.map);
+        this.overlay.on();
         return this;
     }
     on(): PestMapLayer {
@@ -80,7 +107,7 @@ export class PestMapLayer extends MapLayer {
     }
     private _off(): PestMapLayer {
         if (this.overlay) {
-            this.overlay.setMap(null);
+            this.overlay.off();
             this.overlay = null;
         }
         return this;

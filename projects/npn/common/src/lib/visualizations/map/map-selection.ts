@@ -176,6 +176,10 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         return true;
     }
 
+    // NOTE: There is no protection against this being called multiple times in fast succession
+    // e.g. setLayerName, updateLayer, change layerName, call updateLayer
+    // and if this happened there could be two Promises arguing over the ability set `this.layer`
+    // which could cause a layer "sticking" on the map.
     updateLayer(map: google.maps.Map):Promise<void> {
         const {layerName} = this;
         console.debug(`MapSelection.updateLayer`,this.external);

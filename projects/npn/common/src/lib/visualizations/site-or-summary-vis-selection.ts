@@ -9,12 +9,34 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     individualPhenometrics: boolean = false;
     @selectionProperty()
     filterDisclaimer: string;
+    @selectionProperty()
+    _filterLqdSummary: boolean = APPLICATION_SETTINGS.filterLqdSummary;
+    @selectionProperty()
+    _numDaysQualityFilter:number = APPLICATION_SETTINGS.numDaysQualityFilter;
 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super(serviceUtils);
     }
 
-    abstract toURLSearchParams(): Promise<HttpParams>;
+    toURLSearchParams(): Promise<HttpParams> {
+        return Promise.resolve((new HttpParams()).set('num_days_quality_filter',`${this.numDaysQualityFilter}`));
+    }
+
+    get filterLqdSummary():boolean {
+        return this._filterLqdSummary;
+    }
+    set filterLqdSummary(b:boolean) {
+        this._filterLqdSummary = b;
+        this.update();
+    }
+
+    get numDaysQualityFilter():number {
+        return this._numDaysQualityFilter;
+    }
+    set numDaysQualityFilter(n:number) {
+        this._numDaysQualityFilter = n;
+        this.update(); // param change
+    }
 
     private filterSuspectSummaryData(d) {
         var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
@@ -48,7 +70,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         const filterLqd = this.individualPhenometrics
             ? (data) => { // summary
                 let minusSuspect = data.filter(this.filterSuspectSummaryData),
-                    filtered = APPLICATION_SETTINGS.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
+                    filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
                     individuals = filtered.reduce(function (map, d) {
                         var key = d.individual_id + '/' + d.phenophase_id + '/' + d.first_yes_year;
                         map[key] = map[key] || [];
@@ -76,7 +98,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             }
             : (data) => { // site
                 let minusSuspect = data.filter(this.filterSuspectSummaryData),
-                    filtered = APPLICATION_SETTINGS.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
+                    filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
                 console.debug('filtered out ' + (data.length - minusSuspect.length) + '/' + data.length + ' suspect records');
                 console.debug('filtered out ' + (minusSuspect.length - filtered.length) + '/' + minusSuspect.length + ' LQD records.');
                 this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?

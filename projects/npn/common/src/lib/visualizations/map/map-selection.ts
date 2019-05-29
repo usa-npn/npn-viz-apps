@@ -55,15 +55,17 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     }
 
     toURLSearchParams():Promise<HttpParams> {
-        let params = new HttpParams()
-            .set('request_src','npn-vis-map')
-            .set('start_date',`${this.year}-01-01`)
-            .set('end_date',`${this.year}-12-31`);
-        this.validPlots.forEach((p,i) => {
-            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                           .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-        });
-        return this.addNetworkParams(params);
+        return super.toURLSearchParams()
+            .then(params => {
+                params = params.set('request_src','npn-vis-map')
+                    .set('start_date',`${this.year}-01-01`)
+                    .set('end_date',`${this.year}-12-31`);
+                this.validPlots.forEach((p,i) => {
+                    params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                                .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+                });
+                return this.addNetworkParams(params);
+            });
     }
 
     get year():number {
@@ -86,7 +88,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     get layerCategory():string { return this._layerCategory; }
 
     set layerName(s:string) {
-console.log(`MapSelection.layerName=${s}`);
+        console.debug(`MapSelection.layerName=${s}`);
         this._layerName = s;
         if(this.layer && this.layer.layerName !== s) {
             this.layer.off();
@@ -103,7 +105,7 @@ console.log(`MapSelection.layerName=${s}`);
     }
 
     set styleRange(range:number[]) {
-console.log(`MapSelection.styleRange=${range}`);
+        console.debug(`MapSelection.styleRange=${range}`);
         this._styleRange = range;
         if(this.layer && this.layer instanceof WmsMapLayer) {
             this.layer.setStyleRange(range);
@@ -145,7 +147,7 @@ console.log(`MapSelection.styleRange=${range}`);
     // using functions here because of the SupportsOpacity interface.
     /** Sets the current opacity (0-1) for this layer. */
     setOpacity(opacity:number) {
-console.log(`MapSelection.setOpacity=${opacity}`);
+        console.debug(`MapSelection.setOpacity=${opacity}`);
         this.opacity = opacity;
         if(this.layer) {
             this.layer.setOpacity(this.opacity);
@@ -176,7 +178,7 @@ console.log(`MapSelection.setOpacity=${opacity}`);
 
     updateLayer(map: google.maps.Map):Promise<void> {
         const {layerName} = this;
-console.log(`MapSelection.updateLayer`,this.external);
+        console.debug(`MapSelection.updateLayer`,this.external);
         if(this.map !== map) {
             this.map = map;
             const latLng = this._center;

@@ -40,9 +40,11 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
     iconPaths = MAP_VIS_SVG_PATHS;
 
     get state():StepState {
-        return this.selection.validPlots.length
-            ? StepState.COMPLETE
-            : StepState.AVAILABLE;
+        return !this.selection.year
+            ? StepState.UNAVAILABLE
+            : this.selection.validPlots.length
+                ? StepState.COMPLETE
+                : StepState.AVAILABLE;
     }
 }
 

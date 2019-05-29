@@ -262,6 +262,40 @@ const MAPLES_ACTIVITY_2017 = {
       }
     ]
 };
+const RED_MAPLE_MAP_2017 = {
+  "$class": "MapSelection",
+  "guid": "6103bb17-3fd6-4198-a568-432bad6cadbf",
+  "meta": {},
+  "networkIds": [],
+  "stationIds": [],
+  "filterLqdSummary": true,
+  "numDaysQualityFilter": 30,
+  "plots": [
+    {
+      "species": {
+        "common_name": "red maple",
+        "genus": "Acer",
+        "species": "rubrum",
+        "kingdom": "Plantae",
+        "species_id": 3,
+        "number_observations": 664416
+      },
+      "phenophase": {
+        "phenophase_id": 371,
+        "phenophase_name": "Breaking leaf buds",
+        "phenophase_category": "Leaves",
+        "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+        "phenophase_additional_definition": "",
+        "seq_num": 10,
+        "color": "Green1",
+        "abundance_category": -1,
+        "raw_abundance": false
+      }
+    }
+  ],
+  "year": 2017,
+  "filterDisclaimer": "For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization."
+};
 
 const TIME_SERIES_MAY_8 = {
   "$class": "AgddTimeSeriesSelection",
@@ -316,5 +350,12 @@ const CONFIGURATION:StoriesConfiguration = {
       <p>Heat accumulation in the spring is commonly used to predict the timing of phenological transitions in plants and animals.  Read more about it <a href="https://www.usanpn.org/data/agdd_maps" target="_blank">here</a>.</p>
       `,
       "external": TIME_SERIES_MAY_8
+    },{
+      "title": "Red Maples on a map (2017)",
+      "tagline": "shared map URL.",
+      "description": `
+      <p>Integer vel dui tellus. Pellentesque gravida nunc vel varius sollicitudin. Etiam sed arcu libero. Phasellus commodo luctus quam, non posuere massa fermentum nec. Aenean in rutrum lectus, ac accumsan eros. Ut suscipit sit amet magna eu laoreet. Praesent tincidunt velit nec turpis facilisis, vel finibus velit accumsan.</p>
+      `,
+      "external": RED_MAPLE_MAP_2017
     }]
 };

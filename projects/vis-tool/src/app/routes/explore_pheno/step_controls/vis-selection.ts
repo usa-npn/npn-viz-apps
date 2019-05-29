@@ -31,6 +31,7 @@ import { AgddTsLayerPointStep } from './agdd-ts-layer-point';
 import { AgddTsMiscStep } from './agdd-ts-misc';
 import { BoundaryStep } from "./boundary";
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material';
+import { MapMiscStep } from './map-misc';
 
 /**
  * This function is exported to allow the UI reset functionality to put a definition
@@ -180,7 +181,8 @@ const VIS_DEFINITIONS:VisDefinition[] = [
             BoundaryStep,
             MapLayerStep,
             MapYearStep,
-            MapSpeciesPhenoStep
+            MapSpeciesPhenoStep,
+            MapMiscStep
         ]
     },
     {

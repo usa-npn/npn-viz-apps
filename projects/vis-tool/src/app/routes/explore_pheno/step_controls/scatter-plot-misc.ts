@@ -13,6 +13,8 @@ import { Options } from 'ng5-slider';
         <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
         <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
         <div><label>From</label> {{selection.minDoy | legendDoy}} ({{selection.minDoy}})</div>
+        <div><label>Data precision filter</label> {{selection.numDaysQualityFilter}} days</div>
+        <div><label>Exclude less precise data</label> {{selection.filterLqdSummary ? 'Yes' : 'No'}}</div>
         <div><label>To</label> {{selection.maxDoy | legendDoy}} ({{selection.maxDoy}})</div>
     </div>
     `,
@@ -56,11 +58,25 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
         </mat-select>
     </mat-form-field>
 
+    <mat-form-field>
+        <mat-select placeholder="Data precision filter" [(value)]="selection.numDaysQualityFilter">
+            <mat-option [value]="7">7 days</mat-option>
+            <mat-option [value]="14">14 days</mat-option>
+            <mat-option [value]="30">30 days</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <h4 class="misc-title exclude">Exclude less precise data</h4>
+    <mat-radio-group [(ngModel)]="selection.filterLqdSummary">
+        <mat-radio-button [value]="true">Yes</mat-radio-button>
+        <mat-radio-button [value]="false">No</mat-radio-button>
+    </mat-radio-group>
+
     <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="selection.redraw()">Fit Lines</mat-checkbox>
 
     <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="selection.update()">Use Individual Phenometrics</mat-checkbox>
 
-    <h4 class="slider-title">From/To</h4>
+    <h4 class="misc-title to-from">From/To</h4>
     <div class="slider-wrapper">
         <ng5-slider *ngIf="doyOptions" [(value)]="selection.minDoy" [(highValue)]="selection.maxDoy" [options]="doyOptions"></ng5-slider>
     </div>
@@ -73,12 +89,23 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
     :host >* {
         margin-bottom: 5px;
     }
-    .slider-title {
+    .misc-title {
         text-transform: none !important;
+    }
+    .misc-title.exclude {
+        margin-top: 0px;
+    }
+    .misc-title.to-from {
         margin-top: 10px;
     }
     .slider-wrapper {
         height: 500px;
+    }
+    mat-radio-button {
+        margin-right: 5px;
+    }
+    mat-checkbox {
+        margin-top: 5px;
     }
     `],
     providers:[
@@ -87,7 +114,7 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
 })
 export class ScatterPlotMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior';
-    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy'];
+    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy','filterLqdSummary','numDaysQualityFilter'];
     selection: ScatterPlotSelection;
     axis = AXIS;
 

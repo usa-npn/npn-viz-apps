@@ -121,17 +121,19 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     }
 
     toURLSearchParams(): Promise<HttpParams> {
-        let params = new HttpParams()
-            .set('climate_data','1')
-            .set('request_src','npn-vis-scatter-plot')
-            .set('start_date',`${this.start}-01-01`)
-            .set('end_date',`${this.end}-12-31`)
-            .set('num_days_quality_filter',`${APPLICATION_SETTINGS.numDaysQualityFilter}`);
-        this.validPlots.forEach((p,i) => {
-           params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                          .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-        });
-        return this.addNetworkParams(params);
+        return super.toURLSearchParams()
+            .then(params => {
+                params = params.set('climate_data','1')
+                    .set('request_src','npn-vis-scatter-plot')
+                    .set('start_date',`${this.start}-01-01`)
+                    .set('end_date',`${this.end}-12-31`);
+                this.validPlots.forEach((p,i) => {
+                    params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                                    .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+                });
+                return this.addNetworkParams(params);
+            });
+        
     }
 
     doyDateFormat(doy:number):string {

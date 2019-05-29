@@ -12,7 +12,7 @@ import { Component } from '@angular/core';
                 <mat-radio-button [value]="titleEnum.ScientificName">Scientific name</mat-radio-button>
             </mat-radio-group>
         </section>
-        <section>
+        <!--section>
             <h3>Exclude less precise data from visualizations</h3>
             <mat-radio-group [(ngModel)]="settings.filterLqdSummary">
                 <mat-radio-button [value]="true">Yes</mat-radio-button>
@@ -30,7 +30,7 @@ import { Component } from '@angular/core';
                 </mat-select>
             </mat-form-field>
             <p class="mat-caption">Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days.</p>
-        </section>
+        </section-->
         <!--pre>{{settings.settings | json}}</pre-->
     </div>
     `,

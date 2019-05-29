@@ -27,9 +27,10 @@ export function getLayerTitle(layer) {
 })
 export class MapLayerStepComponent extends BaseStepComponent {
     title:string = 'Layer';
+    selection:MapSelection;
 
     get state():StepState {
-        return this.visited
+        return !!this.selection.layerName
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
     }

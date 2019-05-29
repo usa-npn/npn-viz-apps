@@ -19,7 +19,7 @@ export class BoundaryStepComponent extends BaseStepComponent {
     controlComponent:BoundaryControlComponent; 
 
     get state():StepState {
-        return this.selection.isValid()
+        return typeof(this.selection.boundaryId) === 'number'
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
     }

@@ -186,13 +186,19 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         this.subControlsOpen$ = mergeObservables.apply(null,subControlsVisibilitySubjects);
         this.focusStep(this.steps[0]);
         if(this.visualizationHost && this.activeVis && this.activeVis.component) {
+            // pause selection so as components get wired together any updates/resizes are ignored.
+            this.activeVis.selection.pause();
             // create and insert the visualization
             const visFactory = this.componentFactoryResolver.resolveComponentFactory(this.activeVis.component);
             const visRef = this.visualizationHost.createComponent(visFactory);
             const visComponent = (<any>visRef.instance);
             visComponent.selection = this.activeVis.selection;
             this.activeVisComponent = visComponent;
-            setTimeout(() => this.activeVis.selection.update(),750);
+            setTimeout(() => {
+                // resume and kick visualization
+                this.activeVis.selection.resume();
+                this.activeVis.selection.update();
+            },750);
         }
     }
 }

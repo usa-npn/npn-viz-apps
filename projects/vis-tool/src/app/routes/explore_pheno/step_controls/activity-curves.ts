@@ -91,6 +91,9 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
     }
 
     get allValid():boolean {
+        if(!this.selection.curves || this.selection.curves.length === 0) {
+            return false;
+        }
         return this.selection.curves.reduce((valid,c) => valid && c.isValid(), this.selection.curves[0].isValid());
     }
 
@@ -111,7 +114,7 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
 
     speciesMetricChange() {
         // need to prevent more than two metrics being selected
-        const curves = this.selection.curves;
+        const curves = this.selection.curves||[];
         const selectedMetrics = [];
         curves.forEach(c => {
             c.overrideValidMetricsReset();

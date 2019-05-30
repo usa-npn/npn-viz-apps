@@ -36,18 +36,6 @@ export const AXIS = [
     {key:'gdd',label:'AGDD'}
 ];
 
-// NOTE: It's possible that the "plot" class here and the other
-// criteria like start/end should be hoisted into the parent class
-// which would probably mean the entirety of this class should go there
-// but it's not clear if that's the case without another visualization
-// making use of the same service/s to drive it...
-export interface ScatterPlotSelectionPlot {
-    color?: string;
-    species?: Species;
-    phenophase?: Phenophase;
-    [x: string]: any;
-}
-
 /**
  * @dynamic
  */
@@ -63,16 +51,6 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     regressionLines: boolean = false;
     @selectionProperty()
     _axis:any = AXIS[0];
-    @selectionProperty({
-        ser: d => {
-            return {
-                color: d.color,
-                species: d.species,
-                phenophase: d.phenophase
-            };
-        }
-    })
-    plots:ScatterPlotSelectionPlot[] = [];
     @selectionProperty()
     _minDoy:number = 1;
     @selectionProperty()
@@ -116,19 +94,11 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                this.validPlots.length > 0;
     }
 
-    get validPlots():ScatterPlotSelectionPlot[] {
-        return this.plots.filter(p => p.color && p.species && p.phenophase);
-    }
-
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         params = params.set('climate_data','1')
                     .set('request_src','npn-vis-scatter-plot')
                     .set('start_date',`${this.start}-01-01`)
                     .set('end_date',`${this.end}-12-31`);
-        this.validPlots.forEach((p,i) => {
-            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                            .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-        });
         return super.toURLSearchParams(params);
     }
 

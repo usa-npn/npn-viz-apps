@@ -10,11 +10,6 @@ import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
 import { NpnServiceUtils, Species, Phenophase } from '@npn/common/common';
 import { HttpParams } from '@angular/common/http';
 
-export interface MapSelectionPlot {
-    species: Species;
-    phenophase: Phenophase;
-}
-
 /**
  * Note: This type of selection contains more functionality than the underlying visualization
  * will care to make use of.  I.e. if `individualPhenometrics` is set to true then summarized
@@ -43,8 +38,6 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
 
     @selectionProperty() // vis supports a single year of data
     _year:number;
-    @selectionProperty()
-    plots:MapSelectionPlot[] = []; // up to 3
 
     private map:google.maps.Map;
     layer:MapLayer;
@@ -58,10 +51,6 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         params = params.set('request_src','npn-vis-map')
             .set('start_date',`${this.year}-01-01`)
             .set('end_date',`${this.year}-12-31`);
-        this.validPlots.forEach((p,i) => {
-            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                        .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-        });
         return super.toURLSearchParams(params);
     }
 
@@ -71,10 +60,6 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     set year(y:number) {
         this._year = y;
         this.update();
-    }
-
-    get validPlots():MapSelectionPlot[] {
-        return (this.plots||[]).filter(p => (!!p.species && !!p.phenophase));
     }
 
     set layerCategory(s:string) {

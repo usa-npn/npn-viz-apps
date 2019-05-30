@@ -1,10 +1,15 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils } from '../common';
+import { NpnServiceUtils, Species, Phenophase } from '../common';
 import { StationAwareVisSelection, selectionProperty } from './vis-selection';
-import { PARAMETERS } from '@angular/core/src/util/decorators';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
 const DEFAULT_NUM_DAYS_Q_FILTER = 30;
+
+export interface SiteOrSummaryPlot {
+    species?: Species;
+    phenophase?: Phenophase;
+    [x: string]: any;
+}
 
 export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection {
     @selectionProperty()
@@ -15,6 +20,17 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     _filterLqdSummary: boolean = true;
     @selectionProperty()
     _numDaysQualityFilter:number = DEFAULT_NUM_DAYS_Q_FILTER;
+    @selectionProperty({
+        ser:d => {
+            const {species,phenophase} = d;
+            const o:any = {species,phenophase};
+            Object.getOwnPropertyNames(d)
+                .filter(key => key !== 'species' && key !== 'phenophase')
+                .forEach(key => o[key] = d[key]);
+            return o;
+        }
+    })
+    plots:SiteOrSummaryPlot[] = [];
 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super(serviceUtils);
@@ -24,7 +40,15 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         if(this.numDaysQualityFilter) {
             params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
         }
+        this.validPlots.forEach((p,i) => {
+            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                            .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+        });
         return super.toURLSearchParams(params);
+    }
+
+    get validPlots():SiteOrSummaryPlot[] {
+        return this.plots.filter(p => !!p.species && !!p.phenophase);
     }
 
     get filterLqdSummary():boolean {

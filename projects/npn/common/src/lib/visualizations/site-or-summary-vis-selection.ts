@@ -67,6 +67,19 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         this.update(); // param change
     }
 
+    /**
+     * The underlying services do not treat species/phenophase pairs as
+     * parallel arrays but as independent arrays.  This means when two species
+     * share a phenophase but if that phenophase is only requested for one of the two
+     * extra recrods can be returned and need to be discarded.  This function
+     * returns a function that can be passed to Array.filter to discard those records
+     * from server responses.
+     */
+    private filterUnwantedDataFunctor() {
+        const valid:string[] = this.validPlots.map(p => `${p.species.species_id}:${p.phenophase.phenophase_id}`);
+        return d => valid.indexOf(`${d.species_id}:${d.phenophase_id}`) !== -1;
+    }
+
     private filterSuspectSummaryData(d) {
         var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
         if (bad) {
@@ -98,7 +111,8 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
         const filterLqd = this.individualPhenometrics
             ? (data) => { // summary
-                let minusSuspect = data.filter(this.filterSuspectSummaryData),
+                let minusUnwanted = data.filter(this.filterUnwantedDataFunctor()),
+                    minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
                     filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
                     individuals = filtered.reduce(function (map, d) {
                         var key = d.individual_id + '/' + d.phenophase_id + '/' + d.first_yes_year;
@@ -107,8 +121,9 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                         return map;
                     }, {}),
                     uniqueIndividuals = [];
-                console.debug('filtered out ' + (data.length - minusSuspect.length) + '/' + data.length + ' suspect records');
-                console.debug('filtered out ' + (minusSuspect.length - filtered.length) + '/' + minusSuspect.length + ' LQD records.');
+                console.debug(`filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
+                console.debug(`filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
+                console.debug(`filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
                 for (let key in individuals) {
                     let arr = individuals[key];
                     if (arr.length > 1) {
@@ -126,10 +141,12 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 return filtered;
             }
             : (data) => { // site
-                let minusSuspect = data.filter(this.filterSuspectSummaryData),
+                let minusUnwanted =  data.filter(this.filterUnwantedDataFunctor()),
+                    minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
                     filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
-                console.debug('filtered out ' + (data.length - minusSuspect.length) + '/' + data.length + ' suspect records');
-                console.debug('filtered out ' + (minusSuspect.length - filtered.length) + '/' + minusSuspect.length + ' LQD records.');
+                console.debug(`filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
+                console.debug(`filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
+                console.debug(`filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
                 this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?
                     FILTER_LQD_DISCLAIMER : undefined;
                 return filtered;

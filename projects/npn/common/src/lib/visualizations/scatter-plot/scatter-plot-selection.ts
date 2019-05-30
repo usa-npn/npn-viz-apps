@@ -140,17 +140,11 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
             minDoy = this.minDoy,
             maxDoy = this.maxDoy,
             result = data.filter((d,i) => {
-                if(!(d.color = colorMap[colorKey(d)])) {
-                    // this can happen if a phenophase id spans two species but is only plotted for one
-                    // e.g. boxelder/breaking leaf buds, boxelder/unfolding leaves, red maple/breaking leaf buds
-                    // the service will return data for 'red maple/unfolding leaves' but the user hasn't requested
-                    // that be plotted so we need to discard this data.
-                    return false;
-                }
                 const doy = this.getDoy(d);
                 if(doy < minDoy || doy > maxDoy) {
                     return false;
                 }
+                d.color = colorMap[colorKey(d)];
                 d.id = i;
                 d.fyy = this.getFirstYesYear(d);
                 for(let summaryKey in KEYS_TO_NORMALIZE) {

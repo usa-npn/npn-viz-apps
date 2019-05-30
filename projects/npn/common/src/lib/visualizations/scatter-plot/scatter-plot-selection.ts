@@ -120,20 +120,16 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return this.plots.filter(p => p.color && p.species && p.phenophase);
     }
 
-    toURLSearchParams(): Promise<HttpParams> {
-        return super.toURLSearchParams()
-            .then(params => {
-                params = params.set('climate_data','1')
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
+        params = params.set('climate_data','1')
                     .set('request_src','npn-vis-scatter-plot')
                     .set('start_date',`${this.start}-01-01`)
                     .set('end_date',`${this.end}-12-31`);
-                this.validPlots.forEach((p,i) => {
-                    params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                                    .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-                });
-                return this.addNetworkParams(params);
-            });
-        
+        this.validPlots.forEach((p,i) => {
+            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                            .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+        });
+        return super.toURLSearchParams(params);
     }
 
     doyDateFormat(doy:number):string {

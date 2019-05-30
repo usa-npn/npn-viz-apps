@@ -154,7 +154,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     loadCurveData(): Promise<any> {
         this.working = true;
-        return this.addNetworkParams(new HttpParams()
+        return this.toURLSearchParams(new HttpParams()
                 .set('request_src','npn-vis-activity-curves')
                 .set('frequency',`${this.frequency.value}`)
             ).then((baseParams:HttpParams) => {

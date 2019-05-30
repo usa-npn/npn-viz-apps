@@ -20,12 +20,11 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         super(serviceUtils);
     }
 
-    toURLSearchParams(): Promise<HttpParams> {
-        let params = new HttpParams();
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         if(this.numDaysQualityFilter) {
             params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
         }
-        return Promise.resolve(params);
+        return super.toURLSearchParams(params);
     }
 
     get filterLqdSummary():boolean {

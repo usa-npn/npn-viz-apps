@@ -301,7 +301,7 @@ export abstract class NetworkAwareVisSelection extends VisSelection {
     @selectionProperty()
     networkIds?: any[] = [];
 
-    addNetworkParams(params: HttpParams): Promise<HttpParams> {
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
         return Promise.resolve(params);
     }
@@ -331,8 +331,8 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         return this._boundaryId;
     }
 
-    addNetworkParams(params: HttpParams): Promise<HttpParams> {
-        return super.addNetworkParams(params)
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
+        return super.toURLSearchParams(params)
             .then(params => {
                 if(typeof(this.boundaryId) === 'number') {
                     return this.serviceUtils.cachedGet(

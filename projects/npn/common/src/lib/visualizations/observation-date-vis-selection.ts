@@ -49,9 +49,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         });
     }
 
-    toURLSearchParams(): Promise<HttpParams> {
-        let params = new HttpParams()
-            .set('request_src', this.requestSrc);
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
+        params = params.set('request_src', this.requestSrc);
         this.years.forEach((y, i) => {
             params = params.set(`year[${i}]`, `${y}`);
         });
@@ -59,7 +58,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             params = params.set(`species_id[${i}]`, `${plot.species.species_id}`)
                            .set(`phenophase_id[${i}]`, `${plot.phenophase.phenophase_id}`);
         });
-        return this.addNetworkParams(params);
+        return super.toURLSearchParams(params);
     }
 
     postProcessData(data: any[]): ObservationDateData {

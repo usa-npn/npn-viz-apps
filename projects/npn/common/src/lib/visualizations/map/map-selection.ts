@@ -54,18 +54,15 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         super(serviceUtils);
     }
 
-    toURLSearchParams():Promise<HttpParams> {
-        return super.toURLSearchParams()
-            .then(params => {
-                params = params.set('request_src','npn-vis-map')
-                    .set('start_date',`${this.year}-01-01`)
-                    .set('end_date',`${this.year}-12-31`);
-                this.validPlots.forEach((p,i) => {
-                    params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                                .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-                });
-                return this.addNetworkParams(params);
-            });
+    toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
+        params = params.set('request_src','npn-vis-map')
+            .set('start_date',`${this.year}-01-01`)
+            .set('end_date',`${this.year}-12-31`);
+        this.validPlots.forEach((p,i) => {
+            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
+                        .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
+        });
+        return super.toURLSearchParams(params);
     }
 
     get year():number {
@@ -236,10 +233,8 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     }
 
     getData():Promise<any[]> {
-        // this vis is "always" valid since you don't have to plot
-        // anything if you don't want to.
         this.working = true;
-        return (this.year && this.validPlots.length
+        return (this.validForData()
             ? super.getData()
             : Promise.resolve([]))
             .then(results => {

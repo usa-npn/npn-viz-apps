@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, from } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { Router } from '@angular/router';
 import { SharingService, Shared } from '../explore_pheno/sharing.service';
 import { RoutePath } from '../../route-path';
-import { SpeciesTitleFormat, NpnServiceUtils } from '@npn/common';
+import { NpnServiceUtils } from '@npn/common';
 import { GeocoderResponse } from './google-geocoder';
 import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';

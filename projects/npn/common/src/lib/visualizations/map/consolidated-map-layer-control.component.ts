@@ -380,6 +380,7 @@ export class SpringIndexMapLayerControlComponent extends MonitorsDestroy {
             this.leafOrBloom.valueChanges
         ).pipe(
             startWith(null),
+            debounceTime(250),
             takeUntil(this.componentDestroyed)
         ).subscribe(() => {
             const base:SIX_BASE = this.baseLayer.value;

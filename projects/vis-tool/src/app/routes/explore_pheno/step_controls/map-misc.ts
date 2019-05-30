@@ -33,11 +33,11 @@ export class MapMiscStepComponent extends BaseStepComponent {
     selection: MapSelection;
 
     get state():StepState {
-        return !this.selection.validPlots.length || !this.selection.year
-            ? StepState.UNAVAILABLE
-            : this.visited
-                ? StepState.COMPLETE
-                : StepState.AVAILABLE
+        return this.selection.validForData()
+            ? StepState.COMPLETE
+            : this.selection.year && this.selection.validPlots.length > 0
+                ? StepState.AVAILABLE
+                : StepState.UNAVAILABLE;
     }
 }
 

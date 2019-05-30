@@ -126,26 +126,25 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
         this.getMap().then(() => { // just to make sure the google apis are loaded
             this.selection.getData().then((data:MapVisRecord[]) => {
                 console.log(`MapVisualization: data.length=${data.length} (from server, unfiltered)`);
-                if(!data.length) {
-                    return;
+                if(data.length) {                
+                    data = data
+                        .filter(d => d.mean_first_yes_doy !== -9999) // throw out invalid means
+                        .sort((a,b) => a.mean_first_yes_doy - b.mean_first_yes_doy); // sort ascending by doy
+                    const speciesIds = this.selection.validPlots.map(p => `${p.species.species_id}`);
+                    console.log(`MapVisualization: data.length=${data.length} (filtered)`);
+                    const bySiteMap:BySiteMap = {}; // to consolidate multiple species/phenos at a given station/marker
+                    this.markers = data.reduce((arr,d) => {
+                            if(bySiteMap[d.site_id]) {
+                                bySiteMap[d.site_id].addRecord(d);
+                            } else {
+                                const m = new MapVisMarker(d,newGoogleMapsSymbol(MAP_VIS_SVG_PATHS[speciesIds.indexOf(`${d.species_id}`)]));
+                                arr.push(m);
+                                bySiteMap[d.site_id] = m;
+                            }
+                            return arr;
+                        },[]);
+                    console.log(`MapVisualization: markers.length=${this.markers.length}`);
                 }
-                data = data
-                    .filter(d => d.mean_first_yes_doy !== -9999) // throw out invalid means
-                    .sort((a,b) => a.mean_first_yes_doy - b.mean_first_yes_doy); // sort ascending by doy
-                const speciesIds = this.selection.validPlots.map(p => `${p.species.species_id}`);
-                console.log(`MapVisualization: data.length=${data.length} (filtered)`);
-                const bySiteMap:BySiteMap = {}; // to consolidate multiple species/phenos at a given station/marker
-                this.markers = data.reduce((arr,d) => {
-                        if(bySiteMap[d.site_id]) {
-                            bySiteMap[d.site_id].addRecord(d);
-                        } else {
-                            const m = new MapVisMarker(d,newGoogleMapsSymbol(MAP_VIS_SVG_PATHS[speciesIds.indexOf(`${d.species_id}`)]));
-                            arr.push(m);
-                            bySiteMap[d.site_id] = m;
-                        }
-                        return arr;
-                    },[]);
-                console.log(`MapVisualization: markers.length=${this.markers.length}`);
                 this.redraw();
             });
         });

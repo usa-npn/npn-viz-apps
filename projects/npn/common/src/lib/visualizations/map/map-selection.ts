@@ -1,4 +1,4 @@
-import { selectionProperty } from '../vis-selection';
+import { selectionProperty, VisSelectionEvent } from '../vis-selection';
 import {
     MapLayer,
     NpnMapLayerService,
@@ -172,8 +172,17 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         }
     }
 
+    validForLayer():boolean {
+        return !!this.layerName;
+    }
+
+    validForData():boolean {
+        return typeof(this.year) === 'number' && this.validPlots.length > 0 &&
+            typeof(this.numDaysQualityFilter) === 'number';
+    }
+
     isValid():boolean {
-        return true;
+        return this.validForLayer() || this.validForData();
     }
 
     // NOTE: There is no protection against this being called multiple times in fast succession

@@ -32,11 +32,12 @@ export class CalendarMiscStepComponent extends BaseStepComponent {
     selection: CalendarSelection;
 
     get state():StepState {
-        return this.selection.validPlots.length
-            ? this.visited
+        const nearValid = this.selection.years && this.selection.years.length && this.selection.validPlots.length > 0;
+        return nearValid && typeof(this.selection.negative) === 'boolean' // there are others this step populates but...
                 ? StepState.COMPLETE
-                : StepState.AVAILABLE
-            : StepState.UNAVAILABLE;
+                : nearValid
+                    ? StepState.AVAILABLE
+                    : StepState.UNAVAILABLE;
     }
 }
 

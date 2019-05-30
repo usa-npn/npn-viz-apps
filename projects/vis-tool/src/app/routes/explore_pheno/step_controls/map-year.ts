@@ -15,7 +15,7 @@ export class MapYearStepComponent extends BaseStepComponent {
     title:string = 'Year';
 
     get state():StepState {
-        return this.visited && this.selection.year
+        return this.selection.year
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
     }

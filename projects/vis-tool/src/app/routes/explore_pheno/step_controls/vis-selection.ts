@@ -178,8 +178,8 @@ const VIS_DEFINITIONS:VisDefinition[] = [
         selection: 'MapSelection',
         component: MapVisualizationComponent,
         steps:[
-            BoundaryStep,
             MapLayerStep,
+            BoundaryStep,
             MapYearStep,
             MapSpeciesPhenoStep,
             MapMiscStep

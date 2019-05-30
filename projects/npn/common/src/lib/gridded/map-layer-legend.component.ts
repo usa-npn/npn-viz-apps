@@ -30,6 +30,11 @@ export class MapLayerLegendComponent {
         return `${layerType||''} ${layerName ? layerName.replace(/:/g,'_') : ''}`;
     }
 
+    @HostBinding('style.min-width')
+    get minLegendWidth():string {
+        return this.legend.ldef.minLegendWidth||null;
+    }
+
     ngAfterViewInit() {
         this.svg = d3.select(this.rootElement.nativeElement).select('svg');
     }

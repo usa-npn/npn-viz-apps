@@ -113,6 +113,8 @@ export interface MapLayerStyle {
 export interface MapLayerDefinition extends NpnLayerCommon {
     title?: string;
     abstract?: string;
+    /** Minimum width for legend style (e.g. '200px' or '50%') used to set the `min-width` CSS style on the corresponding legend. */
+    minLegendWidth?: string;
     extent?: MapLayerExtent;
     bbox?: MapLayerBoundingBox;
     style?: MapLayerStyle;

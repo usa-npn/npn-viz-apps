@@ -3,7 +3,7 @@ import { MapLayerLegend } from './map-layer-legend';
 import { Observable, from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { GriddedPointData } from './gridded-common';
-import { PestDescription, PestMapLayer } from './pest-map-layer';
+import { PestMapLayer } from './pest-map-layer';
 
 export class PestMapLayerLegend extends MapLayerLegend {
     getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {

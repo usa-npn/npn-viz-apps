@@ -15,7 +15,9 @@ export class SpeciesTitlePipe implements PipeTransform {
                     }
                     return item.common_name;
                 case SpeciesTitleFormat.ScientificName:
-                    return `${item.genus} ${item.species}`;
+                    return item && item.genus
+                        ? `${item.genus} ${item.species}`
+                        : undefined;
             }
         }
         return item;

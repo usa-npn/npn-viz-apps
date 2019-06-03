@@ -12,9 +12,9 @@ import { Options } from 'ng5-slider';
         <div><label>X Axis</label> {{selection.axis ? selection.axis.label : "NA"}}</div>
         <div><label>Regression lines</label> {{selection.regressionLines ? 'Yes' : 'No'}}</div>
         <div><label>Individual phenometrics</label> {{selection.individualPhenometrics ? 'Yes' : 'No'}}</div>
-        <div><label>From</label> {{selection.minDoy | legendDoy}} ({{selection.minDoy}})</div>
         <div><label>Data precision filter</label> {{selection.numDaysQualityFilter}} days</div>
         <div><label>Exclude less precise data</label> {{selection.filterLqdSummary ? 'Yes' : 'No'}}</div>
+        <div><label>From</label> {{selection.minDoy | legendDoy}} ({{selection.minDoy}})</div>
         <div><label>To</label> {{selection.maxDoy | legendDoy}} ({{selection.maxDoy}})</div>
     </div>
     `,

@@ -317,6 +317,8 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     boundaryTypeId?:number;
     @selectionProperty()
     _boundaryId?:number;
+    @selectionProperty()
+    _polygons:number[][][];
 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super();
@@ -331,19 +333,43 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         return this._boundaryId;
     }
 
+    get polygonBoundaries():number[][][] {
+        return this._polygons||[];
+    }
+
+    set polygonBoundaries(polygons:number[][][]) {
+        this._polygons = polygons;
+        this.update();
+    }
+
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
             .then(params => {
+                const stationIdPromises:Promise<any>[] = [];
                 if(typeof(this.boundaryId) === 'number') {
-                    return this.serviceUtils.cachedGet(
+                    stationIdPromises.push(this.serviceUtils.cachedGet(
                         this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
                         {boundary_id:this.boundaryId}
-                    )
-                    .then(stationIds => {
-                        const allStationIds = (this.stationIds||[]).concat(stationIds||[]);
-                        allStationIds.forEach((id, i) => params = params.set(`station_id[${i}]`, `${id}`));
-                        return params;
-                    });
+                    ));
+                }
+                this.polygonBoundaries
+                    .map(polygon => {
+                        // close the polygon
+                        const copy = polygon.slice();
+                        copy.push(polygon[0]);
+                        return copy;
+                    })
+                    .forEach(polygon => stationIdPromises.push(this.serviceUtils.cachedGet(
+                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
+                        {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
+                    ).then(response => response.stations.map(s => s.station_id))));
+                if(stationIdPromises.length) {
+                    return Promise.all(stationIdPromises)
+                        .then(results => {
+                            results.reduce((ids,stationIds) => ids.concat(stationIds),(this.stationIds||[]).slice())
+                                   .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
+                            return params
+                        });
                 }
                 (this.stationIds || []).forEach((id, i) => params = params.set(`station_id[${i}]`, `${id}`));
                 return params;

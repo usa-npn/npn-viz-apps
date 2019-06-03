@@ -39,7 +39,8 @@ export function npnConfigurationFactory():NpnConfiguration {
     AppRoutingModule,
 
     AgmCoreModule.forRoot({
-      apiKey: environment.googleMapsApiKey
+      apiKey: environment.googleMapsApiKey,
+      libraries: ['drawing']
     })
   ],
   declarations: [

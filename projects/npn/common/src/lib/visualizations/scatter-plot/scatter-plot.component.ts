@@ -129,6 +129,9 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
           .style('font-size', '12px')
           .text(this.selection.axis.label);
 
+        this.y.domain([this.selection.minDoy||1,this.selection.maxDoy||365]);
+        this.chart.selectAll('g .y.axis').call(this.yAxis);
+
         this.chart.selectAll('.circle').remove();
         let circles = this.chart.selectAll('.circle').data(nonNullData,d => d.id)
             .enter().append('circle')

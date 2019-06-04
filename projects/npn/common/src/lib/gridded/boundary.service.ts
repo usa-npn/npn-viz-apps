@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { NpnServiceUtils } from "../common";
-import { Observable, from } from "rxjs";
-import { map } from 'rxjs/operators';
+import { Observable, from, of } from "rxjs";
+import { map, tap } from 'rxjs/operators';
 import { Geometry } from "geojson";
 
 
@@ -25,8 +25,14 @@ export interface Boundary {
 
 const BOUNDARY_API_ROOT = '/v0/boundaries';
 
+interface BoundaryCache {
+    [typeId:string]: Promise<Boundary[]>;
+}
+
 @Injectable()
 export class BoundaryService {
+    private _boundaryCache:BoundaryCache = {};
+
     constructor(private serviceUtils:NpnServiceUtils){}
 
     getBoundaryTypes():Observable<BoundaryType[]> {
@@ -36,12 +42,14 @@ export class BoundaryService {
     }
 
     getBoundaries(typeId:number):Observable<Boundary[]> {
-        return this.serviceUtils.http.get<Boundary []>(
-            this.serviceUtils.dataApiUrl2(`${BOUNDARY_API_ROOT}`),
-            {params:{type_id:`"${typeId}"`}}
-        ).pipe(
-            map(boundaries => (boundaries||[]).sort((a,b) => a.name.localeCompare(b.name)))
-        );
+        if(!this._boundaryCache[typeId]) {
+            this._boundaryCache[typeId] = this.serviceUtils.get(
+                this.serviceUtils.dataApiUrl2(`${BOUNDARY_API_ROOT}`),
+                {type_id:`"${typeId}"`}
+            )
+            .then(boundaries => (boundaries||[]).sort((a,b) => a.name.localeCompare(b.name)));
+        }
+        return from(this._boundaryCache[typeId]);
     }
 
     boundariesToFeatureCollection(boundaries:Boundary[]):any/*<FeatureCollection>*/ {

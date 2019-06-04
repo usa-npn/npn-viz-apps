@@ -1,44 +1,43 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from "./base";
-import { MAP_STYLES, BoundaryService, BoundaryType, Boundary, googleFeatureBounds, StationAwareVisSelection } from "@npn/common";
+import { MAP_STYLES, BoundaryService, BoundaryType, StationAwareVisSelection, newGuid, googleFeatureBounds } from "@npn/common";
 import { VisConfigStep, StepState } from "../interfaces";
-import { faDrawPolygon, faTimes } from "@fortawesome/pro-light-svg-icons";
+import { faDrawPolygon, faTimes, faExpandArrowsAlt, faPlus, faCompressArrowsAlt } from "@fortawesome/pro-light-svg-icons";
 import { Component, NgZone } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Observable } from "rxjs";
-import { takeUntil, startWith } from "rxjs/operators";
+import { takeUntil, filter } from "rxjs/operators";
 
 import { scaleOrdinal, schemeCategory20 } from 'd3';
+import { BoundarySelection, PredefinedBoundarySelection, isPolygonBoundarySelection, PolygonBoundarySelection } from '@npn/common/visualizations/vis-selection';
+
+const BOUNDARY_LABEL_MAX_WIDTH = '220px';
 
 @Component({
     template: `
-    <div>{{label}}</div>
-    <div *ngIf="selection.polygonBoundaries.length">{{selection.polygonBoundaries.length}} hand-drawn {{selection.polygonBoundaries.length === 1 ? 'boundary' : 'boundaries'}}</div>
-    `
+    <div class="boundary-label" *ngIf="!controlComponent.boundaryHolders">Loading ...</div>
+    <div class="boundary-label" *ngFor="let boundary of controlComponent.boundaryHolders">{{boundary.label}}</div>
+    `,
+    styles:[`
+    .boundary-label {
+        max-width: ${BOUNDARY_LABEL_MAX_WIDTH};
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    `]
 })
 export class BoundaryStepComponent extends BaseStepComponent {
     title:string = 'Boundary';
     controlComponent:BoundaryControlComponent; 
 
     get state():StepState {
-        return typeof(this.selection.boundaryId) === 'number'
+        return this.selection.boundaries.length > 0
             ? StepState.COMPLETE
             : StepState.AVAILABLE;
-    }
-
-    get label():string {
-        return typeof(this.selection.boundaryId) === 'number'
-            ? !!this.controlComponent.selectedFeature
-                ? this.controlComponent.selectedFeature.getProperty('name')
-                : 'loading ...'
-            : '';
     }
 }
 
 const STYLE_KEY = '$style';
-const SELECTED_STYLES = {
-    fillOpacity: 1.0,
-    strokeWeight: 4
-};
 const DEFAULT_STYLES = {
     fillOpacity: 0.35,
     strokeWeight: 1
@@ -48,144 +47,364 @@ const BASE_BOUNDARY_STYLE = {
     clickable: true,
     strokeColor: '#fff',
 };
+const HOVER_BOUNDARY_STYLE = {
+    ...BASE_BOUNDARY_STYLE,
+    fillOpacity:1,
+    strokeWeight:2
+};
 const LAT: number = 38.8402805;
 const LNG: number = -97.61142369999999
 const ZOOM: number = 4;
 
+class BoundaryHolder {
+    fillColor:string;
+    guid:string;
+    private _hovering:boolean = false;
+
+    constructor(
+        private component:BoundaryControlComponent,
+        private map:google.maps.Map,
+        public selection:BoundarySelection,
+        public googleObject:google.maps.Data.Feature|google.maps.Polygon
+    ) {
+        this.guid = newGuid();
+        if(googleObject instanceof google.maps.Data.Feature) {
+            googleObject.setProperty('$BoundaryHolderGuid',this.guid);
+        }
+    }
+
+    get hovering():boolean {
+        return this._hovering;
+    }
+
+    set hovering(b:boolean) {
+        if(this._hovering && !b) {
+            this.mouseout();
+        } else if (!this._hovering && b) {
+            this.mouseover();
+        }
+        this._hovering = b;
+    }
+
+    isHandDrawn():boolean {
+        return this.googleObject instanceof google.maps.Polygon;
+    }
+
+    isPredefined():boolean {
+        return this.googleObject instanceof google.maps.Data.Feature
+    }
+
+    add():boolean {
+        if(this.googleObject instanceof google.maps.Data.Feature) {
+            this.map.data.add(this.googleObject);
+            return true;
+        } else if (this.googleObject instanceof google.maps.Polygon) {
+            google.maps.event.addListener(this.googleObject,'mouseover',() => this.component.mouseover(this.googleObject));
+            google.maps.event.addListener(this.googleObject,'mouseout',() => this.component.mouseout());
+            this.googleObject.setMap(this.map);
+            return true;
+        }
+        return false;
+    }
+
+    remove():boolean {
+        if(this.googleObject instanceof google.maps.Data.Feature) {
+            this.map.data.remove(this.googleObject);
+            return true;
+        } else if (this.googleObject instanceof google.maps.Polygon) {
+            this.googleObject.setMap(null);
+            google.maps.event.clearInstanceListeners(this.googleObject);
+            return true;
+        }
+        return false;
+    }
+
+    setFillColor(fillColor:string) {
+        this.fillColor = fillColor;
+        if(this.googleObject instanceof google.maps.Data.Feature) {
+            const style = this.googleObject.getProperty(STYLE_KEY);
+            style.fillColor = fillColor;
+            this.googleObject.setProperty(STYLE_KEY,style);
+        } else if (this.googleObject instanceof google.maps.Polygon) {
+            this.googleObject.setOptions({
+                ...BASE_BOUNDARY_STYLE,
+                fillColor
+            });
+        }
+    }
+
+    get label():string {
+        if(isPolygonBoundarySelection(this.selection)) {
+            return 'Hand-drawn boundary';
+        }
+        const predefSel = this.selection as PredefinedBoundarySelection;
+        return `${predefSel.boundaryTypeName}: ${predefSel.boundaryName}`;
+    }
+
+    mouseover() {
+        if(this.googleObject instanceof google.maps.Data.Feature) {
+            this.map.data.overrideStyle(this.googleObject,{...this.googleObject.getProperty(STYLE_KEY),...HOVER_BOUNDARY_STYLE});
+        } else if (this.googleObject instanceof google.maps.Polygon) {
+            const {fillColor} = this;
+            (this.googleObject as google.maps.Polygon).setOptions({
+                ...HOVER_BOUNDARY_STYLE,
+                fillColor
+            });
+        }
+    }
+
+    mouseout() {
+        if(this.googleObject instanceof google.maps.Data.Feature) {
+            this.map.data.revertStyle();
+        } else if (this.googleObject instanceof google.maps.Polygon) {
+            const {fillColor} = this;
+            (this.googleObject as google.maps.Polygon).setOptions({
+                ...BASE_BOUNDARY_STYLE,
+                fillColor
+            });
+        }
+    }
+}
+
 @Component({
     template: `
-    <h4 class="misc-title to-from">Pre-defined boundary</h4>
-    <div class="pre-defined">
-        <mat-form-field>
-            <mat-select placeholder="Boundary type" [formControl]="boundaryType">
-                <mat-option></mat-option>
-                <mat-option *ngFor="let bt of boundaryTypes | async" [value]="bt.type_id">{{bt.name}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-select placeholder="Boundary" [formControl]="boundary">
-                <mat-option>No boundary</mat-option>
-                <mat-option *ngFor="let b of boundaries" [value]="b.boundary_id">{{b.name}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+    <mat-list>
+        <h3 matSubheader>Boundaries</h3>
+        <mat-list-item *ngIf="boundaryHolders && !boundaryHolders.length">None</mat-list-item>
+        <mat-list-item *ngIf="!boundaryHolders">Loading ...</mat-list-item>
+        <mat-list-item *ngFor="let boundary of boundaryHolders; index as i"
+            (mouseover)="mouseover(boundary.googleObject)" (mouseout)="mouseout(boundary.googleObject)">
+            <mat-icon mat-list-icon [ngStyle]="{
+                'background-color': boundary.fillColor,
+                opacity: boundary.hovering ? 1.0 : swatchOpacity
+            }"><fa-icon [icon]="polygonIcon"></fa-icon></mat-icon>
+            <div class="boundary-label">{{boundary.label}}</div>
+            <button mat-icon-button *ngIf="!addingBoundary()"
+                matTooltip="Remove boundary" matTooltipPosition="right"
+                (click)="removeBoundary(i)"><fa-icon [icon]="removeBoundaryIcon"></fa-icon></button>
+        </mat-list-item>
+    </mat-list>
+    <mat-toolbar>
+        <span class="spacer"></span>
+        <button mat-icon-button [disabled]="!boundaryHolders?.length"
+            matTooltip="Fit boundaries" matTooltipPosition="right"
+            (click)="fitBoundaries()"><fa-icon [icon]="fitBoundariesIcon"></fa-icon></button>
+        <button mat-icon-button
+            matTooltip="Reset center/zoom" matTooltipPosition="right"
+            (click)="resetFit()"><fa-icon [icon]="resetFitIcon"></fa-icon></button>
+    </mat-toolbar>
+    <div class="controls">
+        <div *ngIf="addingPredefined">
+            <mat-form-field>
+                <mat-select placeholder="Boundary type" [formControl]="boundaryTypeControl">
+                    <mat-option></mat-option>
+                    <mat-option *ngFor="let boundaryType of boundaryTypes | async" [value]="boundaryType">{{boundaryType.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-select placeholder="Boundary" [formControl]="boundaryControl">
+                    <mat-option>No boundary</mat-option>
+                    <mat-option *ngFor="let boundary of boundaries | async" [value]="boundary">{{boundary.getProperty('name')}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <button class="block-button" *ngIf="!addingBoundary()" mat-button (click)="startHandDrawn()"><fa-icon [icon]="addIcon"></fa-icon> Add hand-drawn boundary</button>
+        <button class="block-button" *ngIf="!addingBoundary()" mat-button (click)="startPredefined()"><fa-icon [icon]="addIcon"></fa-icon> Add pre-defined boundary</button>
+        <button class="block-button" *ngIf="addingBoundary()" mat-button (click)="cancelAdd()">Cancel add boundary</button>
     </div>
-
-    <h4 class="misc-title to-from">Hand-drawn boundaries</h4>
-    <div class="hand-drawn">
-        <mat-list>
-            <mat-list-item class="polygon" *ngFor="let poly of polygons; index as i"
-                (mouseenter)="mouseenterPolygon(i)" (mouseleave)="mouseleavePolygon(i)">
-                <mat-icon mat-list-icon [ngStyle]="{
-                    'background-color':getColor(i),
-                    opacity: polyHover === i ? 1.0 : swatchOpacity
-                }"><fa-icon [icon]="drawPolygonIcon"></fa-icon></mat-icon>
-                Boundary #{{i+1}}
-                <button mat-icon-button
-                    matTooltip="Remove boundary" matTooltipPosition="right"
-                    (click)="removePolygon(i)"><fa-icon [icon]="removePolygonIcon"></fa-icon></button>
-            </mat-list-item>
-            <button mat-button mat-list-item *ngIf="!drawingManager" (click)="startPolygon()">Add boundary</button>
-            <button mat-button mat-list-item *ngIf="drawingManager" (click)="cancelPolygon()">Cancel add boundary</button>
-        </mat-list>
-    </div>
-    
     `,
     styles:[`
+    mat-toolbar {
+        height: 32px;
+    }
+    .spacer {
+        flex: 1 1 auto;
+    }
+    .controls {
+        padding-top: 15px;
+    }
+    button.block-button {
+        display: block;
+        margin: 0px auto;
+    }
     mat-form-field {
         display: block;
     }
-    .misc-title {
+    .misc-title,
+    *[matSubheader] {
         text-transform: none !important;
     }
-    .hand-drawn mat-icon {
+    mat-list-item mat-icon {
         margin-right: 5px;
+    }
+    .boundary-label {
+        display: inline-block;
+        max-width: ${BOUNDARY_LABEL_MAX_WIDTH};
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .fit-controls {
+        text-align: right;
     }
     `]
 })
 export class BoundaryControlComponent extends BaseControlComponent {
-    working:boolean = false;
     title:string = 'Select boundaries';
+    selection:StationAwareVisSelection;
+
     subControlComponent:BoundarySubControlComponent;
     mapPromiseResolver;
     mapPromise:Promise<google.maps.Map> = new Promise(resolve => this.mapPromiseResolver = resolve);
 
     boundaryTypes:Observable<BoundaryType[]>;
-    boundaryType:FormControl;
+    boundaryTypeControl:FormControl;
 
-    boundary:FormControl;
-    boundaries:Boundary[];
-    features:google.maps.Data.Feature[];
-    selectedFeature:google.maps.Data.Feature;
+    boundaries:Promise<google.maps.Data.Feature[]>
+    boundaryControl:FormControl;
+
     colors = scaleOrdinal<number,string>(schemeCategory20);
 
-    selection:StationAwareVisSelection;
-
-    drawingManager:google.maps.drawing.DrawingManager;
-    polygons:google.maps.Polygon[] = [];
-    drawPolygonIcon = faDrawPolygon;
-    removePolygonIcon = faTimes;
+    addIcon = faPlus;
+    polygonIcon = faDrawPolygon;
+    fitBoundariesIcon = faCompressArrowsAlt;
+    resetFitIcon = faExpandArrowsAlt;
+    removeBoundaryIcon = faTimes;
     swatchOpacity = BASE_BOUNDARY_STYLE.fillOpacity;
-    polyHover:number;
 
-    constructor(private boundaryService:BoundaryService,private zone:NgZone){
+    working:boolean = false;
+    addingPredefined:boolean = false;
+    drawingManager:google.maps.drawing.DrawingManager;
+    boundaryHolders:BoundaryHolder[];
+
+    constructor(private boundaryService:BoundaryService,private zone:NgZone) {
         super();
     }
 
-    initMap(map:google.maps.Map) {
-        this.mapPromiseResolver(map);
-        map.data.addListener('click',($event:google.maps.Data.MouseEvent) =>
-            this.zone.run(() => this.boundary.setValue($event.feature.getProperty('boundary_id')))
-        );
-        map.data.addListener('mouseover',($event:google.maps.Data.MouseEvent) =>
-            map.data.overrideStyle($event.feature,{...$event.feature.getProperty(STYLE_KEY),fillOpacity:1,strokeWeight:2})
-        );
-        map.data.addListener('mouseout',($event:google.maps.Data.MouseEvent) => map.data.revertStyle());
-        this.selection.polygonBoundaries.forEach((poly) => this._addPolygonToMap(map,poly));
-    }
-
-    getColor(i:number):string {
+    private colorForIndex(i:number) {
         return this.colors((20+i)%20);
     }
 
-    getPolygonOptions(i:number):google.maps.PolygonOptions {
-        const fillColor = this.getColor(i);
-        return {
-            ...BASE_BOUNDARY_STYLE,
-            fillColor
-        };
+    mouseover(o:google.maps.Data.Feature|google.maps.Polygon) {
+        this.zone.run(() => this.boundaryHolders.forEach(bh => bh.hovering = bh.googleObject === o));
     }
 
-    private _addPolygonToMap(map:google.maps.Map,polygon:number[][]):number[][] {
-        const googlePoly = new google.maps.Polygon(this.getPolygonOptions(this.polygons.length));
-        googlePoly.setPath(polygon.map(pair => new google.maps.LatLng(pair[0],pair[1])));
-        google.maps.event.addListener(googlePoly,'mouseover',() => {this.zone.run(() => this.mouseenterPolygon(this.polygons.indexOf(googlePoly)))});
-        google.maps.event.addListener(googlePoly,'mouseout',() => {this.zone.run(() => this.mouseleavePolygon(this.polygons.indexOf(googlePoly)))});
-        this.polygons.push(googlePoly);
-        googlePoly.setMap(map);
-        return polygon;
+    mouseout() {
+        this.zone.run(() => this.boundaryHolders.forEach(bh => bh.hovering = false));
     }
 
-    removePolygon(i:number) {
-        this.polygons[i].setMap(null);
-        this.polygons.splice(i,1).forEach(polygon => google.maps.event.clearInstanceListeners(polygon));
-        const polys = this.selection.polygonBoundaries;
-        polys.splice(i,1);
-        this.selection.polygonBoundaries = polys;
+    private featuresCache = {};
+    loadFeatures(boundaryTypeId:number):Promise<google.maps.Data.Feature[]> {
+        if(!this.featuresCache[boundaryTypeId]) {
+            this.boundaryControl.disable({emitEvent:false});
+            this.working = true;
+            this.featuresCache[boundaryTypeId] = Promise.all([
+                this.mapPromise,
+                this.boundaryService.getBoundaries(boundaryTypeId).toPromise()
+            ]).then(results => {
+                const [map,boundaries] = results;
+                const features = map.data.addGeoJson(this.boundaryService.boundariesToFeatureCollection(boundaries));
+                features.forEach(f => {
+                    map.data.remove(f);
+                    f.setProperty(STYLE_KEY,{...BASE_BOUNDARY_STYLE});
+                });
+                this.working = false;
+                this.boundaryControl.enable({emitEvent:false});
+                return features;
+            });
+        }
+        return this.featuresCache[boundaryTypeId];
     }
 
-    mouseenterPolygon(i:number) {
-        const options = this.getPolygonOptions(i);
-        options.fillOpacity = 1.0;
-        this.polygons[i].setOptions(options);
-        this.polyHover = i;
+    // initializes a new BoundaryHolder from a BoundarySelection (not added to map)
+    initBoundary(boundarySelection:BoundarySelection):Promise<BoundaryHolder> {
+        return this.mapPromise.then((map:google.maps.Map) => {
+            if(isPolygonBoundarySelection(boundarySelection)) {
+                const googlePoly = new google.maps.Polygon({...BASE_BOUNDARY_STYLE});
+                googlePoly.setPath((boundarySelection as PolygonBoundarySelection).data.map(pair => new google.maps.LatLng(pair[0],pair[1])));
+               return Promise.resolve(new BoundaryHolder(this,map,boundarySelection,googlePoly));
+            }
+            const predefSelection = boundarySelection as PredefinedBoundarySelection;
+            return this.loadFeatures(predefSelection.typeId)
+                .then(features => {
+                    const selected = features.reduce((found,f) => {
+                            if(!found && f.getProperty('boundary_id') == predefSelection.id) {
+                                return f;
+                            }
+                            return found;
+                        },undefined);
+                    if(!selected) {
+                        console.warn(`Unable to found boundary with id ${predefSelection.id}`);
+                        return;
+                    }
+                    return new BoundaryHolder(this,map,predefSelection,selected);
+                });
+        });
     }
 
-    mouseleavePolygon(i:number) {
-        this.polygons[i].setOptions(this.getPolygonOptions(i));
-        delete this.polyHover;
+    addBoundary(boundarySelection:BoundarySelection):Promise<BoundaryHolder> {
+        return this.initBoundary(boundarySelection)
+            .then(boundaryHolder => {
+                if(boundaryHolder.add()) {
+                    const boundaries = this.selection.boundaries;
+                    boundaries.push(boundarySelection);
+                    this.selection.boundaries = boundaries; // re-assign to get update or pick up new list
+                    this.boundaryHolders.push(boundaryHolder);
+                    return this.updateStyles()
+                        .then(() => boundaryHolder);
+                }
+                return null;
+            });
     }
 
-    startPolygon() {
+    initBoundaries():Promise<void> {
+        return Promise.all(
+            this.selection.boundaries.map(bs => this.initBoundary(bs))
+        ).then(holders => {
+            this.boundaryHolders = holders.filter(h => h.add());
+            return this.updateStyles()
+                .then(() => this.fitBoundaries());
+        });
+    }
+
+    updateStyles():Promise<void> {
+        return this.mapPromise.then(map => {
+            this.boundaryHolders.forEach((bh,i) => bh.setFillColor(this.colorForIndex(i)));
+            map.data.setStyle(f => f.getProperty(STYLE_KEY));
+        });
+    }
+
+    // THINK INIT LOGIC IS ALL DONE UP TO HERE
+    fitBoundaries():Promise<void> {
+        return this.mapPromise.then(map => {
+            const bounds = this.boundaryHolders.reduce((bounds,bh) => {
+                if(bh.isPredefined()) {
+                    bounds.union(googleFeatureBounds(bh.googleObject));
+                } else if(bh.isHandDrawn()) {
+                    (bh.googleObject as google.maps.Polygon).getPath().forEach(latLng => bounds.extend(latLng));
+                }
+                return bounds;
+            },new google.maps.LatLngBounds());
+            map.fitBounds(bounds);
+        });
+    }
+
+    resetFit():Promise<void> {
+        return this.mapPromise.then(map => {
+            map.setZoom(ZOOM);
+            map.setCenter(new google.maps.LatLng(LAT,LNG));
+        });
+    }
+
+    removeBoundary(i:number):Promise<void> {
+        const boundaries = this.selection.boundaries;
+        boundaries.splice(i,1);
+        this.selection.boundaries = boundaries;
+        this.boundaryHolders.splice(i,1).forEach(holder => holder.remove());
+        return this.updateStyles();
+    }
+
+    startHandDrawn() {
         this.mapPromise.then(map => {
             const dm = this.drawingManager = new google.maps.drawing.DrawingManager({
                 drawingControlOptions: {
@@ -193,144 +412,123 @@ export class BoundaryControlComponent extends BaseControlComponent {
                 }
             });
             dm.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
-            google.maps.event.addListener(dm,'polygoncomplete',(poly:google.maps.Polygon) => {
-                const coords = poly.getPath().getArray().map(latLng => ([latLng.lat(),latLng.lng()]))
-                const polys = this.selection.polygonBoundaries;
-                this._addPolygonToMap(map,coords)
-                polys.push(coords);
-                this.selection.polygonBoundaries = polys;
-                poly.setMap(null);
-                this.cancelPolygon();
-            });
+            google.maps.event.addListener(dm,'polygoncomplete',(poly:google.maps.Polygon) => this.zone.run(() => {
+                    poly.setMap(null); // remove drawn polygon and re-add
+                    const data = poly.getPath().getArray().map(latLng => ([latLng.lat(),latLng.lng()]));
+                    this.addBoundary({data})
+                        .then(() => this.cancelHandDrawn())
+                }));
             dm.setMap(map);
         });
     }
 
-    cancelPolygon() {
+    addingBoundary():boolean {
+        return !!this.drawingManager || this.addingPredefined;
+    }
+
+    cancelAdd() {
+        return !!this.drawingManager
+            ? this.cancelHandDrawn()
+            : this.cancelPredefined();
+    }
+
+    cancelHandDrawn() {
         this.drawingManager.setMap(null);
+        google.maps.event.clearInstanceListeners(this.drawingManager);
         delete this.drawingManager;
     }
 
+    startPredefined() {
+        this.addingPredefined = true;
+        this.boundaryHolders.forEach(bh => bh.remove());
+    }
+
+    cancelPredefined() {
+        this.boundaryTypeControl.setValue(null);
+        this.boundaryHolders.forEach(bh => bh.add());
+        this.updateStyles()
+            .then(() => this.addingPredefined = false);
+    }
+
+    initMap(map:google.maps.Map) {
+        this.mapPromiseResolver(map);
+        map.data.addListener('click',($event:google.maps.Data.MouseEvent) =>
+            this.zone.run(() => this.boundaryControl.setValue($event.feature))
+        );
+        map.data.addListener('mouseover',($event:google.maps.Data.MouseEvent) => this.mouseover($event.feature));
+        map.data.addListener('mouseout',() => this.mouseout());
+        this.initBoundaries();
+    }
+    
     ngOnInit() {
-        this.boundaryType = new FormControl(this.selection.boundaryTypeId);
+        this.boundaryTypeControl = new FormControl();
         this.boundaryTypes = this.boundaryService.getBoundaryTypes();
-        this.boundary = new FormControl();
+        this.boundaryControl = new FormControl();
         
-        this.boundaryType.valueChanges
+        let currentFeatures;
+        this.boundaryTypeControl.valueChanges
             .pipe(
-                startWith(this.selection.boundaryTypeId),
                 takeUntil(this.componentDestroyed)
             )
-            .subscribe(boundaryTypeId => {
-                console.log(`BoundaryControlComponent.boundaryTypeId=${boundaryTypeId}`);
-                if(this.selection.boundaryTypeId !== boundaryTypeId) {
-                    this.boundary.setValue(
-                        this.selection.boundaryId = undefined,
-                        {emitEvent: false}
-                    );
-                    this.selectedFeature = undefined;
-                    this.focusSelectedFeature();
-                }
-                this.selection.boundaryTypeId = boundaryTypeId;
-                const promise = typeof(boundaryTypeId) === 'number'
-                    ? this.loadBoundaries(boundaryTypeId)
-                    : this.removeBoundaries()
-                promise.then(() => {
-                    console.log(`BoundaryControlComponent boundaries loaded or removed`);
-                    // this is for load time logic, don't want to update
-                    // the FormControl until all the possible boundaries are
-                    // loaded
-                    if(this.selection.boundaryId && !this.boundary.value) {
-                        this.boundary.setValue(this.selection.boundaryId);
+            .subscribe(boundaryType => {
+                console.log(`BoundaryControlComponent.boundaryType`,boundaryType);
+                this.mapPromise.then(map => {
+                    (currentFeatures||[]).forEach(f => map.data.remove(f));
+                    currentFeatures = undefined;
+                    this.boundaryControl.setValue(null,{emitEvent:false});
+                    this.boundaries = !!boundaryType
+                        ? this.loadFeatures(boundaryType.type_id)
+                        : undefined;
+                    if(this.boundaries) {
+                        this.boundaries.then(features => {
+                            currentFeatures = features;
+                            features.forEach((f,i) => {
+                                const style = f.getProperty(STYLE_KEY);
+                                style.fillColor = this.colorForIndex(i);
+                                f.setProperty(STYLE_KEY,style);
+                                map.data.add(f);
+                            });
+                            map.data.setStyle(f => f.getProperty(STYLE_KEY));
+                        });
                     }
                 });
             });
 
-        this.boundary.valueChanges
-            .pipe(takeUntil(this.componentDestroyed))
-            .subscribe(boundaryId => this.mapPromise.then(map => {
-                    console.log(`BoundaryControlComponent.boundaryId=${boundaryId}`);
-                    this.selection.boundaryId = boundaryId;
-                    const haveBoundaryId = typeof(boundaryId) === 'number';
-                    this.selectedFeature = this.features.reduce((found,f) => {
-                            const style:any = f.getProperty(STYLE_KEY);
-                            const isSelected = !found && haveBoundaryId && f.getProperty('boundary_id') === boundaryId;
-                            if(isSelected) {
-                                found = f;
-                            }
-                            const styles = isSelected
-                                ? SELECTED_STYLES
-                                : DEFAULT_STYLES;
-                            Object.keys(styles).forEach(k => style[k] = styles[k]);
-                            return found;
-                        },undefined);
-                    map.data.setStyle(f => f.getProperty(STYLE_KEY));
-                    this.focusSelectedFeature();
-                }));
-    }
-
-    removeBoundaries():Promise<any> {
-        return this.mapPromise.then(map => new Promise(resolve => {
-            let featureCount = this.features
-                ? this.features.length
-                : 0;
-            if(!featureCount) {
-                return resolve();
-            }
-            map.data.forEach(feature => {
-                map.data.remove(feature);
-                if(--featureCount == 0) {
-                    resolve();
-                }
-            });
-        }));
-    }
-
-    loadBoundaries(typeId:number):Promise<any> {
-        this.working = true;
-        return Promise.all([
-            this.mapPromise,
-            this.boundaryService.getBoundaries(typeId).toPromise(),
-            this.removeBoundaries()
-        ]).then(results => {
-            const [map,boundaries] = results;
-            this.features = map.data.addGeoJson(
-                this.boundaryService.boundariesToFeatureCollection(this.boundaries = boundaries)
-            );
-            this.features.forEach((f,i) => f.setProperty(STYLE_KEY,{
-                    ...BASE_BOUNDARY_STYLE,
-                    fillColor: this.colors((20+i)%20)
-                }));
-            map.data.setStyle(f => f.getProperty(STYLE_KEY));
-            console.log(`BoundaryControlComponent.loadBoundaries complete.`);
-            this.working = false;
-        });
-    }
-
-    focusSelectedFeature() {
-        const {selectedFeature} = this;
-        return this.mapPromise.then(map => {
-            if(selectedFeature) {
-                const bounds = googleFeatureBounds(selectedFeature);
-                this.selection.polygonBoundaries.forEach(polygon =>
-                    polygon.forEach(coord => bounds.extend(new google.maps.LatLng(coord[0],coord[1])))
-                );
-                map.fitBounds(bounds);
-            } else {
-                map.setZoom(ZOOM);
-                map.setCenter(new google.maps.LatLng(LAT,LNG));
-            }
-        });
+        this.boundaryControl.valueChanges
+            .pipe(
+                filter(feature =>
+                    // must be an actual feature
+                    !!feature &&
+                    // must not already by selected
+                    !this.boundaryHolders.reduce((found,bh) => (found||bh.googleObject === feature ? bh : undefined),undefined)
+                ),
+                takeUntil(this.componentDestroyed)
+            )
+            .subscribe(boundary => {
+                    const boundaryType = this.boundaryTypeControl.value;
+                    this.boundaryTypeControl.setValue(null);
+                    const selected:PredefinedBoundarySelection = {
+                        id: boundary.getProperty('boundary_id'),
+                        boundaryName: boundary.getProperty('name'),
+                        typeId: boundaryType.type_id,
+                        boundaryTypeName: boundaryType.name
+                    };
+                    console.log(`BoundaryControlComponent.boundary`,selected);
+                    Promise.all([
+                        this.mapPromise,
+                        this.loadFeatures(selected.typeId)
+                    ]).then(results => {
+                        const [map,features] = results;
+                        features.forEach(f => map.data.remove(f));
+                        this.cancelPredefined();
+                        this.addBoundary(selected);
+                    });
+                });
     }
 
     stepVisit():void {
         super.stepVisit();
-        setTimeout(() => {
-            this.subControlComponent.show();
-            if(this.selectedFeature) {
-                this.focusSelectedFeature();
-            }
-        },500);
+        setTimeout(() => this.subControlComponent.show(),500);
     }
 }
 

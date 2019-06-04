@@ -307,6 +307,34 @@ export abstract class NetworkAwareVisSelection extends VisSelection {
     }
 }
 
+export interface PredefinedBoundarySelection {
+    id: number;
+    boundaryName: string;
+    typeId: number;
+    boundaryTypeName: string;
+}
+
+export interface PolygonBoundarySelection {
+    data: number[][];
+}
+
+export type BoundarySelection = PredefinedBoundarySelection | PolygonBoundarySelection;
+
+export function isPredefinedBoundarySelection(o:any):boolean {
+    return typeof(o.id) === 'number' &&
+        typeof(o.typeId) === 'number' &&
+        typeof(o.boundaryName) === 'string' &&
+        typeof(o.boundaryTypeName) === 'string';
+}
+
+export function isPolygonBoundarySelection(o:any):boolean {
+    return Array.isArray(o.data) &&
+        o.data.length &&
+        Array.isArray(o.data[0]) &&
+        o.data[0].length === 2 &&
+        typeof(o.data[0][0]) === 'number';
+}
+
 /**
  * @dynamic
  */
@@ -314,60 +342,46 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     @selectionProperty()
     stationIds?: any[] = [];
     @selectionProperty()
-    boundaryTypeId?:number;
-    @selectionProperty()
-    _boundaryId?:number;
-    @selectionProperty()
-    _polygons:number[][][];
+    _boundaries:BoundarySelection[];
 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super();
     }
 
-    set boundaryId(bid:number) {
-        this._boundaryId = bid;
-        this.update();
+    get boundaries():BoundarySelection[] {
+        return this._boundaries||[];
     }
 
-    get boundaryId():number {
-        return this._boundaryId;
-    }
-
-    get polygonBoundaries():number[][][] {
-        return this._polygons||[];
-    }
-
-    set polygonBoundaries(polygons:number[][][]) {
-        this._polygons = polygons;
+    set boundaries(boundaries:BoundarySelection[]) {
+        this._boundaries = boundaries;
         this.update();
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
             .then(params => {
-                const stationIdPromises:Promise<any>[] = [];
-                if(typeof(this.boundaryId) === 'number') {
-                    stationIdPromises.push(this.serviceUtils.cachedGet(
+                const stationIdPromises:Promise<number[]>[] = this.boundaries.map(b => {
+                    if((b as any).data) {
+                        const polySelection = b as PolygonBoundarySelection;
+                        const polygon = polySelection.data.slice();
+                        polygon.push(polySelection.data[0]); // close the loop
+                        return this.serviceUtils.cachedGet(
+                                this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
+                                {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
+                            )
+                            .then(response => response.stations.map(s => s.station_id))
+                    }
+                    const predefSelection = b as PredefinedBoundarySelection;
+                    return this.serviceUtils.cachedGet(
                         this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
-                        {boundary_id:this.boundaryId}
-                    ));
-                }
-                this.polygonBoundaries
-                    .map(polygon => {
-                        // close the polygon
-                        const copy = polygon.slice();
-                        copy.push(polygon[0]);
-                        return copy;
-                    })
-                    .forEach(polygon => stationIdPromises.push(this.serviceUtils.cachedGet(
-                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
-                        {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
-                    ).then(response => response.stations.map(s => s.station_id))));
+                        {boundary_id:predefSelection.id}
+                    );
+                });
                 if(stationIdPromises.length) {
                     return Promise.all(stationIdPromises)
                         .then(results => {
                             results.reduce((ids,stationIds) => ids.concat(stationIds),(this.stationIds||[]).slice())
-                                   .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
+                                .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
                             return params
                         });
                 }

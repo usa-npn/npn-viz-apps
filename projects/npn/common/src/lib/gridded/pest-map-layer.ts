@@ -129,9 +129,6 @@ export class PestMapLayer extends MapLayer {
 
     getTimeSeriesUrl():Promise<string> {
         return this.getPestDescription()
-            .then(pest => pest.agddMethod
-                    ? this.layerService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod}/pointTimeSeries`)
-                    : this.layerService.serviceUtils.apiUrl('/npn_portal/stations/getTimeSeries.json')
-                );
+            .then(pest => this.layerService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod||'simple'}/pointTimeSeries`));
     }
 }

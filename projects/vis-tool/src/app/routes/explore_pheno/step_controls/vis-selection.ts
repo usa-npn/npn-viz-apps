@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component } from "@angular/core";
 
 import { Subject } from 'rxjs';
 
@@ -30,7 +30,6 @@ import { MapSpeciesPhenoStep } from './map-species-phenophase';
 import { AgddTsLayerPointStep } from './agdd-ts-layer-point';
 import { AgddTsMiscStep } from './agdd-ts-misc';
 import { BoundaryStep } from "./boundary";
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material';
 import { MapMiscStep } from './map-misc';
 
 /**
@@ -79,19 +78,6 @@ export class VisSelectionSelection {
 }
 
 @Component({
-    template:`
-    <div class="mat-typography">
-        <h2 class="mat-h2">{{data.title}}</h2>
-        <h3 class="mat-h2">{{data.tagline}}</h3>
-        <div [innerHTML]="data.description"></div>
-    </div>
-    `
-})
-export class SharedVisualizationDescriptionComponent {
-    constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data:Shared) {}
-}
-
-@Component({
     template: `{{selection?.selected?.title}}`
 })
 export class VisSelectionStepComponent implements StepComponent {
@@ -127,8 +113,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     constructor(
         private selectionFactory:VisualizationSelectionFactory,
         private activatedRoute:ActivatedRoute,
-        private sharingService:SharingService,
-        private matBottomSheet:MatBottomSheet
+        private sharingService:SharingService
     ) {
         super();
     }
@@ -145,10 +130,7 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
             .subscribe(s => {
                 const shared:Shared = this.sharingService.deserialize(s);
                 const selection:VisSelection = this.selectionFactory.newSelection(shared.external);
-                if(shared.description) {
-                    setTimeout(() => this.matBottomSheet.open(SharedVisualizationDescriptionComponent,{data:shared}));
-                }
-                selection.$shared = true;
+                selection.$shared = shared;
                 // find the corresponding definition
                 const visDef = VIS_DEFINITIONS.find(vd => vd.selection && selection.$class === vd.selection.$class);
                 if(visDef) {

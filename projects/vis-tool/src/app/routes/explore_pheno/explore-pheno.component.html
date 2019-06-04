@@ -24,6 +24,7 @@
             </div>
             <share-visualization *ngIf="activeVis" [selection]="activeVis?.selection"></share-visualization>
             <reset-visualization *ngIf="activeVis" [selection]="activeVis?.selection" (reset)="reset()"></reset-visualization>
+            <share-description *ngIf="activeVis?.selection?.$shared?.description" [selection]="activeVis.selection"></share-description>
         </div>
     </mat-drawer>
     <mat-drawer-content>

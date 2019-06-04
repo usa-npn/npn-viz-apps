@@ -9,6 +9,7 @@ import { ExplorePhenoComponent } from './explore-pheno.component';
 import { StepControlsModule } from './step_controls';
 
 import { ResetControlComponent } from './reset-control.component';
+import { ShareDescriptionComponent, SharedVisualizationDescriptionComponent } from './share-description.component';
 
 @NgModule({
     imports: [
@@ -20,10 +21,16 @@ import { ResetControlComponent } from './reset-control.component';
         StepIconComponent,
         ShareControlComponent,
         ResetControlComponent,
-        ExplorePhenoComponent
+        ExplorePhenoComponent,
+        ShareDescriptionComponent,
+        SharedVisualizationDescriptionComponent
     ],
     exports: [
-        ExplorePhenoComponent
+        ExplorePhenoComponent,
+        SharedVisualizationDescriptionComponent
+    ],
+    entryComponents: [
+        SharedVisualizationDescriptionComponent
     ]
 })
 export class ExplorePhenoModule {}

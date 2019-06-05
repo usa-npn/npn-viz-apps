@@ -354,7 +354,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
                         let {lowerThreshold,upperThreshold,base} = pest;
                         lowerThreshold = lowerThreshold||0;
                         upperThreshold = upperThreshold||0;
-                        base = base||this.baseTemp
+                        base = base||lowerThreshold||this.baseTemp
                         return {lowerThreshold,upperThreshold,base};
                     })
                 : Promise.resolve({

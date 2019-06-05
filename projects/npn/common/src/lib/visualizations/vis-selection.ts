@@ -158,6 +158,11 @@ export const REJECT_INVALID_SELECTION = 'invalid selection';
  * @dynamic
  */
 export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
+    /**
+     * Sub-classes set to true if they support export to POP
+     * Must also implement `toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput>`
+     */
+    $supportsPop:boolean = false;
     /*
     Note: Previously this.class.name was used when serializing a selection to JSON.
     This does not work in production mode because of JavaScript minification.
@@ -295,15 +300,88 @@ export abstract class VisSelection extends EventEmitter<VisSelectionEvent> {
 }
 
 /**
+ * Selections may produce if they support export via the POP.
+ * Selections need only supply start/endDate formatted `YYYY-MM-DD` 
+ */
+export interface POPInput {
+    downloadType: string;
+    searchSource: string;
+    rangeType: string;
+
+    dataPrecision?: number;
+
+    startDate?: string;
+    startYear?: number;
+    startMonth?: string;
+    startDay?: number;
+
+    endDate?: string;
+    endYear?: string;
+    endMonth?: string;
+    endDay?: number;
+
+    species?: number[];
+    phenophases?: number[];
+    partnerGroups?: number[];
+    stations?: number[];
+}
+
+export interface SupportsPOPInput {
+    toPOPInput(input?:POPInput):Promise<POPInput>;
+}
+
+const MONTHS = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
+];
+/**
+ * Takes values for `start|endDate` and fills in the values for
+ * `start|endYear|Month|Day`
+ * 
+ * @param input 
+ */
+export function completePOPDates(input:POPInput):POPInput {
+    const {startDate,endDate} = input;
+    const toParts = d => {
+        let [year,month,day] = d.split('-').map(p => parseInt(p));
+        month = MONTHS[month-1];
+        return {year,month,day};
+    };
+    ['start','end'].forEach(prefix => {
+        const date = input[`${prefix}Date`];
+        if(date) {
+            const parts = toParts(date);
+            input[`${prefix}Year`] = parts.year;
+            input[`${prefix}Month`] = parts.month;
+            input[`${prefix}Day`] = parts.day;
+        }
+    });
+    return input;
+}
+
+export const BASE_POP_INPUT:POPInput = {
+    downloadType: 'selectable',
+    searchSource: 'visualization-tool',
+    rangeType: 'Calendar'
+};
+
+/**
  * @dynamic
  */
-export abstract class NetworkAwareVisSelection extends VisSelection {
+export abstract class NetworkAwareVisSelection extends VisSelection implements SupportsPOPInput {
     @selectionProperty()
     networkIds?: any[] = [];
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
         return Promise.resolve(params);
+    }
+    
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        input.partnerGroups = this.networkIds && this.networkIds.length
+            ? this.networkIds.slice()
+            : undefined;
+        return Promise.resolve(input);
     }
 }
 
@@ -357,36 +435,48 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         this.update();
     }
 
+    private getStationIdPromises():Promise<number[]>[] {
+        const promises = this.boundaries.map(b => {
+            if((b as any).data) {
+                const polySelection = b as PolygonBoundarySelection;
+                const polygon = polySelection.data.slice();
+                polygon.push(polySelection.data[0]); // close the loop
+                return this.serviceUtils.cachedGet(
+                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
+                        {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
+                    )
+                    .then(response => response.stations.map(s => s.station_id))
+            }
+            const predefSelection = b as PredefinedBoundarySelection;
+            return this.serviceUtils.cachedGet(
+                this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
+                {boundary_id:predefSelection.id}
+            );
+        });
+        if(this.stationIds && this.stationIds.length) {
+            promises.push(Promise.resolve(this.stationIds.slice()));
+        }
+        return promises;
+    }
+
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
-            .then(params => {
-                const stationIdPromises:Promise<number[]>[] = this.boundaries.map(b => {
-                    if((b as any).data) {
-                        const polySelection = b as PolygonBoundarySelection;
-                        const polygon = polySelection.data.slice();
-                        polygon.push(polySelection.data[0]); // close the loop
-                        return this.serviceUtils.cachedGet(
-                                this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
-                                {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
-                            )
-                            .then(response => response.stations.map(s => s.station_id))
-                    }
-                    const predefSelection = b as PredefinedBoundarySelection;
-                    return this.serviceUtils.cachedGet(
-                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
-                        {boundary_id:predefSelection.id}
-                    );
-                });
-                if(stationIdPromises.length) {
-                    return Promise.all(stationIdPromises)
-                        .then(results => {
-                            results.reduce((ids,stationIds) => ids.concat(stationIds),(this.stationIds||[]).slice())
-                                .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
-                            return params
-                        });
-                }
-                (this.stationIds || []).forEach((id, i) => params = params.set(`station_id[${i}]`, `${id}`));
-                return params;
-            });
+            .then(params => Promise.all(this.getStationIdPromises())
+                .then(results => {
+                    results
+                        .reduce((ids,stationIds) => ids.concat(stationIds),[])
+                        .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
+                    return params
+                })
+            );
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => Promise.all(this.getStationIdPromises())
+                .then(results => {
+                    input.stations = results.reduce((ids,stationIds) => ids.concat(stationIds),[]);
+                    return input;
+                }));
     }
 }

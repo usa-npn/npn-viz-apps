@@ -1,4 +1,8 @@
-import { selectionProperty, VisSelectionEvent } from '../vis-selection';
+import {
+    selectionProperty,
+    POPInput,
+    BASE_POP_INPUT
+} from '../vis-selection';
 import {
     MapLayer,
     NpnMapLayerService,
@@ -7,7 +11,7 @@ import {
     SupportsOpacity
 } from '../../gridded';
 import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
-import { NpnServiceUtils, Species, Phenophase } from '@npn/common/common';
+import { NpnServiceUtils } from '@npn/common/common';
 import { HttpParams } from '@angular/common/http';
 
 /**
@@ -18,6 +22,8 @@ import { HttpParams } from '@angular/common/http';
  * @dynamic
  */
 export class MapSelection extends SiteOrSummaryVisSelection implements SupportsOpacity {
+    $supportsPop:boolean = true;
+
     @selectionProperty()
     $class = 'MapSelection';
 
@@ -52,6 +58,15 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
             .set('start_date',`${this.year}-01-01`)
             .set('end_date',`${this.year}-12-31`);
         return super.toURLSearchParams(params);
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => {
+                input.startDate = `${this.year}-01-01`;
+                input.endDate = `${this.year}-12-31`;
+                return input;
+            });
     }
 
     get year():number {

@@ -9,6 +9,7 @@ export class NpnConfiguration {
     dataApiRoot: string; // URL of NPN data web services
     dataApiUseStatisticsCache?: boolean; // the value for the useCache parameter for data statistics calls.
     dataApiRoot2: string; // URL of NPN data2 web services (new).
+    popApiRoot: string;
     geoServerRoot: string; // URL of the NPN geo server
     [x: string]: any; // not going to dictate what else it might have
 }

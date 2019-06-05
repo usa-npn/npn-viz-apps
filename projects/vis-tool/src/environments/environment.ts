@@ -7,6 +7,7 @@ const npnConfiguration:NpnConfiguration = {
   dataApiRoot: 'https://data-dev.usanpn.org:3006',
   //dataApiRoot: 'https://data.usanpn.org:3006',
   dataApiRoot2: 'https://data-dev.usanpn.org:3004',
+  popApiRoot: 'https://data-dev.usanpn.org:3002',
   dataApiUseStatisticsCache: false,
   //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
   geoServerRoot: 'https://geoserver.usanpn.org/geoserver'

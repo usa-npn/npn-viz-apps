@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { NpnServiceUtils, Species, Phenophase } from '../common';
-import { StationAwareVisSelection, selectionProperty } from './vis-selection';
+import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
 const DEFAULT_NUM_DAYS_Q_FILTER = 30;
@@ -45,6 +45,19 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                             .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
         });
         return super.toURLSearchParams(params);
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => {
+                if(this.numDaysQualityFilter) {
+                    input.dataPrecision = this.numDaysQualityFilter;
+                }
+                input.species = this.validPlots.map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id));
+                // POP supports phenophases but seems to present a higher-level list of possibilities
+                //input.phenophases = this.validPlots.map(p => typeof(p.phenophase.phenophase_id) === 'number' ? p.phenophase.phenophase_id : parseInt(p.phenophase.phenophase_id));
+                return input;
+            });
     }
 
     get validPlots():SiteOrSummaryPlot[] {

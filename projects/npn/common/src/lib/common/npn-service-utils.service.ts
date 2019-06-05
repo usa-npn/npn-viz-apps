@@ -30,6 +30,10 @@ export class NpnServiceUtils {
         return `${this.config.geoServerRoot}${suffix}`;
     }
 
+    public popApipUrl(suffix:string) {
+        return `${this.config.popApiRoot}${suffix}`;
+    }
+
     get dataApiUseStatisticsCache(): boolean {
         return typeof (this.config.dataApiUseStatisticsCache) === 'boolean' ?
             this.config.dataApiUseStatisticsCache : false;

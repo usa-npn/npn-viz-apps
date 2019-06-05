@@ -1,4 +1,4 @@
-import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty } from '../vis-selection';
+import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty, POPInput, BASE_POP_INPUT } from '../vis-selection';
 import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
 import { HttpParams } from '@angular/common/http';
 import { Species, Phenophase, APPLICATION_SETTINGS } from '../../common';
@@ -40,6 +40,8 @@ export const AXIS = [
  * @dynamic
  */
 export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
+    $supportsPop:boolean = true;
+
     @selectionProperty()
     $class:string = 'ScatterPlotSelection';
 
@@ -100,6 +102,15 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                     .set('start_date',`${this.start}-01-01`)
                     .set('end_date',`${this.end}-12-31`);
         return super.toURLSearchParams(params);
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => {
+                input.startDate = `${this.start}-01-01`;
+                input.endDate = `${this.end}-12-31`;
+                return input;
+            });
     }
 
     doyDateFormat(doy:number):string {

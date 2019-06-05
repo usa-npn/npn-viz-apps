@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 
-import { StationAwareVisSelection, selectionProperty } from './vis-selection';
+import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 import { Species, Phenophase, SpeciesTitlePipe, NpnServiceUtils } from '../common';
 
 export class ObservationDatePlot {
@@ -21,6 +21,8 @@ export class ObservationDateData {
 }
 
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
+    $supportsPop:boolean = true;
+
     requestSrc: string = 'observation-date-vis-selection';
 
     @selectionProperty()
@@ -59,6 +61,37 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                            .set(`phenophase_id[${i}]`, `${plot.phenophase.phenophase_id}`);
         });
         return super.toURLSearchParams(params);
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => {
+                input.species = this.validPlots
+                    .map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id))
+                    .reduce((set,id) => {
+                        if(set.indexOf(id) === -1) {
+                            set.push(id);
+                        }
+                        return set;
+                    },[]);
+                const yearRange = this.years.reduce((range,y) => {
+                        if(!range) {
+                            return [y,y];
+                        }
+                        if(y < range[0]) {
+                            range[0] = y;
+                        }
+                        if(y > range[1]) {
+                            range[1] = y;
+                        }
+                        return range;
+                    },undefined);
+                if(yearRange) {
+                    input.startDate = `${yearRange[0]}-01-01`;
+                    input.endDate = `${yearRange[1]}-12-31`;
+                }
+                return input;
+            });
     }
 
     postProcessData(data: any[]): ObservationDateData {

@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { NpnServiceUtils } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
-import { StationAwareVisSelection, selectionProperty } from '../vis-selection';
+import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
 
 export class ActivityFrequency {
     value:string|number;
@@ -30,6 +30,8 @@ export const ACTIVITY_FREQUENCIES:ActivityFrequency[] = [
 
 // @dynamic
 export class ActivityCurvesSelection extends StationAwareVisSelection {
+    $supportsPop:boolean = true;
+
     @selectionProperty()
     $class:string = 'ActivityCurvesSelection';
 
@@ -69,6 +71,37 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
             c.orient = o.orient;
             return c;
         });
+    }
+
+    toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
+        return super.toPOPInput(input)
+            .then(input => {
+                const yearRange = this.validCurves.reduce((range,curve) => {
+                        if(!range) {
+                            return [curve.year,curve.year];
+                        }
+                        if(curve.year < range[0]) {
+                            range[0] = curve.year;
+                        }
+                        if(curve.year > range[1]) {
+                            range[1] = curve.year;
+                        }
+                        return range;
+                    },undefined);
+                if(yearRange) {
+                    input.startDate = `${yearRange[0]}-01-01`;
+                    input.endDate = `${yearRange[1]}-12-31`;
+                }
+                input.species = this.validCurves
+                    .map(c => typeof(c.species.species_id) === 'number' ? c.species.species_id : parseInt(c.species.species_id))
+                    .reduce((set,id) => {
+                        if(set.indexOf(id) === -1) {
+                            set.push(id);
+                        }
+                        return set;
+                    },[]);
+                return input;
+            });
     }
 
     hasValidCurve():boolean {

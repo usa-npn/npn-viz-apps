@@ -267,6 +267,81 @@
                 "year": 2017,
                 "filterDisclaimer": "For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization."
             }
+        },
+        {
+            "title": "Red Maples on a map with boundaries (2016)",
+            "tagline": "April 28 Daily Temp Accumulations (near breaking leaf buds)",
+            "description": "<p>Using pre-defined Maine boundary and hand-drawn boundary around Minnesota</p>",
+            "external": {
+                "$class": "MapSelection",
+                "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
+                "meta": {},
+                "networkIds": [],
+                "stationIds": [],
+                "individualPhenometrics": false,
+                "filterLqdSummary": true,
+                "numDaysQualityFilter": 30,
+                "plots": [
+                  {
+                    "species": {
+                      "common_name": "red maple",
+                      "genus": "Acer",
+                      "species": "rubrum",
+                      "kingdom": "Plantae",
+                      "species_id": 3,
+                      "number_observations": 664416
+                    },
+                    "phenophase": {
+                      "phenophase_id": 371,
+                      "phenophase_name": "Breaking leaf buds",
+                      "phenophase_category": "Leaves",
+                      "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+                      "phenophase_additional_definition": "",
+                      "seq_num": 10,
+                      "color": "Green1",
+                      "abundance_category": -1,
+                      "raw_abundance": false
+                    }
+                  }
+                ],
+                "opacity": 0.6,
+                "boundaries": [
+                  {
+                    "id": 39,
+                    "boundaryName": "Maine",
+                    "typeId": 1,
+                    "boundaryTypeName": "US States"
+                  },
+                  {
+                    "data": [
+                      [
+                        49.739156976352305,
+                        -98.31454869999999
+                      ],
+                      [
+                        42.634499829496264,
+                        -97.43564244999999
+                      ],
+                      [
+                        42.375321715881704,
+                        -88.38290807499999
+                      ],
+                      [
+                        45.90581165455448,
+                        -91.89853307499999
+                      ],
+                      [
+                        48.763915959200844,
+                        -87.15243932499999
+                      ]
+                    ]
+                  }
+                ],
+                "layerCategory": "Daily Temperature Accumulations",
+                "layerName": "gdd:30yr_avg_agdd",
+                "extentValue": "118.0",
+                "year": 2016
+              }
         }
     ]
 }

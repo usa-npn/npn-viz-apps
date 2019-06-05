@@ -341,7 +341,6 @@ const MONTHS = [
  * @param input 
  */
 export function completePOPDates(input:POPInput):POPInput {
-    const {startDate,endDate} = input;
     const toParts = d => {
         let [year,month,day] = d.split('-').map(p => parseInt(p));
         month = MONTHS[month-1];

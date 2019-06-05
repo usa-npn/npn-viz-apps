@@ -119,7 +119,9 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     }
 
     ngOnInit() {
-        VIS_DEFINITIONS.forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
+        VIS_DEFINITIONS
+        .filter(visDef => !visDef.templateSelection) // only reset those that don't have templates
+        .forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
         // if when loaded there is a selection on the current route then wire it up
         this.activatedRoute.paramMap
             .pipe(

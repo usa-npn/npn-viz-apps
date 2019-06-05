@@ -58,7 +58,7 @@ export class ShareControlComponent extends MonitorsDestroy implements StepCompon
 
     ngOnInit() {
         this.step.$stepInstance = this;
-        fromEvent(window,'keypress')
+        fromEvent(window,'keydown')
             .pipe(takeUntil(this.componentDestroyed))
             .subscribe((ke:KeyboardEvent) => {
                 if(ke.ctrlKey && ke.shiftKey && ke.key === 'S') {

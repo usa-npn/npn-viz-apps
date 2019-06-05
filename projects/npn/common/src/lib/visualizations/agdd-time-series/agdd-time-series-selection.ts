@@ -351,14 +351,16 @@ export class AgddTimeSeriesSelection extends VisSelection {
             return this._selectedParamsBasis = this.layer instanceof PestMapLayer
                 ? this.layer.getPestDescription()
                     .then(pest => {
-                        let {lowerThreshold,upperThreshold} = pest;
+                        let {lowerThreshold,upperThreshold,base} = pest;
                         lowerThreshold = lowerThreshold||0;
                         upperThreshold = upperThreshold||0;
-                        return {lowerThreshold,upperThreshold};
+                        base = base||this.baseTemp
+                        return {lowerThreshold,upperThreshold,base};
                     })
                 : Promise.resolve({
                     upperThreshold: 0,
-                    lowerThreshold: 0
+                    lowerThreshold: 0,
+                    base: this.baseTemp
                 });
         }
         return this._selectedParamsBasis;
@@ -375,7 +377,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
             this.selectedParamsBasis
         ]).then(results => {
             const [timeSeriesUrl,paramsBasis] = results;
-            const {lowerThreshold,upperThreshold} = paramsBasis;
+            const {lowerThreshold,upperThreshold,base} = paramsBasis;
             // NOTE: some pests have a "base" but lowerThreshold is always being used here.
             // e.g. Bronze Birch Borer, Emerald Ash Borer
             return {
@@ -386,7 +388,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
                 timeSeriesUrl,
                 startDate,start_date,
                 endDate,end_date,
-                base: lowerThreshold,
+                base,
                 lowerThreshold,
                 upperThreshold
             };

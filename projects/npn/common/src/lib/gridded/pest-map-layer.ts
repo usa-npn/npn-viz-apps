@@ -7,6 +7,7 @@ export interface PestDescription {
     species: string;
     lowerThreshold?: number;
     upperThreshold?: number;
+    base?: number;
     startMonthDay?: string;
     agddMethod?: string;
 }

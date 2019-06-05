@@ -374,19 +374,20 @@ export class BoundaryControlComponent extends BaseControlComponent {
         });
     }
 
-    // THINK INIT LOGIC IS ALL DONE UP TO HERE
     fitBoundaries():Promise<void> {
-        return this.mapPromise.then(map => {
-            const bounds = this.boundaryHolders.reduce((bounds,bh) => {
-                if(bh.isPredefined()) {
-                    bounds.union(googleFeatureBounds(bh.googleObject));
-                } else if(bh.isHandDrawn()) {
-                    (bh.googleObject as google.maps.Polygon).getPath().forEach(latLng => bounds.extend(latLng));
-                }
-                return bounds;
-            },new google.maps.LatLngBounds());
-            map.fitBounds(bounds);
-        });
+        return this.boundaryHolders.length > 0
+            ? this.mapPromise.then(map => {
+                    const bounds = this.boundaryHolders.reduce((bounds,bh) => {
+                        if(bh.isPredefined()) {
+                            bounds.union(googleFeatureBounds(bh.googleObject));
+                        } else if(bh.isHandDrawn()) {
+                            (bh.googleObject as google.maps.Polygon).getPath().forEach(latLng => bounds.extend(latLng));
+                        }
+                        return bounds;
+                    },new google.maps.LatLngBounds());
+                    map.fitBounds(bounds);
+                })
+            : this.resetFit();
     }
 
     resetFit():Promise<void> {

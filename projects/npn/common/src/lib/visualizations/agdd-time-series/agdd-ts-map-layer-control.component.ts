@@ -111,7 +111,7 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
                 this.marker.addListener('dragend',updateLatLng);
             } else {
                 // have them drop a marker
-                map.addListener('click',event => {
+                google.maps.event.addListenerOnce(map,'click',event => {
                     this.marker = new google.maps.Marker({
                         map,
                         draggable:true,

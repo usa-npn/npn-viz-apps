@@ -1,25 +1,33 @@
 import { Component, Input, Inject, HostBinding } from '@angular/core';
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
-import { faBookAlt } from '@fortawesome/pro-light-svg-icons';
+import { faBookAlt, faArrowFromTop } from '@fortawesome/pro-light-svg-icons';
 import { VisSelection, MonitorsDestroy } from '@npn/common';
 import { Shared } from './sharing.service';
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef } from '@angular/material';
 import { takeUntil } from 'rxjs/operators';
 import { Subject, merge } from 'rxjs';
 
 @Component({
     template: `
+    <button class="dismiss" mat-icon-button (click)="ref.dismiss()" matTooltip="Hide description"><fa-icon [icon]="dismissIcon"></fa-icon></button>
     <div class="mat-typography">
         <h2 class="mat-h2">{{data.title}}</h2>
         <h3 class="mat-h2">{{data.tagline}}</h3>
         <div [innerHTML]="data.description"></div>
     </div>
-    `
+    `,
+    styles:[`
+    .dismiss {
+        float: right;
+    }
+    `]
 })
 export class SharedVisualizationDescriptionComponent {
+    dismissIcon = faArrowFromTop;
     constructor(
-        @Inject(MAT_BOTTOM_SHEET_DATA)
-        public data: Shared) { }
+        @Inject(MAT_BOTTOM_SHEET_DATA) public data: Shared,
+        public ref:MatBottomSheetRef
+    ) {}
 }
 
 @Component({

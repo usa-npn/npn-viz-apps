@@ -286,11 +286,19 @@ export class BoundaryControlComponent extends BaseControlComponent {
     }
 
     mouseover(o:google.maps.Data.Feature|google.maps.Polygon) {
-        this.zone.run(() => this.boundaryHolders.forEach(bh => bh.hovering = bh.googleObject === o));
+        this.zone.run(() => {
+            if(o instanceof google.maps.Data.Feature) {
+                this.subControlComponent.featureHover = o.getProperty('name');
+            }
+            this.boundaryHolders.forEach(bh => bh.hovering = bh.googleObject === o);
+        });
     }
 
     mouseout() {
-        this.zone.run(() => this.boundaryHolders.forEach(bh => bh.hovering = false));
+        this.zone.run(() => {
+            this.subControlComponent.featureHover = null;
+            this.boundaryHolders.forEach(bh => bh.hovering = false);
+        });
     }
 
     private featuresCache = {};
@@ -542,10 +550,14 @@ export class BoundaryControlComponent extends BaseControlComponent {
         <agm-map [streetViewControl]="false" [styles]="mapStyles" [scrollwheel]="false"
         [latitude]="latitude" [longitude]="longitude" [zoom]="zoom"
         (mapReady)="controlComponent.initMap($event);"></agm-map>
+        <div *ngIf="featureHover" class="feature-hover mat-elevation-z1">{{featureHover}}</div>
     </div>
     `,
     // might be nicer if this type of CSS were simply global
-    styleUrls:['../../../../../../npn/common/src/lib/visualizations/map/map-visualization.component.scss']
+    styleUrls:[
+        '../../../../../../npn/common/src/lib/visualizations/map/map-visualization.component.scss',
+        './boundary.scss'
+    ]
 })
 export class BoundarySubControlComponent extends BaseSubControlComponent {
     title:string = 'Select boundaries';
@@ -557,6 +569,8 @@ export class BoundarySubControlComponent extends BaseSubControlComponent {
     zoom: number = ZOOM;
 
     mapStyles:any[] = MAP_STYLES;
+
+    featureHover:string;
 }
 
 export const BoundaryStep:VisConfigStep = {

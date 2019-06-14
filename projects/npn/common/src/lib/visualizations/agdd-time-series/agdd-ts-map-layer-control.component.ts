@@ -109,7 +109,7 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
                     position: new google.maps.LatLng(latLng[0],latLng[1])
                 });
                 this.marker.addListener('dragend',updateLatLng);
-            } else {
+            } /*else {
                 // have them drop a marker
                 google.maps.event.addListenerOnce(map,'click',event => {
                     this.marker = new google.maps.Marker({
@@ -120,7 +120,19 @@ export class AgddTsMapLayerControl extends MonitorsDestroy {
                     updateLatLng(event);
                     this.marker.addListener('dragend',updateLatLng);
                 });
-            }
+            }*/
+            google.maps.event.addListener(map,'click',event => {
+                if(!this.marker) {
+                    this.marker = new google.maps.Marker({
+                        map,
+                        draggable:true,
+                        position: event.latLng
+                    });
+                    this.marker.addListener('dragend',updateLatLng);
+                }
+                this.marker.setPosition(event.latLng);
+                updateLatLng(event);
+            });
         });
     }
 

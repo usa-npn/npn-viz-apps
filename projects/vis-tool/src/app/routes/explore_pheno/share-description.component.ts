@@ -59,6 +59,6 @@ export class ShareDescriptionComponent implements StepComponent {
     }
 
     show() {
-        this.matBottomSheet.open(SharedVisualizationDescriptionComponent,{data:this.selection.$shared});
+        setTimeout(() => this.matBottomSheet.open(SharedVisualizationDescriptionComponent,{data:this.selection.$shared}));
     }
 }

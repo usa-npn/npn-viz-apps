@@ -5,6 +5,7 @@ export * from './npn-map-layer.service';
 export * from './map-layer-legend';
 export * from './wcs-data.service';
 export { SupportsOpacity } from './supports-opacity-control.component';
+export { MapLayerLegendComponent } from './map-layer-legend.component';
 export * from './google-feature-bounds';
 export * from './gridded-common';
 export { GriddedPipeProvider, DoyTxType } from './pipes';

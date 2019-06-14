@@ -1,9 +1,9 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from './base';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { StepState, VisConfigStep } from '../interfaces';
 import { getLayerTitle } from './map-layer';
 import { faMapMarkerAlt } from '@fortawesome/pro-light-svg-icons';
-import { MAP_STYLES } from '@npn/common';
+import { MAP_STYLES, MapLayerLegendComponent } from '@npn/common';
 
 @Component({
     template: `
@@ -47,6 +47,7 @@ export class AgddTsLayerPointStepComponent extends BaseStepComponent {
     getTitle() {
         return getLayerTitle(this.selection.layer);
     }
+
 }
 
 @Component({
@@ -92,11 +93,18 @@ export class AgddTsLayerPointSubControlComponent extends BaseSubControlComponent
     title:string = 'Select layer/point';
     $fullScreen:boolean = true;
 
+    @ViewChild(MapLayerLegendComponent) legend:MapLayerLegendComponent;
+
     latitude: number = 38.8402805;
     longitude: number = -97.61142369999999
     zoom: number = 4;
 
     mapStyles: any[] = MAP_STYLES;
+
+    show() {
+        super.show();
+        setTimeout(() => this.legend.redraw());
+    }
 }
 
 export const AgddTsLayerPointStep:VisConfigStep = {

@@ -1,9 +1,11 @@
-import { Component, Input, Inject } from '@angular/core';
+import { Component, Input, Inject, HostBinding } from '@angular/core';
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
 import { faBookAlt } from '@fortawesome/pro-light-svg-icons';
-import { VisSelection } from '@npn/common';
+import { VisSelection, MonitorsDestroy } from '@npn/common';
 import { Shared } from './sharing.service';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material';
+import { takeUntil } from 'rxjs/operators';
+import { Subject, merge } from 'rxjs';
 
 @Component({
     template: `
@@ -36,9 +38,10 @@ export class SharedVisualizationDescriptionComponent {
     </div>
     `
 })
-export class ShareDescriptionComponent implements StepComponent {
+export class ShareDescriptionComponent extends MonitorsDestroy implements StepComponent {
     title:string = 'visualization description';
     @Input() selection:VisSelection;
+    @HostBinding('style.display') display = 'initial';
     step:VisConfigStep = {
         icon: faBookAlt,
         stepComponent: ShareDescriptionComponent,
@@ -47,11 +50,35 @@ export class ShareDescriptionComponent implements StepComponent {
 
     constructor(
         private matBottomSheet:MatBottomSheet
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         this.step.$stepInstance = this;
         this.show();
+        const serializeSelection = () => JSON.stringify(this.selection.external);
+        const initialSelection = serializeSelection();
+        const stopSubscription:Subject<void> = new Subject();
+        this.selection.pipe(takeUntil(merge(stopSubscription,this.componentDestroyed)))
+            .subscribe(e => {
+                if(initialSelection !== serializeSelection()) {
+                    // the contents of the selection have changed, hide this component
+                    // this control hides itself when this happens rather than just deleting the description
+                    // because otherwise the parent will re-draw all steps when this component goes away
+                    // which will in turn reset things to step 0.
+                    // this feels kind of like a workaround but it's unclear WHY Angular is updating stepHosts
+                    this.display = 'none';
+                    stopSubscription.next();
+                }
+            });
+    }
+
+    ngOnDestroy() {
+        if(this.display === 'none') {
+            // navigating away, kill the description if the 
+            delete this.selection.$shared.description;
+        }
     }
 
     get state():StepState {

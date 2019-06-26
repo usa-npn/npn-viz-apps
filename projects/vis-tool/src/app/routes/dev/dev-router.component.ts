@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { faTree } from '@fortawesome/pro-light-svg-icons';
+import { faTree, faDove } from '@fortawesome/pro-light-svg-icons';
 
 @Component({ template: `
     <mat-sidenav-container>
@@ -8,6 +8,10 @@ import { faTree } from '@fortawesome/pro-light-svg-icons';
             <mat-list-item routerLinkActive="active" routerLink="selectTree">
                 <fa-icon mat-list-icon [icon]="faTree"></fa-icon>
                 <h4 mat-line>Select tree</h4>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active" routerLink="speciesPheno">
+                <fa-icon mat-list-icon [icon]="faDove"></fa-icon>
+                <h4 mat-line>Species/Pheno</h4>
             </mat-list-item>
         </mat-list>
     </mat-sidenav>
@@ -35,4 +39,5 @@ import { faTree } from '@fortawesome/pro-light-svg-icons';
 })
 export class DevRouterComponent {
     faTree = faTree;
+    faDove = faDove;
 }

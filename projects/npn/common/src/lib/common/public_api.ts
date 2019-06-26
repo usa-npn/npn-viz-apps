@@ -4,7 +4,7 @@ export { Phenophase } from './phenophase';
 export * from './station';
 
 export { CacheService } from './cache.service';
-export { SpeciesService } from './species.service';
+export * from './species.service';
 export { NetworkService } from './network.service';
 
 export { SpeciesTitlePipe } from './species-title.pipe';

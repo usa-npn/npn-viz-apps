@@ -45,7 +45,7 @@ import {
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
-import {SpeciesPhenophaseInputComponent,YearRangeInputComponent} from './common-controls';
+import {SpeciesPhenophaseInputComponent,YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
 
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -63,8 +63,8 @@ import {NpnGriddedModule} from '../gridded';
 
 @NgModule({
   imports: [
-    BrowserAnimationsModule,
-    BrowserModule,
+    /*BrowserAnimationsModule,
+    BrowserModule,*/
     CommonModule,
     FormsModule,ReactiveFormsModule,
     FontAwesomeModule,
@@ -90,6 +90,7 @@ import {NpnGriddedModule} from '../gridded';
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
+      HigherSpeciesPhenophaseInputComponent,
 
       ExtentControl, ExtentDateControl, ExtentDoyControl, ExtentYearControl,
       GriddedRangeSliderControl,
@@ -107,6 +108,7 @@ import {NpnGriddedModule} from '../gridded';
       MapVisualizationComponent,
       VisualizationComponent,
       SpeciesPhenophaseInputComponent,
+      HigherSpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       ExtentControl,
       GriddedRangeSliderControl,

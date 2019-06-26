@@ -4,7 +4,7 @@ import {FormControl} from '@angular/forms';
 import {Observable,Subject} from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 
-import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy} from '../../common';
+import {Species,Phenophase,SpeciesService,SpeciesTitlePipe,detectIE, MonitorsDestroy, TaxonomicSpeciesRank} from '../../common';
 import {VisSelection} from '../vis-selection';
 
 export const SPECIES_PHENO_INPUT_COLORS = [
@@ -232,7 +232,7 @@ export class SpeciesPhenophaseInputComponent extends MonitorsDestroy implements 
                 }
                 this.phenophaseList = [];
                 if(s) {
-                    this.speciesService.getPhenophases(s,this.startYear,this.endYear)
+                    this.speciesService.getPhenophasesContiguousYears(s,TaxonomicSpeciesRank.SPECIES,this.startYear,this.endYear)
                         .then(phenophases => {
                             let found = false;
                             if(this.phenophase) {

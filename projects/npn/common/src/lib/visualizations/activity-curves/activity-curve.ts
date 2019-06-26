@@ -4,6 +4,7 @@ import {ActivityCurvesSelection} from './activity-curves-selection';
 
 import * as d3 from 'd3';
 
+// TODO an ActivityCurve is a SpeciesPlot
 export class ActivityCurve {
     @selectionProperty()
     id:number;

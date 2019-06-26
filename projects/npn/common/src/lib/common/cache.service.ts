@@ -19,7 +19,7 @@ export class CacheService {
         }
     }
 
-    private cacheKey(key: any): string {
+    cacheKey(key: any): string {
         if (typeof (key) !== 'string') {
             key = JSON.stringify(key);
         }

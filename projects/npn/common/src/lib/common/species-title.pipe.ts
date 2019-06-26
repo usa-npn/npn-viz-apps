@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { SpeciesTitleFormat, APPLICATION_SETTINGS } from './application-settings';
-import { Species } from './species';
+import { Species, TaxonmicSpeciesType, TaxonomicSpeciesRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily } from './species';
 
 @Pipe({ name: 'speciesTitle' })
 export class SpeciesTitlePipe implements PipeTransform {
@@ -18,6 +18,37 @@ export class SpeciesTitlePipe implements PipeTransform {
                     return item && item.genus
                         ? `${item.genus} ${item.species}`
                         : undefined;
+            }
+        }
+        return item;
+    }
+}
+
+@Pipe({name: 'taxonomicSpeciesTitle'})
+export class TaxonomicSpeciesTitlePipe implements PipeTransform {
+    constructor(private speciesTitle:SpeciesTitlePipe) {}
+    transform(item:TaxonmicSpeciesType,rank:TaxonomicSpeciesRank = TaxonomicSpeciesRank.SPECIES,format:SpeciesTitleFormat = APPLICATION_SETTINGS.speciesTitleFormat):any {
+        if(item) {
+            let o;
+            switch(rank) {
+                case TaxonomicSpeciesRank.SPECIES:
+                    o = item as Species;
+                    return this.speciesTitle.transform(o,format);
+                case TaxonomicSpeciesRank.CLASS:
+                    o = item as TaxonomicClass;
+                    return format === SpeciesTitleFormat.CommonName
+                        ? o.class_common_name
+                        : o.class_name;
+                case TaxonomicSpeciesRank.ORDER:
+                    o = item as TaxonomicOrder;
+                    return format === SpeciesTitleFormat.CommonName
+                        ? o.order_common_name
+                        : o.order_name;
+                case TaxonomicSpeciesRank.FAMILY:
+                    o = item as TaxonomicFamily;
+                    return format === SpeciesTitleFormat.CommonName
+                        ? o.family_common_name
+                        : o.family_name;
             }
         }
         return item;

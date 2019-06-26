@@ -82,6 +82,9 @@ export class AppComponent {
       .subscribe((e:NavigationEnd) => {
         const activeItem:MenuItem = this.menuItems.find(mi => (new RegExp(`^\\/${mi.routerLink}`)).test(e.url))
         this.mainNavExpanded = activeItem ? activeItem.navExpandedWhenActive : true;
+        if(!environment.production && /^\/dev\//.test(e.url)) {
+          this.mainNavExpanded = false;
+        }
         this.routeTheme = (activeItem ? activeItem.theme : null)||AppTheme.LIGHT;
       });
   }

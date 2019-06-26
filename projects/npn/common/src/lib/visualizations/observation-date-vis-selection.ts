@@ -3,14 +3,14 @@ import { HttpParams } from '@angular/common/http';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 import { Species, Phenophase, SpeciesTitlePipe, NpnServiceUtils } from '../common';
 
-export class ObservationDatePlot {
+export interface ObservationDatePlot {
     color?: String;
     species?: Species;
     phenophase?: Phenophase;
     [x: string]: any;
 }
 
-export class ObservationDataDataPoint {
+export interface ObservationDataDataPoint {
     x: number;
     y: number;
     color: string;

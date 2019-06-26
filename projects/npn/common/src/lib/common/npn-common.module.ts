@@ -1,5 +1,4 @@
 import { NgModule, InjectionToken } from '@angular/core';
-import { BrowserModule }    from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
 import { CacheService } from './cache.service';
@@ -7,7 +6,7 @@ import { SpeciesService } from './species.service';
 import { NetworkService } from './network.service';
 import { StationService } from './station.service';
 
-import { SpeciesTitlePipe } from './species-title.pipe';
+import { SpeciesTitlePipe, TaxonomicSpeciesTitlePipe } from './species-title.pipe';
 import { DoyPipe } from './doy.pipe';
 import { LegendDoyPipe } from './legend-doy.pipe';
 
@@ -21,7 +20,6 @@ export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
 
 @NgModule({
     imports:[
-        BrowserModule,
         HttpClientModule
     ],
     declarations: [
@@ -43,6 +41,7 @@ export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
         StationService,
         NpnServiceUtils,
         SpeciesTitlePipe,
+        TaxonomicSpeciesTitlePipe,
         DatePipe,
         DoyPipe,
         LegendDoyPipe,

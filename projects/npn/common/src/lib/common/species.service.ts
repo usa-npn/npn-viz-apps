@@ -14,6 +14,11 @@ export interface SpeciesTaxonomicInfo {
     families?: TaxonomicFamily[];
 }
 
+export interface PhenophaseTaxonomicInfo {
+    phenophases: Phenophase[];
+    classes: PhenophaseClass[];
+}
+
 /**
  * @todo need utilities that can be used to generate keys from plot and data based on the plot.
  */
@@ -30,6 +35,14 @@ export interface SpeciesPlot {
     year?: number;
 }
 
+function mapByNumericId(list,key) {
+    return list.reduce((map,o) => {
+            if(typeof(o[key]) === 'number') {
+                map[o[key]] = o;
+            }
+            return map;
+        },{});
+}
 @Injectable()
 export class SpeciesService {
     constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe) {}
@@ -37,7 +50,7 @@ export class SpeciesService {
     getAllSpecies(params?: any): Promise<Species[]> {
         // NOTE: when there are multiple species phenophase controls on the screen the result can
         // be multiple simultaneous queries...
-        console.log('SpeciesService.getAllSpecies:params', params);
+        //console.log('SpeciesService.getAllSpecies:params', params);
         params = params||{};
         const url = this.serviceUtils.apiUrl('/npn_portal/species/getSpeciesFilter.json');
         let postParams = new HttpParams()
@@ -56,28 +69,17 @@ export class SpeciesService {
         }
         // NOTE: when there are multiple species phenophase controls on the screen the result can
         // be multiple simultaneous queries...
-        console.log('SpeciesService.getAllSpeciesHigher:params', params);
+        //console.log('SpeciesService.getAllSpeciesHigher:params', params);
         return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
                 this.serviceUtils.apiUrl('/npn_portal/species/getSpecies.json'),
                 input
             )
             .then((species:TaxonomicSpecies[]) => {
-                const gatherById = key => species
-                        .reduce(( map,s) => {
-                            /*if(/maple/i.test(s.common_name)) {
-                                console.log('MAPLE',s);
-                            }*/
-                            if(typeof(s[key]) === 'number') {
-                                map[s[key]] = s;
-                            }/* else {
-                                console.warn(`${key} is not a number`,s);
-                            }*/
-                            return  map;
-                        },{});
+                const gatherById = key => mapByNumericId(species,key);
                 const classIds = gatherById('class_id');
                 const orderIds = gatherById('order_id');
                 const familyIds = gatherById('family_id');
-                const info = {
+                return {
                     species,
                     classes: Object.keys(classIds).map(id => {
                             const {class_id,class_name,class_common_name} = classIds[id];
@@ -98,13 +100,27 @@ export class SpeciesService {
                         .filter(r => !!r.family_id && !!r.family_name && !!r.family_common_name) // keep only complete records
                         .sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))
                 };
-                return info;
             });
     }
 
+    generatePhenophaseTaxonomicInfo(phenophases:Phenophase[]):PhenophaseTaxonomicInfo {
+        const phenoClassIds = mapByNumericId(phenophases,'pheno_class_id');
+        return {
+            phenophases,
+            classes: Object.keys(phenoClassIds).map(id => {
+                    const {pheno_class_id,pheno_class_name} = phenoClassIds[id];
+                    return {pheno_class_id,pheno_class_name};
+                })
+                .filter(r => !!r.pheno_class_id && !!r.pheno_class_name)
+                .sort((a,b) => a.pheno_class_name.localeCompare(b.pheno_class_name))
+        };
+    }
+
     private _getPhenophases(species: TaxonmicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
-        const url = this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json');
         const params: any = {};
+        const url = rank === TaxonomicSpeciesRank.SPECIES
+            ? this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json')
+            : this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForTaxon.json')
         let o;
         switch(rank) {
             case TaxonomicSpeciesRank.SPECIES:
@@ -130,7 +146,9 @@ export class SpeciesService {
             params.return_all = true;
         }
         return this.serviceUtils.cachedGet(url,params)
-            .then(phases => this.removeRedundantPhenophases(phases[0].phenophases as Phenophase[]));
+            .then(phases => phases && phases.length
+                ? this.removeRedundantPhenophases(phases[0].phenophases as Phenophase[])
+                : []);
     }
 
     getAllPhenophases(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {

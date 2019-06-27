@@ -1,24 +1,26 @@
-import { MonitorsDestroy, SpeciesService, SpeciesTitlePipe, SpeciesPlot, TaxonomicSpeciesRank, SpeciesTaxonomicInfo, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Species } from '@npn/common/common';
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { MonitorsDestroy, SpeciesService, SpeciesPlot, TaxonomicSpeciesRank, SpeciesTaxonomicInfo, PhenophaseTaxonomicInfo } from '@npn/common/common';
+import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { VisSelection, BoundarySelection, StationAwareVisSelection } from '../vis-selection';
-import { Subject, Observable, from, combineLatest } from 'rxjs';
+import { Subject, Observable, from, combineLatest, of } from 'rxjs';
 import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
 import { TaxonomicSpeciesTitlePipe } from '@npn/common/common/species-title.pipe';
 import { HttpParams } from '@angular/common/http';
+import { TaxonomicPhenophaseRank } from '@npn/common/common/phenophase';
+import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component';
 
 /**
  * It would be nice if interfaces were actually meaningful at runtime.
  * Using concrete classes, due to getters/setters, could be problematic
  * SO WRT to validity of phenophases for date ranges this control works on 
  * convention rather than introspection as follows; plot.year, selection.year,
- * selection.years, selection.start/end
+ * selection.years, selection.start/end (TODO).
  */
 @Component({
     selector: 'higher-species-phenophase-input',
     template: `
     <mat-form-field class="species-rank-input">
-        <mat-select placeholder="Taxonomic rank" [formControl]="speciesRank">
+        <mat-select [placeholder]="speciesTaxRankPlaceholder" [formControl]="speciesRank">
             <mat-option *ngFor="let r of speciesRanks" [value]="r.rank">{{r.label}}</mat-option>
         </mat-select>
     </mat-form-field>
@@ -33,10 +35,44 @@ import { HttpParams } from '@angular/common/http';
         </mat-autocomplete>
         <mat-progress-bar *ngIf="fetchingSpeciesList" mode="query"></mat-progress-bar>
     </mat-form-field>
-<pre *ngIf="debug">species={{speciesTaxInfo?.species.length | number}} classes={{speciesTaxInfo?.classes.length | number}} orders={{speciesTaxInfo?.orders.length | number}} families={{speciesTaxInfo?.families.length | number}}</pre>
-    `
+    <mat-form-field class="pheno-rank-input">
+        <mat-select [placeholder]="phenoTaxRankPlaceholder" [formControl]="phenophaseRank">
+            <mat-option *ngFor="let r of phenophaseRanks" [value]="r.rank">{{r.label}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field class="pheno-input">
+        <mat-select [placeholder]="phenophasePlaceholder" [formControl]="phenophase">
+            <mat-option *ngFor="let o of phenophaseList" [value]="o.item">{{o.label}}</mat-option>
+        </mat-select>
+        <mat-progress-bar *ngIf="fetchingPhenophaseList" mode="query"></mat-progress-bar>
+    </mat-form-field>
+    <mat-form-field *ngIf="gatherColor" class="color-input">
+        <mat-select  [placeholder]="colorPlaceholder" [formControl]="color">
+        <mat-select-trigger><div class="color-swatch" [ngStyle]="{'background-color':color.value}"></div></mat-select-trigger>
+        <mat-option *ngFor="let c of colorList" [value]="c"><div class="color-swatch" [ngStyle]="{'background-color':c}"></div></mat-option>
+        </mat-select>
+    </mat-form-field>
+<pre *ngIf="debug">
+species={{speciesTaxInfo?.species.length | number}} classes={{speciesTaxInfo?.classes.length | number}} orders={{speciesTaxInfo?.orders.length | number}} families={{speciesTaxInfo?.families.length | number}}
+phenophases={{phenophaseTaxInfo?.phenophases.length | number}} classes={{phenophaseTaxInfo?.classes.length | number}}
+</pre>
+    `,
+    styles:[`
+    .color-swatch {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+    }
+    .color-input {
+        width: 70px;
+    }
+    `]
 })
 export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
+    // TODO
+    @Input() required:boolean = true;
+    @Input() disabled:boolean = false;
+
     private selectionUpdate:Subject<VisSelection> = new Subject();
     @Input() debug:boolean = false;
     @Input() selection:VisSelection; // for access to network args
@@ -62,10 +98,28 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     speciesList:any[];
     $filteredSpeciesList:Observable<any []>;
     speciesLabel; // closure for translating species items to strings.
-
     speciesTaxInfo:SpeciesTaxonomicInfo; // just for debug purposes
 
-    
+    phenophaseRank:FormControl = new FormControl();
+    phenophaseRanks = [{
+        label: 'Phenophase',
+        rank: TaxonomicPhenophaseRank.PHENOPHASE
+    },{
+        label: 'Class',
+        rank: TaxonomicPhenophaseRank.CLASS
+    }];
+
+    phenophase:FormControl = new FormControl();
+    fetchingPhenophaseList:boolean = false;
+    phenophaseList:any[];
+    phenophaseTaxInfo:PhenophaseTaxonomicInfo; // just for debug purposes
+
+    @Input() gatherColor:boolean = false;
+    color:FormControl = new FormControl();
+    colorList:string[] = SPECIES_PHENO_INPUT_COLORS;
+
+    private group:FormGroup;
+
 
     constructor(
         private speciesService:SpeciesService,
@@ -81,8 +135,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
             switchMap(selection => {
                 if(selection instanceof StationAwareVisSelection) {
                     return from(selection.toURLSearchParams().then(allParams => {
-                        // strictly interested in station_id and not any other params
-                        // a vis might send.
+                        // strictly interested in station_id and not any other params a vis might send.
                         let params = new HttpParams();
                         allParams.keys()
                             .filter(k => /^station_id/.test(k))
@@ -166,25 +219,151 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                 this.species.setValue(null);
             }
         });
-        
-        this.speciesRank.setValue(this.plot ? this.plot.speciesRank : TaxonomicSpeciesRank.SPECIES);
+
+        // whenever species changes go update the available phenophases/classes
+        // TODO deal with years...
+        const $phenophaseTaxInfo:Observable<PhenophaseTaxonomicInfo> = this.species.valueChanges.pipe(
+            tap(() => this.fetchingPhenophaseList = true),
+            switchMap(species => !!species
+                ? from(this.speciesService.getAllPhenophases(species,this.speciesRank.value)
+                    .then(phenos => this.speciesService.generatePhenophaseTaxonomicInfo(phenos)))
+                : of(null)
+            ),
+            tap(() => this.fetchingPhenophaseList = false),
+        );
+
+        // when the in
+        const $phenoListChange = combineLatest(
+            $phenophaseTaxInfo,
+            this.phenophaseRank.valueChanges
+        ).pipe(
+            map(input => {
+                const [info,rank] = input;
+                this.phenophaseTaxInfo = info
+                if(info) {
+                    switch(rank) {
+                        case TaxonomicPhenophaseRank.PHENOPHASE:
+                            return info.phenophases.map(item => ({
+                                item,
+                                label: item.phenophase_name
+                            }));
+                        case TaxonomicPhenophaseRank.CLASS:
+                            return info.classes.map(item => ({
+                                item,
+                                label: item.pheno_class_name
+                            }))
+                    }
+                }
+                return [];
+            }),
+            tap(list => this.phenophaseList = list),
+            takeUntil(this.componentDestroyed),
+            
+        );
+
+        // pheno rank or species changes, need to check validity of phenophase if set
+        combineLatest(
+            this.species.valueChanges,
+            $phenoListChange
+        ).pipe(
+            takeUntil(this.componentDestroyed)
+        ).subscribe(input => {
+            const [species,phenoList] = input;
+            if(!species) {
+                return this.phenophase.setValue(null);
+            }
+            const phenophase = this.phenophase.value;
+            const rank = this.phenophaseRank.value;
+            if(phenophase && phenoList.length) {
+                const key = rank === TaxonomicPhenophaseRank.PHENOPHASE
+                    ? 'phenophase_id'
+                    : 'pheno_class_id';
+                if(rank === TaxonomicPhenophaseRank.CLASS && phenophase.phenophase_id) {
+                    // class but a phenophase selected, if this check didn't exist there's
+                    // a very slight chance that an invalid selection could fall through
+                    // the cracks since phenophases will have BOTH keys
+                    return this.phenophase.setValue(null);
+                }
+                const id = phenophase[key];
+                //console.log(`check pheno validity id=${id}`,phenophase,phenoList);
+                if(!id) { // can't be valid, rank changed
+                    return this.phenophase.setValue(null);
+                }
+                const valid = (phenoList as any[]).reduce((found,i) => (found||(i.item[key] === id ? i : null)),null);
+                this.phenophase.setValue(valid);
+            }
+        });
+       
+        this.speciesRank.setValue((this.plot ? this.plot.speciesRank : null)||TaxonomicSpeciesRank.SPECIES);
         this.species.setValue(this.plot ? this.plot.species : null);
+        this.phenophaseRank.setValue((this.plot ? this.plot.phenophaseRank : null)||TaxonomicPhenophaseRank.PHENOPHASE);
+        this.phenophase.setValue(this.plot ? this.plot.phenophase : null);
+        this.color.setValue(this.plot ? this.plot.color : null);
 
         // gather up any input changes and propagate them outward
-        const group = new FormGroup({
+        this.group = new FormGroup({
             speciesRank: this.speciesRank,
-            species: this.species
+            species: this.species,
+            phenophaseRank: this.phenophaseRank,
+            phenophase: this.phenophase,
+            color: this.color,
         });
-        group.valueChanges
+        this.checkDisabled();
+        this.checkRequired();
+        this.group.valueChanges
             .pipe(
+                //tap(v => console.log('selection changed',v)),
                 // TODO expand the condition that decides when a plot is complete...
                 map(v => !!v.speciesRank && !!v.species && typeof(v.species) === 'object'
+                    && !!v.phenophaseRank && !!v.phenophase
+                    && (!this.gatherColor || !!v.color)
                     ? v
                     : null
                 ),
                 takeUntil(this.componentDestroyed)
             )
-            .subscribe(v => this.plotChange.next(this.plot = v));
+            .subscribe(v => {
+                // edit the plot in place, it may be a class
+                this.plot.speciesRank = v ? v.speciesRank : null;
+                this.plot.species = v ? v.species : null;
+                this.plot.phenophaseRank = v ? v.phenophaseRank : null;
+                this.plot.phenophase = v ? v.phenophase : null;
+                if(this.gatherColor) {
+                    this.plot.color = v ? v.color : null;
+                } else {
+                    delete this.plot.color; // just to be safe, mostly stesting
+                }
+                this.plotChange.next(this.plot);
+            });
+    }
+
+    checkDisabled() {
+        if(this.group) {
+            if(this.disabled) {
+                this.group.disable();
+            } else {
+                this.group.enable();
+            }
+        }
+    }
+
+    checkRequired() {
+        if(this.group) {
+            const validators = this.required
+                ? [Validators.required]
+                : null;
+            Object.keys(this.group.controls).forEach(key => this.group.controls[key].setValidators(validators));
+            this.group.updateValueAndValidity();
+        }
+    }
+
+    ngOnChanges(changes:SimpleChanges) {
+        if(changes.disabled) {
+            this.checkDisabled();
+        }
+        if(changes.required) {
+            this.checkRequired();
+        }
     }
 
     private bootstrapped:boolean = false;
@@ -210,20 +389,54 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
         this.selectionUpdate.complete();
     }
 
+    get speciesTaxRankPlaceholder():string {
+        return 'Taxonomic rank'+(this.required ? ' *' : '');
+    }
+
+    get phenoTaxRankPlaceholder():string {
+        return 'Phenophase taxonomic rank'+(this.required ? ' *' : '');
+    }
+
     get speciesPlaceholder():string {
         const rank = this.speciesRank
             ? this.speciesRank.value as TaxonomicSpeciesRank
             : TaxonomicSpeciesRank.SPECIES;
+        let label;
         switch(rank) {
             case TaxonomicSpeciesRank.SPECIES:
-                return 'Species';
+                label = 'Species';
+                break;
             case TaxonomicSpeciesRank.CLASS:
-                return 'Class';
+                label = 'Class';
+                break;
             case TaxonomicSpeciesRank.ORDER:
-                return 'Order';
+                label = 'Order';
+                break;
             case TaxonomicSpeciesRank.FAMILY:
-                return 'Family';
+                label = 'Family';
+                break;
         }
+        return label+(this.required ? ' *' : '');
+    }
+
+    get phenophasePlaceholder():string {
+        const rank = this.phenophaseRank
+            ? this.phenophaseRank.value as TaxonomicPhenophaseRank
+            : TaxonomicPhenophaseRank.PHENOPHASE;
+        let label;
+        switch(rank) {
+            case TaxonomicPhenophaseRank.PHENOPHASE:
+                label = 'Phenophase';
+                break;
+            case TaxonomicPhenophaseRank.CLASS:
+                label = 'Class';
+                break;
+        }
+        return label+(this.required ? ' *' : '');
+    }
+
+    get colorPlaceholder():string {
+        return 'Color'+(this.required ? ' *' : '');
     }
 
     speciesFocus() {

@@ -7,12 +7,14 @@ export class Phenophase {
 // i.e. why not `phenophase_class_id` and `phenophase_class_name` ??
 export interface PhenophaseClass {
     pheno_class_id: number;
-    phenophase_category: string;
+    pheno_class_name: string;
 }
 
 export interface TaxonomicPhenophase extends PhenophaseClass,Phenophase {
 
 }
+
+export type TaxonomicPhenophaseType = Phenophase|PhenophaseClass;
 
 export enum TaxonomicPhenophaseRank {
     PHENOPHASE = 'phenophase',

@@ -1,13 +1,34 @@
-import { Component } from '@angular/core';
-import { VisualizationSelectionFactory, VisSelection, StationAwareVisSelection } from '@npn/common';
+import { Component, ViewEncapsulation } from '@angular/core';
+import { VisualizationSelectionFactory, StationAwareVisSelection } from '@npn/common';
 
 @Component({
     template: `
-    <higher-species-phenophase-input [selection]="selection" [(plot)]="plot" [debug]="debug"></higher-species-phenophase-input>
-    <mat-checkbox [(ngModel)]="useBoundary">Use Maine boundary</mat-checkbox>
-    <mat-checkbox [(ngModel)]="debug">Debug info</mat-checkbox>
+    <higher-species-phenophase-input [selection]="selection" [(plot)]="plot"
+        [gatherColor]="gatherColor" [required]="required" [disabled]="disabled"
+        [debug]="debug"></higher-species-phenophase-input>
+    <ul class="options">
+        <li><mat-checkbox [(ngModel)]="useBoundary">Use Maine boundary</mat-checkbox></li>
+        <li><mat-checkbox [(ngModel)]="gatherColor">Gather color</mat-checkbox></li>
+        <li><mat-checkbox [(ngModel)]="required">Required</mat-checkbox></li>
+        <li><mat-checkbox [(ngModel)]="disabled">Disabled</mat-checkbox></li>
+        <li><mat-checkbox [(ngModel)]="debug">Debug info</mat-checkbox></li>
+    </ul>
     <pre>plot={{plot | json}}</pre>
-    `
+    `,
+    encapsulation: ViewEncapsulation.None,
+    styles:[`
+    higher-species-phenophase-input {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+    }
+    ul.options {
+        padding-left: 0px;
+    }
+    ul.options > li {
+        list-style: none;
+    }
+    `]
 })
 export class SpeciesPhenoRoute {
     selection:StationAwareVisSelection;
@@ -26,6 +47,9 @@ export class SpeciesPhenoRoute {
         boundaryTypeName: "US States"
     };
     debug:boolean = true;
+    gatherColor:boolean = false;
+    required:boolean = true;
+    disabled:boolean = false;
     private _useBoundary:boolean = false;
 
     constructor(

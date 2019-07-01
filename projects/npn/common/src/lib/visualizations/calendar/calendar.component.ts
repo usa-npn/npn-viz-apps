@@ -126,8 +126,7 @@ export class CalendarComponent extends SvgVisualizationBaseComponent {
         if(!this.data) {
             return;
         }
-        let sizing = this.sizing,
-            processed = this.processed = this.selection.postProcessData(this.data);
+        const processed = this.processed = this.selection.postProcessData(this.data);
 
         // update y axis
         this.y.paddingInner(this.selection.bandPadding);

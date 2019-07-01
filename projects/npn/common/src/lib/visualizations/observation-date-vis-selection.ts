@@ -15,9 +15,9 @@ export interface ObservationDataDataPoint {
     y: number;
     color: string;
 }
-export class ObservationDateData {
-    labels: string[] = [];
-    data: ObservationDataDataPoint[] = [];
+export interface ObservationDateData {
+    labels: string[];
+    data: ObservationDataDataPoint[];
 }
 
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
@@ -56,10 +56,6 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         this.years.forEach((y, i) => {
             params = params.set(`year[${i}]`, `${y}`);
         });
-        this.validPlots.forEach((plot, i) => {
-            params = params.set(`species_id[${i}]`, `${plot.species.species_id}`)
-                           .set(`phenophase_id[${i}]`, `${plot.phenophase.phenophase_id}`);
-        });
         return super.toURLSearchParams(params);
     }
 
@@ -94,70 +90,66 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             });
     }
 
-    postProcessData(data: any[]): ObservationDateData {
+    postProcessData(data: any): ObservationDateData {
         if (!data || !data.length) {
             return null;
         }
-        let response = new ObservationDateData(),
-            vPlots = this.validPlots,
-            y = (vPlots.length * this.years.length) - 1,
-            addDoys = (doys, color) => {
-                doys.forEach(doy => {
-                    response.data.push({
-                        y: y,
-                        x: doy,
-                        color: color
-                    });
+        const validPlots = this.validPlots;
+        let y = (validPlots.length * this.years.length) -1;
+        const addDoys = (doys, color) => {
+            doys.forEach(doy => {
+                response.data.push({
+                    y: y,
+                    x: doy,
+                    color: color
                 });
-            },
-            speciesMap = data.reduce((map, species) => {
-                map[species.species_id] = species;
-                // first time translate phenophases array to a map.
-                if (Array.isArray(species.phenophases)) {
-                    species.phenophases = species.phenophases.reduce(function (m, pp) {
-                        m[pp.phenophase_id] = pp;
-                        return m;
-                    }, {});
-                }
-                return map;
-            }, {});
-        console.log('speciesMap', speciesMap);
-        vPlots.forEach(plot => {
-            let species = speciesMap[plot.species.species_id],
-                phenophase = species.phenophases[plot.phenophase.phenophase_id];
+            });
+        };
+        const response:ObservationDateData = {
+            labels: [],
+            data: []
+        };
+        validPlots.forEach((plot,i) => {
+            const rData:any= data[i][0];
+            const pPhases = rData.phenophases[0];
             this.years.forEach(year => {
-                if (phenophase && phenophase.years && phenophase.years[year]) {
-                    if (this.negative) {
-                        console.debug('year negative', y, year, species.common_name, phenophase, phenophase.years[year].negative);
-                        addDoys(phenophase.years[year].negative, this.negativeColor);
+                if(pPhases.years[year]) {
+                    if(this.negative) {
+                        addDoys(pPhases.years[year].negative,this.negativeColor);
                     }
-                    console.debug('year positive', y, year, species.common_name, phenophase, phenophase.years[year].positive);
-                    addDoys(phenophase.years[year].positive, plot.color);
+                    addDoys(pPhases.years[year].positive,plot.color);
                 }
                 response.labels.splice(0, 0, this.speciesTitle.transform(plot.species) + '/' + plot.phenophase.phenophase_name + ' (' + year + ')');
-                console.debug('y of ' + y + ' is for ' + response.labels[0]);
                 y--;
-            });
+            })
         });
         console.log('observation data', response);
         return response;
     }
 
-    getData(): Promise<any[]> {
+    getData(): Promise<any> {
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
         this.working = true;
+        const serviceUrl = this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json');
         return this.toURLSearchParams()
-            .then(params => this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json'),params.toString())
-            .then(arr => {
+            // one request per valid plot
+            .then(params => Promise.all(
+                    this.validPlots.map(plot => {
+                        const plotParams = params.set('species_id[0]',`${plot.species.species_id}`)
+                            .set('phenophase_id[0]',`${plot.phenophase.phenophase_id}`);
+                        return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString());
+                    })
+                )
+            )
+            .then(result => {
                 this.working = false;
-                return arr;
+                return result;
             })
             .catch(err => {
                 this.working = false;
                 this.handleError(err);
-            }));
-        ;
+            });
     }
 }

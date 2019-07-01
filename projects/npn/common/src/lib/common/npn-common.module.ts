@@ -24,12 +24,14 @@ export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
     ],
     declarations: [
         SpeciesTitlePipe,
+        TaxonomicSpeciesTitlePipe,
         LegendDoyPipe,
         DoyPipe,
         NpnLogoComponent
     ],
     exports: [
         SpeciesTitlePipe,
+        TaxonomicSpeciesTitlePipe,
         LegendDoyPipe,
         DoyPipe,
         NpnLogoComponent

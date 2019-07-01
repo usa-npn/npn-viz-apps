@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { SpeciesTitleFormat, APPLICATION_SETTINGS } from './application-settings';
-import { Species, TaxonmicSpeciesType, TaxonomicSpeciesRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily } from './species';
+import { Species, TaxonomicSpeciesType, TaxonomicSpeciesRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily } from './species';
 
 @Pipe({ name: 'speciesTitle' })
 export class SpeciesTitlePipe implements PipeTransform {
@@ -27,7 +27,7 @@ export class SpeciesTitlePipe implements PipeTransform {
 @Pipe({name: 'taxonomicSpeciesTitle'})
 export class TaxonomicSpeciesTitlePipe implements PipeTransform {
     constructor(private speciesTitle:SpeciesTitlePipe) {}
-    transform(item:TaxonmicSpeciesType,rank:TaxonomicSpeciesRank = TaxonomicSpeciesRank.SPECIES,format:SpeciesTitleFormat = APPLICATION_SETTINGS.speciesTitleFormat):any {
+    transform(item:TaxonomicSpeciesType,rank:TaxonomicSpeciesRank = TaxonomicSpeciesRank.SPECIES,format:SpeciesTitleFormat = APPLICATION_SETTINGS.speciesTitleFormat):any {
         if(item) {
             let o;
             switch(rank) {

@@ -290,7 +290,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                     return this.phenophase.setValue(null);
                 }
                 const valid = (phenoList as any[]).reduce((found,i) => (found||(i.item[key] === id ? i : null)),null);
-                this.phenophase.setValue(valid);
+                this.phenophase.setValue(valid ? valid.item : null);
             }
         });
        

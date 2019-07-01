@@ -8,8 +8,8 @@ import { faChartLine } from '@fortawesome/pro-light-svg-icons';
     template: `
     <div class="curve" *ngFor="let c of selection.validCurves; index as i"
         [ngStyle]="{'border-left-color':c.color}">
-        <div>{{c.species | speciesTitle}}</div>
-        <div>{{c.phenophase.phenophase_name}}</div>
+        <div>{{c.species | taxonomicSpeciesTitle:c.speciesRank}}</div>
+        <div>{{c.phenophase.phenophase_name||c.phenophase.pheno_class_name}}</div>
         <div>{{c.year}}</div>
         <div>{{c.metric.label}}</div>
     </div>
@@ -64,13 +64,13 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
     encapsulation: ViewEncapsulation.None,
     styles:[`
     curve-selection-control,
-    species-phenophase-input {
+    higher-species-phenophase-input {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
     }
-    species-phenophase-input .species-input,
-    species-phenophase-input .phenophase-input,
+    higher-species-phenophase-input .species-input,
+    higher-species-phenophase-input .phenophase-input,
     .metric-input
      {
         width: 100% !important;

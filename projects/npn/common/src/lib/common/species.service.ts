@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 
 import { HttpParams } from '@angular/common/http';
 
-import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicOrder, TaxonomicSpeciesRank, TaxonmicSpeciesType } from './species';
+import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicOrder, TaxonomicSpeciesRank, TaxonomicSpeciesType } from './species';
 import { Phenophase, TaxonomicPhenophaseRank, PhenophaseClass } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';
 
@@ -25,7 +25,7 @@ export interface PhenophaseTaxonomicInfo {
 export interface SpeciesPlot {
     /** Dictates what IS found in the `species` property.  If not specified defaults to SPECIES (legacy) */
     speciesRank?: TaxonomicSpeciesRank;
-    species?: TaxonmicSpeciesType;
+    species?: TaxonomicSpeciesType;
     /** Dictates what IS found in the `phenophase` property.  If not specified defaults to PHENOPHASE (legacy) */
     phenophaseRank?: TaxonomicPhenophaseRank;
     phenophase?: Phenophase|PhenophaseClass;
@@ -82,20 +82,20 @@ export class SpeciesService {
                 return {
                     species,
                     classes: Object.keys(classIds).map(id => {
-                            const {class_id,class_name,class_common_name} = classIds[id];
-                            return {class_id,class_name,class_common_name}
+                            const {class_id,class_name,class_common_name,kingdom} = classIds[id];
+                            return {class_id,class_name,class_common_name,kingdom}
                         })
                         .filter(r => !!r.class_id && !!r.class_name && !!r.class_common_name) // keep only complete records
                         .sort((a,b) => a.class_common_name.localeCompare(b.class_common_name)),
                     orders: Object.keys(orderIds).map(id => {
-                            const {order_id,order_name,order_common_name} = orderIds[id];
-                            return {order_id,order_name,order_common_name};
+                            const {order_id,order_name,order_common_name,kingdom} = orderIds[id];
+                            return {order_id,order_name,order_common_name,kingdom};
                         })
                         .filter(r => !!r.order_id && !!r.order_name && !!r.order_common_name) // keep only complete records
                         .sort((a,b) => a.order_common_name.localeCompare(b.order_common_name)),
                     families: Object.keys(familyIds).map(id => {
-                            const {family_id,family_name,family_common_name} = familyIds[id];
-                            return {family_id,family_name,family_common_name};
+                            const {family_id,family_name,family_common_name,kingdom} = familyIds[id];
+                            return {family_id,family_name,family_common_name,kingdom};
                         })
                         .filter(r => !!r.family_id && !!r.family_name && !!r.family_common_name) // keep only complete records
                         .sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))
@@ -116,7 +116,7 @@ export class SpeciesService {
         };
     }
 
-    private _getPhenophases(species: TaxonmicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
+    private _getPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
         const params: any = {};
         const url = rank === TaxonomicSpeciesRank.SPECIES
             ? this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json')
@@ -151,15 +151,15 @@ export class SpeciesService {
                 : []);
     }
 
-    getAllPhenophases(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {
+    getAllPhenophases(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {
         return this._getPhenophases(species,rank);
     }
 
-    getPhenophasesForDate(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank, date: Date): Promise<Phenophase[]> {
+    getPhenophasesForDate(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, date: Date): Promise<Phenophase[]> {
         return this._getPhenophases(species, rank, date);
     }
 
-    getPhenophasesForYear(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
+    getPhenophasesForYear(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
         let jan1 = new Date(year, 0, 1),
             dec31 = new Date(year, 11, 31);
         return Promise.all([
@@ -168,12 +168,12 @@ export class SpeciesService {
         ]).then(lists => this.mergeRedundantPhenophaseLists(lists));
     }
 
-    getPhenophasesForYears(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank, years:number[]): Promise<Phenophase[]> {
+    getPhenophasesForYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, years:number[]): Promise<Phenophase[]> {
         return Promise.all(years.map(y => this.getPhenophasesForYear(species, rank, y)))
                 .then(lists => this.mergeRedundantPhenophaseLists(lists));
     }
 
-    getPhenophasesContiguousYears(species: TaxonmicSpeciesType, rank:TaxonomicSpeciesRank, startYear?: number, endYear?: number): Promise<Phenophase[]> {
+    getPhenophasesContiguousYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, startYear?: number, endYear?: number): Promise<Phenophase[]> {
         if(startYear) {
             if (startYear && !endYear) {
                 throw new Error('Missing end year.');

@@ -9,16 +9,14 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'curve-selection-control',
     template: `
-    <species-phenophase-input
-        [(species)]="curve.species"
-        [(phenophase)]="curve.phenophase"
-        [(color)]="curve.color"
+    <higher-species-phenophase-input
         [gatherColor]="gatherColor"
         [selection]="selection"
+        [(plot)]="curve"
         [disabled]="disabled"
         [required]="required"
-        (onSpeciesChange)="onSpeciesChange.next($event)">
-    </species-phenophase-input>
+        (onPlotChange)="onSpeciesChange.next($event)">
+    </higher-species-phenophase-input>
 
     <mat-form-field class="year-input">
         <mat-select [placeholder]="'Year'+(required ? ' *':'')" [formControl]="yearControl">

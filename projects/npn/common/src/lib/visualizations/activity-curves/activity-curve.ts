@@ -1,18 +1,28 @@
 import {selectionProperty,GET_EXTERNAL,SET_EXTERNAL} from '../vis-selection';
-import {Species,Phenophase,SpeciesTitlePipe,DoyPipe} from '../../common';
+import {
+    TaxonomicSpeciesTitlePipe,
+    DoyPipe,
+    SpeciesPlot,
+    TaxonomicSpeciesType,
+    TaxonomicSpeciesRank,
+    TaxonomicPhenophaseType,
+    TaxonomicPhenophaseRank,
+    SpeciesTitlePipe
+} from '../../common';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 
 import * as d3 from 'd3';
 
-// TODO an ActivityCurve is a SpeciesPlot
-export class ActivityCurve {
+export class ActivityCurve implements SpeciesPlot {
     @selectionProperty()
     id:number;
 
     interpolate? :INTERPOLATE;
 
     @selectionProperty()
-    private _species:Species;
+    speciesRank:TaxonomicSpeciesRank;
+    @selectionProperty()
+    private _species:TaxonomicSpeciesType;
     @selectionProperty({
         ser: d => d,
         des: d => {
@@ -25,7 +35,9 @@ export class ActivityCurve {
     })
     private _metric;
     @selectionProperty()
-    private _phenophase:Phenophase;
+    phenophaseRank:TaxonomicPhenophaseRank;
+    @selectionProperty()
+    private _phenophase:TaxonomicPhenophaseType;
     @selectionProperty()
     private _year:number;
 
@@ -73,10 +85,10 @@ export class ActivityCurve {
         this.updateCheck(true);
     }
 
-    get phenophase():Phenophase {
+    get phenophase():TaxonomicPhenophaseType {
         return this._phenophase;
     }
-    set phenophase(p:Phenophase) {
+    set phenophase(p:TaxonomicPhenophaseType) {
         this.reset();
         this._phenophase = p;
         this.updateCheck(true);
@@ -99,10 +111,10 @@ export class ActivityCurve {
         this.updateCheck();
     }
 
-    get species():Species {
+    get species():TaxonomicSpeciesType {
         return this._species;
     }
-    set species(s:Species) {
+    set species(s:TaxonomicSpeciesType) {
         this.reset();
         this._species = s;
         this.phenophase = undefined;
@@ -178,7 +190,8 @@ export class ActivityCurve {
      */
     legendLabel(includeMetric:boolean) {
         let doyFocusValue = this.doyDataValue();
-        return this.year+': '+SPECIES_TITLE(this.species)+' - '+this.phenophase.phenophase_name+
+        const pp = this.phenophase as any;
+        return this.year+': '+SPECIES_TITLE(this.species,this.speciesRank)+' - '+(pp.phenophase_name||pp.pheno_class_name)+
             (includeMetric ? (' ('+this.metric.label+')') : '')+
             (typeof(doyFocusValue) !== 'undefined' ? (' ['+doyFocusValue+']') : '');
     }
@@ -385,8 +398,8 @@ export enum INTERPOLATE {
 };
 const DECIMAL = v => v.toFixed(2);
 const IDENTITY = o => o;
-const SPECIES_TITLE_PIPE = new SpeciesTitlePipe();
-const SPECIES_TITLE = (item: Species) => SPECIES_TITLE_PIPE.transform(item);
+const SPECIES_TITLE_PIPE = new TaxonomicSpeciesTitlePipe(new SpeciesTitlePipe());
+const SPECIES_TITLE = (item: TaxonomicSpeciesType,rank:TaxonomicSpeciesRank) => SPECIES_TITLE_PIPE.transform(item,rank);
 const DOY_PIPE = new DoyPipe();
 const DOY = (date,ignoreLeapYear?:boolean): any => DOY_PIPE.transform(date,ignoreLeapYear);
 

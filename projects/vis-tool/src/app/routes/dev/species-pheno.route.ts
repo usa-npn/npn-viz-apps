@@ -33,11 +33,23 @@ import { VisualizationSelectionFactory, StationAwareVisSelection } from '@npn/co
 export class SpeciesPhenoRoute {
     selection:StationAwareVisSelection;
     plot = {
-        speciesRank: 'class',
+        speciesRank: 'family',
         species: {
-            class_id: 5,
-            class_name: 'Aves',
-            class_common_name: 'Birds'
+            family_id: 329,
+            family_name: "Sapindaceae",
+            family_common_name: "Soapberry Family",
+            kingdom: "Plantae"
+        },
+        phenophaseRank: 'phenophase',
+        phenophase: {
+            phenophase_id: 371,
+            phenophase_name: "Breaking leaf buds",
+            phenophase_category: "Leaves",
+            phenophase_definition: "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+            seq_num: 10,
+            color: "Green1",
+            pheno_class_id: 1,
+            pheno_class_name: "Initial shoot or leaf growth"
         }
     };
     maine = {

@@ -11,7 +11,7 @@ const CONTROL_TITLE = 'Select species phenophase';
 const STEP_TEMPLATE = `
 <div *ngFor="let plot of selection.plots" class="plot">
     <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>
-    <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
+    <div class="title">{{plot.species | taxonomicSpeciesTitle:plot.speciesRank}}<span *ngIf="plot.phenophase">/{{plot.phenophase.phenophase_name||plot.phenophase.pheno_class_name}}</span></div>
 </div>
 `;
 const STEP_STYLES = `
@@ -37,7 +37,7 @@ const STEP_STYLES = `
     template: STEP_TEMPLATE,
     styles:[STEP_STYLES]
 })
-export class StartEndLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+export class StartEndSpeciesPhenoColorStepComponent extends BaseStepComponent {
     title:string = 'Species/Phenophase';
     selection: ScatterPlotSelection;
 
@@ -54,7 +54,7 @@ export class StartEndLegacySpeciesPhenoColorStepComponent extends BaseStepCompon
     template: STEP_TEMPLATE,
     styles:[STEP_STYLES]
 })
-export class YearsLegacySpeciesPhenoColorStepComponent extends BaseStepComponent {
+export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
     title:string = CONTROL_TITLE;
     selection: ObservationDateVisSelection;
 
@@ -69,38 +69,46 @@ export class YearsLegacySpeciesPhenoColorStepComponent extends BaseStepComponent
 
 @Component({
     template: `
-    <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
-        <species-phenophase-input
-            [(species)]="spi.species" [(phenophase)]="spi.phenophase" [(color)]="spi.color"
-            [selection]="selection"
-            [gatherColor]="true"
-            (onSpeciesChange)="selection.update()"
-            (onPhenophaseChange)="selection.update()"
-            (onColorChange)="redrawChange($event)"></species-phenophase-input>
-        <div class="buttons">
-            <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-            <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
+    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Plot #{{idx+1}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="phenophase-input-wrapper">
+            <higher-species-phenophase-input
+                    [selection]="selection"
+                    [plot]="plot"
+                    gatherColor="true"
+                    (plotChange)="selection.update()">
+            </higher-species-phenophase-input>
+            <div class="action-holder">
+                <button *ngIf="idx > 0 || selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
+            </div>
         </div>
+    <mat-expansion-panel>
+    <div class="action-holder">
+        <button mat-button class="add-plot" [disabled]="selection.plots.length === 3 || !plotsValid()" (click)="addPlot()">Add</button>
     </div>
     `,
     styles:[`
     .phenophase-input-wrapper,
-    species-phenophase-input {
+    higher-species-phenophase-input {
         display: flex;
         flex-direction: column;
         align-items: stretch;
     }
-    species-phenophase-input>* {
+    higher-species-phenophase-input>*:not(.color-input) {
         width: inherit !important;
     }
-    .buttons {
-        display:flex;
-        justify-content: flex-end;
+    .action-holder {
+        margin: 10px 0px;
+        text-align: right;
     }
     `],
     encapsulation: ViewEncapsulation.None
 })
-export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponent {
+export class SpeciesPhenoColorControlComponent extends BaseControlComponent {
     title:string = CONTROL_TITLE;
     selection: any; //(ScatterPlotSelection|ObservationDateVisSelection);
 
@@ -136,12 +144,12 @@ export class LegacySpeciesPhenoColorControlComponent extends BaseControlComponen
 
 export const StartEndLegacySpeciesPhenoColorStep:VisConfigStep = {
     icon: faCrow,
-    stepComponent: StartEndLegacySpeciesPhenoColorStepComponent,
-    controlComponent: LegacySpeciesPhenoColorControlComponent
+    stepComponent: StartEndSpeciesPhenoColorStepComponent,
+    controlComponent: SpeciesPhenoColorControlComponent
 };
 
 export const YearsLegacySpeciesPhenoColorStep:VisConfigStep = {
     icon: faCrow,
-    stepComponent: YearsLegacySpeciesPhenoColorStepComponent,
-    controlComponent: LegacySpeciesPhenoColorControlComponent
+    stepComponent: YearsSpeciesPhenoColorStepComponent,
+    controlComponent: SpeciesPhenoColorControlComponent
 };

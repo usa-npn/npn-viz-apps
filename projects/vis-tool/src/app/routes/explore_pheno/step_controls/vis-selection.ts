@@ -15,7 +15,7 @@ import {
 
 import { VisConfigStep, VisDefinition, StepComponent, StepState, ControlComponent } from "../interfaces";
 import { VisualizationSelectionFactory, ScatterPlotComponent, VisSelection, CalendarComponent, MapVisualizationComponent, MonitorsDestroy, ActivityCurvesComponent, AgddTimeSeriesComponent, SPECIES_PHENO_INPUT_COLORS, ActivityCurvesSelection, ActivityCurve } from "@npn/common";
-import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./legacy-species-pheno-color";
+import { StartEndLegacySpeciesPhenoColorStep, YearsLegacySpeciesPhenoColorStep } from "./species-pheno-color";
 import { ScatterPlotMiscStep } from "./scatter-plot-misc";
 import { CalendarMiscStep } from './calendar-misc';
 import { ActivatedRoute } from '@angular/router';

@@ -50,7 +50,7 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-expansion-panel  *ngFor="let spi of selection.plots; index as idx"  expanded="true">
+    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true">
         <mat-expansion-panel-header>
             <mat-panel-title>
             <svg class="icon" viewBox="0 0 22 22"><path [attr.d]="iconPaths[idx]"></path></svg>
@@ -60,12 +60,11 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
         <div class="phenophase-input-wrapper">
             <higher-species-phenophase-input
                 [selection]="selection"
-                [plot]="spi"
+                [plot]="plot"
                 (plotChange)="plotChange($event)">
             </higher-species-phenophase-input>
             <div class="action-holder">
                 <button *ngIf="idx > 0 || selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-                
             </div>
         </div>
     </mat-expansion-panel>
@@ -83,10 +82,6 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
     }
     higher-species-phenophase-input>* {
         width: inherit !important;
-    }
-    .buttons {
-        display:flex;
-        justify-content: flex-end;
     }
     .action-holder {
         margin: 10px 0px;

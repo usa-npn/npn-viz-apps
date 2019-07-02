@@ -26,7 +26,7 @@ import { MapMiscStepComponent, MapMiscControlComponent } from './map-misc';
 
 import { ScatterPlotMiscStepComponent, ScatterPlotMiscControlComponent } from './scatter-plot-misc';
 import { CalendarMiscStepComponent, CalendarMiscControlComponent } from './calendar-misc';
-import { StartEndLegacySpeciesPhenoColorStepComponent, YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent } from './legacy-species-pheno-color';
+import { StartEndSpeciesPhenoColorStepComponent, YearsSpeciesPhenoColorStepComponent, SpeciesPhenoColorControlComponent } from './species-pheno-color';
 
 import { ActivityCurvesStepComponent, ActivityCurvesControlComponent } from './activity-curves';
 import { ActivityCurvesMiscStepComponent, ActivityCurvesMiscControlComponent } from './activity-curves-misc';
@@ -60,7 +60,7 @@ const COMPONENTS:any[] = [
     AgddTsLayerPointStepComponent, AgddTsLayerPointControlComponent, AgddTsLayerPointSubControlComponent,
     AgddTsMiscStepComponent, AgddTsMiscControlComponent,
 
-    StartEndLegacySpeciesPhenoColorStepComponent,  YearsLegacySpeciesPhenoColorStepComponent, LegacySpeciesPhenoColorControlComponent,
+    StartEndSpeciesPhenoColorStepComponent,  YearsSpeciesPhenoColorStepComponent, SpeciesPhenoColorControlComponent,
     BoundaryStepComponent, BoundaryControlComponent, BoundarySubControlComponent
 ];
 const ENTRY_COMPONENTS:any[] = [

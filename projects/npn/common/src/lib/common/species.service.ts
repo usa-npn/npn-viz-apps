@@ -140,6 +140,43 @@ export class SpeciesService {
             });
     }
 
+    /**
+     * Flatten a list of SpeciesPlots into the list of species_ids that they constitute.
+     * 
+     * @param plots 
+     * @return {Promise<number []>} Promise resolved with the set of species_ids.
+     */
+    getSpeciesIds(plots:SpeciesPlot[]):Promise<number []> {
+        return this.getAllSpeciesHigher()
+            .then(info => plots.reduce((ids,plot) => {
+                const addId = id => {
+                    if(ids.indexOf(id) === -1) {
+                        ids.push(id);
+                    }
+                };
+                const keys = getSpeciesPlotKeys(plot);
+                let taxId;
+                switch(plot.speciesRank||TaxonomicSpeciesRank.SPECIES) {
+                    case TaxonomicSpeciesRank.SPECIES:
+                        taxId = (plot.species as Species).species_id;
+                        break;
+                    case TaxonomicSpeciesRank.CLASS:
+                        taxId = (plot.species as TaxonomicClass).class_id;
+                        break;
+                    case TaxonomicSpeciesRank.ORDER:
+                        taxId = (plot.species as TaxonomicOrder).order_id;
+                        break;
+                    case TaxonomicSpeciesRank.FAMILY:
+                        taxId = (plot.species as TaxonomicFamily).family_id;
+                        break;
+                }
+                // pull out all species that match and add them to the set
+                info.species.filter(species => species[keys.speciesIdKey] == taxId)
+                    .forEach(species => addId(species.species_id));
+                return ids;
+            },[]));
+    }
+
     generatePhenophaseTaxonomicInfo(phenophases:Phenophase[]):PhenophaseTaxonomicInfo {
         const phenoClassIds = mapByNumericId(phenophases,'pheno_class_id');
         return {

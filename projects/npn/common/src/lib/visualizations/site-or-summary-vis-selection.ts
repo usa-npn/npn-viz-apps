@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank } from '../common';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
@@ -36,7 +36,10 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     })
     plots:SiteOrSummaryPlot[] = [];
 
-    constructor(protected serviceUtils:NpnServiceUtils) {
+    constructor(
+        protected serviceUtils:NpnServiceUtils,
+        protected speciesService:SpeciesService
+    ) {
         super(serviceUtils);
     }
 
@@ -53,13 +56,11 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 if(this.numDaysQualityFilter) {
                     input.dataPrecision = this.numDaysQualityFilter;
                 }
-                /* TODO POP
-                input.species =
-                    this.validPlots.map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id));
-                */
-                // POP supports phenophases but seems to present a higher-level list of possibilities
-                //input.phenophases = this.validPlots.map(p => typeof(p.phenophase.phenophase_id) === 'number' ? p.phenophase.phenophase_id : parseInt(p.phenophase.phenophase_id));
-                return input;
+                return this.speciesService.getSpeciesIds(this.validPlots)
+                    .then(ids => {
+                        input.species = ids;
+                        return input;
+                    });
             });
     }
 

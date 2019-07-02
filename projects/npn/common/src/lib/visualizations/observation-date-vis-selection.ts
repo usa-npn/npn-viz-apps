@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
-import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank } from '../common';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
 
 export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
@@ -33,7 +33,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
 
     constructor(
         protected serviceUtils:NpnServiceUtils,
-        protected speciesTitle: TaxonomicSpeciesTitlePipe
+        protected speciesTitle:TaxonomicSpeciesTitlePipe,
+        protected speciesService:SpeciesService
     ) {
         super(serviceUtils);
     }
@@ -59,16 +60,6 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
         return super.toPOPInput(input)
             .then(input => {
-                /* TODO POP
-                input.species = this.validPlots
-                    .map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id))
-                    .reduce((set,id) => {
-                        if(set.indexOf(id) === -1) {
-                            set.push(id);
-                        }
-                        return set;
-                    },[]);
-                */
                 const yearRange = this.years.reduce((range,y) => {
                         if(!range) {
                             return [y,y];
@@ -85,7 +76,11 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                     input.startDate = `${yearRange[0]}-01-01`;
                     input.endDate = `${yearRange[1]}-12-31`;
                 }
-                return input;
+                return this.speciesService.getSpeciesIds(this.validPlots)
+                    .then(ids => {
+                        input.species = ids;
+                        return input;
+                    });
             });
     }
 

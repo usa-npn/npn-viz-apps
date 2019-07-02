@@ -11,7 +11,7 @@ import {
     SupportsOpacity
 } from '../../gridded';
 import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
-import { NpnServiceUtils } from '@npn/common/common';
+import { NpnServiceUtils, SpeciesService } from '@npn/common/common';
 import { HttpParams } from '@angular/common/http';
 
 /**
@@ -49,8 +49,12 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     layer:MapLayer;
     legend:MapLayerLegend;
 
-    constructor(private layerService:NpnMapLayerService,protected serviceUtils:NpnServiceUtils) {
-        super(serviceUtils);
+    constructor(
+        private layerService:NpnMapLayerService,
+        protected serviceUtils:NpnServiceUtils,
+        protected speciesService:SpeciesService
+    ) {
+        super(serviceUtils,speciesService);
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {

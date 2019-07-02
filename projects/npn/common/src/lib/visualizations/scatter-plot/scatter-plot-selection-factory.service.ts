@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { NpnServiceUtils } from '../../common';
+import { NpnServiceUtils, SpeciesService } from '../../common';
 import { ScatterPlotSelection } from './scatter-plot-selection';
 
 @Injectable()
 export class ScatterPlotSelectionFactory {
-    constructor(protected serviceUtils:NpnServiceUtils) {}
+    constructor(private serviceUtils:NpnServiceUtils,private speciesService:SpeciesService) {}
 
     newSelection(): ScatterPlotSelection {
-        return new ScatterPlotSelection(this.serviceUtils);
+        return new ScatterPlotSelection(this.serviceUtils,this.speciesService);
     }
 }

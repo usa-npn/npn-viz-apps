@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass, getSpeciesPlotKeys } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass, getSpeciesPlotKeys, SpeciesService } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -62,7 +62,11 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     })
     private _curves:ActivityCurve[];
 
-    constructor(protected serviceUtils:NpnServiceUtils,protected datePipe: DatePipe) {
+    constructor(
+        protected serviceUtils:NpnServiceUtils,
+        protected datePipe: DatePipe,
+        protected speciesService:SpeciesService
+    ) {
         super(serviceUtils);
         this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
             let c = new ActivityCurve();
@@ -92,17 +96,11 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
                     input.startDate = `${yearRange[0]}-01-01`;
                     input.endDate = `${yearRange[1]}-12-31`;
                 }
-                input.species = this.validCurves
-                    // TODO POP is currently just working for curves selectin a specific species
-                    .filter((c:any) => !!c.species.species_id)
-                    .map((c:any) => typeof(c.species.species_id) === 'number' ? c.species.species_id : parseInt(c.species.species_id))
-                    .reduce((set,id) => {
-                        if(set.indexOf(id) === -1) {
-                            set.push(id);
-                        }
-                        return set;
-                    },[]);
-                return input;
+                return this.speciesService.getSpeciesIds(this.validCurves)
+                    .then(ids => {
+                        input.species = ids;
+                        return input;
+                    });
             });
     }
 

@@ -84,11 +84,11 @@ export class NpnServiceUtils {
         return data;
     }
 
-    public post(url:string,body:string):Promise<any> {
-        return this.http.post(url,body,{headers: {'Content-Type':'application/x-www-form-urlencoded'}}).toPromise();
+    public post<T = any>(url:string,body:string):Promise<T> {
+        return <Promise<T>>this.http.post(url,body,{headers: {'Content-Type':'application/x-www-form-urlencoded'}}).toPromise();
     }
 
-    public cachedPost(url:string,body:string):Promise<any> {
+    public cachedPost<T = any>(url:string,body:string):Promise<T> {
         const cacheKey = {
             u: url,
             params: body
@@ -97,7 +97,7 @@ export class NpnServiceUtils {
         if(data) {
             return Promise.resolve(data);
         }
-        return this.post(url,body)
+        return this.post<T>(url,body)
             .then(response => {
                 this.cache.set(cacheKey,response);
                 return response;

@@ -1,7 +1,6 @@
 import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty, POPInput, BASE_POP_INPUT } from '../vis-selection';
-import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
+import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 import { HttpParams } from '@angular/common/http';
-import { Species, Phenophase, APPLICATION_SETTINGS } from '../../common';
 import * as d3 from 'd3';
 
 const KEYS_TO_NORMALIZE  = {
@@ -141,35 +140,31 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         });
     }
 
-    postProcessData(data:any[]):any[] {
-        let colorKey = (d) => { return `${d.species_id}:${d.phenophase_id}`},
-            colorMap = this.validPlots.reduce((map,p) => {
-                map[`${p.species.species_id}:${p.phenophase.phenophase_id}`] = p.color;
-                return map;
-            },{}),
-            startYear = this.start,
-            minDoy = this.minDoy,
-            maxDoy = this.maxDoy,
-            result = data.filter((d,i) => {
-                const doy = this.getDoy(d);
-                if(doy < minDoy || doy > maxDoy) {
-                    return false;
-                }
-                d.color = colorMap[colorKey(d)];
+    postProcessData(data:SiteOrSummaryPlotData[]):any[] {
+        const {start,minDoy,maxDoy} = this;
+        return data.reduce((result,plotData) => {
+                const filtered = plotData.data.filter(d => {
+                        const doy = this.getDoy(d);
+                        return doy >= minDoy && doy <= maxDoy;
+                    })
+                    .map(d => {
+                        d.color = plotData.plot.color;
+                        d.fyy = this.getFirstYesYear(d);
+                        for(let summaryKey in KEYS_TO_NORMALIZE) {
+                            let siteKey = KEYS_TO_NORMALIZE[summaryKey];
+                            if(typeof(d[summaryKey]) === 'undefined') {
+                                d[summaryKey] = d[siteKey];
+                            }
+                        }
+                        // this is the day # that will get plotted 1 being the first day of the start_year
+                        // 366 being the first day of start_year+1, etc.
+                        d.day_in_range = ((d.fyy-start)*365)+this.getDoy(d);
+                            return d;
+                        })
+                return result.concat(filtered);
+            },[]).map((d,i) => {
                 d.id = i;
-                d.fyy = this.getFirstYesYear(d);
-                for(let summaryKey in KEYS_TO_NORMALIZE) {
-                    let siteKey = KEYS_TO_NORMALIZE[summaryKey];
-                    if(typeof(d[summaryKey]) === 'undefined') {
-                        d[summaryKey] = d[siteKey];
-                    }
-                }
-                // this is the day # that will get plotted 1 being the first day of the start_year
-                // 366 being the first day of start_year+1, etc.
-                d.day_in_range = ((d.fyy-startYear)*365)+doy;
-                return true;
+                return d;
             });
-        this.working = false;
-        return result;
     }
 }

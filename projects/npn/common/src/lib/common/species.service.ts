@@ -35,6 +35,43 @@ export interface SpeciesPlot {
     year?: number;
 }
 
+export interface SpeciesPlotKeys {
+    speciesIdKey: string;
+    phenophaseIdKey: string;
+}
+
+/**
+ * @param plot The plot
+ * @return {SpeciesPlotKeys} The names of the id keys associated with data records.
+ */
+export function getSpeciesPlotKeys(plot:SpeciesPlot):SpeciesPlotKeys {
+    let speciesIdKey;
+    let phenophaseIdKey;
+    switch(plot.speciesRank||TaxonomicSpeciesRank.SPECIES) {
+        case TaxonomicSpeciesRank.SPECIES:
+            speciesIdKey = 'species_id';
+            break;
+        case TaxonomicSpeciesRank.CLASS:
+            speciesIdKey = 'class_id';
+            break;
+        case TaxonomicSpeciesRank.ORDER:
+            speciesIdKey = 'order_id';
+            break;
+        case TaxonomicSpeciesRank.FAMILY:
+            speciesIdKey = 'family_id';
+            break;           
+    }
+    switch(plot.phenophaseRank||TaxonomicPhenophaseRank.PHENOPHASE) {
+        case TaxonomicPhenophaseRank.PHENOPHASE:
+            phenophaseIdKey = 'phenophase_id';
+            break;
+        case TaxonomicPhenophaseRank.CLASS:
+            phenophaseIdKey = 'pheno_class_id';
+            break;
+    }
+    return {speciesIdKey,phenophaseIdKey};
+}
+
 function mapByNumericId(list,key) {
     return list.reduce((map,o) => {
             if(typeof(o[key]) === 'number') {

@@ -22,7 +22,7 @@ import { MapSelection } from './map-selection';
         <div class="record-info" *ngFor="let r of marker.records">
             <h4>{{r | speciesTitle}}, {{r.phenophase_description}}, {{r.mean_first_yes_year}}
                 <svg class="icon" viewBox="0 0 22 22">
-                    <path [attr.fill]="iconFill(r)" [attr.d]="svgs[r.species_id]" stroke='#000'></path>
+                    <path [attr.fill]="iconFill(r)" [attr.d]="svgs[r.plotIndex]" stroke='#000'></path>
                 </svg></h4>
             <ul>
             <li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} ({{selection.legend.formatPointData(r.mean_first_yes_doy)}})<span *ngIf="r.sd_first_yes_in_days > 0"> [Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li>
@@ -80,7 +80,7 @@ export class MapVisualizationMarkerIw {
 
     station:Station;
     data:GriddedPointData;
-    svgs:any;
+    svgs:any = MAP_VIS_SVG_PATHS;
 
     constructor(
         private stationService:StationService
@@ -92,12 +92,8 @@ export class MapVisualizationMarkerIw {
             this.data = null;
             if(this.marker) {
                 this.marker.records.forEach(r => {
-                    console.log('POINT DATA',this.selection.legend.getPointData(r.mean_first_yes_doy));
-                })
-                this.svgs = this.selection.validPlots.reduce((map,plot,i) => {
-                        map[plot.species.species_id] = MAP_VIS_SVG_PATHS[i];
-                        return map;
-                    },{});
+                    console.log('POINT DATA',this.selection.legend.getPointData(r.mean_first_yes_doy),r);
+                });
                 const {legend} = this.selection;
                 Promise.all([
                     this.stationService.getStation(this.marker.site_id),

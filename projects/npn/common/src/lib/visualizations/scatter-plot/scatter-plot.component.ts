@@ -2,7 +2,7 @@ import { Component, Input, ElementRef } from '@angular/core';
 
 import { ObservableMedia } from "@angular/flex-layout";
 
-import { SpeciesTitlePipe } from '../../common';
+import { TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys } from '../../common';
 import { VisualizationMargins } from '../visualization-base.component';
 import { SvgVisualizationBaseComponent, DEFAULT_MARGINS } from '../svg-visualization-base.component';
 
@@ -12,6 +12,7 @@ import { Axis, axisBottom, axisLeft } from 'd3-axis';
 import { Selection } from 'd3-selection';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
+import { SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 
 @Component({
   selector: 'scatter-plot',
@@ -42,9 +43,9 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
     // similar to _|angular.extend
     margins: VisualizationMargins = {...DEFAULT_MARGINS, ...{top: 80,left: 60}};
 
-    private data:any[];
+    private data:SiteOrSummaryPlotData[];
 
-    constructor(protected rootElement: ElementRef, protected media:ObservableMedia, protected speciesTitle: SpeciesTitlePipe) {
+    constructor(protected rootElement: ElementRef, protected media:ObservableMedia, protected speciesTitle: TaxonomicSpeciesTitlePipe) {
         super(rootElement,media);
     }
 
@@ -133,7 +134,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
         this.chart.selectAll('g .y.axis').call(this.yAxis);
 
         this.chart.selectAll('.circle').remove();
-        let circles = this.chart.selectAll('.circle').data(nonNullData,d => d.id)
+        let circles = this.chart.selectAll('.circle').data(nonNullData,(d:any) => d.id)
             .enter().append('circle')
             .attr('class', 'circle')
             .style('stroke','#333')
@@ -159,8 +160,9 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
             selection.validPlots.forEach(plot => {
                 let series = nonNullData.filter(d => d.color === plot.color);
                 if(series.length) {
+                    const keys = getSpeciesPlotKeys(plot);
                     regressionLines.push(plot.regressionLine = new RegressionLine(
-                        `${plot.species.species_id}.${plot.phenophase.phenophase_id}`,
+                        `${plot.species[keys.speciesIdKey]}.${plot.phenophase[keys.phenophaseIdKey]}`,
                         plot.color,
                         series,
                         getX, getY
@@ -168,7 +170,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                 }
             });
             let regression = this.chart.selectAll('.regression')
-                .data(regressionLines,d => d.id)
+                .data(regressionLines,(d:any) => d.id)
                 .enter().append('line')
                 .attr('class','regression');
                 regression
@@ -192,8 +194,9 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
         this.selection.validPlots.forEach((plot,i) => {
             let row = legend.append('g')
                 .attr('class','legend-item')
-                .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')'),
-                title = this.speciesTitle.transform(plot.species)+'/'+plot.phenophase.phenophase_name;
+                .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')');
+            const pp:any = plot.phenophase;
+            let title = this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
             if(plot.regressionLine && typeof(plot.regressionLine.r2) === 'number') {
                 // NOTE: the baseline-shift doesn't appear to work on Firefox
                 if(this.isIE) {

@@ -10,7 +10,7 @@ import {
     WmsMapLayer,
     SupportsOpacity
 } from '../../gridded';
-import { SiteOrSummaryVisSelection } from '../site-or-summary-vis-selection';
+import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 import { NpnServiceUtils } from '@npn/common/common';
 import { HttpParams } from '@angular/common/http';
 
@@ -232,7 +232,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         return Promise.resolve();
     }
 
-    getData():Promise<any[]> {
+    getData():Promise<SiteOrSummaryPlotData[]> {
         this.working = true;
         return (this.validForData()
             ? super.getData()

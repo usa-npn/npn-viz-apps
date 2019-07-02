@@ -1,15 +1,19 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils, Species, Phenophase } from '../common';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
 const DEFAULT_NUM_DAYS_Q_FILTER = 30;
 
-export interface SiteOrSummaryPlot {
-    species?: Species;
-    phenophase?: Phenophase;
+export interface SiteOrSummaryPlot extends SpeciesPlot {
     [x: string]: any;
 }
+
+export interface SiteOrSummaryPlotData {
+    plot: SiteOrSummaryPlot;
+    data: any[];
+}
+
 
 export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection {
     @selectionProperty()
@@ -40,10 +44,6 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         if(this.numDaysQualityFilter) {
             params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
         }
-        this.validPlots.forEach((p,i) => {
-            params = params.set(`species_id[${i}]`,`${p.species.species_id}`)
-                            .set(`phenophase_id[${i}]`,`${p.phenophase.phenophase_id}`);
-        });
         return super.toURLSearchParams(params);
     }
 
@@ -53,7 +53,10 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 if(this.numDaysQualityFilter) {
                     input.dataPrecision = this.numDaysQualityFilter;
                 }
-                input.species = this.validPlots.map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id));
+                /* TODO POP
+                input.species =
+                    this.validPlots.map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id));
+                */
                 // POP supports phenophases but seems to present a higher-level list of possibilities
                 //input.phenophases = this.validPlots.map(p => typeof(p.phenophase.phenophase_id) === 'number' ? p.phenophase.phenophase_id : parseInt(p.phenophase.phenophase_id));
                 return input;
@@ -87,10 +90,22 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
      * extra recrods can be returned and need to be discarded.  This function
      * returns a function that can be passed to Array.filter to discard those records
      * from server responses.
+     * 
+     * Note: This should no longer ever prune out any unwanted records now that one request
+     * is being made per plot
      */
-    private filterUnwantedDataFunctor() {
-        const valid:string[] = this.validPlots.map(p => `${p.species.species_id}:${p.phenophase.phenophase_id}`);
-        return d => valid.indexOf(`${d.species_id}:${d.phenophase_id}`) !== -1;
+    private filterUnwantedDataFunctor(plot:SpeciesPlot) {
+        const keys = getSpeciesPlotKeys(plot);
+        const speciesId = plot.species[keys.speciesIdKey];
+        const phenoId = plot.phenophase[keys.phenophaseIdKey];
+        return d => {
+            const keep = speciesId == d[keys.speciesIdKey] &&
+                         phenoId == d[keys.phenophaseIdKey];
+            if(!keep) {
+                console.warn('filtering unwanted response record',d);
+            }
+            return keep;
+        };
     }
 
     private filterSuspectSummaryData(d) {
@@ -117,14 +132,19 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         return keep;
     }
 
-    getData(): Promise<any[]> {
+    getData():Promise<SiteOrSummaryPlotData []> {
+        // work around typeScript Promise.all issue
+        return this._getData();
+    }
+
+    private _getData(): Promise<any> {
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
         const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
         const filterLqd = this.individualPhenometrics
-            ? (data) => { // summary
-                let minusUnwanted = data.filter(this.filterUnwantedDataFunctor()),
+            ? (data,plot,plotIndex) => { // summary
+                let minusUnwanted = data.filter(this.filterUnwantedDataFunctor(plot)),
                     minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
                     filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
                     individuals = filtered.reduce(function (map, d) {
@@ -134,9 +154,9 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                         return map;
                     }, {}),
                     uniqueIndividuals = [];
-                console.debug(`filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
-                console.debug(`filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
-                console.debug(`filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
+                console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
                 for (let key in individuals) {
                     let arr = individuals[key];
                     if (arr.length > 1) {
@@ -150,30 +170,41 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 }
                 console.debug('filtered out ' + (filtered.length - uniqueIndividuals.length) + '/' + filtered.length + ' individual records (preferring lowest first_yes_doy)');
 
+                /*
                 this.filterDisclaimer = (minusSuspect.length !== filtered.length) ? FILTER_LQD_DISCLAIMER : undefined;
+                */
                 return filtered;
             }
-            : (data) => { // site
-                let minusUnwanted =  data.filter(this.filterUnwantedDataFunctor()),
+            : (data,plot,plotIndex) => { // site
+                let minusUnwanted =  data.filter(this.filterUnwantedDataFunctor(plot)),
                     minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
                     filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
-                console.debug(`filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
-                console.debug(`filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
-                console.debug(`filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
-                this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?
-                    FILTER_LQD_DISCLAIMER : undefined;
+                console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
+                /*this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?
+                    FILTER_LQD_DISCLAIMER : undefined;*/
                 return filtered;
             };
         this.working = true;
         return this.toURLSearchParams()
-            .then(params => this.serviceUtils.cachedPost(url,params.toString())
-            .then((arr:any[]) => {
+            .then(baseParams => Promise.all(
+                    this.validPlots.map((plot,plotIndex) => {
+                        const keys = getSpeciesPlotKeys(plot);
+                        const params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                            .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
+                        return this.serviceUtils.cachedPost(url,params.toString())
+                            .then(data => filterLqd(data,plot,plotIndex))
+                            .then(data => ({plot,data}))
+                    })
+            ))
+            .then((results) => {
                 this.working = false;
-                return filterLqd(arr);
+                return results;
             })
             .catch(err => {
                 this.working = false;
                 this.handleError(err);
-            }));
+            });
     }
 }

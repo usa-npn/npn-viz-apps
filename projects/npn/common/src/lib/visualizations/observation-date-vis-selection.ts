@@ -1,12 +1,9 @@
 import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
-import { Species, Phenophase, SpeciesTitlePipe, NpnServiceUtils } from '../common';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank } from '../common';
 
-export interface ObservationDatePlot {
-    color?: String;
-    species?: Species;
-    phenophase?: Phenophase;
+export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
 }
 
@@ -36,7 +33,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
 
     constructor(
         protected serviceUtils:NpnServiceUtils,
-        protected speciesTitle: SpeciesTitlePipe
+        protected speciesTitle: TaxonomicSpeciesTitlePipe
     ) {
         super(serviceUtils);
     }
@@ -62,6 +59,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
         return super.toPOPInput(input)
             .then(input => {
+                /* TODO POP
                 input.species = this.validPlots
                     .map(p => typeof(p.species.species_id) === 'number' ? p.species.species_id : parseInt(p.species.species_id))
                     .reduce((set,id) => {
@@ -70,6 +68,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                         }
                         return set;
                     },[]);
+                */
                 const yearRange = this.years.reduce((range,y) => {
                         if(!range) {
                             return [y,y];
@@ -119,7 +118,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                     }
                     addDoys(pPhases.years[year].positive,plot.color);
                 }
-                response.labels.splice(0, 0, this.speciesTitle.transform(plot.species) + '/' + plot.phenophase.phenophase_name + ' (' + year + ')');
+                const pp = plot.phenophase as any;
+                response.labels.splice(0, 0, this.speciesTitle.transform(plot.species,plot.speciesRank) + '/' + (pp.phenophase_name||pp.pheno_class_name) + ' (' + year + ')');
                 y--;
             })
         });
@@ -137,8 +137,15 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             // one request per valid plot
             .then(params => Promise.all(
                     this.validPlots.map(plot => {
-                        const plotParams = params.set('species_id[0]',`${plot.species.species_id}`)
-                            .set('phenophase_id[0]',`${plot.phenophase.phenophase_id}`);
+                        const keys = getSpeciesPlotKeys(plot);
+                        const plotParams = params.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                            .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
+                        if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+                            params = params.set('taxonomy_aggregate','1');
+                        }
+                        if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+                            params = params.set('pheno_class_aggregate','1');
+                        }
                         return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString());
                     })
                 )

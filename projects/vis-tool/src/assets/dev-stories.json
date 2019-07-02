@@ -2,7 +2,7 @@
     "backgroundImage": "assets/default-stories-bg.jpg",
     "stories": [
         {
-            "title": "Maple bud out 2017 vs 2018",
+            "title": "Maple bud out 2017 vs 2018 (Scatter)",
             "tagline": "Will change species title format to scientific...",
             "description": "\n        <p>Red and sugar maples in latin</p>\n        <p><img src='https://cf.ltkcdn.net/garden/images/std/189484-200x266-Fall-Sugar-Maple.jpg' alt='maple' /></p>\n        <p>That there is a picture of a maple tree...</p>\n        ",
             "settings": {
@@ -149,71 +149,184 @@
                 "networkIds": [],
                 "stationIds": [],
                 "interpolate": 2,
+                "dataPoints": true,
                 "frequency": {
-                    "value": 7,
-                    "label": "Weekly"
+                  "value": 7,
+                  "label": "Weekly"
                 },
                 "curves": [
-                    {
-                        "id": 0,
-                        "color": "#1f77b4",
-                        "species": {
-                            "common_name": "red maple",
-                            "genus": "Acer",
-                            "species": "rubrum",
-                            "kingdom": "Plantae",
-                            "species_id": 3,
-                            "number_observations": 664416
+                  {
+                    "id": 0,
+                    "color": "#1f77b4",
+                    "species": {
+                      "species_id": 3,
+                      "common_name": "red maple",
+                      "genus": "Acer",
+                      "species": "rubrum",
+                      "kingdom": "Plantae",
+                      "itis_taxonomic_sn": 28728,
+                      "functional_type": "Deciduous broadleaf",
+                      "class_id": 15,
+                      "class_common_name": "Flowering Plants",
+                      "class_name": "Magnoliopsida",
+                      "order_id": 97,
+                      "order_common_name": "",
+                      "order_name": "Sapindales",
+                      "family_id": 329,
+                      "family_name": "Sapindaceae",
+                      "family_common_name": "Soapberry Family",
+                      "species_type": [
+                        {
+                          "Species_Type_ID": 1,
+                          "Species_Type": "Ornamental",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
                         },
-                        "phenophase": {
-                            "phenophase_id": 371,
-                            "phenophase_name": "Breaking leaf buds",
-                            "phenophase_category": "Leaves",
-                            "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
-                            "phenophase_additional_definition": "",
-                            "seq_num": 10,
-                            "color": "Green1",
-                            "abundance_category": -1,
-                            "raw_abundance": false
+                        {
+                          "Species_Type_ID": 2,
+                          "Species_Type": "Deciduous",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": "http://www.usanpn.org/files/shared/images/ss12white_oak_deciduous_final.png"
                         },
-                        "metric": {
-                            "id": "num_yes_records",
-                            "sampleSize": "status_records_sample_size",
-                            "label": "Total Yes Records"
+                        {
+                          "Species_Type_ID": 5,
+                          "Species_Type": "Allergen",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
                         },
-                        "year": 2017
-                    },
-                    {
-                        "id": 1,
-                        "color": "#ff7f0e",
-                        "year": 2017,
-                        "species": {
-                            "common_name": "sugar maple",
-                            "genus": "Acer",
-                            "species": "saccharum",
-                            "kingdom": "Plantae",
-                            "species_id": 61,
-                            "number_observations": 256064
+                        {
+                          "Species_Type_ID": 26,
+                          "Species_Type": "Focal",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": null,
+                          "Image_Path": null
                         },
-                        "phenophase": {
-                            "phenophase_id": 371,
-                            "phenophase_name": "Breaking leaf buds",
-                            "phenophase_category": "Leaves",
-                            "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
-                            "phenophase_additional_definition": "",
-                            "seq_num": 10,
-                            "color": "Green1",
-                            "abundance_category": -1,
-                            "raw_abundance": false
+                        {
+                          "Species_Type_ID": 29,
+                          "Species_Type": "Calibration",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
                         },
-                        "metric": {
-                            "id": "num_yes_records",
-                            "sampleSize": "status_records_sample_size",
-                            "label": "Total Yes Records"
+                        {
+                          "Species_Type_ID": 31,
+                          "Species_Type": "Green Wave Campaign",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
                         }
-                    }
+                      ]
+                    },
+                    "phenophase": {
+                      "phenophase_id": 371,
+                      "phenophase_name": "Breaking leaf buds",
+                      "phenophase_category": "Leaves",
+                      "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+                      "phenophase_additional_definition": "",
+                      "seq_num": 10,
+                      "color": "Green1",
+                      "pheno_class_id": 1,
+                      "pheno_class_name": "Initial shoot or leaf growth",
+                      "abundance_category": -1,
+                      "raw_abundance": false
+                    },
+                    "metric": {
+                      "id": "num_yes_records",
+                      "sampleSize": "status_records_sample_size",
+                      "label": "Total Yes Records"
+                    },
+                    "year": 2017,
+                    "speciesRank": "species",
+                    "phenophaseRank": "phenophase"
+                  },
+                  {
+                    "id": 1,
+                    "color": "#ff7f0e",
+                    "year": 2017,
+                    "species": {
+                      "species_id": 61,
+                      "common_name": "sugar maple",
+                      "genus": "Acer",
+                      "species": "saccharum",
+                      "kingdom": "Plantae",
+                      "itis_taxonomic_sn": 28731,
+                      "functional_type": "Deciduous broadleaf",
+                      "class_id": 15,
+                      "class_common_name": "Flowering Plants",
+                      "class_name": "Magnoliopsida",
+                      "order_id": 97,
+                      "order_common_name": "",
+                      "order_name": "Sapindales",
+                      "family_id": 329,
+                      "family_name": "Sapindaceae",
+                      "family_common_name": "Soapberry Family",
+                      "species_type": [
+                        {
+                          "Species_Type_ID": 1,
+                          "Species_Type": "Ornamental",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
+                        },
+                        {
+                          "Species_Type_ID": 2,
+                          "Species_Type": "Deciduous",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": "http://www.usanpn.org/files/shared/images/ss12white_oak_deciduous_final.png"
+                        },
+                        {
+                          "Species_Type_ID": 5,
+                          "Species_Type": "Allergen",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
+                        },
+                        {
+                          "Species_Type_ID": 31,
+                          "Species_Type": "Green Wave Campaign",
+                          "Comment": null,
+                          "User_Display": 1,
+                          "Kingdom": "Plantae",
+                          "Image_Path": null
+                        }
+                      ]
+                    },
+                    "phenophase": {
+                      "phenophase_id": 371,
+                      "phenophase_name": "Breaking leaf buds",
+                      "phenophase_category": "Leaves",
+                      "phenophase_definition": "One or more breaking leaf buds are visible on the plant.  A leaf bud is considered 'breaking' once a green leaf tip is visible at the end of the bud, but before the first leaf from the bud has unfolded to expose the leaf stalk (petiole) or leaf base.",
+                      "phenophase_additional_definition": "",
+                      "seq_num": 10,
+                      "color": "Green1",
+                      "pheno_class_id": 1,
+                      "pheno_class_name": "Initial shoot or leaf growth",
+                      "abundance_category": -1,
+                      "raw_abundance": false
+                    },
+                    "metric": {
+                      "id": "num_yes_records",
+                      "sampleSize": "status_records_sample_size",
+                      "label": "Total Yes Records"
+                    },
+                    "speciesRank": "species",
+                    "phenophaseRank": "phenophase"
+                  }
                 ]
-            }
+              }
         },
         {
             "title": "AGDD Where you are for May 8 2019",

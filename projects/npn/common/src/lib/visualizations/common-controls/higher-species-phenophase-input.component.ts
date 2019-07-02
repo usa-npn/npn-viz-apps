@@ -8,6 +8,7 @@ import { TaxonomicSpeciesTitlePipe } from '@npn/common/common/species-title.pipe
 import { HttpParams } from '@angular/common/http';
 import { TaxonomicPhenophaseRank } from '@npn/common/common/phenophase';
 import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component';
+import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
 /**
  * It would be nice if interfaces were actually meaningful at runtime.
@@ -34,6 +35,7 @@ import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component
             </mat-option>
         </mat-autocomplete>
         <mat-progress-bar *ngIf="fetchingSpeciesList" mode="query"></mat-progress-bar>
+        <mat-hint *ngIf="showSpeciesHint" align="end"><fa-icon [icon]="speciesHintIcon" [matTooltip]="speciesHint"></fa-icon></mat-hint>
     </mat-form-field>
     <mat-form-field class="pheno-rank-input">
         <mat-select [placeholder]="phenoTaxRankPlaceholder" [formControl]="phenophaseRank">
@@ -120,6 +122,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
 
     private group:FormGroup;
 
+    speciesHintIcon = faInfoCircle;
 
     constructor(
         private speciesService:SpeciesService,
@@ -157,6 +160,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
             map(input => {
                 const [rank,info] = input;
                 this.speciesTaxInfo = info;
+console.log('speciesTaxInfo',info);
                 switch(rank) {
                     case TaxonomicSpeciesRank.SPECIES:
                         return info.species;
@@ -445,5 +449,21 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
         }
     }
 
+    get showSpeciesHint():boolean {
+        const rank = this.speciesRank.value;
+        const s = this.species.value;
+        return rank === TaxonomicSpeciesRank.SPECIES && !!s
+            && (typeof(s.class_common_name) === 'string' && typeof(s.class_name) === 'string')
+            && (typeof(s.order_common_name) === 'string' && typeof(s.order_name) === 'string')
+            && (typeof(s.family_common_name) === 'string' && typeof(s.family_name) === 'string');
+    }
+
+    get speciesHint():string {
+        const species = this.species.value;
+        const classDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.CLASS);
+        const orderDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.ORDER);
+        const familyDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.FAMILY);
+        return `Class: "${classDisplay}" Order: "${orderDisplay}" Family: "${familyDisplay}"`;
+    }
 
 }

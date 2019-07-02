@@ -10,7 +10,6 @@ import {
     faMapMarker,
     faChartNetwork,
     faCalendarAlt,
-    faInfoCircle,
     faClock
 } from '@fortawesome/pro-light-svg-icons';
 
@@ -99,14 +98,12 @@ export class VisSelectionStepComponent implements StepComponent {
         <button mat-raised-button (click)="selection.selected = v;" [color]="selection.selected === v ? 'accent' : null" [ngClass]="{selected: selection.selected === v}">
             <fa-icon [icon]="v.icon"></fa-icon> {{v.title}}
         </button>
-        <div class="info"><fa-icon [icon]="infoIcon"></fa-icon></div>
     </div>
     `
 })
 export class VisSelectionControlComponent extends MonitorsDestroy implements ControlComponent {
     title:string = 'Select visualization';
     selection:VisSelectionSelection;
-    infoIcon = faInfoCircle;
 
     definitions:VisDefinition[] = VIS_DEFINITIONS;
 

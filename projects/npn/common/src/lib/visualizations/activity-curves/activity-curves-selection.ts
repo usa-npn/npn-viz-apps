@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass, getSpeciesPlotKeys } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -199,42 +199,14 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
                         let curveParams = baseParams
                             .set('start_date',`${c.year}-01-01`)
                             .set('end_date',this.endDate(c.year));
-                        const rank = c.speciesRank||TaxonomicSpeciesRank.SPECIES;
-                        let o;
-                        switch(rank) {
-                            case TaxonomicSpeciesRank.SPECIES:
-                                o = c.species as Species;
-                                curveParams = curveParams.set('species_id[0]',`${o.species_id}`);
-                                    //.set('phenophase_id[0]',`${c.phenophase.phenophase_id}`);
-                                break;
-                            case TaxonomicSpeciesRank.CLASS:
-                                o = c.species as TaxonomicClass;
-                                curveParams = curveParams.set('class_id[0]',`${o.class_id}`)
-                                    .set('taxonomy_aggregate','1');
-                                break;
-                            case TaxonomicSpeciesRank.ORDER:
-                                o = c.species as TaxonomicOrder;
-                                curveParams = curveParams.set('order_id[0]',`${o.order_id}`)
-                                    .set('taxonomy_aggregate','1');
-                                break;
-                            case TaxonomicSpeciesRank.FAMILY:
-                                o = c.species as TaxonomicFamily;
-                                curveParams = curveParams.set('family_id[0]',`${o.family_id}`)
-                                    .set('taxonomy_aggregate','1');
-                                break;
+                        const keys = getSpeciesPlotKeys(c);
+                        curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${c.species[keys.speciesIdKey]}`);
+                        if((c.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+                            curveParams = curveParams.set('taxonomy_aggregate','1');
                         }
-                        const pRank = c.phenophaseRank||TaxonomicPhenophaseRank.PHENOPHASE;
-                        let op;
-                        switch(pRank) {
-                            case TaxonomicPhenophaseRank.PHENOPHASE:
-                                op = c.phenophase as Phenophase;
-                                curveParams = curveParams.set('phenophase_id[0]',`${op.phenophase_id}`);
-                                break;
-                            case TaxonomicPhenophaseRank.CLASS:
-                                op = c.phenophase as PhenophaseClass;
-                                curveParams = curveParams.set('pheno_class_id[0]',`${op.pheno_class_id}`)
-                                    .set('pheno_class_aggregate','1');
-                                break;
+                        curveParams = curveParams.set(`${keys.phenophaseIdKey}[0]`,`${c.phenophase[keys.phenophaseIdKey]}`);
+                        if(c.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+                            curveParams = curveParams.set('pheno_class_aggregate','1');
                         }
                         return this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json'),curveParams.toString())
                             .then(data => c.data(data));

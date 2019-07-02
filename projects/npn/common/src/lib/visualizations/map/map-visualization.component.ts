@@ -130,6 +130,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                         const filtered = plotData.data
                             .filter(d => d.mean_first_yes_doy !== -9999) // throw out invalid means
                             .map(d => {
+                                d.plot = plotData.plot;
                                 d.plotIndex = plotIndex;
                                 return d;
                             });

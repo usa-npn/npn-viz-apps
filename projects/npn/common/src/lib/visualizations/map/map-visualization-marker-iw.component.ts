@@ -20,7 +20,7 @@ import { MapSelection } from './map-selection';
             </ul>
         </div>
         <div class="record-info" *ngFor="let r of marker.records">
-            <h4>{{r | speciesTitle}}, {{r.phenophase_description}}, {{r.mean_first_yes_year}}
+            <h4>{{r | taxonomicSpeciesTitle:r.plot.speciesRank}}, {{r.phenophase_name||r.pheno_class_name||r.phenophase_description}}, {{r.mean_first_yes_year}}
                 <svg class="icon" viewBox="0 0 22 22">
                     <path [attr.fill]="iconFill(r)" [attr.d]="svgs[r.plotIndex]" stroke='#000'></path>
                 </svg></h4>

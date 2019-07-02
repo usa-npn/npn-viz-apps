@@ -10,7 +10,7 @@ import { faCrow } from '@fortawesome/pro-light-svg-icons';
         <svg class="icon" viewBox="0 0 22 22">
             <path [attr.d]="iconPaths[i]"></path>
         </svg>
-        <div class="title">{{plot.species | speciesTitle}}<span *ngIf="plot.phenophase?.phenophase_name">/{{plot.phenophase.phenophase_name}}</span></div>
+        <div class="title">{{plot.species | taxonomicSpeciesTitle:plot.speciesRank}}<span *ngIf="plot.phenophase">/{{plot.phenophase.phenophase_name||plot.phenophase.pheno_class_name}}</span></div>
     </div>
     `,
     styles:[`
@@ -50,32 +50,53 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
-        <species-phenophase-input
-            [(species)]="spi.species" [(phenophase)]="spi.phenophase"
-            [selection]="selection"
-            [gatherColor]="false"
-            (onSpeciesChange)="selection.update()"
-            (onPhenophaseChange)="selection.update()"></species-phenophase-input>
-        <div class="buttons">
-            <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-            <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
+    <mat-expansion-panel  *ngFor="let spi of selection.plots; index as idx"  expanded="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+            <svg class="icon" viewBox="0 0 22 22"><path [attr.d]="iconPaths[idx]"></path></svg>
+            Plot #{{idx+1}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="phenophase-input-wrapper">
+            <higher-species-phenophase-input
+                [selection]="selection"
+                [plot]="spi"
+                (plotChange)="plotChange($event)">
+            </higher-species-phenophase-input>
+            <div class="action-holder">
+                <button *ngIf="idx > 0 || selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
+                
+            </div>
         </div>
+    </mat-expansion-panel>
+    <div class="action-holder">
+        <button mat-button class="add-plot" [disabled]="selection.plots.length === 3 || !plotsValid()" (click)="addPlot()">Add</button>
     </div>
+    
     `,
     styles:[`
     .phenophase-input-wrapper,
-    species-phenophase-input {
+    higher-species-phenophase-input {
         display: flex;
         flex-direction: column;
         align-items: stretch;
     }
-    species-phenophase-input>* {
+    higher-species-phenophase-input>* {
         width: inherit !important;
     }
     .buttons {
         display:flex;
         justify-content: flex-end;
+    }
+    .action-holder {
+        margin: 10px 0px;
+        text-align: right;
+    }
+    .icon {
+        width: 22px;
+        height: 22px;
+        fill: #68bd46;
+        margin-right: 10px;
     }
     `],
     encapsulation: ViewEncapsulation.None
@@ -83,6 +104,7 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
 export class MapSpeciesPhenoControlComponent extends BaseControlComponent {
     title:string = 'Select species phenophase';
     selection:MapSelection;
+    iconPaths = MAP_VIS_SVG_PATHS;
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
@@ -103,6 +125,11 @@ export class MapSpeciesPhenoControlComponent extends BaseControlComponent {
 
     plotsValid() {
         return this.selection.plots.length === this.selection.validPlots.length;
+    }
+
+    plotChange($event) {
+        console.log('plotChange',$event);
+        this.selection.update();
     }
 }
 

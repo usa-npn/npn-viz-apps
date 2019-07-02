@@ -15,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
         [(plot)]="curve"
         [disabled]="disabled"
         [required]="required"
-        (onPlotChange)="onSpeciesChange.next($event)">
+        (plotChange)="onSpeciesChange.next($event)">
     </higher-species-phenophase-input>
 
     <mat-form-field class="year-input">

@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys } from '../common';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
 const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
@@ -142,6 +142,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             return Promise.reject(this.INVALID_SELECTION);
         }
         const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
+        // TODO see about consolidating this filtering logic
         const filterLqd = this.individualPhenometrics
             ? (data,plot,plotIndex) => { // summary
                 let minusUnwanted = data.filter(this.filterUnwantedDataFunctor(plot)),
@@ -191,8 +192,14 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             .then(baseParams => Promise.all(
                     this.validPlots.map((plot,plotIndex) => {
                         const keys = getSpeciesPlotKeys(plot);
-                        const params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                        let params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
                             .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
+                        if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+                            params = params.set('taxonomy_aggregate','1');
+                        }
+                        if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+                            params = params.set('pheno_class_aggregate','1');
+                        }
                         return this.serviceUtils.cachedPost(url,params.toString())
                             .then(data => filterLqd(data,plot,plotIndex))
                             .then(data => ({plot,data}))

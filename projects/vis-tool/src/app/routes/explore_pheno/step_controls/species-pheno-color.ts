@@ -86,7 +86,7 @@ export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
                 <button *ngIf="idx > 0 || selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
             </div>
         </div>
-    <mat-expansion-panel>
+    </mat-expansion-panel>
     <div class="action-holder">
         <button mat-button class="add-plot" [disabled]="selection.plots.length === 3 || !plotsValid()" (click)="addPlot()">Add</button>
     </div>
@@ -142,13 +142,13 @@ export class SpeciesPhenoColorControlComponent extends BaseControlComponent {
     }
 }
 
-export const StartEndLegacySpeciesPhenoColorStep:VisConfigStep = {
+export const StartEndSpeciesPhenoColorStep:VisConfigStep = {
     icon: faCrow,
     stepComponent: StartEndSpeciesPhenoColorStepComponent,
     controlComponent: SpeciesPhenoColorControlComponent
 };
 
-export const YearsLegacySpeciesPhenoColorStep:VisConfigStep = {
+export const YearsSpeciesPhenoColorStep:VisConfigStep = {
     icon: faCrow,
     stepComponent: YearsSpeciesPhenoColorStepComponent,
     controlComponent: SpeciesPhenoColorControlComponent

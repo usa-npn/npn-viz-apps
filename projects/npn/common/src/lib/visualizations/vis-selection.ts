@@ -417,6 +417,8 @@ export function isPolygonBoundarySelection(o:any):boolean {
  */
 export abstract class StationAwareVisSelection extends NetworkAwareVisSelection {
     @selectionProperty()
+    personId;
+    @selectionProperty()
     stationIds?: any[] = [];
     @selectionProperty()
     _boundaries:BoundarySelection[];
@@ -460,6 +462,7 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
+            .then(params => this.personId ? params.set('person_id',`${this.personId}`) : params)
             .then(params => Promise.all(this.getStationIdPromises())
                 .then(results => {
                     results

@@ -11,6 +11,7 @@ import { StepControlsModule } from './step_controls';
 import { ResetControlComponent } from './reset-control.component';
 import { ShareDescriptionComponent, SharedVisualizationDescriptionComponent } from './share-description.component';
 import { ExportControlComponent } from './export-control.component';
+import { PersonControlComponent } from './person-control.component';
 
 @NgModule({
     imports: [
@@ -25,7 +26,8 @@ import { ExportControlComponent } from './export-control.component';
         ExplorePhenoComponent,
         ShareDescriptionComponent,
         SharedVisualizationDescriptionComponent,
-        ExportControlComponent
+        ExportControlComponent,
+        PersonControlComponent
     ],
     exports: [
         ExplorePhenoComponent,

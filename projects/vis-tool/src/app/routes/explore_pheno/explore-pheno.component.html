@@ -22,6 +22,7 @@
                     </div>
                 </div>
             </div>
+            <person-info *ngIf="activeVis?.selection?.personId" [selection]="activeVis?.selection"></person-info>
             <reset-visualization *ngIf="activeVis" [selection]="activeVis?.selection" (reset)="reset()"></reset-visualization>
             <share-visualization *ngIf="activeVis" [selection]="activeVis?.selection"></share-visualization>
             <export-visualization *ngIf="activeVis?.selection?.$supportsPop && activeVis?.selection?.toPOPInput" [selection]="activeVis.selection"></export-visualization>

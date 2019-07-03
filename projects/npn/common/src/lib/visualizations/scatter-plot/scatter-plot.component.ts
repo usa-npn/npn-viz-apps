@@ -104,7 +104,6 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
         if(!this.data) {
             return;
         }
-        this.disclaimer = this.selection.filterDisclaimer;
         let processedData = this.selection.postProcessData(this.data),
             padding = 1,
             selection = this.selection,

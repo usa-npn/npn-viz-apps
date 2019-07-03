@@ -2,9 +2,6 @@ import { HttpParams } from '@angular/common/http';
 import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
-const FILTER_LQD_DISCLAIMER = 'For quality assurance purposes, only onset dates that are preceded by negative records are included in the visualization.';
-const DEFAULT_NUM_DAYS_Q_FILTER = 30;
-
 export interface SiteOrSummaryPlot extends SpeciesPlot {
     [x: string]: any;
 }
@@ -14,16 +11,11 @@ export interface SiteOrSummaryPlotData {
     data: any[];
 }
 
-
 export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection {
     @selectionProperty()
     individualPhenometrics: boolean = false;
     @selectionProperty()
-    filterDisclaimer: string;
-    @selectionProperty()
-    _filterLqdSummary: boolean = true;
-    @selectionProperty()
-    _numDaysQualityFilter:number = DEFAULT_NUM_DAYS_Q_FILTER;
+    _numDaysQualityFilter:number = 30;
     @selectionProperty({
         ser:d => {
             const {species,phenophase} = d;
@@ -44,7 +36,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        if(this.numDaysQualityFilter) {
+        if(this.numDaysQualityFilter && this.numDaysQualityFilter > 0) {
             params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
         }
         return super.toURLSearchParams(params);
@@ -68,14 +60,6 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         return this.plots.filter(p => !!p.species && !!p.phenophase);
     }
 
-    get filterLqdSummary():boolean {
-        return this._filterLqdSummary;
-    }
-    set filterLqdSummary(b:boolean) {
-        this._filterLqdSummary = b;
-        this.update();
-    }
-
     get numDaysQualityFilter():number {
         return this._numDaysQualityFilter;
     }
@@ -84,57 +68,8 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         this.update(); // param change
     }
 
-    /**
-     * The underlying services do not treat species/phenophase pairs as
-     * parallel arrays but as independent arrays.  This means when two species
-     * share a phenophase but if that phenophase is only requested for one of the two
-     * extra recrods can be returned and need to be discarded.  This function
-     * returns a function that can be passed to Array.filter to discard those records
-     * from server responses.
-     * 
-     * Note: This should no longer ever prune out any unwanted records now that one request
-     * is being made per plot
-     */
-    private filterUnwantedDataFunctor(plot:SpeciesPlot) {
-        const keys = getSpeciesPlotKeys(plot);
-        const speciesId = plot.species[keys.speciesIdKey];
-        const phenoId = plot.phenophase[keys.phenophaseIdKey];
-        return d => {
-            const keep = speciesId == d[keys.speciesIdKey] &&
-                         phenoId == d[keys.phenophaseIdKey];
-            if(!keep) {
-                console.warn('filtering unwanted response record',d);
-            }
-            return keep;
-        };
-    }
-
-    private filterSuspectSummaryData(d) {
-        var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
-        if (bad) {
-            console.warn('suspect station data', d);
-        }
-        return !bad;
-    }
-
-    private filterLqSummaryData(d) {
-        var keep = d.numdays_since_prior_no >= 0;
-        if (!keep) {
-            console.debug('filtering less precise data from summary output', d);
-        }
-        return keep;
-    }
-
-    private filterLqSiteData(d) {
-        var keep = d.mean_numdays_since_prior_no >= 0;
-        if (!keep) {
-            console.debug('filtering less precise data from site level output', d);
-        }
-        return keep;
-    }
-
     getData():Promise<SiteOrSummaryPlotData []> {
-        // work around typeScript Promise.all issue
+        // work around TypeScript Promise.all issue
         return this._getData();
     }
 
@@ -143,49 +78,35 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             return Promise.reject(this.INVALID_SELECTION);
         }
         const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
-        // TODO see about consolidating this filtering logic
-        const filterLqd = this.individualPhenometrics
-            ? (data,plot,plotIndex) => { // summary
-                let minusUnwanted = data.filter(this.filterUnwantedDataFunctor(plot)),
-                    minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
-                    filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSummaryData) : minusSuspect,
-                    individuals = filtered.reduce(function (map, d) {
+        const filterLqd = (data,plot,plotIndex) => { // site
+                const minusUnwanted =  data.filter(filterUnwantedDataFunctor(plot));
+                const minusSuspect = minusUnwanted.filter(filterSuspectSummaryData);
+                const filtered = minusSuspect.filter(this.individualPhenometrics ? filterLqSummaryData : filterLqSiteData);
+                console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
+                console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
+                if(this.individualPhenometrics) {
+                    const individuals = filtered.reduce(function (map, d) {
                         var key = d.individual_id + '/' + d.phenophase_id + '/' + d.first_yes_year;
                         map[key] = map[key] || [];
                         map[key].push(d);
                         return map;
-                    }, {}),
-                    uniqueIndividuals = [];
-                console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
-                console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
-                console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
-                for (let key in individuals) {
-                    let arr = individuals[key];
-                    if (arr.length > 1) {
-                        // sort by first_yes_doy
-                        arr.sort(function (a, b) {
-                            return a.first_yes_doy - b.first_yes_doy;
-                        });
+                    }, {});
+                    const uniqueIndividuals = [];
+                    for (let key in individuals) {
+                        let arr = individuals[key];
+                        if (arr.length > 1) {
+                            // sort by first_yes_doy
+                            arr.sort(function (a, b) {
+                                return a.first_yes_doy - b.first_yes_doy;
+                            });
+                        }
+                        // use the earliest record
+                        uniqueIndividuals.push(arr[0]);
                     }
-                    // use the earliest record
-                    uniqueIndividuals.push(arr[0]);
+                    console.debug(`plot[${plotIndex}] filtered out ${(filtered.length - uniqueIndividuals.length)}/${filtered.length} individual records (preferring lowest first_yes_doy)`);
+                    return uniqueIndividuals;
                 }
-                console.debug('filtered out ' + (filtered.length - uniqueIndividuals.length) + '/' + filtered.length + ' individual records (preferring lowest first_yes_doy)');
-
-                /*
-                this.filterDisclaimer = (minusSuspect.length !== filtered.length) ? FILTER_LQD_DISCLAIMER : undefined;
-                */
-                return filtered;
-            }
-            : (data,plot,plotIndex) => { // site
-                let minusUnwanted =  data.filter(this.filterUnwantedDataFunctor(plot)),
-                    minusSuspect = minusUnwanted.filter(this.filterSuspectSummaryData),
-                    filtered = this.filterLqdSummary ? minusSuspect.filter(this.filterLqSiteData) : minusSuspect;
-                console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
-                console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
-                console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
-                /*this.filterDisclaimer = (minusSuspect.length !== filtered.length) ?
-                    FILTER_LQD_DISCLAIMER : undefined;*/
                 return filtered;
             };
         this.working = true;
@@ -215,4 +136,53 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 this.handleError(err);
             });
     }
+}
+
+/**
+ * The underlying services do not treat species/phenophase pairs as
+ * parallel arrays but as independent arrays.  This means when two species
+ * share a phenophase but if that phenophase is only requested for one of the two
+ * extra recrods can be returned and need to be discarded.  This function
+ * returns a function that can be passed to Array.filter to discard those records
+ * from server responses.
+ * 
+ * Note: This should no longer ever prune out any unwanted records now that one request
+ * is being made per plot
+ */
+function filterUnwantedDataFunctor(plot:SpeciesPlot):(any) => boolean {
+    const keys = getSpeciesPlotKeys(plot);
+    const speciesId = plot.species[keys.speciesIdKey];
+    const phenoId = plot.phenophase[keys.phenophaseIdKey];
+    return d => {
+        const keep = speciesId == d[keys.speciesIdKey] &&
+                        phenoId == d[keys.phenophaseIdKey];
+        if(!keep) {
+            console.warn('filtering unwanted response record',d);
+        }
+        return keep;
+    };
+}
+
+function filterSuspectSummaryData(d):boolean {
+    var bad = (d.latitude === 0.0 || d.longitude === 0.0 || d.elevation_in_meters < 0);
+    if (bad) {
+        console.warn('suspect station data', d);
+    }
+    return !bad;
+}
+
+function filterLqSummaryData(d):boolean {
+    var keep = d.numdays_since_prior_no >= 0;
+    if (!keep) {
+        console.debug('filtering less precise data from summary output', d);
+    }
+    return keep;
+}
+
+function filterLqSiteData(d):boolean {
+    var keep = d.mean_numdays_since_prior_no >= 0;
+    if (!keep) {
+        console.debug('filtering less precise data from site level output', d);
+    }
+    return keep;
 }

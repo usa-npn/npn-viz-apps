@@ -121,7 +121,9 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
     }
 
     ngOnInit() {
-        // this always fires and VIS_DEFINITIONS are dealt with only when it does 
+        VIS_DEFINITIONS
+            .filter(visDef => !visDef.templateSelection) // only reset those that don't have templates
+            .forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
         // so we know whether we do or don't have a person id.
         this.activatedRoute.paramMap
             .pipe(
@@ -134,6 +136,11 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
             .subscribe(input => {
                 console.log('url parameter input',input);
                 const {s,personId} = input;
+                if(personId) {
+                    console.log('HAVE PERSON ID',personId);
+                    PERSON_ID = personId;
+                    VIS_DEFINITIONS.forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
+                }
                 if(s) {
                     const shared:Shared = this.sharingService.deserialize(s);
                     const selection:VisSelection = this.selectionFactory.newSelection(shared.external);
@@ -150,13 +157,6 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
                         console.warn('Unable to find visualization for selection',selection);
                     }
                 }
-                if(personId) {
-                    console.log('HAVE PERSON ID',personId);
-                    PERSON_ID = personId;
-                }
-                VIS_DEFINITIONS
-                    .filter(visDef => !visDef.templateSelection) // only reset those that don't have templates
-                    .forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
             });
     }
 }

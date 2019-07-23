@@ -70,12 +70,19 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
         const stopSubscription:Subject<void> = new Subject();
         this.selection.pipe(takeUntil(merge(stopSubscription,this.componentDestroyed)))
             .subscribe(e => {
-                if(initialSelection !== serializeSelection()) {
+                const currentSelection = serializeSelection();
+                if(initialSelection !== currentSelection) {
                     // the contents of the selection have changed, hide this component
                     // this control hides itself when this happens rather than just deleting the description
                     // because otherwise the parent will re-draw all steps when this component goes away
                     // which will in turn reset things to step 0.
                     // this feels kind of like a workaround but it's unclear WHY Angular is updating stepHosts
+
+                    // NOTE: this can happen if a "shared selection" contains old stuff that
+                    // a control like species/pheno might update, or if some server species/pheno
+                    // data changed so the shared selection's representation is out of date with
+                    // what the UI might generate today...  If the control goes away for
+                    // canned stories this is almost certainly why.
                     this.display = 'none';
                     stopSubscription.next();
                 }

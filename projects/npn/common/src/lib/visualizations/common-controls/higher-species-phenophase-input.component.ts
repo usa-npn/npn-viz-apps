@@ -179,7 +179,8 @@ console.log('speciesTaxInfo',info);
                 const label = this.speciesLabel(item);
                 const lower = label.toLowerCase();
                 return {item,label,lower};
-            });
+            })
+            .sort((a,b) => a.label.localeCompare(b.label));
             this.$filteredSpeciesList = this.species.valueChanges.pipe(
                 debounceTime(500),
                 filter(s => typeof(s) === 'string'),

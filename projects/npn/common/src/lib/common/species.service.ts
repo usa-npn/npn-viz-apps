@@ -122,20 +122,20 @@ export class SpeciesService {
                             const {class_id,class_name,class_common_name,kingdom} = classIds[id];
                             return {class_id,class_name,class_common_name,kingdom}
                         })
-                        .filter(r => !!r.class_id && !!r.class_name && !!r.class_common_name) // keep only complete records
-                        .sort((a,b) => a.class_common_name.localeCompare(b.class_common_name)),
+                        .filter(r => !!r.class_id && !!r.class_name/* && !!r.class_common_name*/) // keep only complete records
+                        /*.sort((a,b) => a.class_common_name.localeCompare(b.class_common_name))*/,
                     orders: Object.keys(orderIds).map(id => {
                             const {order_id,order_name,order_common_name,kingdom} = orderIds[id];
                             return {order_id,order_name,order_common_name,kingdom};
                         })
-                        .filter(r => !!r.order_id && !!r.order_name && !!r.order_common_name) // keep only complete records
-                        .sort((a,b) => a.order_common_name.localeCompare(b.order_common_name)),
+                        .filter(r => !!r.order_id && !!r.order_name/* && !!r.order_common_name*/) // keep only complete records
+                        /*.sort((a,b) => a.order_common_name.localeCompare(b.order_common_name))*/,
                     families: Object.keys(familyIds).map(id => {
                             const {family_id,family_name,family_common_name,kingdom} = familyIds[id];
                             return {family_id,family_name,family_common_name,kingdom};
                         })
-                        .filter(r => !!r.family_id && !!r.family_name && !!r.family_common_name) // keep only complete records
-                        .sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))
+                        .filter(r => !!r.family_id && !!r.family_name/* && !!r.family_common_name*/) // keep only complete records
+                        /*.sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))*/
                 };
             });
     }

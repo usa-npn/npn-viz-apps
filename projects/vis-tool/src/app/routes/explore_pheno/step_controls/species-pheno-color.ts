@@ -69,7 +69,7 @@ export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true">
+    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true" class="control-expansion-panel">
         <mat-expansion-panel-header>
             <mat-panel-title>
                 Plot #{{idx+1}}
@@ -92,6 +92,9 @@ export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
     </div>
     `,
     styles:[`
+    .control-expansion-panel {
+        min-width: 300px;
+    }
     .phenophase-input-wrapper,
     higher-species-phenophase-input {
         display: flex;

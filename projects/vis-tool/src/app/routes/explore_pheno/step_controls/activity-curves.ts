@@ -39,7 +39,7 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-expansion-panel  *ngFor="let curve of selection.curves; index as i" expanded="true">
+    <mat-expansion-panel  *ngFor="let curve of selection.curves; index as i" expanded="true" class="curve-expansion-panel">
         <mat-expansion-panel-header>
             <mat-panel-title>
                 <label [ngStyle]="{'color': curve.color}">Curve #{{i+1}} <span *ngIf="!curve.isValid()">(incomplete)</span></label>
@@ -63,6 +63,9 @@ export class ActivityCurvesStepComponent extends BaseStepComponent {
     `,
     encapsulation: ViewEncapsulation.None,
     styles:[`
+    .curve-expansion-panel {
+        min-width: 300px;
+    }
     curve-selection-control,
     higher-species-phenophase-input {
         display: flex;

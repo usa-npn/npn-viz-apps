@@ -28,7 +28,7 @@ export class SpeciesTitlePipe implements PipeTransform {
 export class TaxonomicSpeciesTitlePipe implements PipeTransform {
     constructor(private speciesTitle:SpeciesTitlePipe) {}
     transform(item:TaxonomicSpeciesType,rank:TaxonomicSpeciesRank = TaxonomicSpeciesRank.SPECIES,format:SpeciesTitleFormat = APPLICATION_SETTINGS.speciesTitleFormat):any {
-        if(item) {
+        if(item && typeof(item) === 'object') {
             let o;
             switch(rank) {
                 case TaxonomicSpeciesRank.SPECIES:
@@ -37,17 +37,17 @@ export class TaxonomicSpeciesTitlePipe implements PipeTransform {
                 case TaxonomicSpeciesRank.CLASS:
                     o = item as TaxonomicClass;
                     return format === SpeciesTitleFormat.CommonName
-                        ? o.class_common_name||o.class_name // || should not be necessary
+                        ? o.class_common_name||`${o.class_name} (Scientific)` // || should not be necessary
                         : o.class_name;
                 case TaxonomicSpeciesRank.ORDER:
                     o = item as TaxonomicOrder;
                     return format === SpeciesTitleFormat.CommonName
-                        ? o.order_common_name||o.order_name // || should not be necessary
+                        ? o.order_common_name||`${o.order_name} (Scientific)` // || should not be necessary
                         : o.order_name;
                 case TaxonomicSpeciesRank.FAMILY:
                     o = item as TaxonomicFamily;
                     return format === SpeciesTitleFormat.CommonName
-                        ? o.family_common_name||o.family_name // || should not be necessary
+                        ? o.family_common_name||`${o.family_name} (Scientific)` // || should not be necessary
                         : o.family_name;
             }
         }

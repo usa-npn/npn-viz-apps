@@ -50,7 +50,7 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true">
+    <mat-expansion-panel  *ngFor="let plot of selection.plots; index as idx" expanded="true" class="species-pheno-expansion">
         <mat-expansion-panel-header>
             <mat-panel-title>
             <svg class="icon" viewBox="0 0 22 22"><path [attr.d]="iconPaths[idx]"></path></svg>
@@ -74,6 +74,9 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
     
     `,
     styles:[`
+    .species-pheno-expansion {
+        min-width: 300px;
+    }
     .phenophase-input-wrapper,
     higher-species-phenophase-input {
         display: flex;

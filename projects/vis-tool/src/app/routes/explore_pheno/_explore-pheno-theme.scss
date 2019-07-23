@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+@import './person-control-theme.scss';
 @import './step_controls/vis-selection-theme';
 @import './step_controls/vis-theme';
 
@@ -17,7 +18,6 @@
     }
     #explorePhenologicalFindings {
 
-    
         $step-title-bg: mat-color($primary,800);
         $drawer-title-height: 36px;
         $drawer-padding: 15px;
@@ -286,6 +286,7 @@
             }
         }
 
+        @include person-control-theme($theme);
         @include vis-selection-theme($theme);
         @include vis-theme($theme);
     }

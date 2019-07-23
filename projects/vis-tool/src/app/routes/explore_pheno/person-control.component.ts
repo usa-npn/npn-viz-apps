@@ -1,8 +1,9 @@
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
 import { VisSelection } from '@npn/common';
 import { Input, Component, EventEmitter, Output } from '@angular/core';
-import { faUserCircle, faUser } from '@fortawesome/pro-light-svg-icons';
+import { faUser } from '@fortawesome/pro-light-svg-icons';
 
+// see person-control-theme.scss
 @Component({
     selector: `person-info`,
     template: `

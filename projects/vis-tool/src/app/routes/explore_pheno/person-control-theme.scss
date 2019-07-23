@@ -1,0 +1,14 @@
+@import '~@angular/material/theming';
+
+@mixin person-control-theme($theme) {
+    $primary: map-get($theme,primary);
+    $accent: map-get($theme,accent);
+    $warn: map-get($theme,warn);
+    $accent2: map-get($theme,accent2);
+
+    person-info .step-title {
+        border-radius: 20px;
+        background-color: mat-color($warn,300);
+        //rgba(mat-color($warn,500),0.5);
+    }
+}

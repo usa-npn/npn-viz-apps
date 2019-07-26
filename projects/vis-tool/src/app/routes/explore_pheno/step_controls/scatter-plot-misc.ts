@@ -115,7 +115,7 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
 })
 export class ScatterPlotMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior';
-    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy','filterLqdSummary','numDaysQualityFilter'];
+    protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy','numDaysQualityFilter'];
     selection: ScatterPlotSelection;
     axis = AXIS;
 

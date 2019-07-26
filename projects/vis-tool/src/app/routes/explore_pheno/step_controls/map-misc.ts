@@ -9,7 +9,6 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     template: `
     <div class="misc" *ngIf="complete">
         <div><label>Data precision filter</label> {{selection.numDaysQualityFilter}} days</div>
-        <div><label>Exclude less precise data</label> {{selection.filterLqdSummary ? 'Yes' : 'No'}}</div>
     </div>
     `,
     styles: [`
@@ -50,12 +49,6 @@ export class MapMiscStepComponent extends BaseStepComponent {
             <mat-option [value]="30">30 days</mat-option>
         </mat-select>
     </mat-form-field>
-
-    <h4 class="misc-title exclude">Exclude less precise data</h4>
-    <mat-radio-group [(ngModel)]="selection.filterLqdSummary">
-        <mat-radio-button [value]="true">Yes</mat-radio-button>
-        <mat-radio-button [value]="false">No</mat-radio-button>
-    </mat-radio-group>
     `,
     styles:[`
     :host {
@@ -65,20 +58,11 @@ export class MapMiscStepComponent extends BaseStepComponent {
     :host >* {
         margin-bottom: 5px;
     }
-    .misc-title {
-        text-transform: none !important;
-    }
-    .misc-title.exclude {
-        margin-top: 0px;
-    }
-    mat-radio-button {
-        margin-right: 5px;
-    }
     `]
 })
 export class MapMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior';
-    protected defaultPropertyKeys:string[] = ['filterLqdSummary','numDaysQualityFilter'];
+    protected defaultPropertyKeys:string[] = ['numDaysQualityFilter'];
     selection: MapSelection;
 
     stepVisit():void {

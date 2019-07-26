@@ -32,6 +32,7 @@ import { BoundaryStep } from "./boundary";
 import { MapMiscStep } from './map-misc';
 
 let PERSON_ID;
+let GROUP_ID;
 
 /**
  * This function is exported to allow the UI reset functionality to put a definition
@@ -54,6 +55,9 @@ export function resetVisDefinition(visDef:VisDefinition,selectionFactory:Visuali
         visDef.selection = selectionFactory.newSelection({$class});
         if(PERSON_ID && visDef.selection instanceof StationAwareVisSelection) {
             visDef.selection.personId = PERSON_ID;
+        }
+        if(GROUP_ID && visDef.selection instanceof StationAwareVisSelection) {
+            visDef.selection.groupId = GROUP_ID;
         }
         const externalTemplate = visDef.templateSelection.external;
         Object.keys(externalTemplate)
@@ -129,18 +133,26 @@ export class VisSelectionControlComponent extends MonitorsDestroy implements Con
             .pipe(
                 map(pm => ({
                     s: pm.get('s'),
-                    personId: pm.get('person_id')
+                    personId: pm.get('person_id'),
+                    groupId: pm.get('group_id')
                 })),
                 takeUntil(this.componentDestroyed)
             )
             .subscribe(input => {
                 console.log('url parameter input',input);
-                const {s,personId} = input;
+                const {s,personId,groupId} = input;
                 if(personId) {
                     console.log('HAVE PERSON ID',personId);
                     PERSON_ID = personId;
+                }
+                if(groupId) {
+                    console.log('HAVE GROUP ID',groupId);
+                    GROUP_ID = groupId;
+                }
+                if(personId || groupId) {
                     VIS_DEFINITIONS.forEach(visDef => resetVisDefinition(visDef,this.selectionFactory));
                 }
+
                 if(s) {
                     const shared:Shared = this.sharingService.deserialize(s);
                     const selection:VisSelection = this.selectionFactory.newSelection(shared.external);

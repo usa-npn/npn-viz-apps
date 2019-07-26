@@ -419,6 +419,8 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     @selectionProperty()
     personId;
     @selectionProperty()
+    groupId;
+    @selectionProperty()
     stationIds?: any[] = [];
     @selectionProperty()
     _boundaries:BoundarySelection[];
@@ -437,6 +439,13 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     }
 
     private getStationIdPromises():Promise<number[]>[] {
+        const baseParams:any = {};
+        if(this.personId) {
+            baseParams.person_id = this.personId;
+        }
+        if(this.groupId) {
+            baseParams.group_id = this.groupId;
+        }
         const promises = this.boundaries.map(b => {
             if((b as any).data) {
                 const polySelection = b as PolygonBoundarySelection;
@@ -444,14 +453,14 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
                 polygon.push(polySelection.data[0]); // close the loop
                 return this.serviceUtils.cachedGet(
                         this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
-                        {wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
+                        {...baseParams,wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
                     )
                     .then(response => response.stations.map(s => s.station_id))
             }
             const predefSelection = b as PredefinedBoundarySelection;
             return this.serviceUtils.cachedGet(
                 this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
-                {boundary_id:predefSelection.id}
+                {...baseParams,boundary_id:predefSelection.id}
             );
         });
         if(this.stationIds && this.stationIds.length) {
@@ -463,6 +472,7 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
             .then(params => this.personId ? params.set('person_id',`${this.personId}`) : params)
+            .then(params => this.groupId ? params.set('group_id',`${this.groupId}`) : params)
             .then(params => Promise.all(this.getStationIdPromises())
                 .then(results => {
                     results

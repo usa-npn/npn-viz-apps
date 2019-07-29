@@ -417,9 +417,9 @@ export function isPolygonBoundarySelection(o:any):boolean {
  */
 export abstract class StationAwareVisSelection extends NetworkAwareVisSelection {
     @selectionProperty()
-    personId;
+    _personId;
     @selectionProperty()
-    groupId;
+    _groupId;
     @selectionProperty()
     stationIds?: any[] = [];
     @selectionProperty()
@@ -428,6 +428,28 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     constructor(protected serviceUtils:NpnServiceUtils) {
         super();
     }
+
+    get personId():any {
+        return this._personId;
+    }
+    set personId(id:any) {
+        const orig = this._personId;
+        if((this._personId = id) != orig) {
+            this.update();
+        }
+    }
+
+    get groupId():any {
+        return this._groupId;
+    }
+
+    set groupId(id:any) {
+        const orig = this._groupId;
+        if((this._groupId = id) != orig) {
+            this.update();
+        }
+    }
+
 
     get boundaries():BoundarySelection[] {
         return this._boundaries||[];

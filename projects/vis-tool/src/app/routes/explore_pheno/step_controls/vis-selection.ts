@@ -76,6 +76,14 @@ export function resetVisDefinition(visDef:VisDefinition,selectionFactory:Visuali
     }
 }
 
+export function clearPersonalized(selectionFactory:VisualizationSelectionFactory,skip?:VisSelection) {
+    PERSON_ID = undefined;
+    GROUP_ID = undefined;
+    VIS_DEFINITIONS
+        .filter(visDef => skip != visDef.selection)
+        .forEach(visDef => resetVisDefinition(visDef,selectionFactory));
+}
+
 export class VisSelectionSelection {
     changes:Subject<VisDefinition> = new Subject();
     changeDueToSharing:boolean = false;

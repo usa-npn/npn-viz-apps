@@ -1,7 +1,8 @@
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
-import { VisSelection } from '@npn/common';
+import { VisSelection, VisualizationSelectionFactory } from '@npn/common';
 import { Input, Component, EventEmitter, Output } from '@angular/core';
-import { faUser, faInfoCircle } from '@fortawesome/pro-light-svg-icons';
+import { faUser, faInfoCircle, faTimesCircle } from '@fortawesome/pro-light-svg-icons';
+import { clearPersonalized } from './step_controls/vis-selection';
 
 // see person-control-theme.scss
 @Component({
@@ -10,10 +11,22 @@ import { faUser, faInfoCircle } from '@fortawesome/pro-light-svg-icons';
     <div class="step">
         <div class="step-title alt" [ngClass]="{unavailable: state === 'unavailable'}">
             <step-icon [step]="step"></step-icon>
-            <div class="text">{{title}} {{id}} <fa-icon [icon]="helpIcon" [matTooltip]="tooltip"></fa-icon></div>
+            <div class="text person-text">{{title}} {{id}} <fa-icon [icon]="helpIcon" [matTooltip]="tooltip"></fa-icon><fa-icon [icon]="clearIcon" (click)="clearPersonalized()" class="clear-personalized" matTooltip="Remove constraint"></fa-icon></div>
         </div>
     </div>
-    `
+    `,
+    styles:[`
+    .text.person-text {
+        flex-grow: 1;
+    }
+    .clear-personalized {
+        font-size: 1.25em;
+        float: right;
+    }
+    .clear-personalized:hover {
+        cursor: pointer;
+    }
+    `]
 })
 export class PersonControlComponent implements StepComponent {
     @Input() selection:VisSelection;
@@ -25,6 +38,9 @@ export class PersonControlComponent implements StepComponent {
     };
 
     helpIcon = faInfoCircle;
+    clearIcon = faTimesCircle;
+
+    constructor(private selectionFactory:VisualizationSelectionFactory) {}
 
     get id():any {
         return this.selection && this.selection.personId
@@ -44,6 +60,16 @@ export class PersonControlComponent implements StepComponent {
 
     get tooltip():string {
         return `This visualization is contrained to data collected by ${this.title} ${this.id}`;
+    }
+
+    clearPersonalized() {
+        clearPersonalized(this.selectionFactory,this.selection);
+        if(this.selection.personId) {
+            this.selection.personId = undefined;
+        }
+        if(this.selection.groupId) {
+            this.selection.groupId = undefined;
+        }
     }
 
     ngOnInit() {

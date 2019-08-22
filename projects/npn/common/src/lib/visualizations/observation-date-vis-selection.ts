@@ -133,13 +133,13 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             .then(params => Promise.all(
                     this.validPlots.map(plot => {
                         const keys = getSpeciesPlotKeys(plot);
-                        const plotParams = params.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                        let plotParams = params.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
                             .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
                         if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                            params = params.set('taxonomy_aggregate','1');
+                            plotParams = plotParams.set('taxonomy_aggregate','1');
                         }
                         if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                            params = params.set('pheno_class_aggregate','1');
+                            plotParams = plotParams.set('pheno_class_aggregate','1');
                         }
                         return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString());
                     })

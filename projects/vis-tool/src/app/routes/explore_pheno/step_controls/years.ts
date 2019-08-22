@@ -36,7 +36,7 @@ const VALID_YEARS = (function(){
                 <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y}}</mat-option>
             </mat-select>
         </mat-form-field>
-        <button *ngIf="idx > 0" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
+        <button *ngIf="idx > 0 || selection.years.length > 1" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
         <button *ngIf="selection.years.length < 6 && idx === (selection.years.length-1)" mat-button class="add-year" (click)="addYear()">Add</button>
     </div>
     `,

@@ -477,7 +477,7 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
                         this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
                         {...baseParams,wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
                     )
-                    .then(response => response.stations.map(s => s.station_id))
+                    .then(response => response.map(s => s.station_id))
             }
             const predefSelection = b as PredefinedBoundarySelection;
             return this.serviceUtils.cachedGet(

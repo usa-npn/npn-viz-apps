@@ -116,7 +116,13 @@ export class VisualizationBaseComponent extends MonitorsDestroy {
         // and they seem to want to push the use of RxJs so this kind of thing
         // feels cleaner.
         fromEvent(window, 'resize').pipe(debounceTime(500),takeUntil(this.componentDestroyed))
-            .subscribe(() => this.resize());
+            .subscribe(() => {
+                try {
+                    this.resize()
+                } catch (resizeE) {
+                    console.error('error during resize',resizeE);
+                }
+            });
 
         // now that we're prepared to start listening to our selection for
         // VisSelectionEvents.

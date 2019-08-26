@@ -105,9 +105,11 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         };
         validPlots.forEach((plot,i) => {
             const rData:any= data[i][0];
-            const pPhases = plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS
-                ? rData.pheno_classes[0]
-                : rData.phenophases[0];
+            let pPhases = {years:{}}; // empty
+            const pPhaseKey = plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS ? 'pheno_classes' : 'phenophases';
+            if(rData && rData[pPhaseKey] && rData[pPhaseKey].length) {
+                pPhases = rData[pPhaseKey][0];
+            }
             this.years.forEach(year => {
                 if(pPhases.years[year]) {
                     if(this.negative) {

@@ -4,10 +4,10 @@ const npnConfiguration:NpnConfiguration = {
   cacheTTL: 60,
   apiRoot: '//www-dev.usanpn.org',
   //apiRoot: 'https://www.usanpn.org',
-  dataApiRoot: 'https://data-dev.usanpn.org:3006',
+  dataApiRoot: 'https://data-dev.usanpn.org/geoservices',
   //dataApiRoot: 'https://data.usanpn.org:3006',
-  dataApiRoot2: 'https://data-dev.usanpn.org:3004',
-  popApiRoot: 'https://data-dev.usanpn.org:3002',
+  dataApiRoot2: 'https://data-dev.usanpn.org/webservices',
+  popApiRoot: 'https://data-dev.usanpn.org/popservices',
   dataApiUseStatisticsCache: false,
   //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
   geoServerRoot: 'https://geoserver.usanpn.org/geoserver'

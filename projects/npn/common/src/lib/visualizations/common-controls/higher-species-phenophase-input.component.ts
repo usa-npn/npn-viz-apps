@@ -35,18 +35,14 @@ import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
             </mat-option>
         </mat-autocomplete>
         <mat-progress-bar *ngIf="fetchingSpeciesList" mode="query"></mat-progress-bar>
-        <mat-hint *ngIf="showSpeciesHint" align="end"><fa-icon [icon]="speciesHintIcon" [matTooltip]="speciesHint"></fa-icon></mat-hint>
-    </mat-form-field>
-    <mat-form-field class="pheno-rank-input">
-        <mat-select [placeholder]="phenoTaxRankPlaceholder" [formControl]="phenophaseRank">
-            <mat-option *ngFor="let r of phenophaseRanks" [value]="r.rank">{{r.label}}</mat-option>
-        </mat-select>
+        <mat-hint *ngIf="showSpeciesHint" align="end"><fa-icon [icon]="hintIcon" [matTooltip]="speciesHint"></fa-icon></mat-hint>
     </mat-form-field>
     <mat-form-field class="pheno-input">
         <mat-select [placeholder]="phenophasePlaceholder" [formControl]="phenophase">
             <mat-option *ngFor="let o of phenophaseList" [value]="o.item">{{o.label}}</mat-option>
         </mat-select>
         <mat-progress-bar *ngIf="fetchingPhenophaseList" mode="query"></mat-progress-bar>
+        <mat-hint *ngIf="phenophaseHint" align="end"><fa-icon [icon]="hintIcon" [matTooltip]="phenophaseHint"></fa-icon></mat-hint>
     </mat-form-field>
     <mat-form-field *ngIf="gatherColor" class="color-input">
         <mat-select  [placeholder]="colorPlaceholder" [formControl]="color">
@@ -71,7 +67,6 @@ phenophases={{phenophaseTaxInfo?.phenophases.length | number}} classes={{phenoph
     `]
 })
 export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
-    // TODO
     @Input() required:boolean = true;
     @Input() disabled:boolean = false;
 
@@ -102,18 +97,10 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     speciesLabel; // closure for translating species items to strings.
     speciesTaxInfo:SpeciesTaxonomicInfo; // just for debug purposes
 
-    phenophaseRank:FormControl = new FormControl();
-    phenophaseRanks = [{
-        label: 'Phenophase',
-        rank: TaxonomicPhenophaseRank.PHENOPHASE
-    },{
-        label: 'Class',
-        rank: TaxonomicPhenophaseRank.CLASS
-    }];
-
     phenophase:FormControl = new FormControl();
     fetchingPhenophaseList:boolean = false;
     phenophaseList:any[];
+    phenophaseHint;
     phenophaseTaxInfo:PhenophaseTaxonomicInfo; // just for debug purposes
 
     @Input() gatherColor:boolean = false;
@@ -122,7 +109,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
 
     private group:FormGroup;
 
-    speciesHintIcon = faInfoCircle;
+    hintIcon = faInfoCircle;
 
     constructor(
         private speciesService:SpeciesService,
@@ -238,26 +225,15 @@ console.log('speciesTaxInfo',info);
         );
 
         // when the in
-        const $phenoListChange = combineLatest(
-            $phenophaseTaxInfo,
-            this.phenophaseRank.valueChanges
-        ).pipe(
-            map(input => {
-                const [info,rank] = input;
+        const $phenoListChange = $phenophaseTaxInfo.pipe(
+            map(info => {
                 this.phenophaseTaxInfo = info
                 if(info) {
-                    switch(rank) {
-                        case TaxonomicPhenophaseRank.PHENOPHASE:
-                            return info.phenophases.map(item => ({
-                                item,
-                                label: item.phenophase_name
-                            }));
-                        case TaxonomicPhenophaseRank.CLASS:
-                            return info.classes.map(item => ({
-                                item,
-                                label: item.pheno_class_name
-                            }))
-                    }
+console.log('phenophaseTaxInfo',info);
+                    return info.classes.map(item => ({
+                        item,
+                        label: item.pheno_class_name
+                    }));
                 }
                 return [];
             }),
@@ -266,7 +242,7 @@ console.log('speciesTaxInfo',info);
             
         );
 
-        // pheno rank or species changes, need to check validity of phenophase if set
+        //  species or list of phenophases changed, need to check validity of phenophase if set
         combineLatest(
             this.species.valueChanges,
             $phenoListChange
@@ -275,20 +251,17 @@ console.log('speciesTaxInfo',info);
         ).subscribe(input => {
             const [species,phenoList] = input;
             if(!species) {
+                if(this.phenophase.enabled) {
+                    this.phenophase.disable({emitEvent:false});
+                }
                 return this.phenophase.setValue(null);
             }
+            if(this.phenophase.disabled) {
+                this.phenophase.enable({emitEvent:false});
+            }
             const phenophase = this.phenophase.value;
-            const rank = this.phenophaseRank.value;
             if(phenophase && phenoList.length) {
-                const key = rank === TaxonomicPhenophaseRank.PHENOPHASE
-                    ? 'phenophase_id'
-                    : 'pheno_class_id';
-                if(rank === TaxonomicPhenophaseRank.CLASS && phenophase.phenophase_id) {
-                    // class but a phenophase selected, if this check didn't exist there's
-                    // a very slight chance that an invalid selection could fall through
-                    // the cracks since phenophases will have BOTH keys
-                    return this.phenophase.setValue(null);
-                }
+                const key = 'pheno_class_id';
                 const id = phenophase[key];
                 //console.log(`check pheno validity id=${id}`,phenophase,phenoList);
                 if(!id) { // can't be valid, rank changed
@@ -301,15 +274,34 @@ console.log('speciesTaxInfo',info);
        
         this.speciesRank.setValue((this.plot ? this.plot.speciesRank : null)||TaxonomicSpeciesRank.SPECIES);
         this.species.setValue(this.plot ? this.plot.species : null);
-        this.phenophaseRank.setValue((this.plot ? this.plot.phenophaseRank : null)||TaxonomicPhenophaseRank.PHENOPHASE);
         this.phenophase.setValue(this.plot ? this.plot.phenophase : null);
         this.color.setValue(this.plot ? this.plot.color : null);
+
+        combineLatest(
+            this.phenophase.valueChanges,
+            $phenophaseTaxInfo
+        ).pipe(
+            takeUntil(this.componentDestroyed)
+        ).subscribe((input:any[]) => {
+            const [pheno,list] = input;
+            this.phenophaseHint = (!!pheno && !!list && !!list.phenophases && list.phenophases.length)
+                ? list.phenophases
+                    .filter(pp => pheno.pheno_class_id == pp.pheno_class_id) // phenophases of class
+                    .map(pp => pp.phenophase_name) // map t name
+                    .reduce((arr,ppn) => { // eliminate any duplicate names
+                        if(arr.indexOf(ppn) === -1) {
+                            arr.push(ppn);
+                        }
+                        return arr;
+                    },[])
+                    .join(', ')
+                : undefined;
+        });
 
         // gather up any input changes and propagate them outward
         this.group = new FormGroup({
             speciesRank: this.speciesRank,
             species: this.species,
-            phenophaseRank: this.phenophaseRank,
             phenophase: this.phenophase,
             color: this.color,
         });
@@ -320,7 +312,7 @@ console.log('speciesTaxInfo',info);
                 //tap(v => console.log('selection changed',v)),
                 // TODO expand the condition that decides when a plot is complete...
                 map(v => !!v.speciesRank && !!v.species && typeof(v.species) === 'object'
-                    && !!v.phenophaseRank && !!v.phenophase
+                    && !!v.phenophase
                     && (!this.gatherColor || !!v.color)
                     ? v
                     : null
@@ -331,7 +323,7 @@ console.log('speciesTaxInfo',info);
                 // edit the plot in place, it may be a class
                 this.plot.speciesRank = v ? v.speciesRank : null;
                 this.plot.species = v ? v.species : null;
-                this.plot.phenophaseRank = v ? v.phenophaseRank : null;
+                this.plot.phenophaseRank = TaxonomicPhenophaseRank.CLASS;
                 this.plot.phenophase = v ? v.phenophase : null;
                 if(this.gatherColor) {
                     this.plot.color = v ? v.color : null;
@@ -371,6 +363,7 @@ console.log('speciesTaxInfo',info);
         }
     }
 
+    // TODO need to use promises to get all station ids.
     private bootstrapped:boolean = false;
     private boundaries:BoundarySelection[];
     ngDoCheck() {
@@ -398,10 +391,6 @@ console.log('speciesTaxInfo',info);
         return 'Taxonomic rank'+(this.required ? ' *' : '');
     }
 
-    get phenoTaxRankPlaceholder():string {
-        return 'Phenophase taxonomic rank'+(this.required ? ' *' : '');
-    }
-
     get speciesPlaceholder():string {
         const rank = this.speciesRank
             ? this.speciesRank.value as TaxonomicSpeciesRank
@@ -425,19 +414,7 @@ console.log('speciesTaxInfo',info);
     }
 
     get phenophasePlaceholder():string {
-        const rank = this.phenophaseRank
-            ? this.phenophaseRank.value as TaxonomicPhenophaseRank
-            : TaxonomicPhenophaseRank.PHENOPHASE;
-        let label;
-        switch(rank) {
-            case TaxonomicPhenophaseRank.PHENOPHASE:
-                label = 'Phenophase';
-                break;
-            case TaxonomicPhenophaseRank.CLASS:
-                label = 'Class';
-                break;
-        }
-        return label+(this.required ? ' *' : '');
+        return 'Phenophase class'+(this.required ? ' *' : '');
     }
 
     get colorPlaceholder():string {

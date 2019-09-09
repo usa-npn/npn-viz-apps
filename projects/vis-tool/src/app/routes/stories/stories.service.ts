@@ -43,12 +43,14 @@ export class StoriesService {
                   if(environment.production) {
                     console.error(`Error loading stories ${err.status} "${err.statusText}"`);
                   }
-                  return this.serviceUtils.get('assets/dev-stories.json')
+                  return this.serviceUtils.get('assets/dev-stories.json');
+                  /* causes more confusion than worth in a dev environment
                     .then(stories => {
                       // avoid future 404's
                       this.serviceUtils.cachedSet('stories.json',stories)
                       return stories;
                     });
+                  */
               })
         );
     }

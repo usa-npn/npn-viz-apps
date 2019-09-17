@@ -162,12 +162,16 @@ console.log('speciesTaxInfo',info);
             }),
             takeUntil(this.componentDestroyed)
         ).subscribe((list:any[]) => {
+            const rank = this.speciesRank.value as TaxonomicSpeciesRank;
+            const species = this.species.value as any;
             this.speciesList = list.map(item => {
                 const label = this.speciesLabel(item);
                 const lower = label.toLowerCase();
                 return {item,label,lower};
-            })
-            .sort((a,b) => a.label.localeCompare(b.label));
+            });
+            if(rank !== TaxonomicSpeciesRank.SPECIES) {
+                this.speciesList.sort((a,b) => a.label.localeCompare(b.label));
+            }
             this.$filteredSpeciesList = this.species.valueChanges.pipe(
                 debounceTime(500),
                 filter(s => typeof(s) === 'string'),
@@ -182,8 +186,6 @@ console.log('speciesTaxInfo',info);
                 })
             );
             // clear the current value if it is no longer valid
-            const rank = this.speciesRank.value as TaxonomicSpeciesRank;
-            const species = this.species.value as any;
             if(species) {
                 switch(rank) {
                     case TaxonomicSpeciesRank.SPECIES:

@@ -177,7 +177,7 @@ export class SpeciesService {
                 }
                 if(consolidated.length && typeof(consolidated[0].number_observations) === 'number') {
                     // sort by number_observations
-                    consolidated.sort((a,b) => a.number_observations - b.number_observations);
+                    consolidated.sort((a,b) => b.number_observations - a.number_observations);
                 }
                 console.log('getAllSpeciesConsolidated.consolidated',consolidated.length);
                 return consolidated;

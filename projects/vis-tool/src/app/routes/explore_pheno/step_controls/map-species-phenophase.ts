@@ -1,7 +1,7 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { StepState, VisConfigStep } from '../interfaces';
-import { MapSelection, MAP_VIS_SVG_PATHS } from '@npn/common';
+import { MapSelection, MAP_VIS_SVG_PATHS, HigherSpeciesPhenophaseInputCriteria } from '@npn/common';
 import { faCrow } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
@@ -60,6 +60,7 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
         <div class="phenophase-input-wrapper">
             <higher-species-phenophase-input
                 [selection]="selection"
+                [criteria]="criteria"
                 [plot]="plot"
                 (plotChange)="plotChange($event)">
             </higher-species-phenophase-input>
@@ -103,6 +104,7 @@ export class MapSpeciesPhenoControlComponent extends BaseControlComponent {
     title:string = 'Select species phenophase';
     selection:MapSelection;
     iconPaths = MAP_VIS_SVG_PATHS;
+    criteria:HigherSpeciesPhenophaseInputCriteria;
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
@@ -128,6 +130,14 @@ export class MapSpeciesPhenoControlComponent extends BaseControlComponent {
     plotChange($event) {
         console.log('plotChange',$event);
         this.selection.update();
+    }
+
+    stepVisit() {
+        super.stepVisit();
+        this.criteria = {
+            years: this.selection.year ? [this.selection.year] : [],
+            stationIds: this.selection.getStationIds()
+        };
     }
 }
 

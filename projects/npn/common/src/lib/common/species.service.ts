@@ -95,22 +95,97 @@ export class SpeciesService {
         return this.serviceUtils.cachedPost(url,postParams.toString());
     }
 
+    // all species related results are cached locally but not in the session cache since they can get large
     private higherSpeciesCache = {};
-    getAllSpeciesHigher(params:HttpParams = new HttpParams()): Promise<SpeciesTaxonomicInfo> {
-        // don't store these results in the session cache, they can get large
+
+    private _allSpecies(params:HttpParams = new HttpParams()): Promise<TaxonomicSpecies[]> {
         params = params.set('include_restricted','false');
         const input = params.toString();
-        const cacheKey = this.serviceUtils.cache.cacheKey(input);
-        if(this.higherSpeciesCache[cacheKey]) {
-            return this.higherSpeciesCache[cacheKey];
-        }
-        // NOTE: when there are multiple species phenophase controls on the screen the result can
-        // be multiple simultaneous queries...
-        //console.log('SpeciesService.getAllSpeciesHigher:params', params);
-        return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
+        const cacheKey = this.serviceUtils.cache.cacheKey({service:'getSpecies',input});
+        if(!this.higherSpeciesCache[cacheKey]) {
+            return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
                 this.serviceUtils.apiUrl('/npn_portal/species/getSpecies.json'),
                 input
-            )
+            );
+        }
+        return this.higherSpeciesCache[cacheKey].then(results => JSON.parse(JSON.stringify(results)));
+    }
+
+    private _filterSpecies(params:HttpParams = new HttpParams()): Promise<TaxonomicSpecies[]> {
+        const input = params.toString();
+        const cacheKey = this.serviceUtils.cache.cacheKey({service:'getSpeciesFilter',input});
+        if(!this.higherSpeciesCache[cacheKey]) {
+            return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
+                this.serviceUtils.apiUrl('/npn_portal/species/getSpeciesFilter.json'),
+                input
+            );
+        }
+        return this.higherSpeciesCache[cacheKey].then(results => JSON.parse(JSON.stringify(results)));
+    }
+
+    private _allSpeciesPromises(params:HttpParams = new HttpParams(),years:number[] = []): Promise<TaxonomicSpecies[]>[] {
+        years = years||[]; // in case null is actually passed in
+        // if we aren't doing any filtering then use the getSpecies service because
+        // it's much faster for that use case, it just doesn't return numbers of observations
+        if(!years.length && !params.keys().length) {
+            return [this._allSpecies(params)];
+        }
+        return !years.length
+            ? [this._filterSpecies(params)]
+            // sets of input request parameters for filtering
+            // e.g. [2013,2010,2012] ->
+            // [['2010-01-01','2010-12-31'],['2012-01-01','2013-12-31']]
+            : years.slice().sort().reduce((rngs,year) => {
+                    if(!rngs.length) {
+                        rngs[0] = [year,year];
+                    } else {
+                        const rng = rngs[rngs.length-1];
+                        if(rng[1] === year-1) {
+                            rng[1] = year;
+                        } else {
+                            rngs.push([year,year]);
+                        }
+                    }
+                    return rngs;
+                },[])
+                //.map(range => [`${range[0]}-01-01`,`${range[1]}-12-31`])
+                .map(range => this._filterSpecies(params.set('start_date',`${range[0]}-01-01`).set('end_date',`${range[1]}-12-31`)));
+    }
+
+    getAllSpeciesConsolidated(params:HttpParams = new HttpParams(),years:number[] = null): Promise<TaxonomicSpecies[]> {
+        return Promise.all(this._allSpeciesPromises(params,years))
+            .then((results:TaxonomicSpecies[][]) => {
+                console.log('getAllSpeciesConsolidated.results',results.map(r => r.length).join(', '));
+                let consolidated:TaxonomicSpecies[];
+                if(results.length === 1) {
+                    consolidated = results[0]; // nothing to consolidate
+                } else {
+                    const idMap = {};
+                    consolidated = results.reduce((set,list) => {
+                        list.forEach(species => {
+                            const {species_id} = species;
+                            if(idMap[species_id]) {
+                                // already in set, bump observation count
+                                //console.log(`getAllSpeciesConsolidated.consolidating species observations [${species_id}] ${idMap[species_id].number_observations} + ${species.number_observations}`);
+                                idMap[species_id].number_observations += species.number_observations;
+                            } else {
+                                set.push(idMap[species_id] = species);
+                            }
+                        });
+                        return set;
+                    },[])
+                }
+                if(consolidated.length && typeof(consolidated[0].number_observations) === 'number') {
+                    // sort by number_observations
+                    consolidated.sort((a,b) => a.number_observations - b.number_observations);
+                }
+                console.log('getAllSpeciesConsolidated.consolidated',consolidated.length);
+                return consolidated;
+            });
+    }
+
+    getAllSpeciesHigher(params:HttpParams = new HttpParams(),years:number[] = null): Promise<SpeciesTaxonomicInfo> {
+        return this.getAllSpeciesConsolidated(params,years)
             .then((species:TaxonomicSpecies[]) => {
                 const gatherById = key => mapByNumericId(species,key);
                 const classIds = gatherById('class_id');

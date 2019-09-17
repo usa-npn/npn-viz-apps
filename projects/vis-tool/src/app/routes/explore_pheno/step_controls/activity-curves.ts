@@ -1,6 +1,6 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
-import { Component, ViewEncapsulation } from '@angular/core';
-import { ActivityCurvesSelection, ActivityCurve, SPECIES_PHENO_INPUT_COLORS } from '@npn/common';
+import { Component, ViewEncapsulation, QueryList, ViewChildren } from '@angular/core';
+import { ActivityCurvesSelection, ActivityCurve, SPECIES_PHENO_INPUT_COLORS, CurveControlComponent } from '@npn/common';
 import { VisConfigStep, StepState } from '../interfaces';
 import { faChartLine } from '@fortawesome/pro-light-svg-icons';
 
@@ -89,8 +89,15 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
     selection: ActivityCurvesSelection;
     protected defaultPropertyKeys:string[] = ['curves'];
 
+    @ViewChildren(CurveControlComponent) curveControls:QueryList<CurveControlComponent>;
+
     ngOnInit() {
         setTimeout(() => this.speciesMetricChange());
+    }
+
+    stepVisit() {
+        super.stepVisit();
+        this.curveControls.forEach(control => control.updateCriteria());
     }
 
     get allValid():boolean {

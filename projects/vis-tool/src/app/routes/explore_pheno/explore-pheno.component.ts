@@ -58,6 +58,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         };
         execVisitFunc(this.activeStep,'stepDepart');
         execVisitFunc((this.activeStep = step),'stepVisit');
+        this.steps.forEach(s => s.active = this.activeStep === s);
         step.$controlInstance.visited = step.$stepInstance.visited = true;  
         if(this.steps.indexOf(step) === 0) {
             // flag set if the selection control populated this selection from sharing URL args

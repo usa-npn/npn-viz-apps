@@ -32,6 +32,7 @@ export class BaseControlComponent extends ComponentBase implements ControlCompon
     // this is intended to allow sub-classes to easily repopulate
     // defaults by specifying their associated keys here.
     protected defaultPropertyKeys:string[];
+    stepComponent: StepComponent;
 
     stepVisit():void {
         if(!this.visited) {

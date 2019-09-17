@@ -491,16 +491,18 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         return promises;
     }
 
+    getStationIds():Promise<number []> {
+        return Promise.all(this.getStationIdPromises())
+            .then(results => results.reduce((ids,stationIds) => ids.concat(stationIds),[]))
+    }
+
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         return super.toURLSearchParams(params)
             .then(params => this.personId ? params.set('person_id',`${this.personId}`) : params)
             .then(params => this.groupId ? params.set('group_id',`${this.groupId}`) : params)
-            .then(params => Promise.all(this.getStationIdPromises())
-                .then(results => {
-                    results
-                        .reduce((ids,stationIds) => ids.concat(stationIds),[])
-                        .forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
-                    return params
+            .then(params => this.getStationIds().then(results => {
+                    results.forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
+                    return params;
                 })
             );
     }

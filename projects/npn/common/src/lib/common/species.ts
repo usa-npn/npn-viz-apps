@@ -29,7 +29,8 @@ export interface TaxonomicFamily extends HasKingdom {
 export interface TaxonomicSpecies extends TaxonomicClass,TaxonomicFamily,TaxonomicOrder,Species {
     genus: string;
     itis_taxonomic_sn: number;
-    species_type:any[]; // has type but not using
+    number_observations?: number; // depends on the service getSpeciesFilter.json returns this
+    species_type?:any[]; // has type but not using
 }
 
 export type TaxonomicSpeciesType = Species|TaxonomicClass|TaxonomicOrder|TaxonomicFamily;

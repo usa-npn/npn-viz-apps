@@ -2,7 +2,7 @@ import { VisConfigStep, StepState } from "../interfaces";
 
 import { faCrow } from '@fortawesome/pro-light-svg-icons';
 import { Component, ViewEncapsulation } from "@angular/core";
-import { ScatterPlotSelection } from "@npn/common";
+import { ScatterPlotSelection, HigherSpeciesPhenophaseInputCriteria, StationAwareVisSelection } from "@npn/common";
 import { BaseStepComponent, BaseControlComponent } from "./base";
 // TODO ? export from @npn/common
 import { ObservationDateVisSelection } from '@npn/common/visualizations/observation-date-vis-selection';
@@ -78,6 +78,7 @@ export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
         <div class="phenophase-input-wrapper">
             <higher-species-phenophase-input
                     [selection]="selection"
+                    [criteria]="criteria"
                     [plot]="plot"
                     gatherColor="true"
                     (plotChange)="selection.update()">
@@ -114,6 +115,7 @@ export class YearsSpeciesPhenoColorStepComponent extends BaseStepComponent {
 export class SpeciesPhenoColorControlComponent extends BaseControlComponent {
     title:string = CONTROL_TITLE;
     selection: any; //(ScatterPlotSelection|ObservationDateVisSelection);
+    criteria:HigherSpeciesPhenophaseInputCriteria;
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
@@ -142,6 +144,33 @@ export class SpeciesPhenoColorControlComponent extends BaseControlComponent {
 
     plotsValid() {
         return this.selection.plots.length === this.selection.validPlots.length;
+    }
+
+    stepVisit() {
+        super.stepVisit();
+        const criteria:HigherSpeciesPhenophaseInputCriteria = {
+            years: this.years,
+        };
+        if(this.selection instanceof StationAwareVisSelection) {
+            criteria.stationIds = this.selection.getStationIds();
+        }
+        this.criteria = criteria;
+    }
+
+    get years():number[] {
+        if(this.stepComponent instanceof YearsSpeciesPhenoColorStepComponent) {
+            return (this.stepComponent.selection.years||[]).slice();
+        }
+        if(this.stepComponent instanceof StartEndSpeciesPhenoColorStepComponent) {
+            const {start,end} = this.stepComponent.selection;
+            if(start && end && start < end) {
+                const years = [];
+                for(let i = start; i <= end; i++) {
+                    years.push(i);
+                }
+                return years;
+            }
+        }
     }
 }
 

@@ -5,25 +5,27 @@ import {MonitorsDestroy} from '../../common';
 import {ActivityCurve} from './activity-curve';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 import { takeUntil } from 'rxjs/operators';
+import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
 
 @Component({
     selector: 'curve-selection-control',
     template: `
-    <higher-species-phenophase-input
-        [gatherColor]="gatherColor"
-        [selection]="selection"
-        [(plot)]="curve"
-        [disabled]="disabled"
-        [required]="required"
-        (plotChange)="onSpeciesChange.next($event)">
-    </higher-species-phenophase-input>
-
     <mat-form-field class="year-input">
         <mat-select [placeholder]="'Year'+(required ? ' *':'')" [formControl]="yearControl">
             <mat-option *ngFor="let y of validYears" [value]="y">{{y}}</mat-option>
         </mat-select>
         <mat-error *ngIf="yearControl.errors && yearControl.errors.required">Year is required</mat-error>
     </mat-form-field>
+
+    <higher-species-phenophase-input
+        [gatherColor]="gatherColor"
+        [selection]="selection"
+        [criteria]="criteria"
+        [(plot)]="curve"
+        [disabled]="speciesInputDisabled"
+        [required]="required"
+        (plotChange)="onSpeciesChange.next($event)">
+    </higher-species-phenophase-input>
 
     <mat-form-field class="metric-input">
         <mat-select placeholder="Metric" [(ngModel)]="metric" [disabled]="!curve.validMetrics.length" [disabled]="disabled">
@@ -58,6 +60,7 @@ export class CurveControlComponent extends MonitorsDestroy {
     onMetricChange = new EventEmitter<any>();
 
     yearControl:FormControl;
+    criteria:HigherSpeciesPhenophaseInputCriteria;
 
     get metric():any {
         return this.curve.metric;
@@ -92,7 +95,18 @@ export class CurveControlComponent extends MonitorsDestroy {
         }
         this.yearControl.valueChanges
             .pipe(takeUntil(this.componentDestroyed))
-            .subscribe(y => this.curve.year = y);
+            .subscribe(y => {
+                this.curve.year = y;
+                this.updateCriteria();
+            });
+        setTimeout(() => this.updateCriteria());
+    }
+
+    updateCriteria() {
+        this.criteria = {
+            years: this.curve.year ? [this.curve.year] : [],
+            stationIds: this.selection.getStationIds()
+        };
     }
 
     ngOnChanges(changes:SimpleChanges):void {
@@ -103,5 +117,9 @@ export class CurveControlComponent extends MonitorsDestroy {
                 this.yearControl.enable();
             }
         }
-    }    
+    }
+
+    get speciesInputDisabled():boolean {
+        return this.disabled || !this.curve.year;
+    }
 }

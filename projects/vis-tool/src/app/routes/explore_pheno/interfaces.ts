@@ -88,6 +88,8 @@ export interface VisConfigStep {
     $controlInstance?: ControlComponent;
     /**  Used at runtime to hold onto a reference tot he actual sub-control component (if there is one). */
     $subControlInstance?: SubControlComponent;
+    /** Whether the step is currently active */
+    active?: boolean;
 }
 
 /**

@@ -10,6 +10,11 @@ import { TaxonomicPhenophaseRank } from '@npn/common/common/phenophase';
 import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component';
 import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
+export interface HigherSpeciesPhenophaseInputCriteria {
+    years?: number[];
+    stationIds?: Promise<number []>;
+}
+
 /**
  * It would be nice if interfaces were actually meaningful at runtime.
  * Using concrete classes, due to getters/setters, could be problematic
@@ -69,8 +74,10 @@ phenophases={{phenophaseTaxInfo?.phenophases.length | number}} classes={{phenoph
 export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     @Input() required:boolean = true;
     @Input() disabled:boolean = false;
+    
+    private criteriaUpdate:Subject<HigherSpeciesPhenophaseInputCriteria> = new Subject();
+    _criteria:HigherSpeciesPhenophaseInputCriteria;
 
-    private selectionUpdate:Subject<VisSelection> = new Subject();
     @Input() debug:boolean = false;
     @Input() selection:VisSelection; // for access to network args
     @Input() plot:SpeciesPlot;
@@ -120,25 +127,18 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     }
 
     ngOnInit() {
-        const $speciesTaxonomicInfo:Observable<SpeciesTaxonomicInfo> = this.selectionUpdate.pipe(
+        const $speciesTaxonomicInfo:Observable<SpeciesTaxonomicInfo> = this.criteriaUpdate.pipe(
             tap(() => this.fetchingSpeciesList = true),
-            switchMap(selection => {
-                if(selection instanceof StationAwareVisSelection) {
-                    return from(selection.toURLSearchParams().then(allParams => {
-                        // strictly interested in station_id and not any other params a vis might send.
+            switchMap(criteria => from((criteria.stationIds||Promise.resolve([])).then(stationIds => {
                         let params = new HttpParams();
-                        allParams.keys()
-                            .filter(k => /^station_id/.test(k))
-                            .forEach(k => params = params.set(k,allParams.get(k)))
+                        (stationIds||[]).forEach((id,idx) => params = params.set(`station_ids[${idx}]`,`${id}`))
                         return params;
                     })).pipe(
-                        switchMap(params => this.speciesService.getAllSpeciesHigher(params))
-                    );
-                }
-                return this.speciesService.getAllSpeciesHigher() 
-            }),
+                        switchMap(params => this.speciesService.getAllSpeciesHigher(params,criteria.years))
+                    )),
             tap(() => this.fetchingSpeciesList = false)
         );
+
         combineLatest(
             this.speciesRank.valueChanges,
             $speciesTaxonomicInfo
@@ -213,14 +213,23 @@ console.log('speciesTaxInfo',info);
         });
 
         // whenever species changes go update the available phenophases/classes
-        // TODO deal with years...
-        const $phenophaseTaxInfo:Observable<PhenophaseTaxonomicInfo> = this.species.valueChanges.pipe(
+        // TODO deal with station_ids?
+        const $phenophaseTaxInfo:Observable<PhenophaseTaxonomicInfo> = combineLatest(
+            this.species.valueChanges,
+            this.criteriaUpdate
+        ).pipe(
             tap(() => this.fetchingPhenophaseList = true),
-            switchMap(species => !!species
-                ? from(this.speciesService.getAllPhenophases(species,this.speciesRank.value)
+            switchMap(input => {
+console.log('$phenophaseTaxInfo.input',input);
+                const [species,criteria] = input;
+                return !!species
+                ? from(
+                    (criteria.years && criteria.years.length
+                    ? this.speciesService.getPhenophasesForYears(species,this.speciesRank.value,criteria.years)
+                    : this.speciesService.getAllPhenophases(species,this.speciesRank.value))
                     .then(phenos => this.speciesService.generatePhenophaseTaxonomicInfo(phenos)))
                 : of(null)
-            ),
+            }),
             tap(() => this.fetchingPhenophaseList = false),
         );
 
@@ -239,7 +248,6 @@ console.log('phenophaseTaxInfo',info);
             }),
             tap(list => this.phenophaseList = list),
             takeUntil(this.componentDestroyed),
-            
         );
 
         //  species or list of phenophases changed, need to check validity of phenophase if set
@@ -285,16 +293,17 @@ console.log('phenophaseTaxInfo',info);
         ).subscribe((input:any[]) => {
             const [pheno,list] = input;
             this.phenophaseHint = (!!pheno && !!list && !!list.phenophases && list.phenophases.length)
-                ? list.phenophases
+                ? ('Phenophases included: ' + list.phenophases
                     .filter(pp => pheno.pheno_class_id == pp.pheno_class_id) // phenophases of class
-                    .map(pp => pp.phenophase_name) // map t name
+                    .sort((a,b) => a.seq_num - b.seq_num)
+                    .map(pp => pp.phenophase_name.trim()) // map t name
                     .reduce((arr,ppn) => { // eliminate any duplicate names
                         if(arr.indexOf(ppn) === -1) {
                             arr.push(ppn);
                         }
                         return arr;
                     },[])
-                    .join(', ')
+                    .join(', '))
                 : undefined;
         });
 
@@ -307,6 +316,7 @@ console.log('phenophaseTaxInfo',info);
         });
         this.checkDisabled();
         this.checkRequired();
+        this.criteriaUpdate.next(this.criteria||{});
         this.group.valueChanges
             .pipe(
                 //tap(v => console.log('selection changed',v)),
@@ -320,18 +330,29 @@ console.log('phenophaseTaxInfo',info);
                 takeUntil(this.componentDestroyed)
             )
             .subscribe(v => {
-                // edit the plot in place, it may be a class
-                this.plot.speciesRank = v ? v.speciesRank : null;
-                this.plot.species = v ? v.species : null;
-                this.plot.phenophaseRank = TaxonomicPhenophaseRank.CLASS;
-                this.plot.phenophase = v ? v.phenophase : null;
-                if(this.gatherColor) {
-                    this.plot.color = v ? v.color : null;
-                } else {
-                    delete this.plot.color; // just to be safe, mostly stesting
-                }
-                this.plotChange.next(this.plot);
+                //setTimeout(() => {
+                    // edit the plot in place, it may be a class
+                    this.plot.speciesRank = v ? v.speciesRank : null;
+                    this.plot.species = v ? v.species : null;
+                    this.plot.phenophaseRank = TaxonomicPhenophaseRank.CLASS;
+                    this.plot.phenophase = v ? v.phenophase : null;
+                    if(this.gatherColor) {
+                        this.plot.color = v ? v.color : null;
+                    } else {
+                        delete this.plot.color; // just to be safe, mostly stesting
+                    }
+                    this.plotChange.next(this.plot);
+                //});
             });
+    }
+
+    @Input()
+    set criteria(c:HigherSpeciesPhenophaseInputCriteria) {
+        this.criteriaUpdate.next(this._criteria = c);
+    }
+
+    get criteria():HigherSpeciesPhenophaseInputCriteria {
+        return this._criteria;
     }
 
     checkDisabled() {
@@ -363,28 +384,9 @@ console.log('phenophaseTaxInfo',info);
         }
     }
 
-    // TODO need to use promises to get all station ids.
-    private bootstrapped:boolean = false;
-    private boundaries:BoundarySelection[];
-    ngDoCheck() {
-        if(!this.bootstrapped) {
-            if(this.selection instanceof StationAwareVisSelection) {
-                this.boundaries = this.selection.boundaries;
-            }
-            this.selectionUpdate.next(this.selection);
-            this.bootstrapped = true;
-        } else if (this.selection instanceof StationAwareVisSelection) {
-            const bounds = this.selection.boundaries;
-            if(bounds !== this.boundaries && !(!bounds.length && !this.boundaries.length)) {
-                this.boundaries = bounds;
-                this.selectionUpdate.next(this.selection);
-            }
-        }
-    }
-
     ngOnDestroy() {
         super.ngOnDestroy();
-        this.selectionUpdate.complete();
+        this.criteriaUpdate.complete();
     }
 
     get speciesTaxRankPlaceholder():string {
@@ -410,11 +412,11 @@ console.log('phenophaseTaxInfo',info);
                 label = 'Family';
                 break;
         }
-        return label+(this.required ? ' *' : '');
+        return label + (!this.fetchingPhenophaseList && (this.speciesList||[]).length ? ` (${(this.speciesList||[]).length})` : '') + (this.required ? ' *' : '');
     }
 
     get phenophasePlaceholder():string {
-        return 'Phenophase class'+(this.required ? ' *' : '');
+        return 'Phenophase class' /*+ ((this.phenophaseList||[]).length ? ` (${(this.phenophaseList||[]).length})`: '')*/ + (this.required ? ' *' : '');
     }
 
     get colorPlaceholder():string {

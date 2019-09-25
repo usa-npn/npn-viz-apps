@@ -118,7 +118,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                     addDoys(pPhases.years[year].positive,plot.color);
                 }
                 const pp = plot.phenophase as any;
-                response.labels.splice(0, 0, this.speciesTitle.transform(plot.species,plot.speciesRank) + '/' + (pp.phenophase_name||pp.pheno_class_name) + ' (' + year + ')');
+                response.labels.splice(0, 0, ' (' + year + '): ' + this.speciesTitle.transform(plot.species,plot.speciesRank) + ' - ' + (pp.phenophase_name||pp.pheno_class_name));
                 y--;
             })
         });

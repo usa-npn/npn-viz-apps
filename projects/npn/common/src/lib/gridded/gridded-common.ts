@@ -149,7 +149,7 @@ export interface GriddedPointData {
     formatted: string;
 }
 
-export const CATEGORY_PEST = 'Pests';
+export const CATEGORY_PEST = 'Phenoforecasts';
 export const CATEGORY_TEMP_ACCUM_30_YR_AVG = 'Temperature Accumulations, Daily 30-year Average';
 export const CATEGORY_TEMP_ACCUM_CURRENT = 'Temperature Accumulations, Current Day';
 export const CATEGORY_TEMP_ACCUM_CURRENT_AK = 'Temperature Accumulations, Current Day, Alaska';

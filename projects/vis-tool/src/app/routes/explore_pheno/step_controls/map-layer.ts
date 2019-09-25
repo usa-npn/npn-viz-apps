@@ -26,7 +26,7 @@ export function getLayerTitle(layer) {
     `]
 })
 export class MapLayerStepComponent extends BaseStepComponent {
-    title:string = 'Layer';
+    title:string = 'Base Layer';
     selection:MapSelection;
 
     get state():StepState {

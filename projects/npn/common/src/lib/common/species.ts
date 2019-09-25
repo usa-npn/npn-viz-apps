@@ -37,7 +37,7 @@ export type TaxonomicSpeciesType = Species|TaxonomicClass|TaxonomicOrder|Taxonom
 
 export enum TaxonomicSpeciesRank {
     SPECIES = 'species',
-    CLASS = 'class',
+    FAMILY = 'family',
     ORDER = 'order',
-    FAMILY = 'family'
+    CLASS = 'class'
 }

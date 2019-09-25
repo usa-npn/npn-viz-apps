@@ -88,14 +88,14 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
         label: 'Species',
         rank: TaxonomicSpeciesRank.SPECIES
     },{
-        label: 'Class',
-        rank: TaxonomicSpeciesRank.CLASS
+        label: 'Family',
+        rank: TaxonomicSpeciesRank.FAMILY
     },{
         label: 'Order',
         rank: TaxonomicSpeciesRank.ORDER
     },{
-        label: 'Family',
-        rank: TaxonomicSpeciesRank.FAMILY
+        label: 'Class',
+        rank: TaxonomicSpeciesRank.CLASS
     }];
     species:FormControl = new FormControl();
     fetchingSpeciesList:boolean = false;

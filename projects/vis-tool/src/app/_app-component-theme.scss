@@ -8,6 +8,10 @@
     //color: mat-contrast($warn,500);
     $main-nav-active-color: mat-color($warn,500);
 
+    .mat-option.mat-selected {
+        background-color: #e8e8e8 !important;
+    }
+
     mat-drawer-container {
         height: 100vh;
     }

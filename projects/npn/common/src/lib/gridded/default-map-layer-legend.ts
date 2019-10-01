@@ -9,19 +9,19 @@ export class DefaultMapLayerLegend extends WmsMapLayerLegend {
             griddedPipes,
             [
                 {quantity:-9999, color:'', original_label:'',label:''}, // first data always ignored.
-                {quantity: 0, color: 'rgb(31,119,180)', original_label: '', label: 'Jan'},
-                {quantity: 32, color: 'rgb(255,127,14)', original_label: '', label: 'Feb'},
-                {quantity: 60, color: 'rgb(44,160,44)', original_label: '', label: 'Mar'},
-                {quantity: 91, color: 'rgb(214,39,40)', original_label: '', label: 'Apr'},
-                {quantity: 121, color: 'rgb(148,103,189)', original_label: '', label: 'May'},
-                {quantity: 152, color: 'rgb(140,86,75)', original_label: '', label: 'Jun'},
-                {quantity: 182, color: 'rgb(227, 119, 194)', original_label: '', label: 'Jul'},
-                {quantity: 213, color: 'rgb(127, 127, 127)', original_label: '', label: 'Aug'},
-                {quantity: 244, color: 'rgb(188, 189, 34)', original_label: '', label: 'Sep'},
-                {quantity: 274, color: 'rgb(23, 190, 207)', original_label: '', label: 'Oct'},
+                {quantity: 0, color: 'rgb(62,38,168)', original_label: '', label: 'Jan'},
+                {quantity: 32, color: 'rgb(71,64,227)', original_label: '', label: 'Feb'},
+                {quantity: 60, color: 'rgb(70,96,252)', original_label: '', label: 'Mar'},
+                {quantity: 91, color: 'rgb(47,130,249)', original_label: '', label: 'Apr'},
+                {quantity: 121, color: 'rgb(35,160,229)', original_label: '', label: 'May'},
+                {quantity: 152, color: 'rgb(2,183,204)', original_label: '', label: 'Jun'},
+                {quantity: 182, color: 'rgb(46,196,164)', original_label: '', label: 'Jul'},
+                {quantity: 213, color: 'rgb(101,205,110)', original_label: '', label: 'Aug'},
+                {quantity: 244, color: 'rgb(182,197,50)', original_label: '', label: 'Sep'},
+                {quantity: 274, color: 'rgb(244,186,58)', original_label: '', label: 'Oct'},
 
-                {quantity: 305, color: 'rgb(174,199,232)', original_label: '', label: 'Nov'},
-                {quantity: 335, color: 'rgb(152,223,138)', original_label: '', label: 'Dec'},
+                {quantity: 305, color: 'rgb(249,216,44)', original_label: '', label: 'Nov'},
+                {quantity: 335, color: 'rgb(249,251,21)', original_label: '', label: 'Dec'},
             ],{
                 name: 'Default',
                 legend_label_filter: {

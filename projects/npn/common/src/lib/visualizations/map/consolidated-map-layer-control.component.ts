@@ -41,7 +41,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     template: `
     <mat-form-field class="layer-category">
         <mat-select placeholder="Layer category" [(ngModel)]="selection.layerCategory">
-            <mat-option [value]="null"></mat-option>
+            <mat-option [value]="null">None</mat-option>
             <mat-option [value]="CATEGORY_PESTS">{{CATEGORY_PESTS}}</mat-option>
             <mat-option [value]="CATEGORY_TEMP_ACCUMULATIONS">{{CATEGORY_TEMP_ACCUMULATIONS}}</mat-option>
             <mat-option [value]="CATEGORY_SPRING_INDICES">{{CATEGORY_SPRING_INDICES}}</mat-option>

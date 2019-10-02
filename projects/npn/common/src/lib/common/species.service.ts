@@ -257,11 +257,19 @@ export class SpeciesService {
         return {
             phenophases,
             classes: Object.keys(phenoClassIds).map(id => {
-                    const {pheno_class_id,pheno_class_name} = phenoClassIds[id];
-                    return {pheno_class_id,pheno_class_name};
+                    const {pheno_class_id,pheno_class_name,pheno_class_sequence} = phenoClassIds[id];
+                    return {pheno_class_id,pheno_class_name,pheno_class_sequence};
                 })
                 .filter(r => !!r.pheno_class_id && !!r.pheno_class_name)
-                .sort((a,b) => a.pheno_class_name.localeCompare(b.pheno_class_name))
+                .sort((a,b) => {
+                    if(a.pheno_class_sequence > b.pheno_class_sequence) {
+                        return 1;
+                    } else if(a.pheno_class_sequence < b.pheno_class_sequence) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                })
         };
     }
 

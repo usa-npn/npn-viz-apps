@@ -1,5 +1,5 @@
 export class Phenophase {
-    phenophase_id: number;    
+    phenophase_id: number;
     [x: string]: any
 }
 
@@ -8,6 +8,7 @@ export class Phenophase {
 export interface PhenophaseClass {
     pheno_class_id: number;
     pheno_class_name: string;
+    pheno_class_sequence: number;
 }
 
 export interface TaxonomicPhenophase extends PhenophaseClass,Phenophase {

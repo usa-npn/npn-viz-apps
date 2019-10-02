@@ -42,7 +42,7 @@ export class MapMiscStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-form-field>
+    <mat-form-field matTooltip="Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days.">
         <mat-select placeholder="Data precision filter" [(value)]="selection.numDaysQualityFilter">
             <mat-option [value]="7">7 days</mat-option>
             <mat-option [value]="14">14 days</mat-option>

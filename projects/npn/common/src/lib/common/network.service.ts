@@ -12,4 +12,10 @@ export class NetworkService {
             { network_id: networkId }
         );
     }
+
+    getNetwork(networkId): Promise<any[]> {
+        return this.serviceUtils.cachedGet(
+            this.serviceUtils.dataApiUrl2(`/v0/networks/${networkId}`)
+        );
+    }
 }

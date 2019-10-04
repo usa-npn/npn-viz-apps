@@ -4,6 +4,7 @@ import { faBars } from '@fortawesome/pro-light-svg-icons';
 import { Component } from "@angular/core";
 import { MapSelection } from "@npn/common";
 import { BaseStepComponent, BaseControlComponent } from "./base";
+import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     template: `
@@ -42,12 +43,13 @@ export class MapMiscStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <mat-form-field matTooltip="Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days.">
+    <mat-form-field>
         <mat-select placeholder="Data precision filter" [(value)]="selection.numDaysQualityFilter">
             <mat-option [value]="7">7 days</mat-option>
             <mat-option [value]="14">14 days</mat-option>
             <mat-option [value]="30">30 days</mat-option>
         </mat-select>
+        <mat-hint align="end"><fa-icon [icon]="hintIcon" matTooltip="Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days."></fa-icon></mat-hint>
     </mat-form-field>
     `,
     styles:[`
@@ -64,6 +66,7 @@ export class MapMiscControlComponent extends BaseControlComponent {
     title:string = 'Select visualization behavior';
     protected defaultPropertyKeys:string[] = ['numDaysQualityFilter'];
     selection: MapSelection;
+    hintIcon = faInfoCircle;
 
     stepVisit():void {
         const firstVisit = !this.visited;

@@ -5,6 +5,7 @@ import { Component } from "@angular/core";
 import { ScatterPlotSelection, AXIS, LegendDoyPipe } from "@npn/common";
 import { BaseStepComponent, BaseControlComponent } from "./base";
 import { Options } from 'ng5-slider';
+import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     template: `
@@ -64,13 +65,14 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
         </mat-select>
     </mat-form-field>
 
-    <mat-form-field matTooltip="Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days.">
+    <mat-form-field>
         <mat-select placeholder="Data precision filter" [(value)]="selection.numDaysQualityFilter">
             <mat-option [value]="7">7 days</mat-option>
             <mat-option [value]="14">14 days</mat-option>
             <mat-option [value]="30">30 days</mat-option>
             <mat-option [value]="-1" [disabled]="!selection.individualPhenometrics">None<span *ngIf="!selection.individualPhenometrics"> (Individual phenometrics only)</span></mat-option>
         </mat-select>
+        <mat-hint align="end"><fa-icon [icon]="hintIcon" matTooltip="Less precise data is removed from the scatter plot and map visualizations by only plotting data points preceded or followed by a “no” within 30 days. This filter can be adjusted here to 7, 14, or 30 days."></fa-icon></mat-hint>
     </mat-form-field>
 
     <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="selection.redraw()">Fit Lines</mat-checkbox>
@@ -118,6 +120,7 @@ export class ScatterPlotMiscControlComponent extends BaseControlComponent {
     protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy','numDaysQualityFilter'];
     selection: ScatterPlotSelection;
     axis = AXIS;
+    hintIcon = faInfoCircle;
 
     doyOptions:Options;
 

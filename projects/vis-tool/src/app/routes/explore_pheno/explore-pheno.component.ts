@@ -68,7 +68,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         } else {
             this.controlsOpen.next(true);
         }
-        setTimeout(() => this.resize(),500);
+        setTimeout(() => this.resize(),800);
     }
 
     ngOnInit() {
@@ -187,6 +187,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
         this.subControlsOpen$ = mergeObservables.apply(null,subControlsVisibilitySubjects);
         this.focusStep(this.steps[0]);
         if(this.visualizationHost && this.activeVis && this.activeVis.component) {
+            this.resize();
             // pause selection so as components get wired together any updates/resizes are ignored.
             this.activeVis.selection.pause();
             // create and insert the visualization

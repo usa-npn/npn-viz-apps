@@ -108,7 +108,11 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                 const data = legend
                     ? legend.getPointData(m.doy)
                     : null;
-                m.icon.fillColor = data ? data.color : '#ffffff';
+                if(legend.layerName.includes('si-x')) {
+                    m.icon.fillColor = data ? data.color : '#ffffff';
+                } else {
+                    m.icon.fillColor = '#ffffff';
+                }
                 m.title = legend
                     ? m.records.map(r => legend.formatPointData(r.mean_first_yes_doy)).join(', ')
                     : m.records.map(r => r.mean_first_yes_doy).join(', ');

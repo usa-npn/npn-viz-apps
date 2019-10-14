@@ -32,7 +32,7 @@ import { takeUntil } from 'rxjs/operators';
     `]
 })
 export class AgddTsMiscStepComponent extends BaseStepComponent {
-    title:string = 'Behavior';
+    title:string = 'Features';
     selection:AgddTimeSeriesSelection;
 
     get state():StepState {
@@ -54,7 +54,7 @@ export class AgddTsMiscStepComponent extends BaseStepComponent {
     `
 })
 export class AgddTsMiscControlComponent extends BaseControlComponent {
-    title:string = 'Select visualization behavior';
+    title:string = 'Select visualization features';
     selection:AgddTimeSeriesSelection;
 
     stepVisit():void {

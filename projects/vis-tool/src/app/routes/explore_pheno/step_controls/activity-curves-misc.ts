@@ -35,7 +35,7 @@ import { faBars } from '@fortawesome/pro-light-svg-icons';
     `]
 })
 export class ActivityCurvesMiscStepComponent extends BaseStepComponent {
-    title:string = 'Behavior';
+    title:string = 'Features';
     selection: ActivityCurvesSelection;
 
     get interpolate():string {
@@ -84,7 +84,7 @@ export class ActivityCurvesMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class ActivityCurvesMiscControlComponent extends BaseControlComponent {
-    title:string = 'Select visualization behavior';
+    title:string = 'Select visualization features';
     selection: ActivityCurvesSelection;
     protected defaultPropertyKeys:string[] = ['interpolate','frequency','dataPoints'];
 

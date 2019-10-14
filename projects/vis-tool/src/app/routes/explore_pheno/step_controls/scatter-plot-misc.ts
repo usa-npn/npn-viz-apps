@@ -38,7 +38,7 @@ import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
     ]
 })
 export class ScatterPlotMiscStepComponent extends BaseStepComponent {
-    title:string = 'Behavior';
+    title:string = 'Features';
     selection: ScatterPlotSelection;
 
     get state():StepState {
@@ -116,7 +116,7 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
     ]
 })
 export class ScatterPlotMiscControlComponent extends BaseControlComponent {
-    title:string = 'Select visualization behavior';
+    title:string = 'Select visualization features';
     protected defaultPropertyKeys:string[] = ['axis','regressionLines','individualPhenometrics','minDoy','maxDoy','numDaysQualityFilter'];
     selection: ScatterPlotSelection;
     axis = AXIS;

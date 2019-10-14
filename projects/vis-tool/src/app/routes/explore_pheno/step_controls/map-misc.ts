@@ -29,7 +29,7 @@ import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
     `]
 })
 export class MapMiscStepComponent extends BaseStepComponent {
-    title:string = 'Behavior';
+    title:string = 'Features';
     selection: MapSelection;
 
     get state():StepState {
@@ -63,7 +63,7 @@ export class MapMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class MapMiscControlComponent extends BaseControlComponent {
-    title:string = 'Select visualization behavior';
+    title:string = 'Select visualization features';
     protected defaultPropertyKeys:string[] = ['numDaysQualityFilter'];
     selection: MapSelection;
     hintIcon = faInfoCircle;

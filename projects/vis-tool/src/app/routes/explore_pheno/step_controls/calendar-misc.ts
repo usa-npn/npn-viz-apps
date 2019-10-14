@@ -28,7 +28,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
     `]
 })
 export class CalendarMiscStepComponent extends BaseStepComponent {
-    title:string = 'Behavior';
+    title:string = 'Features';
     selection: CalendarSelection;
 
     get state():StepState {
@@ -68,7 +68,7 @@ export class CalendarMiscStepComponent extends BaseStepComponent {
     `]
 })
 export class CalendarMiscControlComponent extends BaseControlComponent {
-    title:string = 'Select visualization behavior'
+    title:string = 'Select visualization features'
     protected defaultPropertyKeys:string[] = ['negative','negativeColor','fontSizeDelta','labelOffset','bandPadding'];
     selection: CalendarSelection;
     axis = AXIS;

@@ -64,7 +64,7 @@ export class AgddTsLayerPointStepComponent extends BaseStepComponent {
     `]
 })
 export class AgddTsLayerPointControlComponent extends BaseControlComponent {
-    title:string = 'Select layer/point';
+    title:string = 'Select layer and click a location on the map';
     defaultPropertyKeys:string[] = ['layerCategory','layerName'];
     subControlComponent:AgddTsLayerPointSubControlComponent;
     map;
@@ -90,7 +90,7 @@ export class AgddTsLayerPointControlComponent extends BaseControlComponent {
     styleUrls:['../../../../../../npn/common/src/lib/visualizations/map/map-visualization.component.scss']
 })
 export class AgddTsLayerPointSubControlComponent extends BaseSubControlComponent {
-    title:string = 'Select layer/point';
+    title:string = 'Select layer and click a location on the map';
     $fullScreen:boolean = true;
 
     @ViewChild(MapLayerLegendComponent) legend:MapLayerLegendComponent;

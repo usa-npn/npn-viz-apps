@@ -108,7 +108,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
                 const data = legend
                     ? legend.getPointData(m.doy)
                     : null;
-                if(legend.layerName.includes('si-x')) {
+                if(legend.layerName.includes('si-x') || legend.layerName.includes('no-layer')) {
                     m.icon.fillColor = data ? data.color : '#ffffff';
                 } else {
                     m.icon.fillColor = '#ffffff';

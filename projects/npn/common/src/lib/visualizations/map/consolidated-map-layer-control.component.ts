@@ -97,7 +97,7 @@ export class ConsolidatedMapLayerControlComponent {
     selector: 'pest-map-layer-control',
     template: `
     <mat-form-field>
-        <mat-select placeholder="Pest" [(ngModel)]="selection.layerName" (selectionChange)="selection.redraw()">
+        <mat-select placeholder="Phenoforecast" [(ngModel)]="selection.layerName" (selectionChange)="selection.redraw()">
             <mat-option *ngFor="let l of layers" [value]="l.name">{{l.title}}</mat-option>
         </mat-select>
     </mat-form-field>

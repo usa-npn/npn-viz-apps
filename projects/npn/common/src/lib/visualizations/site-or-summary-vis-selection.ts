@@ -37,7 +37,11 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         if(this.numDaysQualityFilter && this.numDaysQualityFilter > 0) {
-            params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
+            if(this.individualPhenometrics) {
+                params = params.set('num_days_quality_filter_individual',`${this.numDaysQualityFilter}`)
+            } else {
+                params = params.set('num_days_quality_filter',`${this.numDaysQualityFilter}`)
+            }
         }
         return super.toURLSearchParams(params);
     }

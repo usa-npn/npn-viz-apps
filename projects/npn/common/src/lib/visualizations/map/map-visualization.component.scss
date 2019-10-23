@@ -49,9 +49,34 @@
             height: 30px;
             border: 1px solid #aaa;
         }
+        .spinner-logo {
+            width: 30px;
+            height: 30px;
+        }
         .point-formatted {
             font-size: 1.25em;
             padding-left: .5em;
         }
+    }
+    .spinner-logo>svg {
+        animation-name: loading-anim;
+        animation-duration: 1250ms;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        width: 28px;
+        height: 28px;
+    }
+    .spinner-logo>svg .swirl-top {
+        fill: #f37022;
+    }
+    .spinner-logo>svg .swirl-left {
+        fill: #68bd46;
+    }
+    .spinner-logo>svg .swirl-right {
+        fill: #3b94d0;
+    }
+    @keyframes loading-anim {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 }

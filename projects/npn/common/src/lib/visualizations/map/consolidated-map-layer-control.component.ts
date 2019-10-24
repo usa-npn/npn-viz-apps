@@ -365,6 +365,10 @@ export class SpringIndexMapLayerControlComponent extends MonitorsDestroy {
             takeUntil(this.componentDestroyed)
         )
         .subscribe(baseLayer => {
+            if(baseLayer === SIX_BASE.CUR_YEAR || baseLayer === SIX_BASE.DAILY_ANOM) {
+                this.selection.year = new Date().getFullYear();
+                this.selection.extentValue = new Date().toISOString().split('T')[0]+"00:00:00.000Z";
+            }
             if(baseLayer === SIX_BASE.CUR_YEAR) {
                 this.alaska.enable();
             } else {

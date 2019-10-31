@@ -9,9 +9,9 @@
             "request": "launch",
             "name": "Vis tool",
             "url": "http://localhost:4200/vis-tool",
-            "webRoot": "/Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",
+            "webRoot": "${workspaceFolder}",
             "sourceMapPathOverrides": {
-                "webpack:///./*": "${workspaceFolder}/projects/fws-dashboard/*",
+                "webpack:///./*": "${workspaceFolder}/projects/vis-tool/*",
                 "webpack:///../npn/common/*": "${workspaceFolder}/projects/npn/common/*"
             }
         },

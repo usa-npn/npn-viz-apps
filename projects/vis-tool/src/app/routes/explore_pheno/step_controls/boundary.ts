@@ -537,6 +537,7 @@ export class BoundaryControlComponent extends BaseControlComponent {
 
     stepVisit():void {
         super.stepVisit();
+        this.subControlComponent.zoom = 4.1;
         setTimeout(() => this.subControlComponent.show(),500);
     }
 }

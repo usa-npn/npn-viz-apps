@@ -12,8 +12,11 @@ import { Subject, merge } from 'rxjs';
     <button class="dismiss" mat-icon-button (click)="ref.dismiss()" matTooltip="Hide description"><fa-icon [icon]="dismissIcon"></fa-icon></button>
     <div class="mat-typography">
         <h2 class="mat-h2">{{data.title}}</h2>
-        <h3 class="mat-h2">{{data.tagline}}</h3>
+        <!-- <h3 class="mat-h2">{{data.tagline}}</h3> -->
+        <div>
+        <img *ngIf="data.image" src="{{data.image.src}}" alt="{{data.image.alt}}" width="300px" height="300px" style="float: left; padding: 10px">
         <div [innerHTML]="data.description"></div>
+        </div>
     </div>
     `,
     styles:[`

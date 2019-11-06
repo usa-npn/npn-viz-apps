@@ -18,6 +18,8 @@ export interface Story extends Shared {
     tagline: string;
     /** A long description (HTML) to place in a dialog when opening the story */
     description?: string;
+    /** An image (HTML) to place in a dialog when opening the story */
+    image?;
 }
 
 export interface StoriesConfiguration {
@@ -36,6 +38,30 @@ export class StoriesService {
         private sharingService:SharingService
     ) {}
 
+    mapDynamicDates(storiesConfig: StoriesConfiguration) {
+      let today = new Date();
+      today.setHours(0,0,0,0);
+
+      //calculate today's doy
+      let start = new Date(today.getFullYear(), 0, 0);
+      let diff = (+today - +start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
+      let oneDay = 1000 * 60 * 60 * 24;
+      let doy = Math.floor(diff / oneDay);
+
+      storiesConfig.stories.forEach(s => {
+        if(s.external['extentValue'] == 'today') {
+          s.external['extentValue'] = today.toISOString();
+        }
+        if(s.external['doy'] == 'today') {
+          s.external['doy'] = doy;
+        }
+        if(s.external['year'] == 'today') {
+          s.external['year'] = today.getFullYear();
+        }
+      })
+      return storiesConfig;
+    }
+
     getConfiguration():Observable<StoriesConfiguration> {
         return from(
             this.serviceUtils.cachedGet('stories.json')
@@ -52,7 +78,7 @@ export class StoriesService {
                     });
                   */
               })
-        );
+        ).pipe( map((storiesConfig: StoriesConfiguration) => this.mapDynamicDates(storiesConfig)) );
     }
 
     visit(story:Story):Promise<boolean> {

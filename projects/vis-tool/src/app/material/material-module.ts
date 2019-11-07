@@ -15,6 +15,7 @@ import {
     MatBottomSheetModule,
     MatGridListModule,
     MatCardModule,
+    MatRippleModule,
     MatExpansionModule,
     MatIconModule,
     MatToolbarModule
@@ -49,6 +50,7 @@ import { SelectTreeModule } from '../select-tree';
         MatBottomSheetModule,
         MatGridListModule,
         MatCardModule,
+        MatRippleModule,
         MatExpansionModule,
         MatIconModule,
         MatToolbarModule
@@ -72,6 +74,7 @@ import { SelectTreeModule } from '../select-tree';
         MatBottomSheetModule,
         MatGridListModule,
         MatCardModule,
+        MatRippleModule,
         MatExpansionModule,
         MatIconModule,
         MatToolbarModule

@@ -1,15 +1,15 @@
-import { Component, Input, Inject, HostBinding } from '@angular/core';
+import { Component, Input, Inject, HostBinding, ViewChild, ElementRef } from '@angular/core';
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
 import { faBookAlt, faArrowFromTop } from '@fortawesome/pro-light-svg-icons';
 import { VisSelection, MonitorsDestroy } from '@npn/common';
-import { Shared } from './sharing.service';
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef } from '@angular/material';
-import { takeUntil } from 'rxjs/operators';
+import { Shared, SharingService } from './sharing.service';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef, MatRipple } from '@angular/material';
+import { takeUntil, delay } from 'rxjs/operators';
 import { Subject, merge } from 'rxjs';
 
 @Component({
     template: `
-    <button class="dismiss" mat-icon-button (click)="ref.dismiss()" matTooltip="Hide description"><fa-icon [icon]="dismissIcon"></fa-icon></button>
+    <button class="dismiss" mat-icon-button (click)="closeDescription()" matTooltip="Hide description"><fa-icon [icon]="dismissIcon"></fa-icon></button>
     <div class="mat-typography">
         <h2 class="mat-h2">{{data.title}}</h2>
         <!-- <h3 class="mat-h2">{{data.tagline}}</h3> -->
@@ -29,8 +29,14 @@ export class SharedVisualizationDescriptionComponent {
     dismissIcon = faArrowFromTop;
     constructor(
         @Inject(MAT_BOTTOM_SHEET_DATA) public data: Shared,
-        public ref:MatBottomSheetRef
+        public ref:MatBottomSheetRef,
+        private sharingService:SharingService
     ) {}
+
+    closeDescription() {
+        this.sharingService.closingShareDescription.next(true);
+        this.ref.dismiss();
+    }
 }
 
 @Component({
@@ -42,8 +48,8 @@ export class SharedVisualizationDescriptionComponent {
             <div class="text">{{title}}</div>
         </div>
         <div class="step-host">
-            <div *ngIf="selection?.isValid() && selection.$shared?.description">
-                <button mat-stroked-button color="accent" (click)="show()">Show description</button>
+        <div *ngIf="selection?.isValid() && selection.$shared?.description">
+                <button matRipple mat-stroked-button color="accent" (click)="show()">Show description</button>
             </div>
         </div>
     </div>
@@ -59,13 +65,23 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
         controlComponent: null
     }
 
+    @ViewChild(MatRipple) ripple: MatRipple;
+
+    triggerRipple() {
+        this.ripple.launch({centered: true});
+    }
+
     constructor(
-        private matBottomSheet:MatBottomSheet
+        private matBottomSheet:MatBottomSheet,
+        private sharingService:SharingService
     ) {
         super();
     }
 
     ngOnInit() {
+        this.sharingService.closingShareDescription
+            .pipe(delay(1000))
+            .subscribe(() => { this.triggerRipple() });
         this.step.$stepInstance = this;
         this.show();
         const serializeSelection = () => JSON.stringify(this.selection.external);
@@ -86,7 +102,7 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
                     // data changed so the shared selection's representation is out of date with
                     // what the UI might generate today...  If the control goes away for
                     // canned stories this is almost certainly why.
-                    this.display = 'none';
+                    // this.display = 'none'; //temp comment out by jeff
                     stopSubscription.next();
                 }
             });

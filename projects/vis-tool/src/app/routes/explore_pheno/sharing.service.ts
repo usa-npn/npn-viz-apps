@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import * as pako from 'pako';
 import { VisSelection, APPLICATION_SETTINGS, AppSettings } from '@npn/common';
+import { Subject } from 'rxjs';
 
 export interface Shared {
     /** The external form of the `VisSelection` to  display */
@@ -14,6 +15,9 @@ export interface Shared {
 
 @Injectable()
 export class SharingService {
+    /** flashes show description button when user closes description */
+    public closingShareDescription = new Subject();
+
     /**
      * Serializes a VisSelection to a string.  Current application
      * settings will be included.

@@ -25,7 +25,8 @@ import { MapSelection } from './map-selection';
                     <path [attr.fill]="iconFill(r)" [attr.d]="svgs[r.plotIndex]" stroke='#000'></path>
                 </svg></h4>
             <ul>
-            <li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} ({{selection.legend.formatPointData(r.mean_first_yes_doy)}})<span *ngIf="r.sd_first_yes_in_days > 0"> [Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li>
+            <!--<li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} ({{selection.legend.formatPointData((selection.layerName?.includes('gdd') || selection.layerCategory == 'Phenoforecasts') ? r.mean_gddf : r.mean_first_yes_doy)}})<span *ngIf="r.sd_first_yes_in_days > 0"> [Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li> -->
+            <li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} {{gddOrDateMarkerText(r)}} <span *ngIf="r.sd_first_yes_in_days > 0">[Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li>
             </ul>
         </div>
     </ng-template>
@@ -85,6 +86,15 @@ export class MapVisualizationMarkerIw {
     constructor(
         private stationService:StationService
     ) {}
+
+    gddOrDateMarkerText(r) {
+        if (this.selection.layerCategory == 'Phenoforecasts' 
+            || (this.selection.layerName && this.selection.layerName.includes('gdd'))) {
+            return r.mean_gddf != -9999 ? `(${r.mean_gddf} AGDD)` : '';
+        } else {
+            return `(${this.selection.legend.formatPointData(r.mean_first_yes_doy)})`;
+        }
+    }
 
     ngOnChanges(changes: SimpleChanges):void {
         if(changes.marker) {

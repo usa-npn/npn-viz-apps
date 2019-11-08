@@ -126,6 +126,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                         if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
                             params = params.set('pheno_class_aggregate','1');
                         }
+                        params = params.set('climate_data','1');
                         return this.serviceUtils.cachedPost(url,params.toString())
                             .then(data => filterLqd(data,plot,plotIndex))
                             .then(data => ({plot,data}))

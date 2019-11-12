@@ -8,9 +8,10 @@ import {MatTabChangeEvent} from '@angular/material';
 const WHAT_WERE_FINDING_TAB_IDX = 0;
 const FOCAL_SPECIES_TAB_IDX = 1;
 const RESOURCES_TAB_IDX = 2;
+const PARTNERS_TAB_IDX = 3;
 
 @Component({
-  selector: 'refuge-dashboard',
+  selector: 'fws-dashboard',
   template: `
   <mat-tab-group class="refuge-dashboard-tabs" (selectedTabChange)="selectedTabChange($event)">
     <mat-tab label="What we're finding">
@@ -45,12 +46,23 @@ const RESOURCES_TAB_IDX = 2;
             <refuge-resources [refuge]="refuge" [userIsLoggedIn]="userIsLoggedIn"></refuge-resources>
         </div>
     </mat-tab>
+
+    <mat-tab label="Resources for observers">
+        <ng-template mat-tab-label>
+            <div class="rd-tab-label resources">
+                <label>Partners</label>
+            </div>
+        </ng-template>
+        <div class="rd-tab-content" *ngIf="renderPartners">
+            TODO partners implementation
+        </div>
+    </mat-tab>
   </mat-tab-group>
   `,
-  styleUrls: ['./refuge-dashboard.component.scss'],
+  styleUrls: ['./fws-dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class RefugeDashboardComponent implements OnInit {
+export class FwsDashboardComponent implements OnInit {
     refuge_id:string;
     refuge:Refuge;
     userIsLoggedIn:boolean = false;
@@ -59,6 +71,7 @@ export class RefugeDashboardComponent implements OnInit {
     renderVisualizations:boolean = true;
     renderFocalSpecies:boolean = false;
     renderResources:boolean = false;
+    renderPartners:boolean = false;
 
     @ViewChild(FindingsComponent)
     private findingsComponent:FindingsComponent;
@@ -80,6 +93,7 @@ export class RefugeDashboardComponent implements OnInit {
         // lazily render the visualizations, only once visiting their tab
         this.renderVisualizations = this.renderVisualizations||($event.index === WHAT_WERE_FINDING_TAB_IDX);
         this.renderResources = this.renderResources||($event.index === RESOURCES_TAB_IDX);
+        this.renderPartners = this.renderPartners||($event.index === PARTNERS_TAB_IDX);
         if($event.index === WHAT_WERE_FINDING_TAB_IDX) {
             // if the visualizations are selected makes ure that resizeAll() is called
             // in case the browser was re-sized AFTER the visualizations were visited but

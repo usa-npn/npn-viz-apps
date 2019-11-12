@@ -18,6 +18,7 @@ $tab-angle-width: $tab-height/2;
 $color-tab1: #271614;
 $color-tab2: #3f322b;
 $color-tab3: #574d3f;
+$color-tab4: #574dff;
 
 .mat-tab-header {
     .mat-ink-bar {
@@ -91,10 +92,22 @@ $color-tab3: #574d3f;
             }
             &::after {
                 content: '';
-                border-top: $tab-angle-width solid $tab-content-bg;
-                border-right: $tab-angle-width solid $tab-content-bg;
+                border-top: $tab-angle-width solid $color-tab4;
+                border-right: $tab-angle-width solid $color-tab4;
                 border-bottom: $tab-angle-width solid $color-tab3;
                 border-left: $tab-angle-width solid $color-tab3;
+            }
+        }
+        &:nth-of-type(4) {
+            >.mat-tab-label-content >.rd-tab-label {
+                background-color: $color-tab4;
+            }
+            &::after {
+                content: '';
+                border-top: $tab-angle-width solid $tab-content-bg;
+                border-right: $tab-angle-width solid $tab-content-bg;
+                border-bottom: $tab-angle-width solid $color-tab4;
+                border-left: $tab-angle-width solid $color-tab4;
             }
         }
     }

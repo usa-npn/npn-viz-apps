@@ -7,7 +7,7 @@ import {NpnLibModule,NpnCommonModule,VisualizationsModule,NPN_BASE_HREF,NpnConfi
 import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
-import {RefugeDashboardComponent} from './refuge-dashboard.component';
+import {FwsDashboardComponent} from './fws-dashboard.component';
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,VisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
 import {RefugeService} from './refuge.service';
 
@@ -34,7 +34,7 @@ export function npnConfigurationFactory() {
 
 @NgModule({
   declarations: [
-    RefugeDashboardComponent,
+    FwsDashboardComponent,
     FocalSpeciesComponent,
     FindingsComponent,
     ResourcesComponent,
@@ -66,7 +66,7 @@ export function npnConfigurationFactory() {
     }),
     DndModule.forRoot()
   ],
-  bootstrap: [RefugeDashboardComponent],
+  bootstrap: [FwsDashboardComponent],
   providers: [
       RefugeService,
       {provide:NPN_BASE_HREF,useFactory:baseHrefFactory},

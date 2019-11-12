@@ -180,6 +180,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     <clipped-wms-map-control *ngIf="clipped" [selection]="clipped"></clipped-wms-map-control>
 
     <npn-visualization *ngIf="selection" [selection]="selection"></npn-visualization>
+    <pre *ngIf="selection">{{selection.external | json}}</pre>
     `,
     styles:[`
         npn-visualization {
@@ -234,6 +235,7 @@ export class NewVisualizationBuilderComponent implements OnInit {
     <div *ngIf="visScope === 'station' && stations && stations.length">
         <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
     </div>
+    <pre *ngIf="selection">{{selection.external | json}}</pre>
     `,
     styles:[`
         .vis-scope-input {

@@ -2,7 +2,7 @@ import {Component,Inject,Input,OnInit, ViewEncapsulation} from '@angular/core';
 import {MAT_DIALOG_DATA,MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import {Refuge} from './refuge.service';
+import {EntityBase, Refuge, PhenologyTrail} from './entity.service';
 import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSelection,
         ActivityCurvesSelection,ScatterPlotSelection,CalendarSelection,
         ObserverActivitySelection,ObservationFrequencySelection,ClippedWmsMapSelection} from '@npn/common';
@@ -15,7 +15,7 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step *ngIf="stationAware" [stepControl]="step1FormGroup" label="Select sites">
             <div class="step-wrapper">
                 <div class="step-content">
-                    <visualization-scope-selection [selection]="selection" [refuge]="refuge"></visualization-scope-selection>
+                    <visualization-scope-selection [selection]="selection" [refuge]="entity"></visualization-scope-selection>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
@@ -27,7 +27,7 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step [stepControl]="step2FormGroup" label="Build visualization">
             <div *ngIf="showVis" class="step-wrapper">
                 <div class="step-content">
-                    <new-visualization-builder [selection]="selection" [refuge]="refuge"></new-visualization-builder>
+                    <new-visualization-builder [selection]="selection" [entity]="entity"></new-visualization-builder>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
@@ -111,7 +111,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     showVis:number;
     showDetails:boolean;
 
-    refuge:Refuge;
+    entity:EntityBase;
     selection: VisSelection;
 
     constructor(private formBuilder: FormBuilder,
@@ -127,7 +127,7 @@ export class NewVisualizationDialogComponent implements OnInit {
             thirdCtrl: ['',Validators.required]
         });
         this.selection = data.selection as VisSelection;
-        this.refuge = data.refuge;
+        this.entity = data.entity;
         this.edit = data.edit;
     }
 
@@ -143,7 +143,11 @@ export class NewVisualizationDialogComponent implements OnInit {
         this.showVis = !this.stationAware ? 1 : 0;
         if(s instanceof NetworkAwareVisSelection) {
             if(!s.networkIds || !s.networkIds.length) { // don't change on edit (not necessary but seems appropriate)
-                s.networkIds = [this.refuge.network_id];
+                if(this.entity instanceof Refuge) {
+                    s.networkIds = [this.entity.network_id];
+                } else if (this.entity instanceof PhenologyTrail) {
+                    s.networkIds = this.entity.network_ids.slice();
+                }
             }
         }
         if(this.edit) {
@@ -193,7 +197,7 @@ export class NewVisualizationBuilderComponent implements OnInit {
     @Input()
     selection: VisSelection;
     @Input()
-    refuge: Refuge;
+    entity: EntityBase;
 
     scatter: ScatterPlotSelection;
     calendar: CalendarSelection;
@@ -216,13 +220,15 @@ export class NewVisualizationBuilderComponent implements OnInit {
         } else if (s instanceof ObservationFrequencySelection) {
             this.observationFreq = s;
         } else if (s instanceof ClippedWmsMapSelection) {
+            // this visualization only supported for Refuge
             this.clipped = s;
-            s.fwsBoundary = this.refuge.boundary_id;
+            s.fwsBoundary = (this.entity as Refuge).boundary_id;
         }
         s.resize();
     }
 }
 
+// TODO this component is refuge specific
 @Component({
     selector: 'visualization-scope-selection',
     template: `

@@ -1,7 +1,7 @@
 import {Component,OnInit,ElementRef,ViewChild, ViewEncapsulation} from '@angular/core';
 
 import {FindingsComponent} from './findings.component';
-import {Refuge,RefugeService} from './refuge.service';
+import {EntityBase,EntityService,DASHBOARD_MODE, DashboardMode, setDashboardMode} from './entity.service';
 
 import {MatTabChangeEvent} from '@angular/material';
 
@@ -13,7 +13,7 @@ const PARTNERS_TAB_IDX = 3;
 @Component({
   selector: 'fws-dashboard',
   template: `
-  <mat-tab-group class="refuge-dashboard-tabs" (selectedTabChange)="selectedTabChange($event)">
+  <mat-tab-group class="entity-dashboard-tabs" (selectedTabChange)="selectedTabChange($event)">
     <mat-tab label="What we're finding">
         <ng-template mat-tab-label>
             <div class="rd-tab-label findings">
@@ -21,7 +21,7 @@ const PARTNERS_TAB_IDX = 3;
             </div>
         </ng-template>
         <div class="rd-tab-content" *ngIf="renderVisualizations">
-            <refuge-findings *ngIf="refuge" [refuge]="refuge" [userIsAdmin]="userIsAdmin"></refuge-findings>
+            <fws-dashboard-findings *ngIf="entity" [entity]="entity" [userIsAdmin]="userIsAdmin"></fws-dashboard-findings>
         </div>
     </mat-tab>
 
@@ -32,7 +32,7 @@ const PARTNERS_TAB_IDX = 3;
             </div>
         </ng-template>
         <div class="rd-tab-content" *ngIf="renderFocalSpecies">
-            <focal-species [refuge]="refuge"></focal-species>
+            <focal-species [entity]="entity"></focal-species>
         </div>
     </mat-tab>
 
@@ -43,7 +43,7 @@ const PARTNERS_TAB_IDX = 3;
             </div>
         </ng-template>
         <div class="rd-tab-content" *ngIf="renderResources">
-            <refuge-resources [refuge]="refuge" [userIsLoggedIn]="userIsLoggedIn"></refuge-resources>
+            <fws-dashboard-resources [entity]="entity" [userIsLoggedIn]="userIsLoggedIn"></fws-dashboard-resources>
         </div>
     </mat-tab>
 
@@ -63,10 +63,11 @@ const PARTNERS_TAB_IDX = 3;
   encapsulation: ViewEncapsulation.None
 })
 export class FwsDashboardComponent implements OnInit {
-    refuge_id:string;
-    refuge:Refuge;
+    entity_id:string;
+    entity:EntityBase;
     userIsLoggedIn:boolean = false;
     userIsAdmin:boolean = false;
+    dashboardMode:string = null;
 
     renderVisualizations:boolean = true;
     renderFocalSpecies:boolean = false;
@@ -77,15 +78,16 @@ export class FwsDashboardComponent implements OnInit {
     private findingsComponent:FindingsComponent;
 
     constructor(private element:ElementRef,
-                private refugeService:RefugeService) {
+                private entityService:EntityService) {
         let e = element.nativeElement as HTMLElement;
-        this.refuge_id = e.getAttribute('refuge_id');
+        this.entity_id = e.getAttribute('entity_id');
         this.userIsAdmin = e.getAttribute('user_is_admin') !== null;
         this.userIsLoggedIn = e.getAttribute('user_is_logged_in') !== null;
+        setDashboardMode(e.getAttribute('mode') as DashboardMode);
     }
 
     ngOnInit() {
-        this.refugeService.getRefuge(this.refuge_id).then(refuge => this.refuge = refuge);
+        this.entityService.get(this.entity_id).then(entity => this.entity = entity);
     }
 
     selectedTabChange($event:MatTabChangeEvent) {

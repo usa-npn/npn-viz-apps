@@ -9,7 +9,7 @@ import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
 import {FwsDashboardComponent} from './fws-dashboard.component';
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,VisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
-import {RefugeService} from './refuge.service';
+import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -68,7 +68,7 @@ export function npnConfigurationFactory() {
   ],
   bootstrap: [FwsDashboardComponent],
   providers: [
-      RefugeService,
+      EntityService,
       {provide:NPN_BASE_HREF,useFactory:baseHrefFactory},
       {provide:NPN_CONFIGURATION,useFactory:npnConfigurationFactory}
   ]

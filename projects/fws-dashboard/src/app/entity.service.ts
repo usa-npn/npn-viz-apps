@@ -4,6 +4,21 @@ import {HttpClient} from '@angular/common/http';
 
 import {CacheService,VisualizationSelectionFactory,VisSelection} from '@npn/common';
 
+// using class instead of interface so can use instanceof
+export class EntityBase {
+    id:string;
+    title:string;
+    selections:VisSelection[];
+    resources?:string;
+}
+export class Refuge extends EntityBase {
+    network_id:number;
+    boundary_id:string;
+}
+export class PhenologyTrail extends EntityBase {
+    network_ids:number[];
+}
+
 // this means that the app can no longer function outside of the context of Drupal, period.
 const API_ROOT = '/api';
 
@@ -57,7 +72,6 @@ export class EntityService {
     }
 
     get(entity_id):Promise<EntityBase> {
-console.log(`DASHBOARD_MODE=${DASHBOARD_MODE}`);
         return this.http.get(this.apiUrl(entity_id))
                 .toPromise()
                 .then(response => this.castEntity(entity_id,response));
@@ -72,20 +86,4 @@ console.log(`DASHBOARD_MODE=${DASHBOARD_MODE}`);
                 .toPromise()
                 .then(response => this.castEntity(entity.id,response));
     }
-}
-
-
-// using class instead of interface so can use instanceof
-export class EntityBase {
-    id:string;
-    title:string;
-    selections:VisSelection[];
-    resources?:string;
-}
-export class Refuge extends EntityBase {
-    network_id:number;
-    boundary_id:string;
-}
-export class PhenologyTrail extends EntityBase {
-    network_ids:number[];
 }

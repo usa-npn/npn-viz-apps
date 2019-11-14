@@ -26,10 +26,14 @@ export enum DashboardMode {
     REFUGE = 'refuge',
     PHENO_TRAIL = 'phenology_trail'
 };
-export let DASHBOARD_MODE:DashboardMode = DashboardMode.REFUGE;
-export function setDashboardMode(mode:DashboardMode) {
-    DASHBOARD_MODE = mode;
-}
+
+export const DashboardModeState = (function() {
+    let mode:DashboardMode = DashboardMode.REFUGE;
+    return {
+        get: ():DashboardMode => mode,
+        set: (m:DashboardMode) => mode = m,
+    };
+})();
 
 @Injectable()
 export class EntityService {
@@ -48,13 +52,13 @@ export class EntityService {
     }
 
     private apiUrl(entity_id) {
-        return `${API_ROOT}/${DASHBOARD_MODE}/${entity_id}`;
+        return `${API_ROOT}/${DashboardModeState.get()}/${entity_id}`;
     }
 
     private castEntity(entityId,apiResult:any):EntityBase {
         // actually constructing an instance so that other classes can use instanceof
         let entity;
-        switch(DASHBOARD_MODE) {
+        switch(DashboardModeState.get()) {
             case DashboardMode.REFUGE:
                 entity = new Refuge();
                 break;
@@ -62,7 +66,7 @@ export class EntityService {
                 entity = new PhenologyTrail();
                 break;
             default:
-                throw new Error(`Unsupported DASHBOARD_MODE "${DASHBOARD_MODE}"`);
+                throw new Error(`Unsupported DASHBOARD_MODE "${DashboardModeState.get()}"`);
         }
         Object.assign(entity,apiResult);
         entity.id = entityId;

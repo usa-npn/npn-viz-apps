@@ -1,7 +1,7 @@
 import {Component,OnInit,ElementRef,ViewChild, ViewEncapsulation} from '@angular/core';
 
 import {FindingsComponent} from './findings.component';
-import {EntityBase,EntityService,DASHBOARD_MODE, DashboardMode, setDashboardMode} from './entity.service';
+import {EntityBase,EntityService, DashboardMode, DashboardModeState} from './entity.service';
 
 import {MatTabChangeEvent} from '@angular/material';
 
@@ -13,7 +13,7 @@ const PARTNERS_TAB_IDX = 3;
 @Component({
   selector: 'fws-dashboard',
   template: `
-  <mat-tab-group class="entity-dashboard-tabs" (selectedTabChange)="selectedTabChange($event)">
+  <mat-tab-group [ngClass]="{'entity-dashboard-tabs':true, 'three-tabs': !supportsPartners}" (selectedTabChange)="selectedTabChange($event)">
     <mat-tab label="What we're finding">
         <ng-template mat-tab-label>
             <div class="rd-tab-label findings">
@@ -47,7 +47,7 @@ const PARTNERS_TAB_IDX = 3;
         </div>
     </mat-tab>
 
-    <mat-tab label="Resources for observers">
+    <mat-tab label="Resources for observers" *ngIf="supportsPartners">
         <ng-template mat-tab-label>
             <div class="rd-tab-label resources">
                 <label>Partners</label>
@@ -72,6 +72,7 @@ export class FwsDashboardComponent implements OnInit {
     renderVisualizations:boolean = true;
     renderFocalSpecies:boolean = false;
     renderResources:boolean = false;
+    supportsPartners:boolean = false;
     renderPartners:boolean = false;
 
     @ViewChild(FindingsComponent)
@@ -83,7 +84,8 @@ export class FwsDashboardComponent implements OnInit {
         this.entity_id = e.getAttribute('entity_id');
         this.userIsAdmin = e.getAttribute('user_is_admin') !== null;
         this.userIsLoggedIn = e.getAttribute('user_is_logged_in') !== null;
-        setDashboardMode(e.getAttribute('mode') as DashboardMode);
+        DashboardModeState.set(e.getAttribute('mode') as DashboardMode);
+        this.supportsPartners = DashboardModeState.get() === DashboardMode.PHENO_TRAIL;
     }
 
     ngOnInit() {

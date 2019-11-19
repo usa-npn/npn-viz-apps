@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
             <!-- just to push other content down 
             <mat-grid-tile colspan="2">&nbsp;</mat-grid-tile> -->
             <mat-grid-tile *ngFor="let story of cfg.stories">
-                <mat-card [ngStyle]="{'border-radius':'20px', 'opacity': 0.9, 'width': '100%', 'height': '100%', 'box-sizing': 'border-box'}">
+                <mat-card class="story-card">
                     <mat-card-title>{{story.title}}</mat-card-title>
                     <mat-card-subtitle>{{story.tagline}}</mat-card-subtitle>
                     <mat-card-actions align="end">
@@ -41,17 +41,28 @@ import { Observable } from 'rxjs';
     .stories mat-card {
         width: 100%;
     }
+    .stories mat-card-title {
+        font-size: 20px;
+        font-weight: bold;
+    }
     .vis-title {
+        padding: 15px;
         font-weight: bold;
         font-size: 60px;
         color: white;
-        // background-color: black;
-        // width: 40%;
-        height: 150px;
     }
     .mat-card {
         display:flex;
         flex-direction: column;
+    }
+    .story-card {
+        padding: 10px;
+        padding-bottom: 20px;
+        border-radius: 20px;
+        opacity: 0.9;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
     }
     .mat-card-header {
         flex-shrink: 0;
@@ -61,23 +72,19 @@ import { Observable } from 'rxjs';
         overflow: auto;
     }
     .story-npn-logo {
-        width: 30%;
-        // height: 150px;
-        // background-color: red;
+        height: 100px;
     }
     .header-card {
+        padding: 10px;
         background: rgba(0,0,0,0.6);
         border-radius: 20px;
         display:flex;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
-        // width: 900px;
-        height: 130px;
         text-align: center;
         vertical-align: middle;
-        line-height: 130px;
-        // word-wrap: true;
+        flex-wrap: wrap;
     }
     .header-wrapper {
         padding: 25px;

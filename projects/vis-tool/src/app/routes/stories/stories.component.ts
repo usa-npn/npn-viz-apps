@@ -5,14 +5,12 @@ import { Observable } from 'rxjs';
 @Component({
     template: `
     <div class="stories" *ngIf="configuration | async as cfg" [ngStyle]="{background: 'url('+(cfg.backgroundImage||'assets/leaves.jpg')+')'}">
-        <mat-grid-list cols="2" rowHeight="160px" gutterSize="10px">
-            <mat-grid-tile>
+        <div class='header-wrapper'>
+            <div class="header-card">
                 <img class="story-npn-logo" src="assets/USA-NPN-logo-white-RGB2019.png" />
-            </mat-grid-tile>
-            <mat-grid-tile>
                 <p class="vis-title">Visualization Tool</p>
-            </mat-grid-tile>
-        </mat-grid-list>
+            </div>
+        </div>
         <mat-grid-list cols="2" rowHeight="190px" gutterSize="20px">
             <!-- just to push other content down 
             <mat-grid-tile colspan="2">&nbsp;</mat-grid-tile> -->
@@ -47,6 +45,9 @@ import { Observable } from 'rxjs';
         font-weight: bold;
         font-size: 60px;
         color: white;
+        // background-color: black;
+        // width: 40%;
+        height: 150px;
     }
     .mat-card {
         display:flex;
@@ -58,6 +59,28 @@ import { Observable } from 'rxjs';
     .mat-card-subtitle {
         flex-grow: 1;
         overflow: auto;
+    }
+    .story-npn-logo {
+        width: 30%;
+        // height: 150px;
+        // background-color: red;
+    }
+    .header-card {
+        background: rgba(0,0,0,0.6);
+        border-radius: 20px;
+        display:flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        // width: 900px;
+        height: 130px;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 130px;
+        // word-wrap: true;
+    }
+    .header-wrapper {
+        padding: 25px;
     }
     `]
 })

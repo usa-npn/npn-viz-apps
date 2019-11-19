@@ -4,8 +4,8 @@ import { faBookAlt, faArrowFromTop } from '@fortawesome/pro-light-svg-icons';
 import { VisSelection, MonitorsDestroy } from '@npn/common';
 import { Shared, SharingService } from './sharing.service';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef, MatRipple } from '@angular/material';
-import { takeUntil, delay } from 'rxjs/operators';
-import { Subject, merge } from 'rxjs';
+import { takeUntil, delay, repeatWhen} from 'rxjs/operators';
+import { Subject, merge, timer } from 'rxjs';
 
 @Component({
     template: `
@@ -14,7 +14,10 @@ import { Subject, merge } from 'rxjs';
         <h2 class="mat-h2">{{data.title}}</h2>
         <!-- <h3 class="mat-h2">{{data.tagline}}</h3> -->
         <div>
-        <img *ngIf="data.image" src="{{data.image.src}}" alt="{{data.image.alt}}" width="300px" height="300px" style="float: left; padding: 10px">
+        <div *ngIf="data.image" style="float: left; padding: 10px">
+            <img src="{{data.image.src}}" alt="{{data.image.alt}}" width="300px" height="300px">
+            <p *ngIf="data.image.credit"><i>Image credit: {{data.image.credit}}</i></p>
+        </div>
         <div [innerHTML]="data.description"></div>
         </div>
     </div>
@@ -49,7 +52,7 @@ export class SharedVisualizationDescriptionComponent {
         </div>
         <div class="step-host">
         <div *ngIf="selection?.isValid() && selection.$shared?.description">
-                <button matRipple mat-stroked-button color="accent" (click)="show()">Show description</button>
+                <button matRipple [matRippleColor]="'rgba(0, 153, 0, 0.5)'" mat-stroked-button color="accent" (click)="show()">Show description</button>
             </div>
         </div>
     </div>
@@ -80,8 +83,13 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
 
     ngOnInit() {
         this.sharingService.closingShareDescription
-            .pipe(delay(1000))
-            .subscribe(() => { this.triggerRipple() });
+            .pipe(delay(1000)) //, repeatWhen(() => timer(1000))
+            .subscribe(() => { 
+                this.triggerRipple();
+                setTimeout(()=> {
+                    this.triggerRipple();
+                }, 1000)
+            });
         this.step.$stepInstance = this;
         this.show();
         const serializeSelection = () => JSON.stringify(this.selection.external);

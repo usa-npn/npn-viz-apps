@@ -16,7 +16,7 @@ import { MapSelection } from './map-selection';
             <li *ngIf="station.group_name"><label>Group:</label> {{station.group_name}}</li>
             <li><label>Latitude:</label> {{station.latitude}} <label>Longitude:</label> {{station.longitude}}</li>
             <li *ngIf="data && data.legendData" class="gridded-data"><label>Gridded Layer Value:</label> <div class="legend-cell"
-                [ngStyle]="{'background-color': data.legendData.color}">&nbsp;</div> {{data.point | number}} ({{data.formatted}})</li>
+                [ngStyle]="{'background-color': data.legendData.color}">&nbsp;</div> {{dataText(data)}}</li>
             </ul>
         </div>
         <div class="record-info" *ngFor="let r of marker.records">
@@ -86,6 +86,15 @@ export class MapVisualizationMarkerIw {
     constructor(
         private stationService:StationService
     ) {}
+
+    dataText(data) {
+        if (this.selection.layerCategory == 'Phenoforecasts' 
+            || (this.selection.layerName && this.selection.layerName.includes('gdd'))) {
+            return `${data.formatted}`; // for gdd layers, data.point and data.formatted are same, formatted is just rounded
+        } else {
+            return `${data.point} (${data.formatted})`;
+        }
+    }
 
     gddOrDateMarkerText(r) {
         if (this.selection.layerCategory == 'Phenoforecasts' 

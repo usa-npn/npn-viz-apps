@@ -4,7 +4,7 @@ import { faBookAlt, faArrowFromTop } from '@fortawesome/pro-light-svg-icons';
 import { VisSelection, MonitorsDestroy } from '@npn/common';
 import { Shared, SharingService } from './sharing.service';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef, MatRipple } from '@angular/material';
-import { takeUntil, delay, repeatWhen} from 'rxjs/operators';
+import { takeUntil, delay, tap} from 'rxjs/operators';
 import { Subject, merge, timer } from 'rxjs';
 
 @Component({
@@ -52,7 +52,8 @@ export class SharedVisualizationDescriptionComponent {
         </div>
         <div class="step-host">
         <div *ngIf="selection?.isValid() && selection.$shared?.description">
-                <button matRipple [matRippleColor]="'rgba(0, 153, 0, 0.5)'" mat-stroked-button color="accent" (click)="show()">Show description</button>
+                <button *ngIf="showRipple" matRipple [matRippleColor]="'rgba(0, 153, 0, 0.5)'" mat-stroked-button color="accent" (click)="show()">Show description</button>
+                <button *ngIf="!showRipple" mat-stroked-button color="accent" (click)="show()">Show description</button>
             </div>
         </div>
     </div>
@@ -60,6 +61,7 @@ export class SharedVisualizationDescriptionComponent {
 })
 export class ShareDescriptionComponent extends MonitorsDestroy implements StepComponent {
     title:string = 'visualization description';
+    showRipple = false;
     @Input() selection:VisSelection;
     @HostBinding('style.display') display = 'initial';
     step:VisConfigStep = {
@@ -70,7 +72,7 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
 
     @ViewChild(MatRipple) ripple: MatRipple;
 
-    triggerRipple() {
+    triggerRipple() { //& ::ng-deep .mat-slide-toggle-ripple.mat-ripple { display: none; }
         this.ripple.launch({centered: true});
     }
 
@@ -83,12 +85,15 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
 
     ngOnInit() {
         this.sharingService.closingShareDescription
-            .pipe(delay(1000)) //, repeatWhen(() => timer(1000))
+            .pipe(tap(ev => this.showRipple = true), delay(1000))
             .subscribe(() => { 
                 this.triggerRipple();
                 setTimeout(()=> {
                     this.triggerRipple();
                 }, 1000)
+                setTimeout(()=> {
+                    this.showRipple = false;
+                }, 1500)
             });
         this.step.$stepInstance = this;
         this.show();

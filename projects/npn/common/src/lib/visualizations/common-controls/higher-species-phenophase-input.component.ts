@@ -96,7 +96,11 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     },{
         label: 'Class',
         rank: TaxonomicSpeciesRank.CLASS
-    }];
+    },{
+        label: 'Genus',
+        rank: TaxonomicSpeciesRank.GENUS
+    }
+    ];
     species:FormControl = new FormControl();
     fetchingSpeciesList:boolean = false;
     speciesList:any[];
@@ -157,6 +161,8 @@ console.log('speciesTaxInfo',info);
                         return info.orders;
                     case TaxonomicSpeciesRank.FAMILY:
                         return info.families;
+                    case TaxonomicSpeciesRank.GENUS:
+                        return info.genera; // TODO: make sure this works, KW just made genus plural
                 }
                 throw new Error(`Invalid species rank "${rank}"`);
             }),
@@ -205,6 +211,11 @@ console.log('speciesTaxInfo',info);
                         break;
                     case TaxonomicSpeciesRank.FAMILY:
                         if(!species.family_id || !!species.species_id) {
+                            this.species.setValue(null);
+                        }
+                        break;
+                    case TaxonomicSpeciesRank.GENUS:
+                        if(!species.genus_id || !!species.species_id) {
                             this.species.setValue(null);
                         }
                         break;
@@ -413,6 +424,9 @@ console.log('phenophaseTaxInfo',info);
             case TaxonomicSpeciesRank.FAMILY:
                 label = 'Family';
                 break;
+            case TaxonomicSpeciesRank.GENUS:
+                label = 'Genus';
+                break;
         }
         return label + (!this.fetchingPhenophaseList && (this.speciesList||[]).length ? ` (${(this.speciesList||[]).length})` : '') + (this.required ? ' *' : '');
     }
@@ -445,7 +459,8 @@ console.log('phenophaseTaxInfo',info);
         const classDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.CLASS);
         const orderDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.ORDER);
         const familyDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.FAMILY);
-        return `Class: "${classDisplay}" Order: "${orderDisplay}" Family: "${familyDisplay}"`;
+        const genusDisplay = this.speciesTitle.transform(species,TaxonomicSpeciesRank.GENUS);
+        return `Class: "${classDisplay}" Order: "${orderDisplay}" Family: "${familyDisplay}" Genus: "${genusDisplay}`;
     }
 
 }

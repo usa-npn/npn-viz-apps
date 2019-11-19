@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 
 import { HttpParams } from '@angular/common/http';
 
-import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicOrder, TaxonomicSpeciesRank, TaxonomicSpeciesType } from './species';
+import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicGenus, TaxonomicOrder, TaxonomicSpeciesRank, TaxonomicSpeciesType } from './species';
 import { Phenophase, TaxonomicPhenophaseRank, PhenophaseClass } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';
 
@@ -12,6 +12,7 @@ export interface SpeciesTaxonomicInfo {
     classes?: TaxonomicClass[];
     orders?: TaxonomicOrder[];
     families?: TaxonomicFamily[];
+    genera?: TaxonomicGenus[];
 }
 
 export interface PhenophaseTaxonomicInfo {
@@ -59,6 +60,9 @@ export function getSpeciesPlotKeys(plot:SpeciesPlot):SpeciesPlotKeys {
             break;
         case TaxonomicSpeciesRank.FAMILY:
             speciesIdKey = 'family_id';
+            break;
+        case TaxonomicSpeciesRank.GENUS:
+            speciesIdKey = 'genus_id';
             break;           
     }
     switch(plot.phenophaseRank||TaxonomicPhenophaseRank.PHENOPHASE) {
@@ -191,6 +195,8 @@ export class SpeciesService {
                 const classIds = gatherById('class_id');
                 const orderIds = gatherById('order_id');
                 const familyIds = gatherById('family_id');
+                const genusIds = gatherById('genus_id');
+
                 return {
                     species,
                     classes: Object.keys(classIds).map(id => {
@@ -210,7 +216,13 @@ export class SpeciesService {
                             return {family_id,family_name,family_common_name,kingdom};
                         })
                         .filter(r => !!r.family_id && !!r.family_name/* && !!r.family_common_name*/) // keep only complete records
-                        /*.sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))*/
+                        /*.sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))*/,
+                    genera: Object.keys(genusIds).map(id => {
+                        const {genus_id,genus,genus_common_name, kingdom} = genusIds[id];
+                        return {genus_id,genus,genus_common_name, kingdom};
+                    })
+                    .filter(r => !!r.genus_id && !!r.genus/* && !!r.family_common_name*/) // keep only complete records
+                    /*.sort((a,b) => a.family_common_name.localeCompare(b.family_common_name))*/
                 };
             });
     }
@@ -243,6 +255,9 @@ export class SpeciesService {
                         break;
                     case TaxonomicSpeciesRank.FAMILY:
                         taxId = (plot.species as TaxonomicFamily).family_id;
+                        break;
+                    case TaxonomicSpeciesRank.GENUS:
+                        taxId = (plot.species as TaxonomicGenus).genus_id;
                         break;
                 }
                 // pull out all species that match and add them to the set
@@ -296,7 +311,12 @@ export class SpeciesService {
                 o = species as TaxonomicFamily;
                 params.family_id = o.family_id;
                 break;
+            case TaxonomicSpeciesRank.GENUS:
+                o = species as TaxonomicGenus;
+                params.genus_id = o.genus_id;
+                break;
         }
+        
         if (date) {
             params.date = this.datePipe.transform(date, 'y-MM-dd')
         } else {

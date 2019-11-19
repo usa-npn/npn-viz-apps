@@ -26,17 +26,24 @@ export interface TaxonomicFamily extends HasKingdom {
     family_common_name:string;
 }
 
-export interface TaxonomicSpecies extends TaxonomicClass,TaxonomicFamily,TaxonomicOrder,Species {
+export interface TaxonomicGenus extends HasKingdom {
+    genus_id:number;
+    genus:string;
+    genus_common_name:string;
+}
+
+export interface TaxonomicSpecies extends TaxonomicClass,TaxonomicFamily,TaxonomicOrder,TaxonomicGenus,Species {
     genus: string;
     itis_taxonomic_sn: number;
     number_observations?: number; // depends on the service getSpeciesFilter.json returns this
     species_type?:any[]; // has type but not using
 }
 
-export type TaxonomicSpeciesType = Species|TaxonomicClass|TaxonomicOrder|TaxonomicFamily;
+export type TaxonomicSpeciesType = Species|TaxonomicClass|TaxonomicOrder|TaxonomicFamily|TaxonomicGenus;
 
 export enum TaxonomicSpeciesRank {
     SPECIES = 'species',
+    GENUS = 'genus',
     FAMILY = 'family',
     ORDER = 'order',
     CLASS = 'class'

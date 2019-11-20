@@ -66,6 +66,8 @@ export interface SubControlComponent extends VisConfigComponent {
     controlComponent?: ControlComponent;
     /** Component must supply a stream of indications of when to show/hide. */
     visibility:Subject<boolean>;
+    $fullScreen:boolean;
+    $closeDisabled:boolean;
 }
 
 /**

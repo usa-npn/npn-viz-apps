@@ -34,7 +34,7 @@
                 <mat-drawer mode="side" [opened]="controlsOpen | async" (openedChange)="resize()" disableClose="true" id="explorePhenoControls">
                     <div class="drawer-title">
                         <div class="title-caret"></div>
-                        <div class="title-inner">{{activeStep?.$controlInstance?.title||activeStep?.title}}</div>
+                        <div class="title-inner">{{activeStep?.$controlInstance?.title}}</div>
                         <div class="close-control" (click)="controlsOpen.next(false)"><fa-icon [icon]="faArrowLeft"></fa-icon></div>
                     </div>
                     <div class="drawer-contents">
@@ -52,7 +52,7 @@
                         <mat-drawer mode="over" [opened]="subControlsOpen$ | async" (openChange)="resize()" disableClose="true" id="explorePhenoSubControls" [ngClass]="{'full-screen':activeStep && activeStep.$subControlInstance && activeStep.$subControlInstance.$fullScreen}">
                             <div class="drawer-title">
                                 <div class="title-caret"></div>
-                                <div class="title-inner">{{activeStep?.$subControlInstance?.title||activeStep?.title}}</div>
+                                <div class="title-inner">{{activeStep?.$subControlInstance?.title}}</div>
                                 <div class="close-control" [ngClass]="{
                                     disabled: (activeStep && activeStep.$subControlInstance && activeStep.$subControlInstance.$closeDisabled)
                                 }" (click)="subControlsOpen.next(false)"><fa-icon [icon]="faArrowLeft"></fa-icon></div>

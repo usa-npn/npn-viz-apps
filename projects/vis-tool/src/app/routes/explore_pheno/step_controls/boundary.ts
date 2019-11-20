@@ -1,6 +1,6 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from "./base";
 import { MAP_STYLES, BoundaryService, BoundaryType, StationAwareVisSelection, newGuid, googleFeatureBounds } from "@npn/common";
-import { VisConfigStep, StepState } from "../interfaces";
+import { VisConfigStep, StepState, ControlComponent } from "../interfaces";
 import { faDrawPolygon, faTimes, faExpandArrowsAlt, faPlus, faCompressArrowsAlt } from "@fortawesome/pro-light-svg-icons";
 import { Component, NgZone } from "@angular/core";
 import { FormControl } from "@angular/forms";
@@ -564,6 +564,7 @@ export class BoundarySubControlComponent extends BaseSubControlComponent {
     title:string = 'Select boundaries';
     $fullScreen:boolean = true;
     $closeDisabled:boolean = true;
+    controlComponent?: ControlComponent;
 
     latitude: number = LAT;
     longitude: number = LNG;

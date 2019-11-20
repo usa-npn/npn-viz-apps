@@ -1,6 +1,6 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from './base';
 import { Component, ViewChild } from '@angular/core';
-import { StepState, VisConfigStep } from '../interfaces';
+import { StepState, VisConfigStep, ControlComponent } from '../interfaces';
 import { getLayerTitle } from './map-layer';
 import { faMapMarkerAlt } from '@fortawesome/pro-light-svg-icons';
 import { MAP_STYLES, MapLayerLegendComponent } from '@npn/common';
@@ -92,6 +92,8 @@ export class AgddTsLayerPointControlComponent extends BaseControlComponent {
 export class AgddTsLayerPointSubControlComponent extends BaseSubControlComponent {
     title:string = 'Select layer and click a location on the map';
     $fullScreen:boolean = true;
+    thumbnail: boolean = false;
+    controlComponent?: ControlComponent;
 
     @ViewChild(MapLayerLegendComponent) legend:MapLayerLegendComponent;
 

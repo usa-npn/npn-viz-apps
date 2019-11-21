@@ -105,6 +105,15 @@ export class WmsMapLayerLegend extends MapLayerLegend {
             legend_title = legendTitle;
         }
         else {
+            // viztool revamp, make legend titles more concise
+            if(legend.ldef.title != null) {
+                legend.ldef.title = legend.ldef.title.replace('- Spring Index', '');
+                legend.ldef.title = legend.ldef.title.replace('- Daily Spring Index Leaf Anomaly', '- First Leaf');
+                legend.ldef.title = legend.ldef.title.replace('- Daily Spring Index Bloom Anomaly', '- First Bloom');
+                legend.ldef.title = legend.ldef.title.replace('- 30-year Average SI-x First Leaf Date', '- First Leaf');
+                legend.ldef.title = legend.ldef.title.replace('- 30-year Average SI-x First Bloom Date', '- First Bloom');
+
+            }
             legend_title = legend.ldef.title;
             if (legend.ldef.extent && legend.ldef.extent.current) {
                 legend_title += `, ${legend.ldef.extent.current.label}`;

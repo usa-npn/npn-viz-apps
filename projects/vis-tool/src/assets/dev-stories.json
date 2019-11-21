@@ -17,7 +17,7 @@
           }
         },
         {
-          "title": "Where was spring early this year?",
+          "title": "Where did spring arrive early this year?",
           "tagline": "This map shows where spring leaf out arrived earlier or later compared to the long-term average.",
           "description": "\n <b>What am I looking at?</b> \n <p>This map shows where spring leaf out arrived earlier or later this year compared to the long-term average based on the period from 1981-2010. The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>Locations that are red are earlier than the average start of spring leaf out and locations that are blue are later than the average date. Early spring leaf out may result in a greater risk of frost damage to plants that begin leafing out or flowering before final winter frost events.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the map displayed by changing the Layer Category in the Map menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
           "external": {

@@ -368,12 +368,12 @@ export class SpeciesService {
     }
 
     private removeRedundantPhenophases(list) {
-        let seen = [];
+        let seen = {};
         return list.filter(function (pp) {
-            if (seen[pp.phenophase_id]) {
+            if (seen[pp.phenophase_definition_id]) {
                 return false;
             }
-            seen[pp.phenophase_id] = pp;
+            seen[pp.phenophase_definition_id] = pp;
             return true;
         });
     }

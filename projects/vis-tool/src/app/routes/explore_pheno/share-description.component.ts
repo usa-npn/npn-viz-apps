@@ -83,6 +83,32 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
         super();
     }
 
+    serializeSelection(selection) {
+        let s = selection;
+        // ignore timezone on dates
+        let dateRegEx = /^\d{4}-\d{2}-\d{2}/;
+        if(s. extentValue && s.extentValue.match(dateRegEx)) {
+            s.extentValue = s.extentValue.substring(0,10);
+        }
+
+        if(s.plots) {
+            s.plots.forEach(plot => {
+                // remove undefined keys
+                Object.keys(plot).forEach(key => {
+                    if (plot[key] === undefined || plot[key] === null) {
+                        delete plot[key];
+                    } 
+                });
+            });
+            
+            // get rid of empty objects in plots array
+            s.plots = s.plots.filter(plot => JSON.stringify(plot) !== '{}');
+            s.plots = s.plots.filter(plot => JSON.stringify(plot) !== '{"phenophaseRank":"class"}');
+        }
+
+        return JSON.stringify(s);
+    }
+
     ngOnInit() {
         this.sharingService.closingShareDescription
             .pipe(tap(ev => this.showRipple = true), delay(1000))
@@ -97,12 +123,13 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
             });
         this.step.$stepInstance = this;
         this.show();
-        const serializeSelection = () => JSON.stringify(this.selection.external);
-        const initialSelection = serializeSelection();
+        const initialSelection = this.serializeSelection(this.selection.external);
         const stopSubscription:Subject<void> = new Subject();
         this.selection.pipe(takeUntil(merge(stopSubscription,this.componentDestroyed)))
             .subscribe(e => {
-                const currentSelection = serializeSelection();
+               
+                let currentSelection = this.serializeSelection(this.selection.external);
+
                 if(initialSelection !== currentSelection) {
                     // the contents of the selection have changed, hide this component
                     // this control hides itself when this happens rather than just deleting the description
@@ -115,7 +142,7 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
                     // data changed so the shared selection's representation is out of date with
                     // what the UI might generate today...  If the control goes away for
                     // canned stories this is almost certainly why.
-                    // this.display = 'none'; //temp comment out by jeff
+                    this.display = 'none'; //temp comment out by jeff
                     stopSubscription.next();
                 }
             });

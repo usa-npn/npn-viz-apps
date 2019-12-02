@@ -50,6 +50,7 @@ import { Observable } from 'rxjs';
         font-weight: bold;
         font-size: 60px;
         color: white;
+        line-height: 60px;
     }
     .mat-card {
         display:flex;
@@ -88,6 +89,19 @@ import { Observable } from 'rxjs';
     }
     .header-wrapper {
         padding: 25px;
+    }
+    @media (max-width: 1024px) {
+        .story-card {
+            padding: 4px;
+            padding-bottom: 10px;
+        }
+        .stories mat-card-title {
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .stories mat-card-subtitle {
+            font-size: 10px;
+        }
     }
     `]
 })

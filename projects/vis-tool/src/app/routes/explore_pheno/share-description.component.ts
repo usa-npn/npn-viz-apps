@@ -73,7 +73,8 @@ export class ShareDescriptionComponent extends MonitorsDestroy implements StepCo
     @ViewChild(MatRipple) ripple: MatRipple;
 
     triggerRipple() { //& ::ng-deep .mat-slide-toggle-ripple.mat-ripple { display: none; }
-        this.ripple.launch({centered: true});
+        if(this.ripple)
+            this.ripple.launch({centered: true});
     }
 
     constructor(

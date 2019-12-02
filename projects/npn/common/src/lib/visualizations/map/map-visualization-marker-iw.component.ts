@@ -26,7 +26,8 @@ import { MapSelection } from './map-selection';
                 </svg></h4>
             <ul>
             <!--<li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} ({{selection.legend.formatPointData((selection.layerName?.includes('gdd') || selection.layerCategory == 'Phenoforecasts') ? r.mean_gddf : r.mean_first_yes_doy)}})<span *ngIf="r.sd_first_yes_in_days > 0"> [Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li> -->
-            <li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} {{gddOrDateMarkerText(r)}} <span *ngIf="r.sd_first_yes_in_days > 0">[Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li>
+            <li><label>Observed Day of Onset:</label> {{r.mean_first_yes_doy | number:'1.0-0'}} {{dateMarkerText(r)}} <span *ngIf="r.sd_first_yes_in_days > 0">[Standard Deviation: {{r.sd_first_yes_in_days | number:'1.1-1'}}]</span></li>
+            <li *ngIf="showGddInPopup()"><label>AGDD on Day of Onset:</label> {{gddMarkerText(r)}} </li>
             </ul>
         </div>
     </ng-template>
@@ -96,13 +97,27 @@ export class MapVisualizationMarkerIw {
         }
     }
 
-    gddOrDateMarkerText(r) {
+    dateMarkerText(r) {
         if (this.selection.layerCategory == 'Phenoforecasts' 
             || (this.selection.layerName && this.selection.layerName.includes('gdd'))) {
-            return r.mean_gddf != -9999 ? `(${r.mean_gddf} AGDD)` : '';
+            return '';
         } else {
             return `(${this.selection.legend.formatPointData(r.mean_first_yes_doy)})`;
         }
+    }
+
+    gddMarkerText(r) {
+        if (this.selection.layerCategory == 'Phenoforecasts' 
+            || (this.selection.layerName && this.selection.layerName.includes('gdd'))) {
+            return r.mean_gddf != -9999 ? `${r.mean_gddf} (Daymet, start date Jan 1, base 32${String.fromCharCode(176)})` : 'not available';
+        } else {
+            return ``;
+        }
+    }
+
+    showGddInPopup() {
+        return (this.selection.layerCategory == 'Phenoforecasts' 
+        || (this.selection.layerName && this.selection.layerName.includes('gdd')))
     }
 
     ngOnChanges(changes: SimpleChanges):void {

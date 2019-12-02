@@ -88,6 +88,9 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
         label: 'Species',
         rank: TaxonomicSpeciesRank.SPECIES
     },{
+        label: 'Genus',
+        rank: TaxonomicSpeciesRank.GENUS
+    },{
         label: 'Family',
         rank: TaxonomicSpeciesRank.FAMILY
     },{
@@ -96,9 +99,6 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     },{
         label: 'Class',
         rank: TaxonomicSpeciesRank.CLASS
-    },{
-        label: 'Genus',
-        rank: TaxonomicSpeciesRank.GENUS
     }
     ];
     species:FormControl = new FormControl();

@@ -238,8 +238,8 @@ console.log('$phenophaseTaxInfo.input',input);
                 return !!species
                 ? from(
                     (criteria.years && criteria.years.length
-                    ? this.speciesService.getPhenophasesForYears(species,this.speciesRank.value,criteria.years)
-                    : this.speciesService.getAllPhenophases(species,this.speciesRank.value))
+                    ? this.speciesService.getPhenodefinitionsForYears(species,this.speciesRank.value,criteria.years)
+                    : this.speciesService.getAllPhenodefinitions(species,this.speciesRank.value))
                     .then(phenos => this.speciesService.generatePhenophaseTaxonomicInfo(phenos)))
                 : of(null)
             }),

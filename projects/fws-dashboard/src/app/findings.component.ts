@@ -40,7 +40,7 @@ const VIS_TEMPLATES = [{
 <mat-list *ngIf="adminMode" class="new-vis-list">
   <div>
     <button mat-icon-button (click)="toggleAdminMode()" class="toggle-admin-mode"><i class="fa fa-2x fa-times-circle" aria-hidden="true"></i></button>
-    <p>Click and drag the visualizations below onto your Refuge Dashboard. You can have up to 10 visualizations on your Dashboard at one time. You can have multiple versions of each visualization type.</p>
+    <p>Click and drag the visualizations below onto your Dashboard. You can have up to 10 visualizations on your Dashboard at one time. You can have multiple versions of each visualization type.</p>
   </div>
   <mat-list-item class="vis-template"
                 *ngFor="let template of visTemplates"

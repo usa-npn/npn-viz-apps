@@ -17,9 +17,14 @@ label {
 }
 
 // should really probably be in the theme but....
-body.node-type-refuge {
+body.node-type-refuge,
+body.node-type-phenology-trail {
     .refuge-content {
         margin: 0px;
         width: 100%;
+    }
+    // in wizards mat-form-fields are displayed inline generically force some space between them
+    mat-form-field {
+        padding-right: 10px;
     }
 }

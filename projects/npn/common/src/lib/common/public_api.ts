@@ -2,6 +2,7 @@ export { NpnCommonModule, NPN_BASE_HREF } from './npn-common.module';
 export * from './species';
 export * from './phenophase';
 export * from './station';
+export * from './network';
 
 export { CacheService } from './cache.service';
 export * from './species.service';

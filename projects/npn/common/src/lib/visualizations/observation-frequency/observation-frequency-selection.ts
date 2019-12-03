@@ -14,7 +14,7 @@ export class ObservationFrequencySelection extends NetworkAwareVisSelection {
     defaultStation:number;
 
     constructor(protected serviceUtils:NpnServiceUtils,protected networkService: NetworkService) {
-        super();
+        super(networkService);
     }
 
     set year(y:number) {

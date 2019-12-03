@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
-import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService } from '../common';
 
 export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
@@ -34,9 +34,10 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     constructor(
         protected serviceUtils:NpnServiceUtils,
         protected speciesTitle:TaxonomicSpeciesTitlePipe,
-        protected speciesService:SpeciesService
+        protected speciesService:SpeciesService,
+        protected networkService:NetworkService
     ) {
-        super(serviceUtils);
+        super(serviceUtils,networkService);
     }
 
     isValid(): boolean {

@@ -1,4 +1,4 @@
-import {NpnServiceUtils} from '../../common';
+import {NpnServiceUtils, NetworkService} from '../../common';
 import {NetworkAwareVisSelection,selectionProperty} from '../vis-selection';
 
 export class ObserverActivitySelection extends NetworkAwareVisSelection {
@@ -8,8 +8,8 @@ export class ObserverActivitySelection extends NetworkAwareVisSelection {
     @selectionProperty()
     year:number;
 
-    constructor(protected serviceUtils:NpnServiceUtils) {
-        super();
+    constructor(protected serviceUtils:NpnServiceUtils,protected networkService:NetworkService) {
+        super(networkService);
     }
 
     isMultiStation():boolean {

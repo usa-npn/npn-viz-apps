@@ -1,5 +1,5 @@
 import { NetworkAwareVisSelection, selectionProperty, ONE_DAY_MILLIS } from '../vis-selection';
-import { NpnServiceUtils } from '../../common';
+import { NpnServiceUtils, NetworkService } from '../../common';
 import {
     MapLayerLegend,
     SupportsOpacity,
@@ -85,8 +85,9 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     constructor(protected serviceUtils:NpnServiceUtils,
                 protected datePipe:DatePipe,
                 protected mapLayerService:NpnMapLayerService,
-                protected dataService:WcsDataService) {
-        super();
+                protected dataService:WcsDataService,
+                protected networkService:NetworkService) {
+        super(networkService);
     }
 
     isValid():boolean {

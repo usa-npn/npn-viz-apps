@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
 
 export interface SiteOrSummaryPlot extends SpeciesPlot {
@@ -30,9 +30,10 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
 
     constructor(
         protected serviceUtils:NpnServiceUtils,
-        protected speciesService:SpeciesService
+        protected speciesService:SpeciesService,
+        protected networkService:NetworkService
     ) {
-        super(serviceUtils);
+        super(serviceUtils,networkService);
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {

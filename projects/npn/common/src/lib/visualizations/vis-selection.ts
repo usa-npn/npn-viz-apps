@@ -1,5 +1,5 @@
 import { EventEmitter } from '@angular/core';
-import { newGuid, NpnServiceUtils } from '../common';
+import { newGuid, NpnServiceUtils, NetworkService } from '../common';
 import { HttpParams } from '@angular/common/http';
 
 export const NULL_DATA = -9999;
@@ -371,9 +371,21 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
     @selectionProperty()
     networkIds?: any[] = [];
 
+    constructor(protected networkService:NetworkService){
+        super();
+    }
+
+    getStationIds():Promise<number []> {
+        return this.networkIds && this.networkIds.length
+            ? this.networkService.getStations(this.networkIds)
+                .then(stations => stations.map(s => s.station_id))
+            : Promise.resolve([]);
+    }
+
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        (this.networkIds || []).forEach((id, i) => params = params.set(`network_id[${i}]`, `${id}`));
-        return Promise.resolve(params);
+        // translate any network_ids into station_ids
+        return this.getStationIds()
+            .then(sids => sids.reduce((params,id,i) => params.set(`station_id[${i}]`, `${id}`),params));
     }
     
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
@@ -425,8 +437,8 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     @selectionProperty()
     _boundaries:BoundarySelection[];
 
-    constructor(protected serviceUtils:NpnServiceUtils) {
-        super();
+    constructor(protected serviceUtils:NpnServiceUtils,protected networkService:NetworkService) {
+        super(networkService);
     }
 
     get personId():any {
@@ -450,7 +462,6 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         }
     }
 
-
     get boundaries():BoundarySelection[] {
         return this._boundaries||[];
     }
@@ -460,7 +471,7 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         this.update();
     }
 
-    private getStationIdPromises():Promise<number[]>[] {
+    protected getStationIdPromises():Promise<number[]>[] {
         const baseParams:any = {};
         if(this.personId) {
             baseParams.person_id = this.personId;
@@ -485,8 +496,14 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
                 {...baseParams,boundary_id:predefSelection.id}
             );
         });
+        // If this selection has an explicit list of stationIds then return them and ignore any
+        // the parent class might supply by virtue of the value of the networkIds property.
+        // It is assumed that if they are set AND the parent has a list of networkIds
+        // that the list of stationIds is a subset of stations within the parent's networks
         if(this.stationIds && this.stationIds.length) {
             promises.push(Promise.resolve(this.stationIds.slice()));
+        } else {
+            promises.push(super.getStationIds());
         }
         return promises;
     }
@@ -500,11 +517,18 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         return super.toURLSearchParams(params)
             .then(params => this.personId ? params.set('person_id',`${this.personId}`) : params)
             .then(params => this.groupId ? params.set('group_id',`${this.groupId}`) : params)
-            .then(params => this.getStationIds().then(results => {
+            .then(params => {
+                // note: in case the parent's implementation of toURLSearchParams included station_ids parameters we need
+                // to unset them and replace them with any this class generates (which may include or exclude those supplied
+                // by the parent)
+                params.keys()
+                    .filter(key => /^station_id\[\d+\]$/.test(key))
+                    .forEach(key => params = params.delete(key));
+                return this.getStationIds().then(results => {
                     results.forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
                     return params;
                 })
-            );
+            });
     }
 
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {

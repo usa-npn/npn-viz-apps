@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass, getSpeciesPlotKeys, SpeciesService } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -65,9 +65,10 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     constructor(
         protected serviceUtils:NpnServiceUtils,
         protected datePipe: DatePipe,
-        protected speciesService:SpeciesService
+        protected speciesService:SpeciesService,
+        protected networkService:NetworkService
     ) {
-        super(serviceUtils);
+        super(serviceUtils,networkService);
         this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
             let c = new ActivityCurve();
             c.id = i;

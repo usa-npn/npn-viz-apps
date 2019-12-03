@@ -8,7 +8,7 @@ import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
 import {FwsDashboardComponent} from './fws-dashboard.component';
-import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,VisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
+import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,RefugeVisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
 import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
@@ -39,7 +39,7 @@ export function npnConfigurationFactory() {
     FindingsComponent,
     ResourcesComponent,
     NewVisualizationBuilderComponent,
-    VisualizationScopeSelectionComponent,
+    RefugeVisualizationScopeSelectionComponent,
     NewVisualizationDialogComponent
   ],
   entryComponents: [

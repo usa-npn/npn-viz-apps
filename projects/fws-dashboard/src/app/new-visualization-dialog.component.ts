@@ -15,7 +15,7 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step *ngIf="stationAware" [stepControl]="step1FormGroup" label="Select sites">
             <div class="step-wrapper">
                 <div class="step-content">
-                    <visualization-scope-selection [selection]="selection" [refuge]="entity"></visualization-scope-selection>
+                    <refuge-visualization-scope-selection [selection]="selection" [refuge]="entity"></refuge-visualization-scope-selection>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
@@ -228,9 +228,8 @@ export class NewVisualizationBuilderComponent implements OnInit {
     }
 }
 
-// TODO this component is refuge specific
 @Component({
-    selector: 'visualization-scope-selection',
+    selector: 'refuge-visualization-scope-selection',
     template: `
     <mat-radio-group name="visScope" class="vis-scope-input" [(ngModel)]="visScope" (change)="scopeChanged()">
       <!--mat-radio-button class="vis-scope-radio" [value]="'all'">No restrictions</mat-radio-button-->
@@ -256,7 +255,7 @@ export class NewVisualizationBuilderComponent implements OnInit {
         }
     `]
 })
-export class VisualizationScopeSelectionComponent {
+export class RefugeVisualizationScopeSelectionComponent {
     @Input()
     selection: VisSelection;
     @Input()

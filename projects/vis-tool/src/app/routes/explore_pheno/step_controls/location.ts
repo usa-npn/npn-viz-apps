@@ -19,7 +19,7 @@ export class LocationStepComponent extends BaseStepComponent {
 
 @Component({
     template: `
-    <button mat-raised-button (click)="subControlComponent.show()">Show sub-control</button>
+    <!--<button mat-raised-button (click)="subControlComponent.show()">Show sub-control</button>-->
     `,
     styles:[`
     

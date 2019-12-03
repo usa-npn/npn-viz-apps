@@ -19,7 +19,8 @@ All compiled applications will be compiled into a corresponding sub-directory of
 
 ### The Vis Tool
 
-`npm run build`
+`npm run build` for a dev build
+`npm run buildprod` for a production build
 
 ### FWS Dashboard
 

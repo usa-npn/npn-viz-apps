@@ -17,7 +17,7 @@
           }
         },
         {
-          "title": "Where was spring early this year?",
+          "title": "Where did spring arrive early this year?",
           "tagline": "This map shows where spring leaf out arrived earlier or later compared to the long-term average.",
           "description": "\n <b>What am I looking at?</b> \n <p>This map shows where spring leaf out arrived earlier or later this year compared to the long-term average based on the period from 1981-2010. The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>Locations that are red are earlier than the average start of spring leaf out and locations that are blue are later than the average date. Early spring leaf out may result in a greater risk of frost damage to plants that begin leafing out or flowering before final winter frost events.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the map displayed by changing the Layer Category in the Map menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
           "external": {
@@ -33,7 +33,7 @@
             "boundaries": [],
             "layerCategory": "Spring Indices",
             "layerName": "si-x:leaf_anomaly",
-            "extentValue": "118.0",
+            "extentValue": "today",
             "year": "today"
           }
         },
@@ -78,12 +78,13 @@
                 },
                 "phenophase": {
                   "pheno_class_id": 3,
-                  "pheno_class_name": "Leaves or needles"
+                  "pheno_class_name": "Leaves or needles",
+                  "pheno_class_sequence":30
                 },
                 "metric": {
-                  "id": "num_yes_records",
+                  "id": "proportion_individuals_with_yes_record",
                   "sampleSize": "status_records_sample_size",
-                  "label": "Total Yes Records"
+                  "label": "Proportion Yes Records"
                 },
                 "speciesRank": "family",
                 "phenophaseRank": "class"
@@ -111,7 +112,8 @@
                 },
                 "phenophase": {
                   "pheno_class_id": 109,
-                  "pheno_class_name": "Active caterpillars"
+                  "pheno_class_name": "Active caterpillars",
+                  "pheno_class_sequence":480
                 },
                 "metric": {
                   "id": "mean_numanimals_in-phase",
@@ -184,7 +186,9 @@
                   "species": "rubra"
                 },
                 "phenophase": {
-                  "pheno_class_id": 4
+                  "pheno_class_id": 4,
+                  "pheno_class_name":"Colored leaves or needles",
+                  "pheno_class_sequence":40
                 },
                 "speciesRank": "species",
                 "phenophaseRank": "class"
@@ -226,7 +230,7 @@
           }
         },
         {
-          "title": "How do winter temperatures correspond to leafing in the Soapberry family?",
+          "title": "How does winter temperature relate to leafing in the Soapberry family?",
           "tagline": "This scatterplot graph shows how minimum winter temperatures relate to the onset of spring leafing in the Soapberry family, which includes maples and chestnuts.",
           "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between minimum winter temperatures and the onset of leafing within the Soapberry family (Sapindaceae) using all available data across the United States for the years 2010-2019. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>Minimum winter temperatures can drive phenological activity in the spring. In some species, colder temperatures have been found to suppress leaf-out whereas warmer temperatures promote earlier leaf-out. In this case, warmer temperatures are associated with earlier leaf-out within species of the Soapberry family.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring. You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
           "settings": {
@@ -261,7 +265,8 @@
                 },
                 "phenophase": {
                   "pheno_class_id": 3,
-                  "pheno_class_name": "Leaves or needles"
+                  "pheno_class_name": "Leaves or needles",
+                  "pheno_class_sequence":30
                 },
                 "color": "#1f77b4",
                 "speciesRank": "family",
@@ -298,7 +303,8 @@
           "description": "\n <b>What am I looking at? </b> \n <p>This Pheno Forecast shows the first locations (in yellow) to reach the required accumulation of heat to trigger emergence of eastern tent caterpillars this year, which occured on March 10. The map also shows bands of color indicating locations that are 2-3 weeks, 1-2 weeks, and 7 days away from emergence, as well as those that are in areas of delining activity and past the time of caterpillar activity.</p> \n <b>What does this tell me?</b> \n <p>Our Pheno Forecasts predict key life cycle stages in invasive and pest species. These maps help managers to know when to expect emergence to more effectively plan treatment actities. Learn more about these Pheno Forecasts at <a href=\"https://www.usanpn.org/data/forecasts\" target=\"_blank\">www.usanpn.org/data/forecasts</a>.</p> \n <b>How can I modify this visualization?</b> \n <p>We have Pheno Forecasts available for other insect pests and invasive plants. You can change the species displayed by selecting from the Base Layer menu. You can also use the Base Layer menu to change the date of the forecast by choosing a date from the calendar. You can also add observations of eastern tent caterpillars collected through Nature's Notebook by going to the Species/Phenophase menu and selecting a Species (or higher Taxonomic group) and Phenophase Class.</p>",
           "image": {
             "src": "assets/eastern_tent_caterpillar.jpg",
-            "alt": "eastern tent caterpillar"
+            "alt": "eastern tent caterpillar",
+            "credit": "Tom Potterfield, Wikipedia"
           },
           "external": {
             "$class": "MapSelection",

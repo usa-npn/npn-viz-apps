@@ -99,6 +99,7 @@ export class VisSelectionSelection {
 export class VisSelectionStepComponent implements StepComponent {
     title:string = 'Visualization type';
     state:StepState;
+    selection?;
 
     stepVisit() {
         this.state = StepState.AVAILABLE;

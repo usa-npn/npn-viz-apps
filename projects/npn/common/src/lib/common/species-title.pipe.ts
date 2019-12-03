@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { SpeciesTitleFormat, APPLICATION_SETTINGS } from './application-settings';
-import { Species, TaxonomicSpeciesType, TaxonomicSpeciesRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily } from './species';
+import { Species, TaxonomicSpeciesType, TaxonomicSpeciesRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, TaxonomicGenus } from './species';
 
 @Pipe({ name: 'speciesTitle' })
 export class SpeciesTitlePipe implements PipeTransform {
@@ -49,6 +49,11 @@ export class TaxonomicSpeciesTitlePipe implements PipeTransform {
                     return format === SpeciesTitleFormat.CommonName
                         ? o.family_common_name||`${o.family_name} (Scientific)` // || should not be necessary
                         : o.family_name;
+                case TaxonomicSpeciesRank.GENUS:
+                    o = item as TaxonomicGenus;
+                    return format === SpeciesTitleFormat.CommonName
+                        ? o.genus_common_name||`${o.genus} (Scientific)` // || should not be necessary
+                        : o.genus;
             }
         }
         return item;

@@ -4,13 +4,13 @@ const npnConfiguration:NpnConfiguration = {
   cacheTTL: 60,
   apiRoot: '//www-dev.usanpn.org',
   //apiRoot: 'https://www.usanpn.org',
-  dataApiRoot: 'https://data-dev.usanpn.org/geoservices',
-  //dataApiRoot: 'https://data.usanpn.org:3006',
+  // dataApiRoot: 'https://data-dev.usanpn.org/geoservices',
+  dataApiRoot: 'https://data.usanpn.org/geoservices',
   dataApiRoot2: 'https://data-dev.usanpn.org/webservices',
   popApiRoot: 'https://data-dev.usanpn.org/popservices',
   dataApiUseStatisticsCache: false,
-  //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
-  geoServerRoot: 'https://geoserver.usanpn.org/geoserver'
+  geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+  // geoServerRoot: 'https://geoserver.usanpn.org/geoserver'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

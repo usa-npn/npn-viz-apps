@@ -88,6 +88,9 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
         label: 'Species',
         rank: TaxonomicSpeciesRank.SPECIES
     },{
+        label: 'Genus',
+        rank: TaxonomicSpeciesRank.GENUS
+    },{
         label: 'Family',
         rank: TaxonomicSpeciesRank.FAMILY
     },{
@@ -96,9 +99,6 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     },{
         label: 'Class',
         rank: TaxonomicSpeciesRank.CLASS
-    },{
-        label: 'Genus',
-        rank: TaxonomicSpeciesRank.GENUS
     }
     ];
     species:FormControl = new FormControl();
@@ -238,8 +238,8 @@ console.log('$phenophaseTaxInfo.input',input);
                 return !!species
                 ? from(
                     (criteria.years && criteria.years.length
-                    ? this.speciesService.getPhenophasesForYears(species,this.speciesRank.value,criteria.years)
-                    : this.speciesService.getAllPhenophases(species,this.speciesRank.value))
+                    ? this.speciesService.getPhenodefinitionsForYears(species,this.speciesRank.value,criteria.years)
+                    : this.speciesService.getAllPhenodefinitions(species,this.speciesRank.value))
                     .then(phenos => this.speciesService.generatePhenophaseTaxonomicInfo(phenos)))
                 : of(null)
             }),

@@ -328,12 +328,60 @@ export class SpeciesService {
                 : []);
     }
 
+    private _getPhenodefinitions(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
+        const params: any = {};
+        const url = rank === TaxonomicSpeciesRank.SPECIES
+            ? this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json')
+            : this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForTaxon.json')
+        let o;
+        switch(rank) {
+            case TaxonomicSpeciesRank.SPECIES:
+                o = species as Species;
+                params.species_id = o.species_id;
+                break;
+            case TaxonomicSpeciesRank.CLASS:
+                o = species as TaxonomicClass;
+                params.class_id = o.class_id;
+                break;
+            case TaxonomicSpeciesRank.ORDER:
+                o = species as TaxonomicOrder;
+                params.order_id = o.order_id;
+                break;
+            case TaxonomicSpeciesRank.FAMILY:
+                o = species as TaxonomicFamily;
+                params.family_id = o.family_id;
+                break;
+            case TaxonomicSpeciesRank.GENUS:
+                o = species as TaxonomicGenus;
+                params.genus_id = o.genus_id;
+                break;
+        }
+        
+        if (date) {
+            params.date = this.datePipe.transform(date, 'y-MM-dd')
+        } else {
+            params.return_all = true;
+        }
+        return this.serviceUtils.cachedGet(url,params)
+            .then(phases => phases && phases.length
+                ? this.removeRedundantPhenodefinitions(phases[0].phenophases as Phenophase[])
+                : []);
+    }
+
     getAllPhenophases(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {
         return this._getPhenophases(species,rank);
     }
 
+    getAllPhenodefinitions(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {
+        return this._getPhenodefinitions(species,rank);
+    }
+
     getPhenophasesForDate(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, date: Date): Promise<Phenophase[]> {
         return this._getPhenophases(species, rank, date);
+    }
+
+    getPhenodefinitionsForDate(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, date: Date): Promise<Phenophase[]> {
+        return this._getPhenodefinitions(species, rank, date);
     }
 
     getPhenophasesForYear(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
@@ -345,9 +393,23 @@ export class SpeciesService {
         ]).then(lists => this.mergeRedundantPhenophaseLists(lists));
     }
 
+    getPhenodefinitionsForYear(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
+        let jan1 = new Date(year, 0, 1),
+            dec31 = new Date(year, 11, 31);
+        return Promise.all([
+            this.getPhenodefinitionsForDate(species, rank, jan1),
+            this.getPhenodefinitionsForDate(species, rank, dec31)
+        ]).then(lists => this.mergeRedundantPhenodefinitionLists(lists));
+    }
+
     getPhenophasesForYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, years:number[]): Promise<Phenophase[]> {
         return Promise.all(years.map(y => this.getPhenophasesForYear(species, rank, y)))
                 .then(lists => this.mergeRedundantPhenophaseLists(lists));
+    }
+
+    getPhenodefinitionsForYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, years:number[]): Promise<Phenophase[]> {
+        return Promise.all(years.map(y => this.getPhenodefinitionsForYear(species, rank, y)))
+                .then(lists => this.mergeRedundantPhenodefinitionLists(lists));
     }
 
     getPhenophasesContiguousYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, startYear?: number, endYear?: number): Promise<Phenophase[]> {
@@ -377,8 +439,26 @@ export class SpeciesService {
             return true;
         });
     }
+
+    private removeRedundantPhenodefinitions(list){
+        let seen = {};
+        return list.filter(function (pp) {
+            if (seen[pp.phenophase_id]) {
+                return false;
+            }
+            seen[pp.phenophase_id] = pp;
+            return true;
+        });
+    }
     private mergeRedundantPhenophaseLists(lists) {
         return this.removeRedundantPhenophases(
+            lists.reduce(function (arr, l) {
+                return arr.concat(l);
+            }, []));
+    }
+
+    private mergeRedundantPhenodefinitionLists(lists) {
+        return this.removeRedundantPhenodefinitions(
             lists.reduce(function (arr, l) {
                 return arr.concat(l);
             }, []));

@@ -11,8 +11,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "watch-fws-spring": "ng build fws-spring --output-path /Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/spring --watch",
-    "watch-fws-dashboard": "ng build fws-dashboard --output-path /Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app --watch"
+    "watch-fws-spring": "ng build fws-spring --output-path ../npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/spring --watch",
+    "watch-fws-dashboard": "ng build fws-dashboard --output-path ../npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app --watch"
   },
   "private": true,
   "dependencies": {

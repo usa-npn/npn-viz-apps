@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve vis-tool --base-href /vis-tool/",
-    "build": "ng build vis-tool --base-href /vis-tool/",
+    "builddev": "ng build vis-tool --base-href /vis-tool/",
     "buildprod": "ng build vis-tool --configuration=production --base-href /vis-tool/",
     "build-fws-spring": "ng build fws-spring",
     "build-fws-dashboard": "ng build fws-dashboard",

@@ -64,7 +64,7 @@ export class StoriesService {
 
     getConfiguration():Observable<StoriesConfiguration> {
         return from(
-            this.serviceUtils.cachedGet('stories.json')
+            this.serviceUtils.cachedGet('assets/prod-stories.json')
               .catch((err) => {
                   if(environment.production) {
                     console.error(`Error loading stories ${err.status} "${err.statusText}"`);

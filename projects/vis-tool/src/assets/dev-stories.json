@@ -77,9 +77,9 @@
                   "family_common_name": "Dogbane Family"
                 },
                 "phenophase": {
-                  "pheno_class_id": 3,
-                  "pheno_class_name": "Leaves or needles",
-                  "pheno_class_sequence":30
+                  "pheno_class_id": 6,
+                  "pheno_class_name": "Flowers or pollen cones",
+                  "pheno_class_sequence":60
                 },
                 "metric": {
                   "id": "proportion_individuals_with_yes_record",
@@ -111,9 +111,9 @@
                   "family_common_name": "Soapberry Family"
                 },
                 "phenophase": {
-                  "pheno_class_id": 109,
-                  "pheno_class_name": "Active caterpillars",
-                  "pheno_class_sequence":480
+                  "pheno_class_id": 62,
+                  "pheno_class_name": "Active individuals",
+                  "pheno_class_sequence":10
                 },
                 "metric": {
                   "id": "mean_numanimals_in-phase",

@@ -75,7 +75,7 @@ export class CurveControlComponent extends MonitorsDestroy {
         let thisYear = (new Date()).getFullYear(),
             years: number[] = [],
             c = 2010;
-        while(c < thisYear) {
+        while(c <= thisYear) {
             years.push(c++);
         }
         return years;

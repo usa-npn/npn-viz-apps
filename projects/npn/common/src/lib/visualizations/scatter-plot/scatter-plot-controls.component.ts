@@ -1,20 +1,22 @@
 import {Component, Input, OnInit} from '@angular/core';
 
 import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
+import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
+import * as d3 from 'd3';
 
 @Component({
     selector: 'scatter-plot-control',
     template: `
-    <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="updateChange()" (onEndChange)="updateChange()"></year-range-input>
+    <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="yearChange()" (onEndChange)="yearChange()"></year-range-input>
 
     <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
-        <species-phenophase-input
-            [(species)]="spi.species" [(phenophase)]="spi.phenophase" [(color)]="spi.color"
+        <higher-species-phenophase-input
+            gatherColor="true"
             [selection]="selection"
-            [gatherColor]="true"
-            (onSpeciesChange)="updateChange()"
-            (onPhenophaseChange)="updateChange()"
-            (onColorChange)="redrawChange($event)"></species-phenophase-input>
+            [criteria]="criteria"
+            [plot]="spi"
+            (plotChange)="updateChange()">
+        </higher-species-phenophase-input>
         <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
         <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
     </div>
@@ -29,7 +31,6 @@ import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
         <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="redrawChange()">Fit Lines</mat-checkbox>
 
         <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="updateChange()">Use Individual Phenometrics</mat-checkbox>
-
     </div>
     `,
     styles: [`
@@ -49,12 +50,20 @@ export class ScatterPlotControls implements OnInit {
     selection: ScatterPlotSelection;
     axis = AXIS;
 
+    criteria:HigherSpeciesPhenophaseInputCriteria;
+
     updateSent:boolean = false;
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
             this.addPlot();
         }
+        setTimeout(() => this.updateCriteria());
+    }
+
+    yearChange() {
+        this.updateCriteria();
+        this.updateChange();
     }
 
     updateChange() {
@@ -62,6 +71,13 @@ export class ScatterPlotControls implements OnInit {
             this.selection.update();
             this.updateSent = true;
         }
+    }
+
+    updateCriteria() {
+        this.criteria = {
+            years: d3.range(this.selection.start,this.selection.end+1),
+            stationIds: this.selection.getStationIds()
+        };
     }
 
     redrawChange(change?) {

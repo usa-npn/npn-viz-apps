@@ -138,7 +138,7 @@ export class NpnMapLayerService {
     }
 
     private getLayerOverrides():Promise<MapLayerDefinitionMap> {
-        const url = 'npn-map-layer-overrides.json';
+        const url = 'assets/npn-map-layer-overrides.json';
         return this.serviceUtils.cachedGet(url)
             // on any error (e.g. 404 not fond) return an empty document (cached to avoid subsequent failures)
             .catch(err => this.serviceUtils.cachedSet(url,{}));

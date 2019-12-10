@@ -1,0 +1,56 @@
+{
+    "si-x:leaf_anomaly" : {
+        "title": "Daily Spring Index Leaf Anomaly"
+    },
+    "si-x:bloom_anomaly" : {
+        "title": "Daily Spring Index Bloom Anomaly"
+    },
+    "si-x:30yr_avg_six_leaf" : {
+        "title": "30-year Average SI-x First Leaf"
+    },
+    "si-x:30yr_avg_six_bloom" : {
+        "title": "30-year Average SI-x First Bloom"
+    },
+    "si-x:average_leaf_ncep" : {
+        "title": "Current Year SI-x First Leaf"
+    },
+    "si-x:average_bloom_ncep" : {
+        "title": "Current Year SI-x First Bloom"
+    },
+    "si-x:average_leaf_ncep_alaska" : {
+        "title": "Current Year SI-x First Leaf"
+    },
+    "si-x:average_bloom_ncep_alaska" : {
+        "title": "Current Year SI-x First Bloom"
+    },
+    "si-x:average_leaf_prism" : {
+        "title": "Historical Annual SI-x First Leaf"
+    },
+    "si-x:average_bloom_prism" : {
+        "title": "Historical Annual SI-x First Bloom"
+    },
+    "gdd:30yr_avg_agdd" : {
+        "title": "30 Year Average AGDD - 32 Base Temp"
+    },
+    "gdd:30yr_avg_agdd_50f" : {
+        "title": "30 Year Average AGDD - 50 Base Temp"
+    },
+    "gdd:agdd" : {
+        "title": "Daily AGDD - 32 Base Temp"
+    },
+    "gdd:agdd_50f" : {
+        "title": "Daily AGDD - 50 Base Temp"
+    },
+    "gdd:agdd_alaska" : {
+        "title": "Daily AGDD - 32 Base Temp"
+    },
+    "gdd:agdd_alaska_50f" : {
+        "title": "Daily AGDD - 50 Base Temp"
+    },
+    "gdd:agdd_anomaly" : {
+        "title": "AGDD Anomaly - 32 Base Temp"
+    },
+    "gdd:agdd_anomaly_50f" : {
+        "title": "AGDD Anomaly - 50 Base Temp"
+    }
+}

@@ -63,20 +63,11 @@ export class StoriesService {
     }
 
     getConfiguration():Observable<StoriesConfiguration> {
+      let storiesJsonPath = (environment.production) ? 'assets/prod-stories.json' : 'assets/dev-stories.json';
         return from(
-            this.serviceUtils.cachedGet('stories.json')
+            this.serviceUtils.cachedGet(storiesJsonPath)
               .catch((err) => {
-                  if(environment.production) {
-                    console.error(`Error loading stories ${err.status} "${err.statusText}"`);
-                  }
-                  return this.serviceUtils.get('assets/dev-stories.json');
-                  /* causes more confusion than worth in a dev environment
-                    .then(stories => {
-                      // avoid future 404's
-                      this.serviceUtils.cachedSet('stories.json',stories)
-                      return stories;
-                    });
-                  */
+                console.error(`Error loading stories ${err.status} "${err.statusText}"`);
               })
         ).pipe( map((storiesConfig: StoriesConfiguration) => this.mapDynamicDates(storiesConfig)) );
     }

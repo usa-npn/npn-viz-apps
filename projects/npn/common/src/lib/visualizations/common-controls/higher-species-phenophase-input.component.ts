@@ -235,7 +235,7 @@ console.log('speciesTaxInfo',info);
             switchMap(input => {
 console.log('$phenophaseTaxInfo.input',input);
                 const [species,criteria] = input;
-                return !!species
+                return !!species && typeof(species) === 'object'
                 ? from(
                     (criteria.years && criteria.years.length
                     ? this.speciesService.getPhenodefinitionsForYears(species,this.speciesRank.value,criteria.years)

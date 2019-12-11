@@ -8,7 +8,8 @@ import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
 import {FwsDashboardComponent} from './fws-dashboard.component';
-import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,RefugeVisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
+import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent} from './new-visualization-dialog.component';
+import { RefugeVisualizationScopeSelectionComponent } from "./refuge-visualization-scope-selection.component";
 import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';

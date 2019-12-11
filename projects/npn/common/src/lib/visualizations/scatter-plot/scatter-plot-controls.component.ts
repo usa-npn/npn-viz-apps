@@ -15,7 +15,7 @@ import * as d3 from 'd3';
             [selection]="selection"
             [criteria]="criteria"
             [plot]="spi"
-            (plotChange)="updateChange()">
+            (plotChange)="selection.update()">
         </higher-species-phenophase-input>
         <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
         <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
@@ -30,7 +30,7 @@ import * as d3 from 'd3';
 
         <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="redrawChange()">Fit Lines</mat-checkbox>
 
-        <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="updateChange()">Use Individual Phenometrics</mat-checkbox>
+        <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="selection.update()">Use Individual Phenometrics</mat-checkbox>
     </div>
     `,
     styles: [`
@@ -49,10 +49,7 @@ export class ScatterPlotControlsComponent implements OnInit {
     @Input()
     selection: ScatterPlotSelection;
     axis = AXIS;
-
     criteria:HigherSpeciesPhenophaseInputCriteria;
-
-    updateSent:boolean = false;
 
     ngOnInit() {
         if(this.selection.plots.length === 0) {
@@ -63,14 +60,7 @@ export class ScatterPlotControlsComponent implements OnInit {
 
     yearChange() {
         this.updateCriteria();
-        this.updateChange();
-    }
-
-    updateChange() {
-        if(this.selection.isValid()) {
-            this.selection.update();
-            this.updateSent = true;
-        }
+        this.selection.update();
     }
 
     updateCriteria() {
@@ -81,16 +71,10 @@ export class ScatterPlotControlsComponent implements OnInit {
     }
 
     redrawChange(change?) {
-        if(this.selection.isValid()) {
-            if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
-                this.updateChange();
-            } else {
-                if(this.updateSent) {
-                    this.selection.redraw();
-                } else {
-                    this.updateChange();
-                }
-            }
+        if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
+            this.selection.update();
+        } else {
+            this.selection.redraw();
         }
     }
 
@@ -100,7 +84,7 @@ export class ScatterPlotControlsComponent implements OnInit {
 
     removePlot(index:number) {
         this.selection.plots.splice(index,1);
-        this.updateChange();
+        this.selection.update();
     }
 
     plotsValid() {

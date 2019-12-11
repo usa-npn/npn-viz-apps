@@ -35,7 +35,7 @@ const VALID_YEARS = (function(){
             [selection]="selection"
             [criteria]="criteria"
             [plot]="spi"
-            (plotChange)="updateChange()"></higher-species-phenophase-input>
+            (plotChange)="selection.update()"></higher-species-phenophase-input>
         <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
         <button *ngIf="idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
     </div>
@@ -73,10 +73,7 @@ const VALID_YEARS = (function(){
 export class CalendarControlComponent implements OnInit {
     @Input()
     selection: CalendarSelection;
-
     maxYears = 5;
-    updateSent:boolean = false;
-
     criteria:HigherSpeciesPhenophaseInputCriteria;
 
     selectableYears(y:number) {
@@ -108,27 +105,14 @@ export class CalendarControlComponent implements OnInit {
 
     yearChange() {
         this.updateCriteria();
-        this.updateChange();
-    }
-
-    updateChange() {
-        if(this.selection.isValid()) {
-            this.selection.update();
-            this.updateSent = true;
-        }
+        this.selection.update();
     }
 
     redrawChange(change?) {
-        if(this.selection.isValid()) {
-            if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
-                this.updateChange();
-            } else {
-                if(this.updateSent) {
-                    this.selection.redraw();
-                } else {
-                    this.updateChange();
-                }
-            }
+        if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
+            this.selection.update();
+        } else {
+            this.selection.redraw();
         }
     }
 
@@ -138,7 +122,7 @@ export class CalendarControlComponent implements OnInit {
 
     removePlot(index:number) {
         this.selection.plots.splice(index,1);
-        this.updateChange();
+        this.selection.update();
     }
 
     addYear() {

@@ -45,7 +45,7 @@ import * as d3 from 'd3';
         }
     `]
 })
-export class ScatterPlotControls implements OnInit {
+export class ScatterPlotControlsComponent implements OnInit {
     @Input()
     selection: ScatterPlotSelection;
     axis = AXIS;

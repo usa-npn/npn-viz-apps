@@ -178,14 +178,6 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         return (this._curves||[]).filter(c => c.isValid());
     }
 
-    private endDate(year) {
-        var now = new Date();
-        if(year === now.getFullYear()) {
-            return this.datePipe.transform(now,'yyyy-MM-dd');
-        }
-        return year+'-12-31';
-    }
-
     loadCurveData(): Promise<any> {
         this.working = true;
         return this.toURLSearchParams(new HttpParams()

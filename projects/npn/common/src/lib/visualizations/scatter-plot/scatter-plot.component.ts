@@ -153,10 +153,11 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
               .text(d => `${selection.doyDateFormat(d.day_in_range)} [${d.latitude},${d.longitude}]`);
 
         this.chart.selectAll('.regression').remove();
-        selection.validPlots.forEach(plot => delete plot.regressionLine);
+        const plots = this.data.map(d => d.plot);
+        plots.forEach(plot => delete plot.regressionLine);
         if(this.selection.regressionLines) {
             let regressionLines = [];
-            selection.validPlots.forEach(plot => {
+            plots.forEach(plot => {
                 let series = nonNullData.filter(d => d.color === plot.color);
                 if(series.length) {
                     const keys = getSpeciesPlotKeys(plot);
@@ -172,15 +173,15 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                 .data(regressionLines,(d:any) => d.id)
                 .enter().append('line')
                 .attr('class','regression');
-                regression
-                    //.attr('data-legend',function(d) { return d.legend; } )
-                    .attr('x1', d => this.x(d.p1[0]))
-                    .attr('y1', d => this.y(d.p1[1]))
-                    .attr('x2', d => this.x(d.p2[0]))
-                    .attr('y2', d => this.y(d.p2[1]))
-                    .attr('fill', d => d.color)
-                    .attr('stroke', d => d.color)
-                    .attr('stroke-width', 2);
+            regression
+                //.attr('data-legend',function(d) { return d.legend; } )
+                .attr('x1', d => this.x(d.p1[0]))
+                .attr('y1', d => this.y(d.p1[1]))
+                .attr('x2', d => this.x(d.p2[0]))
+                .attr('y2', d => this.y(d.p2[1]))
+                .attr('fill', d => d.color)
+                .attr('stroke', d => d.color)
+                .attr('stroke-width', 2);
         }
 
         // TODO abstract legend out to a class...
@@ -190,7 +191,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
             .attr('transform','translate(0,-'+(this.sizing.margin.top-10)+')')
             .style('font-size','1em'),
             r = 5, vpad = 4;
-        this.selection.validPlots.forEach((plot,i) => {
+        plots.forEach((plot,i) => {
             let row = legend.append('g')
                 .attr('class','legend-item')
                 .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')');

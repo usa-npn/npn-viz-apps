@@ -151,16 +151,15 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
                         d.color = plotData.plot.color;
                         d.fyy = this.getFirstYesYear(d);
                         for(let summaryKey in KEYS_TO_NORMALIZE) {
-                            let siteKey = KEYS_TO_NORMALIZE[summaryKey];
                             if(typeof(d[summaryKey]) === 'undefined') {
-                                d[summaryKey] = d[siteKey];
+                                d[summaryKey] = d[KEYS_TO_NORMALIZE[summaryKey]];
                             }
                         }
                         // this is the day # that will get plotted 1 being the first day of the start_year
                         // 366 being the first day of start_year+1, etc.
                         d.day_in_range = ((d.fyy-start)*365)+this.getDoy(d);
-                            return d;
-                        })
+                        return d;
+                    });
                 return result.concat(filtered);
             },[]).map((d,i) => {
                 d.id = i;

@@ -191,12 +191,14 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
             .attr('transform','translate(0,-'+(this.sizing.margin.top-10)+')')
             .style('font-size','1em'),
             r = 5, vpad = 4;
-        plots.forEach((plot,i) => {
+        this.data.forEach((d,i) => {
+            const plot = d.plot;
+            const group = d.group;
             let row = legend.append('g')
                 .attr('class','legend-item')
                 .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')');
             const pp:any = plot.phenophase;
-            let title = this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
+            let title = (group ? `${group.label}: ` : '') + this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
             if(plot.regressionLine && typeof(plot.regressionLine.r2) === 'number') {
                 // NOTE: the baseline-shift doesn't appear to work on Firefox
                 if(this.isIE) {

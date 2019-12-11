@@ -7,11 +7,13 @@ import {
     TaxonomicSpeciesRank,
     TaxonomicPhenophaseType,
     TaxonomicPhenophaseRank,
-    SpeciesTitlePipe
+    SpeciesTitlePipe,
+    getSpeciesPlotKeys
 } from '../../common';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 
 import * as d3 from 'd3';
+import { HttpParams } from '@angular/common/http';
 
 export class ActivityCurve implements SpeciesPlot {
     @selectionProperty()
@@ -253,6 +255,32 @@ export class ActivityCurve implements SpeciesPlot {
             }
         }
         return data;
+    }
+
+    private endDate(year) {
+        var now = new Date();
+        if(year === now.getFullYear()) {
+            return this.selection.datePipe.transform(now,'yyyy-MM-dd');
+        }
+        return year+'-12-31';
+    }
+
+    loadData(baseParams:HttpParams):Promise<any> {
+        let curveParams = baseParams
+            .set('start_date',`${this.year}-01-01`)
+            .set('end_date',this.endDate(this.year));
+        const keys = getSpeciesPlotKeys(this);
+        curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${this.species[keys.speciesIdKey]}`);
+        if((this.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+            curveParams = curveParams.set('taxonomy_aggregate','1');
+        }
+        curveParams = curveParams.set(`${keys.phenophaseIdKey}[0]`,`${this.phenophase[keys.phenophaseIdKey]}`);
+        if(this.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+            curveParams = curveParams.set('pheno_class_aggregate','1');
+        }
+        return this.selection.serviceUtils
+            .cachedPost(this.selection.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json'),curveParams.toString())
+            .then(data => this.data(data));
     }
 
     axis() {

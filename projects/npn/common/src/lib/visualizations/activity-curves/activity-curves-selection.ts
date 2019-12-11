@@ -63,10 +63,10 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     private _curves:ActivityCurve[];
 
     constructor(
-        protected serviceUtils:NpnServiceUtils,
-        protected datePipe: DatePipe,
-        protected speciesService:SpeciesService,
-        protected networkService:NetworkService
+        public serviceUtils:NpnServiceUtils,
+        public datePipe: DatePipe,
+        public speciesService:SpeciesService,
+        public networkService:NetworkService
     ) {
         super(serviceUtils,networkService);
         this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
@@ -194,29 +194,14 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
             ).then((baseParams:HttpParams) => {
                 const promises:Promise<any[]>[] = this.curves
                     .filter(c => c.data(null).isValid())
-                    .map(c => {
-                        let curveParams = baseParams
-                            .set('start_date',`${c.year}-01-01`)
-                            .set('end_date',this.endDate(c.year));
-                        const keys = getSpeciesPlotKeys(c);
-                        curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${c.species[keys.speciesIdKey]}`);
-                        if((c.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                            curveParams = curveParams.set('taxonomy_aggregate','1');
-                        }
-                        curveParams = curveParams.set(`${keys.phenophaseIdKey}[0]`,`${c.phenophase[keys.phenophaseIdKey]}`);
-                        if(c.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                            curveParams = curveParams.set('pheno_class_aggregate','1');
-                        }
-                        return this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json'),curveParams.toString())
-                            .then(data => c.data(data));
+                    .map(c => c.loadData(baseParams));
+                return Promise.all(promises)
+                    .then(() => this.working = false)
+                    .catch(err => {
+                        this.working = false;
+                        //throw err;
+                        this.handleError(err);
                     });
-                    return Promise.all(promises)
-                        .then(() => this.working = false)
-                        .catch(err => {
-                            this.working = false;
-                            //throw err;
-                            this.handleError(err);
-                        });
             });        
     }
 

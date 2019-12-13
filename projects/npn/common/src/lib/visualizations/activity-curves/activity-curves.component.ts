@@ -119,6 +119,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         let inRow = 0;
         let xTrans = 0;
         const maxInRow = 3;
+        // TODO each curve (plot) may now actually draw multiple curves
         selection.validCurves.forEach((c) => {
                 if(c.plotted()) {
                     const yTrans = (((inRow+1)*(this.baseFontSize() as number))+(inRow*vpad));

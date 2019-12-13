@@ -17,6 +17,11 @@ export interface ObservationDateData {
     data: ObservationDataDataPoint[];
 }
 
+export interface ObservationDatePlotData {
+    plot: ObservationDatePlot;
+    data: any;
+}
+
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
     $supportsPop:boolean = true;
 
@@ -85,12 +90,12 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             });
     }
 
-    postProcessData(data: any): ObservationDateData {
+    postProcessData(data: ObservationDatePlotData[]): ObservationDateData {
         if (!data || !data.length) {
             return null;
         }
-        const validPlots = this.validPlots;
-        let y = (validPlots.length * this.years.length) -1;
+        const plots = data.map(d => d.plot);
+        let y = (plots.length * this.years.length) -1;
         const addDoys = (doys, color) => {
             doys.forEach(doy => {
                 response.data.push({
@@ -104,8 +109,9 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             labels: [],
             data: []
         };
-        validPlots.forEach((plot,i) => {
-            const rData:any= data[i][0];
+        data.forEach((d,i) => {
+            const plot = d.plot;
+            const rData:any= d.data;
             let pPhases = {years:{}}; // empty
             const pPhaseKey = plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS ? 'pheno_classes' : 'phenophases';
             if(rData && rData[pPhaseKey] && rData[pPhaseKey].length) {
@@ -127,7 +133,12 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         return response;
     }
 
-    getData(): Promise<any> {
+    getData(): Promise<ObservationDatePlotData[]> {
+        // work around TypeScript Promise.all issue
+        return this._getData();
+    }
+
+    private _getData(): Promise<any> {
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
@@ -146,7 +157,11 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                         if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
                             plotParams = plotParams.set('pheno_class_aggregate','1');
                         }
-                        return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString());
+                        return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString())
+                            .then((results:any[]) => {
+                                const data = results[0];
+                                return {plot,data}
+                            })
                     })
                 )
             )

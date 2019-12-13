@@ -45,7 +45,7 @@ import {
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
-import {SpeciesPhenophaseInputComponent,YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
+import {YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
 
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -88,7 +88,6 @@ import {NpnGriddedModule} from '../gridded';
       MapVisualizationComponent,
       VisualizationDownloadComponent,
       VisualizationComponent,
-      SpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       HigherSpeciesPhenophaseInputComponent,
 
@@ -107,7 +106,6 @@ import {NpnGriddedModule} from '../gridded';
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,
       MapVisualizationComponent,
       VisualizationComponent,
-      SpeciesPhenophaseInputComponent,
       HigherSpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       ExtentControl,

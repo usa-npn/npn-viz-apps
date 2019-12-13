@@ -1,13 +1,18 @@
-import { MonitorsDestroy, SpeciesService, SpeciesPlot, TaxonomicSpeciesRank, SpeciesTaxonomicInfo, PhenophaseTaxonomicInfo } from '@npn/common/common';
 import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { VisSelection, BoundarySelection, StationAwareVisSelection } from '../vis-selection';
+import { VisSelection } from '../vis-selection';
 import { Subject, Observable, from, combineLatest, of } from 'rxjs';
 import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
-import { TaxonomicSpeciesTitlePipe } from '@npn/common/common/species-title.pipe';
+import { MonitorsDestroy,
+         SpeciesService,
+         SpeciesPlot,
+         TaxonomicSpeciesRank,
+         SpeciesTaxonomicInfo,
+         PhenophaseTaxonomicInfo,
+         TaxonomicSpeciesTitlePipe,
+         TaxonomicPhenophaseRank,
+         STATIC_COLORS } from '../../common';
 import { HttpParams } from '@angular/common/http';
-import { TaxonomicPhenophaseRank } from '@npn/common/common/phenophase';
-import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component';
 import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
 export interface HigherSpeciesPhenophaseInputCriteria {
@@ -116,7 +121,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
 
     @Input() gatherColor:boolean = false;
     color:FormControl = new FormControl();
-    colorList:string[] = SPECIES_PHENO_INPUT_COLORS;
+    colorList:string[] = STATIC_COLORS;
 
     private group:FormGroup;
 
@@ -235,7 +240,7 @@ console.log('speciesTaxInfo',info);
             switchMap(input => {
 console.log('$phenophaseTaxInfo.input',input);
                 const [species,criteria] = input;
-                return !!species
+                return !!species && typeof(species) === 'object'
                 ? from(
                     (criteria.years && criteria.years.length
                     ? this.speciesService.getPhenodefinitionsForYears(species,this.speciesRank.value,criteria.years)

@@ -61,7 +61,7 @@
               {
                 "id": 0,
                 "color": "#2ca02c",
-                "year": 2017,
+                "year": 2019,
                 "species": {
                   "kingdom": "Plantae",
                   "itis_taxonomic_sn": 28731,
@@ -120,7 +120,7 @@
                   "sampleSize": "in-phase_per_hr_sites_sample_size",
                   "label": "Animals In Phase"
                 },
-                "year": 2017,
+                "year": 2019,
                 "speciesRank": "species",
                 "phenophaseRank": "class"
               }

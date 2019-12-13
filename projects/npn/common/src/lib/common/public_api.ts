@@ -3,6 +3,7 @@ export * from './species';
 export * from './phenophase';
 export * from './station';
 export * from './network';
+export * from './static-color';
 
 export { CacheService } from './cache.service';
 export * from './species.service';

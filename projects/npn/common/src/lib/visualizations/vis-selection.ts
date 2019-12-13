@@ -1,5 +1,5 @@
 import { EventEmitter } from '@angular/core';
-import { newGuid, NpnServiceUtils, NetworkService } from '../common';
+import { newGuid, NpnServiceUtils, NetworkService, Station } from '../common';
 import { HttpParams } from '@angular/common/http';
 
 export const NULL_DATA = -9999;
@@ -365,11 +365,51 @@ export const BASE_POP_INPUT:POPInput = {
 };
 
 /**
+ * The mode of a given SelectionGroup
+ */
+export enum SelectionGroupMode {
+    /** The group represents the data gathered by a network. */
+    NETWORK = "N",
+    /** The group represents the data gathered by a single station. */
+    STATION = "S",
+    /** The group represents the data gathered by stations within a radius of a network (specifically a network with a known boundary). */
+    OUTSIDE = "O"
+};
+
+/**
+ * Represents a selection group when performing visualization comparisons between
+ * stations and networks.
+ */
+export interface SelectionGroup {
+    /** The label representing this selection group */
+    label: string;
+    /** The mode of this selection group. */
+    mode: SelectionGroupMode;
+    /** The network or station id of this selection group. */
+    id?: number;
+    /** If mode === NETWORK an optional list of station ids to exclude from the network. */
+    excludeIds?: number[];
+    /** If mode === OUTSIDE the radius outside of the network to gather stations. */
+    outsideRadiusMiles?: number;
+}
+
+/**
+ * The pairing of a single SelectionGroup with the HttpParams that
+ * will be used to fetch its data.
+ */
+export interface GroupHttpParams {
+    group: SelectionGroup;
+    params: HttpParams;
+}
+
+/**
  * @dynamic
  */
 export abstract class NetworkAwareVisSelection extends VisSelection implements SupportsPOPInput {
     @selectionProperty()
     networkIds?: any[] = [];
+    @selectionProperty()
+    groups?: SelectionGroup[];
 
     constructor(protected networkService:NetworkService){
         super();
@@ -393,6 +433,55 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
             ? this.networkIds.slice()
             : undefined;
         return Promise.resolve(input);
+    }
+
+    /**
+     * Removes any station_id[n] parameters from a set of HttpParams.
+     * 
+     * @param params The params to remove parameters from
+     */
+    protected resetStationIdParams(params: HttpParams):HttpParams {
+        params.keys()
+            .filter(key => /^station_id\[\d+\]$/.test(key))
+            .forEach(key => params = params.delete(key));
+        return params;
+    }
+
+    /**
+     * Multiplies out a set of HttpParams by the value of the groups property.
+     * This function should NOT be called if the groups property is not set or empty (will result in a rejected Promise).
+     * 
+     * @todo Implement SelectionGroupMode.OUTSIDE support
+     * @param params The params to multiply out by groups
+     */
+    toGroupHttpParams(params: HttpParams = new HttpParams()): Promise<GroupHttpParams[]> {
+        if(!this.groups || !this.groups.length) {
+            return Promise.reject('selection has no SelectionGroups defined');
+        }
+        // to be safe clean out any station_id parameters that might have been set
+        params = this.resetStationIdParams(params);
+        const promises:Promise<GroupHttpParams>[] = this.groups.map(group => {
+            switch(group.mode) {
+                case SelectionGroupMode.STATION:
+                    params = params.set('station_id[0]',`${group.id}`);
+                    return Promise.resolve({group,params});
+                case SelectionGroupMode.NETWORK:
+                    // translate the network to its underlying stations
+                    return this.networkService.getStations(group.id)
+                        // just need the station_ids
+                        .then((stations:Station[]) => stations.map(s => s.station_id))
+                        // exclude any stations the group excludes
+                        .then((ids:number[]) => ids.filter(id => (group.excludeIds||[]).indexOf(id) === -1))
+                        .then((ids:number[]) => {
+                            ids.forEach((id,i) => params = params.set(`station_id[${i}]`,`${id}`));
+                            return ({group,params})
+                        });
+                case SelectionGroupMode.OUTSIDE:
+                    return Promise.reject('TODO SelectionGroupMode.OUTSIDE not implemented yet');
+            }
+            return Promise.reject(`Unknown SelectionGroupMode ${group.mode}`);
+        });
+        return Promise.all(promises);
     }
 }
 
@@ -521,9 +610,7 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
                 // note: in case the parent's implementation of toURLSearchParams included station_ids parameters we need
                 // to unset them and replace them with any this class generates (which may include or exclude those supplied
                 // by the parent)
-                params.keys()
-                    .filter(key => /^station_id\[\d+\]$/.test(key))
-                    .forEach(key => params = params.delete(key));
+                params = this.resetStationIdParams(params);
                 return this.getStationIds().then(results => {
                     results.forEach((id,i) => params = params.set(`station_id[${i}]`, `${id}`));
                     return params;

@@ -1,9 +1,9 @@
-import {Component,Inject,Input,OnInit, ViewEncapsulation} from '@angular/core';
+import {Component,Inject,Input,OnInit, ViewEncapsulation, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA,MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {EntityBase, Refuge, PhenologyTrail} from './entity.service';
-import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSelection,
+import {VisSelection,NetworkAwareVisSelection,StationAwareVisSelection,
         ActivityCurvesSelection,ScatterPlotSelection,CalendarSelection,
         ObserverActivitySelection,ObservationFrequencySelection,ClippedWmsMapSelection} from '@npn/common';
 
@@ -15,11 +15,11 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step *ngIf="stationAware" [stepControl]="step1FormGroup" label="Select sites">
             <div class="step-wrapper">
                 <div class="step-content">
-                    <refuge-visualization-scope-selection [selection]="selection" [refuge]="entity"></refuge-visualization-scope-selection>
+                    <refuge-visualization-scope-selection [selection]="selection" [refuge]="entity" #scopeSelection></refuge-visualization-scope-selection>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
-                    <button mat-raised-button matStepperNext>Next</button>
+                    <button mat-raised-button matStepperNext [disabled]="!scopeSelection.valid">Next</button>
                 </div>
             </div>
         </mat-step>
@@ -32,7 +32,7 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
                     <button mat-raised-button *ngIf="stationAware" matStepperPrevious>Back</button>
-                    <button mat-raised-button matStepperNext>Next</button>
+                    <button mat-raised-button matStepperNext [disabled]="!selection.isValid()">Next</button>
                 </div>
             </div>
         </mat-step>
@@ -114,6 +114,9 @@ export class NewVisualizationDialogComponent implements OnInit {
     entity:EntityBase;
     selection: VisSelection;
 
+    @ViewChild('scopeSelection')
+    scopeSelection:any; // should there be a common base class?
+
     constructor(private formBuilder: FormBuilder,
                 private dialogRef: MatDialogRef<NewVisualizationDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) private data:any) {
@@ -184,7 +187,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     <clipped-wms-map-control *ngIf="clipped" [selection]="clipped"></clipped-wms-map-control>
 
     <npn-visualization *ngIf="selection" [selection]="selection"></npn-visualization>
-    <pre *ngIf="selection">{{selection.external | json}}</pre>
+    <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
     `,
     styles:[`
         npn-visualization {
@@ -228,74 +231,4 @@ export class NewVisualizationBuilderComponent implements OnInit {
     }
 }
 
-@Component({
-    selector: 'refuge-visualization-scope-selection',
-    template: `
-    <mat-radio-group name="visScope" class="vis-scope-input" [(ngModel)]="visScope" (change)="scopeChanged()">
-      <!--mat-radio-button class="vis-scope-radio" [value]="'all'">No restrictions</mat-radio-button-->
-      <mat-radio-button class="vis-scope-radio" [value]="'refuge'">Show data for all sites at "{{refuge.title}}"</mat-radio-button>
-      <mat-radio-button class="vis-scope-radio" [value]="'station'">Show data for select sites at "{{refuge.title}}"</mat-radio-button>
-    </mat-radio-group>
-    <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
-    <div *ngIf="visScope === 'station' && stations && stations.length">
-        <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
-    </div>
-    <pre *ngIf="selection">{{selection.external | json}}</pre>
-    `,
-    styles:[`
-        .vis-scope-input {
-          display: inline-flex;
-          flex-direction: column;
-        }
-        .vis-scope-radio {
-          margin: 5px;
-        }
-        .station-input {
-            display: block;
-        }
-    `]
-})
-export class RefugeVisualizationScopeSelectionComponent {
-    @Input()
-    selection: VisSelection;
-    @Input()
-    refuge: Refuge;
 
-    visScope:string = 'refuge';
-    stationFetch:boolean = false;
-    stations:any[];
-
-    constructor(private networkService:NetworkService) {}
-
-    scopeChanged() {
-        this.selection.networkIds = [];
-        this.selection.stationIds = [];
-        switch(this.visScope) {
-            case 'all':
-                break;
-            case 'refuge':
-                this.selection.networkIds = [this.refuge.network_id];
-                break;
-            case 'station':
-                this.selection.networkIds = [this.refuge.network_id];
-                if(!this.stations) {
-                    this.stationFetch = true;
-                    this.networkService.getStations(this.refuge.network_id)
-                        .then(stations => {
-                            stations.forEach(s => s.selected = true);
-                            this.stations = stations;
-                            this.stationFetch = false;
-                        })
-                        .catch(e => {
-                            this.stationFetch = false;
-                            console.error(e);
-                        });
-                }
-                break;
-        }
-    }
-
-    stationChange() {
-        this.selection.stationIds = this.stations.filter(s => s.selected).map(s => s.station_id);
-    }
-}

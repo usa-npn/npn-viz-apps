@@ -7,6 +7,8 @@ export * from './network';
 export { CacheService } from './cache.service';
 export * from './species.service';
 export { NetworkService } from './network.service';
+export { StationService } from './station.service';
+export { getStaticColor } from './static-color';
 
 export * from './species-title.pipe';
 export { DoyPipe } from './doy.pipe';

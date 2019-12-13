@@ -8,6 +8,7 @@ import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
 import {FwsDashboardComponent} from './fws-dashboard.component';
+import {PhenologyTrailPartnersComponent} from './phenology-trail-partners.component';
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,RefugeVisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
 import {EntityService} from './entity.service';
 
@@ -35,6 +36,7 @@ export function npnConfigurationFactory() {
 @NgModule({
   declarations: [
     FwsDashboardComponent,
+    PhenologyTrailPartnersComponent,
     FocalSpeciesComponent,
     FindingsComponent,
     ResourcesComponent,

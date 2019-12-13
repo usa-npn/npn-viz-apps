@@ -54,7 +54,7 @@ const PARTNERS_TAB_IDX = 3;
             </div>
         </ng-template>
         <div class="rd-tab-content" *ngIf="renderPartners">
-            TODO partners implementation
+        <phenology-trail-partners [entity]="entity"></phenology-trail-partners>
         </div>
     </mat-tab>
   </mat-tab-group>

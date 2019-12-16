@@ -11,4 +11,5 @@ export interface Station {
     group_name?:string;
     // allow arbitrary keys for use by controls
     [x:string]:any;
+    icon?:string;
 }

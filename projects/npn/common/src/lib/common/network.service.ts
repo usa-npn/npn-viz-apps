@@ -58,7 +58,8 @@ export class NetworkService {
         return Promise.all(
             networkIds.map(id => this.serviceUtils.cachedGet(this.serviceUtils.dataApiUrl2(`/v0/networks/${id}`)))
         ).then(results => {
-            return results.map(result=>result[0]);
+            // TODO: What to do when given a bad network id?
+            return results.map(result=> result.length == 1 ? result[0] : null).filter(network => !!network);
         });
     }
 }

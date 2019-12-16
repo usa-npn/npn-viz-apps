@@ -8,19 +8,20 @@ agm-map {
 }
 .info-window-card {
     max-width:400px;
-    h1 {
+    h3 {
         font-weight:400;
         font-size:2em;
         text-align:center;
         margin-bottom: 0;
         line-height:1em;
     }
-    h2 {
+    h4 {
         text-align:center;
         font-size:1.4em;
         margin-top: 0;
         margin-bottom:12px;
         line-height:1.5em;
+        font-weight:200;
     }
     ul {
         margin-top:0;
@@ -28,7 +29,7 @@ agm-map {
         display: flex;
         justify-content: space-between;
         li{
-            h1 {
+            h3 {
                 line-height:1em;
             }
             width: 170px;
@@ -37,4 +38,26 @@ agm-map {
             text-align:center;
         }
     }
+}
+.map-legend {
+    padding:20px;
+    h3{
+        font-size:2em;
+        line-height:1em;
+        margin-bottom:20px;
+    }
+    ul {
+        li{
+            margin-bottom:0;
+            line-height:.5em;
+            list-style: none;
+            div.legend-box {
+                width:14px;
+                height:14px;
+                display:inline-block;
+                margin-right:10px;
+            }
+        }
+    }
+    
 }

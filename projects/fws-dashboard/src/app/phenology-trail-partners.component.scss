@@ -1,0 +1,40 @@
+agm-map {
+    height: 500px;
+}
+.in-info-window {
+    width: 60px;
+    height: 60px;
+    padding:20px;
+}
+.info-window-card {
+    max-width:400px;
+    h1 {
+        font-weight:400;
+        font-size:2em;
+        text-align:center;
+        margin-bottom: 0;
+        line-height:1em;
+    }
+    h2 {
+        text-align:center;
+        font-size:1.4em;
+        margin-top: 0;
+        margin-bottom:12px;
+        line-height:1.5em;
+    }
+    ul {
+        margin-top:0;
+        margin-bottom:6px;
+        display: flex;
+        justify-content: space-between;
+        li{
+            h1 {
+                line-height:1em;
+            }
+            width: 170px;
+            margin: 10px auto;
+            list-style: none;
+            text-align:center;
+        }
+    }
+}

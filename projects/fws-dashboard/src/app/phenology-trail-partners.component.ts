@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { I18nPluralPipe } from '@angular/common';
 import {PhenologyTrail} from './entity.service';
 import {Network, Station, NetworkService, StationService, getStaticColor} from '@npn/common';
 
@@ -13,7 +14,7 @@ import {Network, Station, NetworkService, StationService, getStaticColor} from '
     [opacity]="1"
     [markerDraggable]="true"
     (markerClick)="selectMarker(station)"
-    [iconUrl]="'https://www.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png'"
+    [iconUrl]="purpleMarker"
     ></agm-marker>
     <agm-info-window *ngIf="griddedLoading"
                     [isOpen]="griddedOpen"
@@ -23,25 +24,19 @@ import {Network, Station, NetworkService, StationService, getStaticColor} from '
     </agm-info-window>
     <agm-info-window [isOpen]="!!selectedMarker" (infoWindowClose)="selectedMarker = null"
     [latitude]="selectedMarker?.latitude" [longitude]="selectedMarker?.longitude" *ngIf="selectedMarker">
-        <div>
-            <h4>{{selectedMarker.site_name}}</h4>
-            <p>{{selectedMarker.group_name}}</p>
-            <p>Individuals: {{selectedMarker.num_individuals}}</p>
-            <p>Records: {{selectedMarker.num_records}}</p>
+        <div class="info-window-card">
+            <h1>{{selectedMarker.site_name}}</h1>
+            <h2>{{selectedMarker.group_name}}</h2>
+            <ul>
+                <li><h1>{{selectedMarker.num_individuals}}</h1> {{selectedMarker.num_individuals | i18nPlural: itemPluralMapping['individual'] }}</li>
+                <li><h1>{{selectedMarker.num_records}}</h1> {{selectedMarker.num_records | i18nPlural: itemPluralMapping['record']}}</li>
+            </ul>
         </div>
     </agm-info-window>
     
   </agm-map>
   `,
-  styles: [`
-    agm-map {
-        height: 500px;
-    }
-    .in-info-window {
-        width: 60px;
-        height: 60px;
-        padding:20px;
-    }`]
+  styleUrls: ['./phenology-trail-partners.component.scss']
 })
 export class PhenologyTrailPartnersComponent implements OnInit {
     @Input() entity:PhenologyTrail;
@@ -50,12 +45,26 @@ export class PhenologyTrailPartnersComponent implements OnInit {
     lat = 35;
     lng = -106.2615581;
     selectedMarker;
-
+    itemPluralMapping = {
+        'record': {
+          '=0' : 'Records',
+          '=1' : 'Record',
+          'other' : 'Records'
+        }, 
+        'individual': {
+          '=0' : 'Individuals',
+          '=1' : 'Individual',
+          'other' : 'Individuals'
+        }
+      };
     griddedLat:number;
     griddedLng:number;
     griddedOpen:boolean = false;
     //griddedData:GriddedPointData;
     griddedLoading:boolean = false;
+    greenMarker = 'https://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
+    yellowMarker = 'https://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png';
+    purpleMarker = 'https://www.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
 
     constructor(
         private networkService:NetworkService,
@@ -93,6 +102,6 @@ export class PhenologyTrailPartnersComponent implements OnInit {
         this.stationService.getStation(selectedStation.station_id).then(station =>{
             this.selectedMarker = station;
             this.griddedLoading = false;
-        })
-      }
+        });
+    }
 }

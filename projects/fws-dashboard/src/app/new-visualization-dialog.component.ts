@@ -2,7 +2,7 @@ import {Component,Inject,Input,OnInit, ViewEncapsulation, ViewChild} from '@angu
 import {MAT_DIALOG_DATA,MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import {EntityBase, Refuge, PhenologyTrail} from './entity.service';
+import {EntityBase, Refuge, PhenologyTrail, DashboardMode, DashboardModeState} from './entity.service';
 import {VisSelection,NetworkAwareVisSelection,StationAwareVisSelection,
         ActivityCurvesSelection,ScatterPlotSelection,CalendarSelection,
         ObserverActivitySelection,ObservationFrequencySelection,ClippedWmsMapSelection} from '@npn/common';
@@ -15,11 +15,12 @@ import {VisSelection,NetworkAwareVisSelection,StationAwareVisSelection,
         <mat-step *ngIf="stationAware" [stepControl]="step1FormGroup" label="Select sites">
             <div class="step-wrapper">
                 <div class="step-content">
-                    <refuge-visualization-scope-selection [selection]="selection" [refuge]="entity" #scopeSelection></refuge-visualization-scope-selection>
+                    <refuge-visualization-scope-selection *ngIf="mode === 'refuge'" [selection]="selection" [refuge]="entity" #scopeSelection></refuge-visualization-scope-selection>
+                    <pheno-trail-visualization-scope-selection *ngIf="mode === 'phenology_trail'" [selection]="selection" [phenoTrail]="entity" #scopeSelection></pheno-trail-visualization-scope-selection>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
-                    <button mat-raised-button matStepperNext [disabled]="!scopeSelection.valid">Next</button>
+                    <button mat-raised-button matStepperNext [disabled]="!!scopeSelection && !scopeSelection.valid">Next</button>
                 </div>
             </div>
         </mat-step>
@@ -110,7 +111,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     step3FormGroup: FormGroup;
     showVis:number;
     showDetails:boolean;
-
+    mode:DashboardMode = DashboardModeState.get();
     entity:EntityBase;
     selection: VisSelection;
 

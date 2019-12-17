@@ -11,6 +11,7 @@ import {FwsDashboardComponent} from './fws-dashboard.component';
 import {PhenologyTrailPartnersComponent} from './phenology-trail-partners.component';
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent} from './new-visualization-dialog.component';
 import { RefugeVisualizationScopeSelectionComponent } from "./refuge-visualization-scope-selection.component";
+import { PhenoTrailVisualizationScopeSelectionComponent } from './pheno-trail-visualization-scope-selection.component';
 import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
@@ -43,6 +44,7 @@ export function npnConfigurationFactory() {
     ResourcesComponent,
     NewVisualizationBuilderComponent,
     RefugeVisualizationScopeSelectionComponent,
+    PhenoTrailVisualizationScopeSelectionComponent,
     NewVisualizationDialogComponent
   ],
   entryComponents: [

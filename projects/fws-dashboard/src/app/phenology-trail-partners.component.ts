@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, ViewChild, HostListener } from '@angular/core';
-import { I18nPluralPipe } from '@angular/common';
-import {PhenologyTrail} from './entity.service';
-import {Network, Station, NetworkService, StationService, getStaticColor, MAP_STYLES} from '@npn/common';
-import { MapsAPILoader, AgmMap, LatLngBounds, LatLngBoundsLiteral} from '@agm/core';
+import { PhenologyTrail } from './entity.service';
+import { Network, Station, NetworkService, StationService, getStaticColor, MAP_STYLES } from '@npn/common';
+import { MapsAPILoader, AgmMap } from '@agm/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -16,20 +15,15 @@ import * as d3 from 'd3';
         [iconUrl]="station.icon"
         (markerClick)="selectMarker(station)"
     ></agm-marker>
-    <agm-info-window *ngIf="griddedLoading"
-                    [isOpen]="griddedOpen"
-                    (infoWindowClose)="griddedOpen = false"
-                    [latitude]="griddedLat" [longitude]="griddedLng">
-                    <npn-logo class="in-info-window" spin="true"></npn-logo>
-    </agm-info-window>
-    <agm-info-window [isOpen]="!!selectedMarker" (infoWindowClose)="selectedMarker = null"
-    [latitude]="selectedMarker?.latitude" [longitude]="selectedMarker?.longitude" *ngIf="selectedMarker">
-        <div class="info-window-card">
-            <h3>{{selectedMarker.site_name}}</h3>
-            <h4>{{selectedMarker.group_name}}</h4>
+    <agm-info-window [isOpen]="!!selectedStation" (infoWindowClose)="selectedStation = stationInfo = null"
+    [latitude]="selectedStation?.latitude" [longitude]="selectedStation?.longitude">
+        <npn-logo class="in-info-window" spin="true" *ngIf="!stationInfo"></npn-logo>
+        <div class="info-window-card" *ngIf="stationInfo">
+            <h3>{{stationInfo.site_name}}</h3>
+            <h4>{{stationInfo.group_name}}</h4>
             <ul>
-                <li><h3>{{selectedMarker.num_individuals}}</h3> {{selectedMarker.num_individuals | i18nPlural: itemPluralMapping['individual'] }}</li>
-                <li><h3>{{selectedMarker.num_records}}</h3> {{selectedMarker.num_records | i18nPlural: itemPluralMapping['record']}}</li>
+                <li><h3>{{stationInfo.num_individuals}}</h3> {{stationInfo.num_individuals | i18nPlural: itemPluralMapping['individual'] }}</li>
+                <li><h3>{{stationInfo.num_records}}</h3> {{stationInfo.num_records | i18nPlural: itemPluralMapping['record']}}</li>
             </ul>
         </div>
     </agm-info-window>
@@ -51,7 +45,9 @@ export class PhenologyTrailPartnersComponent implements OnInit {
     @Input() entity:PhenologyTrail;
     networks:Promise<Network[]>;
     stations:Promise<Station[]>;
-    selectedMarker;
+    selectedStation:Station;
+    stationInfo:Station;
+
     bounds:google.maps.LatLngBounds;
     map: google.maps.Map;
     itemPluralMapping = {
@@ -66,11 +62,6 @@ export class PhenologyTrailPartnersComponent implements OnInit {
           'other' : 'Individuals'
         }
       };
-    griddedLat:number;
-    griddedLng:number;
-    griddedOpen:boolean = false;
-    //griddedData:GriddedPointData;
-    griddedLoading:boolean = false;
     mapStyles: any[] = MAP_STYLES;
 
     constructor(
@@ -83,10 +74,8 @@ export class PhenologyTrailPartnersComponent implements OnInit {
         // map of network_id to a color
         const colorMap:any = this.entity.network_ids.reduce((map,id,i) => {
             const color = getStaticColor(i);
-            map[`${id}`] = { 
-                color: color,
-                outline: d3.color(color).darker().toString()
-            }
+            const outline = d3.color(color).darker().toString();
+            map[`${id}`] = {color,outline};
             return map;
         },{});
 
@@ -105,13 +94,9 @@ export class PhenologyTrailPartnersComponent implements OnInit {
             });
             
         });
-
-        console.log(this.networks);
-        console.log(this.stations);
     }
 
     ngAfterViewInit() {
-        //console.log(this.agmMap);
         //cycle through the map elements and get the center position of the map
         this.agmMap.mapReady.subscribe(map => {
           this.map = map;
@@ -138,14 +123,8 @@ export class PhenologyTrailPartnersComponent implements OnInit {
      * @param selectedStation - The station that is selected. Needs latitude, longitude, and station_id
      */
     selectMarker(selectedStation:Station) {
-        this.griddedLoading = true;
-        this.griddedLat = selectedStation.latitude;
-        this.griddedLng = selectedStation.longitude;
-        this.griddedOpen = true;
-        this.stationService.getStation(selectedStation.station_id).then(station =>{
-            this.selectedMarker = station;
-            this.griddedLoading = false;
-        });
+        this.selectedStation = selectedStation;
+        this.stationService.getStation(selectedStation.station_id).then(station => this.stationInfo = station);
     }
 
     newGoogleMapsSymbol(station:Station):google.maps.Symbol {

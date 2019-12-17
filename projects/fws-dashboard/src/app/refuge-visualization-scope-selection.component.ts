@@ -55,6 +55,7 @@ export class RefugeVisualizationScopeSelectionComponent {
                 break;
             case 'station':
             case 'stationGroup':
+            case 'outsideGroup':
                 this.selection.networkIds = [this.refuge.network_id];
                 if (!this._stations) {
                     this.stationFetch = true;
@@ -69,6 +70,9 @@ export class RefugeVisualizationScopeSelectionComponent {
                     stations.forEach(s => s.selected = this.visScope === 'station');
                     this.stations = stations;
                 });
+                if(this.visScope === 'outsideGroup') {
+                    // TODO populate selection.groups
+                }
                 break;
         }
     }
@@ -86,6 +90,9 @@ export class RefugeVisualizationScopeSelectionComponent {
                         const id = s.station_id;
                         return {mode,id,label};
                     });
+                break;
+            case 'outsideGroup':
+                // TODO
                 break;
         }
     }

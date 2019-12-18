@@ -415,17 +415,63 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
         super();
     }
 
+    /**
+     * Fetches the list of station ids associated with a `Selectiongroup`
+     * 
+     * @param group The group
+     */
+    private getStationIdsForGroup(group:SelectionGroup):Promise<number[]> {
+        switch(group.mode) {
+            case SelectionGroupMode.STATION:
+                return Promise.resolve([group.id]);
+            case SelectionGroupMode.NETWORK:
+                // translate the network to its underlying stations
+                return this.networkService.getStations(group.id)
+                    // just need the station_ids
+                    .then((stations:Station[]) => stations.map(s => s.station_id))
+                    // exclude any stations the group excludes
+                    .then((ids:number[]) => ids.filter(id => (group.excludeIds||[]).indexOf(id) === -1));
+            case SelectionGroupMode.OUTSIDE:
+                return Promise.reject('TODO SelectionGroupMode.OUTSIDE not implemented yet');
+        }
+    }
+
+    /**
+     * If the `groups` property is set then the output of this function will be
+     * the compilation of all the station ids that are part of the corresponding
+     * groups, otherwise it will be based upon any networkIds set.
+     */
     getStationIds():Promise<number []> {
-        return this.networkIds && this.networkIds.length
+        return !!this.groups && this.groups.length > 0
+            ? Promise.all(this.groups.map(group => this.getStationIdsForGroup(group)))
+                .then((list) => list.reduce((ids,idList) => {
+                    idList.forEach(id => {
+                        if(ids.indexOf(id) === -1) {
+                            ids.push(id);
+                        }
+                    });
+                    return ids;
+                },[]))
+            : this.networkIds && this.networkIds.length
             ? this.networkService.getStations(this.networkIds)
                 .then(stations => stations.map(s => s.station_id))
             : Promise.resolve([]);
     }
 
+    /**
+     * If the `groups` property is set then no `station_id` parameters will
+     * be populated on the base `HttpParams` since separate requests will need to
+     * be issued for group data and `toGroupHttpParams` must be called to build those
+     * request parameters.
+     * 
+     * @param params The HttpParams (optional)
+     */
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        // translate any network_ids into station_ids
-        return this.getStationIds()
-            .then(sids => sids.reduce((params,id,i) => params.set(`station_id[${i}]`, `${id}`),params));
+        return !!this.groups && this.groups.length > 0
+            ? Promise.resolve(params)
+            // translate any network_ids into station_ids
+            : this.getStationIds()
+                  .then(sids => sids.reduce((params,id,i) => params.set(`station_id[${i}]`, `${id}`),params));
     }
     
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
@@ -460,27 +506,11 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
         }
         // to be safe clean out any station_id parameters that might have been set
         params = this.resetStationIdParams(params);
-        const promises:Promise<GroupHttpParams>[] = this.groups.map(group => {
-            switch(group.mode) {
-                case SelectionGroupMode.STATION:
-                    params = params.set('station_id[0]',`${group.id}`);
-                    return Promise.resolve({group,params});
-                case SelectionGroupMode.NETWORK:
-                    // translate the network to its underlying stations
-                    return this.networkService.getStations(group.id)
-                        // just need the station_ids
-                        .then((stations:Station[]) => stations.map(s => s.station_id))
-                        // exclude any stations the group excludes
-                        .then((ids:number[]) => ids.filter(id => (group.excludeIds||[]).indexOf(id) === -1))
-                        .then((ids:number[]) => {
-                            ids.forEach((id,i) => params = params.set(`station_id[${i}]`,`${id}`));
-                            return ({group,params})
-                        });
-                case SelectionGroupMode.OUTSIDE:
-                    return Promise.reject('TODO SelectionGroupMode.OUTSIDE not implemented yet');
-            }
-            return Promise.reject(`Unknown SelectionGroupMode ${group.mode}`);
-        });
+        const promises:Promise<GroupHttpParams>[] = this.groups.map(group => this.getStationIdsForGroup(group)
+            .then((ids:number[]) => {
+                params = ids.reduce((params,id,i) => params.set(`station_id[${i}]`,`${id}`),params);
+                return ({group,params});
+            }));
         return Promise.all(promises);
     }
 }

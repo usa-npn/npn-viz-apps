@@ -115,7 +115,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 }
                 return filtered;
             };
-        const fetchDataForPlot = (baseParams,plot,plotIndex) => {
+        const fetchDataForPlot = (baseParams,plot,plotIndex,group?) => {
             const keys = getSpeciesPlotKeys(plot);
             let params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
                 .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
@@ -128,7 +128,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             params = params.set('climate_data','1');
             return this.serviceUtils.cachedPost(url,params.toString())
                 .then(data => filterLqd(data,plot,plotIndex))
-                .then(data => ({plot,data}));
+                .then(data => ({plot,data,group}));
         };
         this.working = true;
         return this.toURLSearchParams()
@@ -143,10 +143,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                                 validPlots.forEach(p => {
                                     const plot = JSON.parse(JSON.stringify(p));
                                     plot.color = getStaticColor(plotIndex);
-                                    promises.push(fetchDataForPlot(gp.params,plot,plotIndex++).then((result:any) => {
-                                        result.group = gp.group;
-                                        return result;
-                                    }));
+                                    promises.push(fetchDataForPlot(gp.params,plot,plotIndex++,gp.group));
                                 });
                                 return promises;
                             },[]);

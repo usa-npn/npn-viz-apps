@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { VisSelection } from '../vis-selection';
+import { VisSelection, NetworkAwareVisSelection } from '../vis-selection';
 import { Subject, Observable, from, combineLatest, of } from 'rxjs';
 import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
 import { MonitorsDestroy,
@@ -21,11 +21,7 @@ export interface HigherSpeciesPhenophaseInputCriteria {
 }
 
 /**
- * It would be nice if interfaces were actually meaningful at runtime.
- * Using concrete classes, due to getters/setters, could be problematic
- * SO WRT to validity of phenophases for date ranges this control works on 
- * convention rather than introspection as follows; plot.year, selection.year,
- * selection.years, selection.start/end (TODO).
+ * Filtering of applicable species is based upon the `criteria` input.
  */
 @Component({
     selector: 'higher-species-phenophase-input',
@@ -54,7 +50,7 @@ export interface HigherSpeciesPhenophaseInputCriteria {
         <mat-progress-bar *ngIf="fetchingPhenophaseList" mode="query"></mat-progress-bar>
         <mat-hint *ngIf="phenophaseHint" align="end"><fa-icon [icon]="hintIcon" [matTooltip]="phenophaseHint"></fa-icon></mat-hint>
     </mat-form-field>
-    <mat-form-field *ngIf="gatherColor" class="color-input">
+    <mat-form-field *ngIf="actuallyGatherColor" class="color-input">
         <mat-select  [placeholder]="colorPlaceholder" [formControl]="color">
         <mat-select-trigger><div class="color-swatch" [ngStyle]="{'background-color':color.value}"></div></mat-select-trigger>
         <mat-option *ngFor="let c of colorList" [value]="c"><div class="color-swatch" [ngStyle]="{'background-color':c}"></div></mat-option>
@@ -119,6 +115,13 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     phenophaseHint;
     phenophaseTaxInfo:PhenophaseTaxonomicInfo; // just for debug purposes
 
+    ignoreGatherColor:boolean = false;
+    /**
+     * Whether or not to gather color and set on the plot
+     * This input is ignored if the selection is an instanceof NetworkAwareVisSelection
+     * and is using grouping.  In that scenario visualizations will need to calculate
+     * colors based on groups.length*plots.length.
+     */
     @Input() gatherColor:boolean = false;
     color:FormControl = new FormControl();
     colorList:string[] = STATIC_COLORS;
@@ -136,6 +139,13 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     }
 
     ngOnInit() {
+        this.criteriaUpdate
+            .pipe(takeUntil(this.componentDestroyed))
+            .subscribe(() => this.ignoreGatherColor =
+                (this.selection instanceof NetworkAwareVisSelection &&
+                 !!this.selection.groups &&
+                 this.selection.groups.length > 0));
+
         const $speciesTaxonomicInfo:Observable<SpeciesTaxonomicInfo> = this.criteriaUpdate.pipe(
             tap(() => this.fetchingSpeciesList = true),
             switchMap(criteria => from((criteria.stationIds||Promise.resolve([])).then(stationIds => {
@@ -341,7 +351,7 @@ console.log('phenophaseTaxInfo',info);
                 // TODO expand the condition that decides when a plot is complete...
                 map(v => !!v.speciesRank && !!v.species && typeof(v.species) === 'object'
                     && !!v.phenophase
-                    && (!this.gatherColor || !!v.color)
+                    && (!this.actuallyGatherColor || !!v.color)
                     ? v
                     : null
                 ),
@@ -354,7 +364,7 @@ console.log('phenophaseTaxInfo',info);
                     this.plot.species = v ? v.species : null;
                     this.plot.phenophaseRank = TaxonomicPhenophaseRank.CLASS;
                     this.plot.phenophase = v ? v.phenophase : null;
-                    if(this.gatherColor) {
+                    if(this.actuallyGatherColor) {
                         this.plot.color = v ? v.color : null;
                     } else {
                         delete this.plot.color; // just to be safe, mostly stesting
@@ -438,6 +448,10 @@ console.log('phenophaseTaxInfo',info);
 
     get phenophasePlaceholder():string {
         return 'Phenophase class' /*+ ((this.phenophaseList||[]).length ? ` (${(this.phenophaseList||[]).length})`: '')*/ + (this.required ? ' *' : '');
+    }
+
+    get actuallyGatherColor():boolean {
+        return this.gatherColor && !this.ignoreGatherColor;
     }
 
     get colorPlaceholder():string {

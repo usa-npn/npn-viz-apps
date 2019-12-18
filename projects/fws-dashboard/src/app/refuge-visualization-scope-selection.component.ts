@@ -7,7 +7,6 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
     selector: 'refuge-visualization-scope-selection',
     template: `
     <mat-radio-group name="visScope" class="vis-scope-input" [(ngModel)]="visScope" (change)="scopeChanged()">
-      <!--mat-radio-button class="vis-scope-radio" [value]="'all'">No restrictions</mat-radio-button-->
       <mat-radio-button class="vis-scope-radio" [value]="'refuge'">Show data for all sites at "{{refuge.title}}"</mat-radio-button>
       <mat-radio-button class="vis-scope-radio" [value]="'station'">Show data for select sites at "{{refuge.title}}"</mat-radio-button>
       <mat-radio-button class="vis-scope-radio" [value]="'stationGroup'">Compare data for select sites at "{{refuge.title}}"</mat-radio-button>
@@ -44,19 +43,16 @@ export class RefugeVisualizationScopeSelectionComponent {
     constructor(private networkService: NetworkService) { }
     scopeChanged() {
         // reset to a clean slate
-        delete this.selection.networkIds;
-        delete this.selection.stationIds;
-        delete this.selection.groups;
+        this.selection.stationIds = undefined;
+        this.selection.groups = undefined;
         switch (this.visScope) {
-            case 'all':
-                break;
             case 'refuge':
-                this.selection.networkIds = [this.refuge.network_id];
+                // it's always set and doesn't ever need to change
+                // this.selection.networkIds = [this.refuge.network_id];
                 break;
             case 'station':
             case 'stationGroup':
             case 'outsideGroup':
-                this.selection.networkIds = [this.refuge.network_id];
                 if (!this._stations) {
                     this.stationFetch = true;
                     this._stations = this.networkService.getStations(this.refuge.network_id)

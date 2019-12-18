@@ -244,7 +244,7 @@ console.log('speciesTaxInfo',info);
         // TODO deal with station_ids?
         const $phenophaseTaxInfo:Observable<PhenophaseTaxonomicInfo> = combineLatest(
             this.species.valueChanges,
-            this.criteriaUpdate
+            this.criteriaUpdate.pipe(debounceTime(500)),
         ).pipe(
             tap(() => this.fetchingPhenophaseList = true),
             switchMap(input => {

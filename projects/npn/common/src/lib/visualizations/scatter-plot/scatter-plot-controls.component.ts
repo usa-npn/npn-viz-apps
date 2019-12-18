@@ -1,8 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input } from '@angular/core';
 
 import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
 import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
 import * as d3 from 'd3';
+import { MonitorsDestroy } from '@npn/common/common';
+import { takeUntil, filter, debounceTime } from 'rxjs/operators';
+import { VisSelectionEvent } from '../vis-selection';
 
 @Component({
     selector: 'scatter-plot-control',
@@ -45,13 +48,19 @@ import * as d3 from 'd3';
         }
     `]
 })
-export class ScatterPlotControlsComponent implements OnInit {
+export class ScatterPlotControlsComponent extends MonitorsDestroy {
     @Input()
     selection: ScatterPlotSelection;
     axis = AXIS;
     criteria:HigherSpeciesPhenophaseInputCriteria;
 
     ngOnInit() {
+        this.selection.pipe(
+            filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
+            debounceTime(500),
+            takeUntil(this.componentDestroyed)
+        ).subscribe(() => this.updateCriteria());
+        
         if(this.selection.plots.length === 0) {
             this.addPlot();
         }

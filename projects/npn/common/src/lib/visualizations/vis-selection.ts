@@ -10,6 +10,7 @@ export const enum VisSelectionEvent {
     REDRAW = 'redraw', // assuming you have data simply re-draw with that data
     UPDATE = 'update', // go get new data and reset/redraw
     RESIZE = 'resize', // short cut for reset/redraw
+    SCOPE_CHANGE = 'scope_change', // a scope related property has changed (NetworkAwareVisSelection)
 }
 
 /*
@@ -30,6 +31,7 @@ export const enum VisSelectionEvent {
  * is run.
  */
 import 'reflect-metadata';
+import { Subject } from 'rxjs';
 const selectionPropertyMetadataKey = Symbol('npnSelectionProperty');
 const IDENTITY = d => d;
 /**
@@ -407,12 +409,30 @@ export interface GroupHttpParams {
  */
 export abstract class NetworkAwareVisSelection extends VisSelection implements SupportsPOPInput {
     @selectionProperty()
-    networkIds?: any[] = [];
+    _networkIds?: number[] = [];
     @selectionProperty()
-    groups?: SelectionGroup[];
+    _groups?: SelectionGroup[];
 
     constructor(protected networkService:NetworkService){
         super();
+    }
+
+    set networkIds(ids:number[]) {
+        this._networkIds = ids;
+        this.emit(VisSelectionEvent.SCOPE_CHANGE);
+    }
+
+    get networkIds():number[] {
+        return this._networkIds;
+    }
+
+    set groups(groups:SelectionGroup[]) {
+        this._groups = groups;
+        this.emit(VisSelectionEvent.SCOPE_CHANGE);
+    }
+
+    get groups():SelectionGroup[] {
+        return this._groups;
     }
 
     /**
@@ -552,12 +572,20 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     @selectionProperty()
     _groupId;
     @selectionProperty()
-    stationIds?: any[] = [];
+    _stationIds?: any[] = [];
     @selectionProperty()
     _boundaries:BoundarySelection[];
 
     constructor(protected serviceUtils:NpnServiceUtils,protected networkService:NetworkService) {
         super(networkService);
+    }
+
+    set stationIds(ids:any[]) {
+        this._stationIds = ids;
+        this.emit(VisSelectionEvent.SCOPE_CHANGE);
+    }
+    get stationIds():any[] {
+        return this._stationIds;
     }
 
     get personId():any {

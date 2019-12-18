@@ -2,6 +2,9 @@ import {Component,Input,OnInit} from '@angular/core';
 
 import {CalendarSelection} from './calendar-selection';
 import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
+import { filter, debounceTime, takeUntil } from 'rxjs/operators';
+import { VisSelectionEvent } from '../vis-selection';
+import { MonitorsDestroy } from '@npn/common/common';
 
 const THIS_YEAR = (new Date()).getFullYear();
 const VALID_YEARS = (function(){
@@ -70,7 +73,7 @@ const VALID_YEARS = (function(){
         }
     `]
 })
-export class CalendarControlComponent implements OnInit {
+export class CalendarControlComponent extends MonitorsDestroy {
     @Input()
     selection: CalendarSelection;
     maxYears = 5;
@@ -87,6 +90,12 @@ export class CalendarControlComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.selection.pipe(
+            filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
+            debounceTime(500),
+            takeUntil(this.componentDestroyed)
+        ).subscribe(() => this.updateCriteria());
+        
         if(this.selection.years.length === 0) {
             this.addYear();
         }

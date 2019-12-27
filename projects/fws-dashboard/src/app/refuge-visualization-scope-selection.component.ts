@@ -15,7 +15,7 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
     <div *ngIf="(visScope === 'station' || visScope === 'stationGroup')">
         <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
     </div>
-    <pre *ngIf="selection">{{selection.external | json}}</pre>
+    <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
     `,
     styles: [`
         .vis-scope-input {

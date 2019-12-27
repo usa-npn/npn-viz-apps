@@ -15,7 +15,7 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
     <div *ngIf="(visScope === 'station' || visScope === 'stationGroup')">
         <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
     </div>
-    <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
+    <pre *ngIf="selection">{{selection.external | json}}</pre>
     `,
     styles: [`
         .vis-scope-input {
@@ -41,6 +41,43 @@ export class RefugeVisualizationScopeSelectionComponent {
     private _stations:Promise<Station []>;
     stations: Station[];
     constructor(private networkService: NetworkService) { }
+
+    ngOnInit() {
+        const {selection} = this;
+        if(selection.groups && selection.groups.length) {
+            // this control is simplistic when it comes to groups, there are only two use cases
+            this.visScope = selection.groups[0].mode === SelectionGroupMode.STATION
+                ? 'stationGroup'
+                : 'outsideGroup';
+        } else if (selection.stationIds && selection.stationIds.length) {
+            this.visScope = 'station';
+        } else {
+            this.visScope = 'refuge';
+        }
+        if(this.visScope !== 'refuge') {
+            this.loadStations().then((stations:Station[]) => stations.forEach(s => {
+                if(this.visScope === 'station') {
+                    s.selected = selection.stationIds.indexOf(s.station_id) !== -1;
+                } else {
+                    s.selected = !!selection.groups.reduce((found,g) => (found||(g.id === s.station_id ? s : undefined)),undefined);
+                }
+            }));
+        }
+    }
+
+    private loadStations() {
+        if (!this._stations) {
+            this.stationFetch = true;
+            this._stations = this.networkService.getStations(this.refuge.network_id)
+                .then(stations => {
+                    this.stations = stations;
+                    this.stationFetch = false;
+                    return stations;
+                });
+        }
+        return this._stations;
+    }
+
     scopeChanged() {
         // reset to a clean slate
         this.selection.stationIds = undefined;
@@ -53,18 +90,9 @@ export class RefugeVisualizationScopeSelectionComponent {
             case 'station':
             case 'stationGroup':
             case 'outsideGroup':
-                if (!this._stations) {
-                    this.stationFetch = true;
-                    this._stations = this.networkService.getStations(this.refuge.network_id)
-                        .then(stations => {
-                            this.stationFetch = false;
-                            return stations;
-                        });
-                }
-                this._stations.then((stations:Station[]) => {
+                this.loadStations().then((stations:Station[]) => {
                     // all selected for station mode and all de-selected for stationGroup mode
                     stations.forEach(s => s.selected = this.visScope === 'station');
-                    this.stations = stations;
                 });
                 if(this.visScope === 'outsideGroup') {
                     // TODO populate selection.groups

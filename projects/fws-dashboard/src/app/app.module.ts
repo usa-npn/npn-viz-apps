@@ -12,6 +12,8 @@ import {PhenologyTrailPartnersComponent} from './phenology-trail-partners.compon
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent} from './new-visualization-dialog.component';
 import { RefugeVisualizationScopeSelectionComponent } from "./refuge-visualization-scope-selection.component";
 import { PhenoTrailVisualizationScopeSelectionComponent } from './pheno-trail-visualization-scope-selection.component';
+import { PhenoTrailVisualizationScopeGroupsComponent } from './pheno-trail-visualization-scope-groups.component';
+import { PhenoTrailVisualizationScopeGroupComponent } from './pheno-trail-visualization-scope-group.component';
 import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
@@ -19,9 +21,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatCheckboxModule,MatGridListModule,MatCardModule,MatListModule,
         MatTooltipModule,MatSnackBarModule,MatDialogModule,MatStepperModule,
         MatButtonModule,MatRadioModule,MatProgressSpinnerModule,MatSelectModule,
-        MatInputModule,MatFormFieldModule,MatTabsModule,MatButtonToggleModule} from '@angular/material';
+        MatInputModule,MatFormFieldModule,MatTabsModule,MatButtonToggleModule,MatIconModule} from '@angular/material';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {environment} from '../environments/environment';
 import {AgmCoreModule} from '@agm/core';
@@ -45,6 +49,8 @@ export function npnConfigurationFactory() {
     NewVisualizationBuilderComponent,
     RefugeVisualizationScopeSelectionComponent,
     PhenoTrailVisualizationScopeSelectionComponent,
+    PhenoTrailVisualizationScopeGroupsComponent,
+    PhenoTrailVisualizationScopeGroupComponent,
     NewVisualizationDialogComponent
   ],
   entryComponents: [
@@ -58,6 +64,7 @@ export function npnConfigurationFactory() {
     NpnCommonModule,
     HttpClientModule,
     FormsModule,ReactiveFormsModule,
+    FontAwesomeModule,MatIconModule,
     MatCheckboxModule,MatGridListModule,
     MatCardModule,MatListModule,
     MatTooltipModule,MatSnackBarModule,

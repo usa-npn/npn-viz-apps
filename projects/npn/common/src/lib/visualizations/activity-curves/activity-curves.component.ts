@@ -68,15 +68,21 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     filename:string = 'activity-curves.png';
     margins: VisualizationMargins = {top: 80,left: 80,right: 80,bottom: 80};
 
+    private _curves:ActivityCurve[];
+
     constructor(protected rootElement: ElementRef,protected media:ObservableMedia,private legendDoyPipe: LegendDoyPipe) {
         super(rootElement,media);
+    }
+
+    get curves():ActivityCurve[] {
+        return (this._curves||[]).filter(c => c.isValid());
     }
 
     /**
      * Organizes the valid curves into a map of metric to curves using that metric.
      */
     private byMetric() {
-        return this.selection.validCurves.reduce((map,c) => {
+        return this.curves.reduce((map,c) => {
             map[c.metric.id] = map[c.metric.id]||{
                 metric: c.metric,
                 curves: []
@@ -90,12 +96,12 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
      * Tests to see if the curves are all using the same metric.
      */
     private usingCommonMetric() {
-        const validCurves = this.selection.validCurves;
+        const curves = this.curves;
         // could be byMetric().length === 1 but this could be more performant
-        return validCurves.length > 0
+        return curves.length > 0
             // all curves using same metric.
-            ? validCurves.reduce((metric,curve) => metric === curve.metric ? metric : undefined,
-                validCurves[0].metric)
+            ? curves.reduce((metric,curve) => metric === curve.metric ? metric : undefined,
+                curves[0].metric)
             : undefined;
     }
 
@@ -119,8 +125,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         let inRow = 0;
         let xTrans = 0;
         const maxInRow = 3;
-        // TODO each curve (plot) may now actually draw multiple curves
-        selection.validCurves.forEach((c) => {
+        this.curves.forEach((c) => {
                 if(c.plotted()) {
                     const yTrans = (((inRow+1)*(this.baseFontSize() as number))+(inRow*vpad));
                     const legendItem = legend.append('g')
@@ -182,13 +187,13 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('x',0)
                 .text('hover doy');
         let focusOff = () => {
-                selection.validCurves.forEach(function(c) { delete c.doyFocus; });
+                this.curves.forEach(function(c) { delete c.doyFocus; });
                 hover.style('display','none');
                 this.updateLegend();
             },
             focusOn = () => {
                 // only turn on if something has been plotted
-                if(selection.validCurves.reduce(function(plotted,c){
+                if(this.curves.reduce(function(plotted,c){
                         return plotted||c.plotted();
                     },false)) {
                     hover.style('display',null);
@@ -201,8 +206,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 xCoord = coords[0],
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
-                validCurves = selection.validCurves,
-                dataPoint:ActivityCurveMagnitudeData = validCurves.reduce(function(dp:ActivityCurveMagnitudeData,curve){
+                dataPoint:ActivityCurveMagnitudeData = self.curves.reduce(function(dp:ActivityCurveMagnitudeData,curve){
                     if(!dp && curve.plotted()) {
                         dp = curve.nearest(doy);
                     }
@@ -215,7 +219,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .text(dataPoint ?
                     self.legendDoyPipe.transform(dataPoint.start_doy)+' - '+self.legendDoyPipe.transform(dataPoint.end_doy) :
                     self.legendDoyPipe.transform(doy));
-            validCurves.forEach(function(c) { c.doyFocus = doy; });
+            self.curves.forEach(function(c) { c.doyFocus = doy; });
             self.updateLegend();
         }
         svg.append('rect')
@@ -235,13 +239,12 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     protected reset(): void {
         super.reset();
         let chart = this.chart,
-            sizing = this.sizing,
-            selection = this.selection;
+            sizing = this.sizing;
 
         this.x = scaleLinear().range([0,sizing.width]).domain([1,365]);
         this.xAxis = axisBottom<number>(this.x).tickFormat(DATE_FMT);
 
-        selection.validCurves.forEach(c => c.x(this.x).y(this.newY()));
+        this.curves.forEach(c => c.x(this.x).y(this.newY()));
 
         chart.append('g')
              .attr('class','chart-title')
@@ -258,15 +261,17 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
 
     protected update(): void {
         this.reset();
-        let selection = this.selection;
-        selection.loadCurveData().then(() => this.redraw());
+        this.selection.loadCurves().then(curves => {
+            this._curves = curves;
+            this.reset();
+            this.redraw()
+        });
     }
 
     protected redrawSvg(): void {
         let chart = this.chart,
             sizing = this.sizing,
-            selection = this.selection,
-            validCurves = selection.validCurves;
+            selection = this.selection;
 
         chart.selectAll('g .axis').remove();
 
@@ -334,7 +339,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         this.commonUpdates();
 
         // draw the curves
-        validCurves.forEach(c => c.draw(chart));
+        this.curves.forEach(c => c.draw(chart));
 
         this.updateLegend();
         this.hover();

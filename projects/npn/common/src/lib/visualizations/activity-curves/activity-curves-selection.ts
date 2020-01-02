@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, getStaticColor } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -178,23 +178,36 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         return (this._curves||[]).filter(c => c.isValid());
     }
 
-    loadCurveData(): Promise<any> {
+    /**
+     * Load all the curves and their data.  It's ipmortant to understand that this function
+     * may return more curves than are defined on the selection and the resulting curves may
+     * not be references to those held on this selection.
+     */
+    loadCurves(): Promise<ActivityCurve[]> {
         this.working = true;
         return this.toURLSearchParams(new HttpParams()
                 .set('request_src','npn-vis-activity-curves')
                 .set('frequency',`${this.frequency.value}`)
             ).then((baseParams:HttpParams) => {
-                const promises:Promise<any[]>[] = this.curves
+                const promises:Promise<ActivityCurve[]>[] = this.curves
                     .filter(c => (c.data(null) as ActivityCurve).isValid())
                     .map(c => c.loadData(baseParams));
                 return Promise.all(promises)
-                    .then(() => this.working = false)
+                    .then((curves:ActivityCurve[][]) => {
+                        this.working = false;
+                        const toPlot = curves.reduce((arr,list) => arr.concat(list),[]);
+                        if(this.groups && this.groups.length) {
+                            toPlot.forEach((curve,index) => curve.color = getStaticColor(index));
+                        }
+                        return toPlot;
+                    })
                     .catch(err => {
                         this.working = false;
                         //throw err;
                         this.handleError(err);
+                        return [];
                     });
-            });        
+            });    
     }
 
     protected handleError(error: any): void {

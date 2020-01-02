@@ -19,8 +19,8 @@
             "type": "chrome",
             "request": "launch",
             "name": "Refuge dashboard app",
-            "url": "http://fwstest.loc:8888/arctic-nwr",
-            "webRoot": "/Users/adamspe/Sites/djcase/npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",
+            "url": "http://localhost:9999/valle-de-oro",
+            "webRoot": "../npn-fws/drupal/sites/fws-drupal/modules/custom/fws_dashboard/app",
             "sourceMapPathOverrides": {
                 "webpack:///./*": "${workspaceFolder}/projects/fws-dashboard/*",
                 "webpack:///../npn/common/*": "${workspaceFolder}/projects/npn/common/*"

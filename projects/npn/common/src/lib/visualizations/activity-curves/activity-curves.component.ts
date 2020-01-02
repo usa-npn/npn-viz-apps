@@ -12,7 +12,7 @@ import { ActivityCurvesSelection } from './activity-curves-selection';
 import { Axis, axisBottom } from 'd3-axis';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
-import { ActivityCurve } from './activity-curve';
+import { ActivityCurve, ActivityCurveMagnitudeData } from './activity-curve';
 
 const ROOT_DATE = new Date(2010,0);
 const D3_DATE_FMT = d3.timeFormat('%m/%d');
@@ -202,14 +202,12 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
                 validCurves = selection.validCurves,
-                dataPoint = validCurves.reduce(function(dp,curve){
+                dataPoint:ActivityCurveMagnitudeData = validCurves.reduce(function(dp:ActivityCurveMagnitudeData,curve){
                     if(!dp && curve.plotted()) {
-                        dp = curve.data().reduce(function(found,point){
-                            return found||(doy >= point.start_doy && doy <= point.end_doy ? point : undefined);
-                        },undefined);
+                        dp = curve.nearest(doy);
                     }
                     return dp;
-                },undefined) as any; // TS thinks dataPoint is an "ActivityCurve"
+                },undefined);
             hoverLine.attr('transform','translate('+xCoord+')');
             hoverDoy
                 .style('text-anchor',doy < 324 ? 'start' : 'end')

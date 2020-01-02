@@ -15,6 +15,13 @@ import {ActivityCurvesSelection} from './activity-curves-selection';
 import * as d3 from 'd3';
 import { HttpParams } from '@angular/common/http';
 
+export interface ActivityCurveMagnitudeData {
+    start_doy?: number;
+    end_doy?: number;
+    start_date: string;
+    end_date: string;
+}
+
 export class ActivityCurve implements SpeciesPlot {
     @selectionProperty()
     id:number;
@@ -53,7 +60,7 @@ export class ActivityCurve implements SpeciesPlot {
     doyFocus:number;
     dataPoints:boolean = true;
 
-    private $data:any;
+    private $data:ActivityCurveMagnitudeData[];
     private $metricData:any;
     private $x;
     private $y;
@@ -171,7 +178,7 @@ export class ActivityCurve implements SpeciesPlot {
 
     doyDataValue() {
         let self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             value,d,i;
         if(self.doyFocus && data) {
             for(i = 0; i < data.length; i++) {
@@ -205,7 +212,7 @@ export class ActivityCurve implements SpeciesPlot {
         return this.metric? this.metric.id : undefined;
     }
 
-    data(_?):any {
+    data(_?:ActivityCurveMagnitudeData[]):ActivityCurveMagnitudeData[]|ActivityCurve {
         if(arguments.length) {
             delete this.$data;
             delete this.$metricData;
@@ -326,7 +333,8 @@ export class ActivityCurve implements SpeciesPlot {
     plotted(): boolean {
         // not keeping track of a flag but curves are plotted if they
         // are valid and have data
-        return this.isValid() && this.data();
+        const data = this.data() as ActivityCurveMagnitudeData[];
+        return this.isValid() && !!data;
     }
 
     shouldRevisualize():boolean {
@@ -335,7 +343,7 @@ export class ActivityCurve implements SpeciesPlot {
 
     domain() {
         var self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             extents;
         if(data && self.metric) {
             extents = d3.extent(data,function(d){
@@ -354,9 +362,20 @@ export class ActivityCurve implements SpeciesPlot {
         }
     }
 
+    /**
+     * Searches this curve's data for a data point nearest to a doy.
+     * 
+     * @param doy The doy to find the nearest data to.
+     * @returns ActivityCurveMagnitudeData or undefined
+     */
+    nearest(doy:number):ActivityCurveMagnitudeData {
+        const data = this.data() as ActivityCurveMagnitudeData[];
+        return data.reduce((found,md) => (found||(doy >= md.start_doy && doy <= md.end_doy ? md : undefined)),undefined);
+    }
+
     draw(chart) {
         let self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             datas = [[]],
             x,y,i,d,dn,line,
             r = 3;

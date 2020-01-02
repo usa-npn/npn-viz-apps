@@ -185,7 +185,7 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
                 .set('frequency',`${this.frequency.value}`)
             ).then((baseParams:HttpParams) => {
                 const promises:Promise<any[]>[] = this.curves
-                    .filter(c => c.data(null).isValid())
+                    .filter(c => (c.data(null) as ActivityCurve).isValid())
                     .map(c => c.loadData(baseParams));
                 return Promise.all(promises)
                     .then(() => this.working = false)

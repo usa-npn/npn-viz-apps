@@ -14,6 +14,10 @@ import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
 import { SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 
+const DEFAULT_TOP_MARGIN = 80;
+const LEGEND_VPAD = 4;
+const MARGIN_VPAD = 5;
+
 @Component({
   selector: 'scatter-plot',
   templateUrl: '../svg-visualization-base.component.html',
@@ -41,7 +45,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
     filename:string = 'scatter-plot.png';
     // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#object-spread-and-rest
     // similar to _|angular.extend
-    margins: VisualizationMargins = {...DEFAULT_MARGINS, ...{top: 80,left: 60}};
+    margins: VisualizationMargins = {...DEFAULT_MARGINS, ...{top: DEFAULT_TOP_MARGIN,left: 60}};
 
     private data:SiteOrSummaryPlotData[];
 
@@ -50,19 +54,29 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
     }
 
     protected reset(): void {
+        this.margins.top = DEFAULT_TOP_MARGIN;
+        const fontSize = this.baseFontSize() as number;
+        const plotCount = this.data ? this.data.length : 0;
+        if(plotCount) {
+            this.margins.top = ((plotCount+1)*fontSize)+(plotCount*LEGEND_VPAD)+MARGIN_VPAD;
+        }
+        // TODO depending on legend increase top margin
         super.reset();
         let chart = this.chart,
             sizing = this.sizing,
             titleX = sizing.width < this.minWidth ?
                 (2*(this.sizing.width/3)) : (this.sizing.width/2);
+
+        const titleFontSize = 18;
+        const titleDy = this.margins.top-titleFontSize-fontSize;
         this.title =  chart.append('g')
                      .attr('class','chart-title')
                      .append('text')
                      .attr('y', '0')
-                     .attr('dy','-3em')
-                     .attr('x', titleX)
-                     .style('text-anchor','middle')
-                     .style('font-size','18px');
+                     .attr('dy',`-${titleDy}`)
+                     .attr('x', '-2.5em')
+                     .style('text-anchor','start')
+                     .style('font-size',`${titleFontSize}px`);
         this.x = scaleLinear().range([0,sizing.width]).domain([0,100]);
         this.xAxis = axisBottom<number>(this.x).tickFormat((i) => {
             // TODO
@@ -188,15 +202,15 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
         this.chart.select('.legend').remove();
         let legend = this.chart.append('g')
             .attr('class','legend')
-            .attr('transform','translate(0,-'+(this.sizing.margin.top-10)+')')
-            .style('font-size','1em'),
-            r = 5, vpad = 4;
+            .attr('transform','translate(75,-'+(this.sizing.margin.top-10)+')')
+            .style('font-size','1em');
+        const r = 5;
         this.data.forEach((d,i) => {
             const plot = d.plot;
             const group = d.group;
             let row = legend.append('g')
                 .attr('class','legend-item')
-                .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')');
+                .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*LEGEND_VPAD))+')');
             const pp:any = plot.phenophase;
             let title =  this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
             if(plot.regressionLine && typeof(plot.regressionLine.r2) === 'number' && !isNaN(plot.regressionLine.r2)) {
@@ -222,7 +236,6 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
             } else {
                 text.html(title);
             }
-
         });
 
         this.commonUpdates();

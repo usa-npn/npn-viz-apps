@@ -198,7 +198,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                 .attr('class','legend-item')
                 .attr('transform','translate(10,'+(((i+1)*(this.baseFontSize() as number))+(i*vpad))+')');
             const pp:any = plot.phenophase;
-            let title = (group ? `${group.label}: ` : '') + this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
+            let title =  this.speciesTitle.transform(plot.species,plot.speciesRank)+'/'+(pp.phenophase_name||pp.pheno_class_name);
             if(plot.regressionLine && typeof(plot.regressionLine.r2) === 'number' && !isNaN(plot.regressionLine.r2)) {
                 // NOTE: the baseline-shift doesn't appear to work on Firefox
                 if(this.isIE) {
@@ -206,6 +206,9 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                 } else {
                     title += ` (R<tspan style="baseline-shift: super; font-size: 0.65em;">2</tspan> ${plot.regressionLine.r2.toFixed(2)})`;
                 }
+            }
+            if(group) {
+                title += ` (${group.label})`;
             }
             row.append('circle')
                 .attr('r',r)

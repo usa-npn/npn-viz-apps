@@ -234,11 +234,11 @@ export class ActivityCurve implements SpeciesPlot {
     legendLabel(includeMetric:boolean) {
         let doyFocusValue = this.doyDataValue();
         const pp = this.phenophase as any;
-        return (this._group ? `${this._group.label}: ` : '')+
-               `${this.year}: `+
+        return `${this.year}: `+
                SPECIES_TITLE(this.species,this.speciesRank)+' - '+(pp.phenophase_name||pp.pheno_class_name)+
-               (includeMetric ? (' ('+this.metric.label+')') : '')+
-               (typeof(doyFocusValue) !== 'undefined' ? (' ['+doyFocusValue+']') : '');
+               (includeMetric ? ` (${this.metric.label})` : '')+
+               (this._group ? ` (${this._group.label})` : '')+
+               (typeof(doyFocusValue) !== 'undefined' ? ` [${doyFocusValue}]` : '');
     }
 
     /**

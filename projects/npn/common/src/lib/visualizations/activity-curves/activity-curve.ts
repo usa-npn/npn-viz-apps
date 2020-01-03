@@ -147,9 +147,12 @@ export class ActivityCurve implements SpeciesPlot {
         return this._metric;
     }
     set metric(m) {
-        this.reset();
+        delete this.$metricData;
         this._metric = m;
-        this.children.forEach(c => c._metric = m);
+        this.children.forEach(c => {
+            delete c.$metricData;
+            c._metric = m
+        });
         this.updateCheck();
     }
 

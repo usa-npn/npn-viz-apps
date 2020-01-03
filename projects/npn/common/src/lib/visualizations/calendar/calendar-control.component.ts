@@ -5,6 +5,7 @@ import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
 import { filter, debounceTime, takeUntil } from 'rxjs/operators';
 import { VisSelectionEvent } from '../vis-selection';
 import { MonitorsDestroy } from '@npn/common/common';
+import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 
 const THIS_YEAR = (new Date()).getFullYear();
 const VALID_YEARS = (function(){
@@ -20,6 +21,7 @@ const VALID_YEARS = (function(){
 @Component({
     selector: 'calendar-control',
     template: `
+    <div *ngIf="!selection.canAddPlot" class="max-plots-reached"><fa-icon [icon]="faExclamationTriangle"></fa-icon> One more year or species/phenophase combination would exceed the maximum of {{selection.MAX_PLOTS}} plots</div>
     <div>
         <div class="year-input-wrapper" *ngFor="let plotYear of selection.years;index as idx">
             <mat-form-field class="year-input">
@@ -27,8 +29,8 @@ const VALID_YEARS = (function(){
                     <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y}}</mat-option>
                 </mat-select>
             </mat-form-field>
-            <button *ngIf="idx > 0" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
-            <button *ngIf="selection.years.length < 6 && idx === (selection.years.length-1)" mat-button class="add-year" (click)="addYear()">Add</button>
+            <button *ngIf="selection.years?.length > 0" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
+            <button *ngIf="idx === (selection.years.length-1)" mat-button class="add-year" (click)="addYear()" [disabled]="!selection.canAddPlot">Add</button>
         </div>
     </div>
 
@@ -40,7 +42,7 @@ const VALID_YEARS = (function(){
             [plot]="spi"
             (plotChange)="selection.update()"></higher-species-phenophase-input>
         <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-        <button *ngIf="idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
+        <button *ngIf="idx === (selection.plots.length-1)" mat-button class="add-plot" (click)="addPlot()" [disabled]="!plotsValid() || !selection.canAddPlot">Add</button>
     </div>
 
     <mat-checkbox [(ngModel)]="selection.negative" (change)="redrawChange()">Display negative data</mat-checkbox>
@@ -78,6 +80,7 @@ export class CalendarControlComponent extends MonitorsDestroy {
     selection: CalendarSelection;
     maxYears = 5;
     criteria:HigherSpeciesPhenophaseInputCriteria;
+    faExclamationTriangle = faExclamationTriangle;
 
     selectableYears(y:number) {
         if(y) {

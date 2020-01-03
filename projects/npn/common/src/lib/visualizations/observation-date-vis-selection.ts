@@ -37,6 +37,9 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     @selectionProperty()
     plots: ObservationDatePlot[] = [];
 
+    /** The maximum number of plots we want to allow. */
+    readonly MAX_PLOTS:number = 10;
+
     constructor(
         protected serviceUtils:NpnServiceUtils,
         protected speciesTitle:TaxonomicSpeciesTitlePipe,
@@ -56,6 +59,18 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                 // color only required if not grouping
                 (p.color || (this.groups && this.groups.length > 0));
         });
+    }
+
+    /**
+     * Indicates whether or not adding one more plot will result in a visualization exceeding
+     * the maximum number of allowed plots.
+     */
+    get canAddPlot():boolean {
+        const years = this.years ? this.years.length : 0;
+        const groups = this.groups ? this.groups.length : 0;
+        const next_plots = ((this.plots ? this.plots.length : 0)+1)*years;
+        const next_count = groups ? (groups * next_plots) : next_plots;
+        return next_count <= this.MAX_PLOTS;
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {

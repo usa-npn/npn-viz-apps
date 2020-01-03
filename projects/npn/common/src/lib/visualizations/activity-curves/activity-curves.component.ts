@@ -54,6 +54,10 @@ const X_TICK_CFG = {
     }
 };
 
+const DEFAULT_TOP_MARGIN = 80;
+const LEGEND_VPAD = 4;
+const MARGIN_VPAD = 10;
+
 @Component({
     selector: 'activity-curves',
     templateUrl: '../svg-visualization-base.component.html',
@@ -66,7 +70,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     xAxis: Axis<number>;
 
     filename:string = 'activity-curves.png';
-    margins: VisualizationMargins = {top: 80,left: 80,right: 80,bottom: 80};
+    margins: VisualizationMargins = {top: DEFAULT_TOP_MARGIN,left: 80,right: 80,bottom: 80};
 
     private _curves:ActivityCurve[];
 
@@ -119,47 +123,22 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 // the 150 below was picked just based on the site of the 'Activity Curves' title
                 .attr('transform',`translate(90,-${sizing.margin.top-10})`) // relative to the chart, not the svg
                 .style('font-size','1em');
-        const r = 5, vpad = 4;
         
-        let rowIndex = 0;
-        let inRow = 0;
-        let xTrans = 0;
-        const maxInRow = 3;
-        this.curves.forEach((c) => {
-                if(c.plotted()) {
-                    const yTrans = (((inRow+1)*(this.baseFontSize() as number))+(inRow*vpad));
-                    const legendItem = legend.append('g')
-                        .attr('class',`legend-item curve-${c.id} row-${rowIndex}`)
-                        .attr('transform',`translate(${xTrans},${yTrans})`);
-                    legendItem.append('circle')
-                        .attr('r',r)
-                        .attr('fill',c.color);
-                    legendItem.append('text')
-                        .style('font-size', this.baseFontSize(true))
-                        .attr('x',(2*r))
-                        .attr('y',(r/2))
-                        .text(c.legendLabel(!commonMetric));
-                    if(++inRow === maxInRow) {
-                        const items = legend.selectAll(`.legend-item.row-${rowIndex}`);
-                        // based on children added calculate the current row width
-                        // and add it to how far we move items in the x direction
-                        let maxWidth = 0;
-                        items.each(function() {
-                            let w = (r*2)+10; // diameter of circle plue some padding
-                            d3.select(this)
-                                .selectAll('text')
-                                .each(function() {
-                                    w += (this as any).getBBox().width;
-                                });
-                            if(w > maxWidth) {
-                                maxWidth = w;
-                            }
-                        });
-                        rowIndex++;
-                        xTrans += maxWidth;
-                        inRow = 0;
-                    }
-                }
+        const r = 5;
+        this.curves.filter(c => c.plotted())
+            .forEach((curve,index) => {
+                const yTrans = (((index+1)*(this.baseFontSize() as number))+(index*LEGEND_VPAD));
+                const legendItem = legend.append('g')
+                    .attr('class',`legend-item curve-${curve.id} row-${index}`)
+                    .attr('transform',`translate(0,${yTrans})`);
+                legendItem.append('circle')
+                    .attr('r',r)
+                    .attr('fill',curve.color);
+                legendItem.append('text')
+                    .style('font-size', this.baseFontSize(true))
+                    .attr('x',(2*r))
+                    .attr('y',(r/2))
+                    .text(curve.legendLabel(!commonMetric));
             });
     }
 
@@ -237,6 +216,15 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     }
 
     protected reset(): void {
+        // make room for the legend based on the number of plots
+        this.margins.top = DEFAULT_TOP_MARGIN;
+        const fontSize = this.baseFontSize() as number;
+        if(this.selection) {
+            const plotCount = this.curves.filter(c => c.plotted()).length;
+            if(plotCount) {
+                this.margins.top = ((plotCount+1)*fontSize)+(plotCount*LEGEND_VPAD)+MARGIN_VPAD;
+            }
+        }
         super.reset();
         let chart = this.chart,
             sizing = this.sizing;
@@ -246,15 +234,17 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
 
         this.curves.forEach(c => c.x(this.x).y(this.newY()));
 
-        chart.append('g')
+        const titleFontSize = 18;
+        const titleDy = this.margins.top-titleFontSize-fontSize;
+        this.chart.append('g')
              .attr('class','chart-title')
              .append('text')
              .attr('y', '0')
-             .attr('dy','-3em')
+             .attr('dy',`-${titleDy}`)
              .attr('x', '0')
              .attr('dx','-3em')
              .style('text-anchor','start')
-             .style('font-size','18px')
+             .style('font-size',`${titleFontSize}px`)
              .text('Activity Curves');
         this.commonUpdates();
     }

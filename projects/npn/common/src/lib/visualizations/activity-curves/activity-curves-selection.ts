@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, getStaticColor } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, getStaticColor, STATIC_COLORS } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -62,6 +62,9 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     })
     private _curves:ActivityCurve[];
 
+    /** The maximum number of plots we want to allow. */
+    readonly MAX_PLOTS:number = 6;
+
     constructor(
         public serviceUtils:NpnServiceUtils,
         public datePipe: DatePipe,
@@ -69,13 +72,22 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         public networkService:NetworkService
     ) {
         super(serviceUtils,networkService);
-        this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
-            let c = new ActivityCurve();
-            c.id = i;
-            c.color = o.color;
-            c.orient = o.orient;
-            return c;
-        });
+        // create a default empty curve
+        const curve0 = new ActivityCurve();
+        curve0.color = STATIC_COLORS[0];
+        curve0.id = 0;
+        this.curves = [curve0];
+    }
+
+    /**
+     * Indicates whether or not adding one more plot will result in a visualization exceeding
+     * the maximum number of allowed plots.
+     */
+    get canAddPlot():boolean {
+        const groups = this.groups ? this.groups.length : 0;
+        const next_plots = (this._curves ? this._curves.length : 0)+1;
+        const next_count = groups ? (groups * next_plots) : next_plots;
+        return next_count <= this.MAX_PLOTS;
     }
 
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
@@ -134,7 +146,10 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     set frequency(f:ActivityFrequency) {
         this._frequency = f;
         // any change in frequency invalidates any data held by curves
-        (this._curves||[]).forEach(c => c.data(null));
+        (this._curves||[]).forEach((c:any) => {
+            c._frequency = f;
+            c.data(null);
+        });
         this.updateCheck(true);
     }
 
@@ -144,7 +159,6 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set interpolate(i:INTERPOLATE) {
         this._interpolate = i;
-        (this._curves||[]).forEach(c => c.interpolate = i);
         this.updateCheck();
     }
 
@@ -157,17 +171,12 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
     set dataPoints(dp:boolean) {
         this._dataPoints = dp;
-        (this._curves||[]).forEach(c => c.dataPoints = dp);
         this.updateCheck(false);
     }
 
     set curves(cs:ActivityCurve[]) {
         this._curves = cs;
-        (this._curves||[]).forEach(c => {
-            c.selection = this;
-            c.interpolate = this._interpolate;
-            c.dataPoints = this._dataPoints;
-        });
+        (this._curves||[]).forEach(c => c.selection = this);
     }
 
     get curves():ActivityCurve[] {

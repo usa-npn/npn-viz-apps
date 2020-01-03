@@ -111,7 +111,6 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
         const curve = new ActivityCurve();
         curve.id = this.selection.curves.length;
         curve.color = STATIC_COLORS[curve.id];
-        curve.interpolate = this.selection.curves[0].interpolate;
         curve.selection = this.selection;
         this.selection.curves.push(curve);
     }

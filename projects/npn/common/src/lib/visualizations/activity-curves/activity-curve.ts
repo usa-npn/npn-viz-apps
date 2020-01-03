@@ -28,8 +28,6 @@ export class ActivityCurve implements SpeciesPlot {
 
     childId:number = 0;
 
-    interpolate? :INTERPOLATE;
-
     @selectionProperty()
     speciesRank:TaxonomicSpeciesRank;
     @selectionProperty()
@@ -60,7 +58,6 @@ export class ActivityCurve implements SpeciesPlot {
     orient:string;
 
     doyFocus:number;
-    dataPoints:boolean = true;
 
     private $data:ActivityCurveMagnitudeData[];
     private $metricData:any;
@@ -85,7 +82,6 @@ export class ActivityCurve implements SpeciesPlot {
         copy.childId = childIndex;
         copy.color = this.color;
         copy.orient = this.orient;
-        copy.interpolate = this.interpolate;
         copy.speciesRank = this.speciesRank;
         copy._species = this._species;
         copy._metric = this._metric;
@@ -402,7 +398,11 @@ export class ActivityCurve implements SpeciesPlot {
         // not keeping track of a flag but curves are plotted if they
         // are valid and have data
         const data = this.data() as ActivityCurveMagnitudeData[];
-        return this.isValid() && !!data;
+        if(this.isValid() && !!data) {
+            return true; // this curve is plotted
+        }
+        // plotted if any children are plotted
+        return this.children.reduce((plotted,child) => (plotted||(child.plotted ? true: false)),false);
     }
 
     shouldRevisualize():boolean {
@@ -466,7 +466,7 @@ export class ActivityCurve implements SpeciesPlot {
             let x_functor = (d) => x(d.start_doy+Math.round((d.end_doy-d.start_doy)/2)),
                 y_functor = (d) => y(d[self.metric.id]);
             line = d3.line();
-            switch(self.interpolate) {
+            switch(self.selection.interpolate) {
                 case INTERPOLATE.monotone:
                     line.curve(d3.curveMonotoneX);
                     break;
@@ -482,7 +482,7 @@ export class ActivityCurve implements SpeciesPlot {
             console.debug('ActivityCurve.draw',self.species,self.phenophase,self.year,self.metric,self.domain(),y.domain());
             console.debug('draw.datas',datas);
             datas.forEach(function(curve_data,i){
-                if(curve_data.length === 1 || self.dataPoints) {
+                if(curve_data.length === 1 || self.selection.dataPoints) {
                     curve_data.forEach(function(d){
                         g.append('circle')
                             .attr('class','curve-point curve-point-'+self.curveId)

@@ -57,7 +57,21 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     @selectionProperty()
     _maxDoy:number = 365;
 
+    /** The maximum number of plots we want to allow. */
+    readonly MAX_PLOTS:number = 6;
+
     private d3DateFormat = d3.timeFormat('%x');
+
+    /**
+     * Indicates whether or not adding one more plot will result in a visualization exceeding
+     * the maximum number of allowed plots.
+     */
+    get canAddPlot():boolean {
+        const groups = this.groups ? this.groups.length : 0;
+        const next_plots = (this.plots ? this.plots.length : 0)+1;
+        const next_count = groups ? (groups * next_plots) : next_plots;
+        return next_count <= this.MAX_PLOTS;
+    }    
 
     get minDoy():number { return this._minDoy; }
     set minDoy(doy:number) {

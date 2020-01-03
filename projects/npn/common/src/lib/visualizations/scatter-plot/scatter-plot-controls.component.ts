@@ -6,10 +6,12 @@ import * as d3 from 'd3';
 import { MonitorsDestroy } from '@npn/common/common';
 import { takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { VisSelectionEvent } from '../vis-selection';
+import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     selector: 'scatter-plot-control',
     template: `
+    <div *ngIf="!selection.canAddPlot" class="max-plots-reached"><fa-icon [icon]="faExclamationTriangle"></fa-icon> One more plot would exceed the maximum of {{selection.MAX_PLOTS}} allowed</div>
     <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="yearChange()" (onEndChange)="yearChange()"></year-range-input>
 
     <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
@@ -20,8 +22,8 @@ import { VisSelectionEvent } from '../vis-selection';
             [plot]="spi"
             (plotChange)="selection.update()">
         </higher-species-phenophase-input>
-        <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-        <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
+        <button *ngIf="selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
+        <button *ngIf="idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid() || !selection.canAddPlot" (click)="addPlot()">Add</button>
     </div>
 
     <div>
@@ -53,6 +55,8 @@ export class ScatterPlotControlsComponent extends MonitorsDestroy {
     selection: ScatterPlotSelection;
     axis = AXIS;
     criteria:HigherSpeciesPhenophaseInputCriteria;
+
+    faExclamationTriangle = faExclamationTriangle;
 
     ngOnInit() {
         this.selection.pipe(

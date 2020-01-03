@@ -2,7 +2,7 @@ import {Component,OnInit,Input,ElementRef,HostBinding,Inject,Injectable,Optional
 import {MatSnackBar,MatDialog,MatDialogRef} from '@angular/material';
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
 
-import {EntityBase,EntityService} from './entity.service';
+import {EntityBase,EntityService, DashboardModeState, DashboardMode} from './entity.service';
 import {VisSelection,VisualizationSelectionFactory,NPN_BASE_HREF} from '@npn/common';
 import {NewVisualizationDialogComponent} from './new-visualization-dialog.component';
 
@@ -51,6 +51,9 @@ const VIS_TEMPLATES = [{
                 [dropZones]="['newvis-dropZone']">
     <img class="new-vis-thumbnail" src="{{baseHref}}{{template.$thumbnail}}" />
   </mat-list-item>
+  <mat-list-item *ngIf="dashboardMode === DashboardMode.PHENO_TRAIL">
+    <!-- empty item to just to keep the number even -->
+  </mat-list-item>
   <mat-list-item class="trash"
                 matTooltip="Drag and drop visualization here to remove"
                 matTooltipPosition="right"
@@ -97,11 +100,14 @@ export class FindingsComponent {
 
     @HostBinding('class.adminMode') adminMode:boolean = false;
     maxVisualizations:number = 10;
-    visTemplates:any[] = VIS_TEMPLATES;
+    visTemplates:any[];
     guidOrder:string[];
     dragStartIndex:number;
     lookAtVisDrop:boolean = false;
     mobileMode:boolean = false;
+
+    dashboardMode:DashboardMode;
+    DashboardMode = DashboardMode;
 
     constructor(private entityService:EntityService,
                 private selectionFactory: VisualizationSelectionFactory,
@@ -119,6 +125,13 @@ export class FindingsComponent {
         if(this.isTouchDevice) {
             console.warn('Touch device detected any administrative functionality will be disabled.');
         }
+    }
+
+    ngOnInit() {
+        this.dashboardMode = DashboardModeState.get();
+        this.visTemplates = (this.dashboardMode === DashboardMode.PHENO_TRAIL)
+            ? VIS_TEMPLATES.filter(t => t.$class !== 'ClippedWmsMapSelection')
+            : VIS_TEMPLATES;
     }
 
     toggleAdminMode() {
@@ -140,19 +153,6 @@ export class FindingsComponent {
     get entity():EntityBase {
         return this._entity;
     }
-/*
-    setRefuge(entity:EntityBase) {
-        this.entity = entity;
-        entity.selections.forEach((s,i) => {
-            //s.debug = (i === 0);
-            s.update()
-        });
-        this.guidOrder = entity.selections.map(s => s.guid);
-    }
-
-    ngOnInit() {
-        this.setRefuge(this.entity);
-    }*/
 
     resizeAll() {
         this.entity.selections.forEach((s,i) => {

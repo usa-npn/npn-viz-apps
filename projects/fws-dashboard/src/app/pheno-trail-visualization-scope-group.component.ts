@@ -1,5 +1,4 @@
 import { Input, Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { NetworkService, Station } from '@npn/common';
 import { faChevronRight, faChevronDown } from "@fortawesome/pro-light-svg-icons";
 import { NetworkWrapper } from './pheno-trail-visualization-scope-selection.component';
 
@@ -15,7 +14,7 @@ import { NetworkWrapper } from './pheno-trail-visualization-scope-selection.comp
       <div class="station-input" *ngIf="open">
         <h3>Exclude Stations</h3>
         <mat-progress-spinner *ngIf="loading" mode="indeterminate"></mat-progress-spinner>
-        <div *ngFor="let s of stations | async as all" class="station-input">
+        <div *ngFor="let s of networkWrapper.stations | async as all" class="station-input">
           <mat-checkbox [(ngModel)]="s.selected" (change)="stationChange()" [disabled]="!s.selected && networkWrapper.group.excludeIds?.length === (all.length-1)">{{s.station_name}}</mat-checkbox>
         </div>
       </div>
@@ -31,45 +30,36 @@ export class PhenoTrailVisualizationScopeGroupComponent implements OnInit{
   @Input() networkWrapper:NetworkWrapper;
   @Output() change:EventEmitter<void> = new EventEmitter();
   open = false;
-  stations: Promise<Station[]>;
   chevronDownIcon = faChevronDown;
   chevronRightIcon = faChevronRight;
   loading = false;
-  
-  constructor(private networkService:NetworkService) { }
+
+  constructor() { }
 
   ngOnInit(){
     //Load any pre-existing selections
     if(this.networkWrapper.selected){
-      this.loadStations();
+      this.networkWrapper.getStations();
     }
-  }
-
-  loadStations(){
-    if(!this.stations){
-      this.loading = true;
-      this.stations = this.networkService.getStations(this.networkWrapper.network.network_id).then(stations => {
-        stations.forEach(station =>  station.selected = (this.networkWrapper.group.excludeIds || []).indexOf(station.station_id) > -1);
-        this.loading = false;
-        return stations;
-      });
-    }
-    return this.stations;
   }
 
   /**
    * Toggles the view of the group's stations
    */
   toggleOpen(){
-    this.loadStations();
-    this.open = !this.open;
+    this.loading = true;
+    this.networkWrapper.getStations().then(stations => {
+      this.open = !this.open;
+      this.loading = false;
+    });
+    
   }
 
   /**
    * Toggle whether a station should be excluded for a selected group
    */
   stationChange(){
-    this.loadStations().then(stations => {
+    this.networkWrapper.getStations().then(stations => {
       this.networkWrapper.selected = true;
       this.networkWrapper.group.excludeIds = stations.filter(station => station.selected).map(station => station.station_id);
       this.change.emit();

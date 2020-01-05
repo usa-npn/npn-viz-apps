@@ -14,6 +14,8 @@ import { RefugeVisualizationScopeSelectionComponent } from "./refuge-visualizati
 import { PhenoTrailVisualizationScopeSelectionComponent } from './pheno-trail-visualization-scope-selection.component';
 import { PhenoTrailVisualizationScopeGroupsComponent } from './pheno-trail-visualization-scope-groups.component';
 import { PhenoTrailVisualizationScopeGroupComponent } from './pheno-trail-visualization-scope-group.component';
+import { PhenoTrailVisualizationScopeStationGroupsComponent } from './pheno-trail-visualization-scope-station-groups.component';
+
 import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
@@ -51,6 +53,7 @@ export function npnConfigurationFactory() {
     PhenoTrailVisualizationScopeSelectionComponent,
     PhenoTrailVisualizationScopeGroupsComponent,
     PhenoTrailVisualizationScopeGroupComponent,
+    PhenoTrailVisualizationScopeStationGroupsComponent,
     NewVisualizationDialogComponent
   ],
   entryComponents: [

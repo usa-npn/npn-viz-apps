@@ -13,7 +13,8 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
     </mat-radio-group>
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
     <div *ngIf="(visScope === 'station' || visScope === 'stationGroup')">
-        <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
+        <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()"
+            [disabled]="visScope === 'station' && s.selected && selection.stationIds?.length === 1">{{s.station_name}}</mat-checkbox>
     </div>
     <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
     `,

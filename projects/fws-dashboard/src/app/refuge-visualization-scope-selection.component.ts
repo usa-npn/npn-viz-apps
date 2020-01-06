@@ -11,6 +11,7 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
       <mat-radio-button class="vis-scope-radio" [value]="'station'">Show data for select sites at "{{refuge.title}}"</mat-radio-button>
       <mat-radio-button class="vis-scope-radio" [value]="'stationGroup'">Compare data for select sites at "{{refuge.title}}"</mat-radio-button>
     </mat-radio-group>
+    <hr *ngIf="visScope !== 'refuge'" />
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
     <div *ngIf="(visScope === 'station' || visScope === 'stationGroup')">
         <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()"

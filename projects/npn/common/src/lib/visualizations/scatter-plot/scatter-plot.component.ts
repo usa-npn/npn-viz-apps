@@ -60,13 +60,8 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
         if(plotCount) {
             this.margins.top = ((plotCount+1)*fontSize)+(plotCount*LEGEND_VPAD)+MARGIN_VPAD;
         }
-        // TODO depending on legend increase top margin
         super.reset();
-        let chart = this.chart,
-            sizing = this.sizing,
-            titleX = sizing.width < this.minWidth ?
-                (2*(this.sizing.width/3)) : (this.sizing.width/2);
-
+        const {chart,sizing} = this;
         const titleFontSize = 18;
         const titleDy = this.margins.top-titleFontSize-fontSize;
         this.title =  chart.append('g')
@@ -78,10 +73,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                      .style('text-anchor','start')
                      .style('font-size',`${titleFontSize}px`);
         this.x = scaleLinear().range([0,sizing.width]).domain([0,100]);
-        this.xAxis = axisBottom<number>(this.x).tickFormat((i) => {
-            // TODO
-            return this.defaultAxisFormat(i);
-        });
+        this.xAxis = axisBottom<number>(this.x).tickFormat((i) => this.defaultAxisFormat(i));
         this.y = scaleLinear().range([sizing.height,0]).domain([1,365]);
         this.yAxis = axisLeft<number>(this.y);
 
@@ -198,7 +190,6 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
                 .attr('stroke-width', 2);
         }
 
-        // TODO abstract legend out to a class...
         this.chart.select('.legend').remove();
         let legend = this.chart.append('g')
             .attr('class','legend')

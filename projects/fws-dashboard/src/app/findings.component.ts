@@ -1,4 +1,4 @@
-import {Component,OnInit,Input,ElementRef,HostBinding,Inject,Injectable,Optional, ViewEncapsulation} from '@angular/core';
+import {Component,Input,HostBinding,Inject,Optional, ViewEncapsulation} from '@angular/core';
 import {MatSnackBar,MatDialog,MatDialogRef} from '@angular/material';
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
 
@@ -51,7 +51,7 @@ const VIS_TEMPLATES = [{
                 [dropZones]="['newvis-dropZone']">
     <img class="new-vis-thumbnail" src="{{baseHref}}{{template.$thumbnail}}" />
   </mat-list-item>
-  <mat-list-item *ngIf="dashboardMode === DashboardMode.PHENO_TRAIL">
+  <mat-list-item *ngIf="(visTemplates.length%2) === 1">
     <!-- empty item to just to keep the number even -->
   </mat-list-item>
   <mat-list-item class="trash"
@@ -106,7 +106,6 @@ export class FindingsComponent {
     lookAtVisDrop:boolean = false;
     mobileMode:boolean = false;
 
-    dashboardMode:DashboardMode;
     DashboardMode = DashboardMode;
 
     constructor(private entityService:EntityService,
@@ -128,8 +127,7 @@ export class FindingsComponent {
     }
 
     ngOnInit() {
-        this.dashboardMode = DashboardModeState.get();
-        this.visTemplates = (this.dashboardMode === DashboardMode.PHENO_TRAIL)
+        this.visTemplates = (DashboardModeState.get() === DashboardMode.PHENO_TRAIL)
             ? VIS_TEMPLATES.filter(t => t.$class !== 'ClippedWmsMapSelection')
             : VIS_TEMPLATES;
     }

@@ -47,9 +47,7 @@ import {VisualizationComponent} from './visualization.component';
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
 import {YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
 
-import {BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,
+import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,MatRadioModule,
         MatExpansionModule,MatAutocompleteModule,
         MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
         MatDatepickerModule, MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material';
@@ -68,7 +66,7 @@ import {NpnGriddedModule} from '../gridded';
     CommonModule,
     FormsModule,ReactiveFormsModule,
     FontAwesomeModule,
-    MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
+    MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,MatRadioModule,
     MatExpansionModule,MatAutocompleteModule,
     MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule, MatDatepickerModule,
     MatNativeDateModule,

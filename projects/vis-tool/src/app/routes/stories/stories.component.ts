@@ -69,6 +69,7 @@ import { Observable } from 'rxjs';
         flex-shrink: 0;
     }
     .mat-card-subtitle {
+        color: black !important;
         flex-grow: 1;
         overflow: auto;
     }

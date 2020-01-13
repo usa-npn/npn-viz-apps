@@ -38,9 +38,9 @@
           }
         },
         {
-          "title": "Are milkweed leaves available when monarch caterpillars need them?",
-          "tagline": "This Activity Curve shows the overlap between leaves in milkweed plants and activity of monarch butterfly caterpillars in the Midwest this year.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of invidual milkweed plants with leaves and the mean number of monarch active caterpillars observed in Midwest states in 2019. You can see the change in the proportion of individuals with leaves and number of caterpillars in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting milkweed leaves in late April in the Midwest, and by early June, all observers were reporting a 'yes' for leaves. Observers started reporting monarch caterpillars in late May, with a peak in number of caterpillars observed in early July. Activity of caterpillars started to decline in September, and as of October, milkweed leaves were still being reported.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the pheno classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
+          "title": "Are milkweed flowers available when monarchs need them?",
+          "tagline": "This Activity Curve shows the overlap between open flowers in common milkweed plants and activity of monarch butterflies in the Midwest this year.",
+          "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of invidual milkweed plants with open flowers and the mean number of monarch butterflies observed in Midwest states in 2019. You can see the change in the proportion of individuals with open flowers and number of butterflies in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting milkweed open flowers in early June in the Midwest, and by mid July, nearly all observers were reporting a 'yes' for open flowers. Observers started reporting monarch butterflies in early May, with a peak in number of butterflies observed in mid July. An additional smaller peak in monarch activity was reported in mid September, but milkweed flowers declined by this time.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the pheno classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
           "image": {
             "src": "assets/BFP_7227-X2.jpg",
             "alt": "caterpillar"
@@ -77,9 +77,9 @@
                   "family_common_name": "Dogbane Family"
                 },
                 "phenophase": {
-                  "pheno_class_id": 6,
-                  "pheno_class_name": "Flowers or pollen cones",
-                  "pheno_class_sequence":60
+                  "pheno_class_id": 7,
+                  "pheno_class_name": "Open flowers or pollen cones",
+                  "pheno_class_sequence":70
                 },
                 "metric": {
                   "id": "proportion_individuals_with_yes_record",

@@ -40,7 +40,7 @@ export class YearRangeInputComponent {
         let max = (new Date()).getFullYear(),
             current = 1900,
             years:number[] = [];
-        while(current < max) {
+        while(current <= max) {
             years.push(current++);
         }
         return years;
@@ -64,7 +64,7 @@ export class YearRangeInputComponent {
             });
             if(s) {
                 let thisYear = (new Date()).getFullYear(),
-                    current = s+1,
+                    current = s,//+1,
                     max = current+this.maxSpan,
                     ends:number[] = [];
                 if(max > thisYear) {
@@ -74,9 +74,9 @@ export class YearRangeInputComponent {
                     ends.push(current++);
                 }
                 this.validEnds = ends;
-                if(this.end > max) {
-                    this.end = undefined;
-                }
+                // if(this.end > max) {
+                //     this.end = undefined;
+                // }
             }
         }
     }

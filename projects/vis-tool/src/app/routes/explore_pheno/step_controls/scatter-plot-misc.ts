@@ -42,7 +42,7 @@ export class ScatterPlotMiscStepComponent extends BaseStepComponent {
     selection: ScatterPlotSelection;
 
     get state():StepState {
-        const nearValid = this.selection.start && this.selection.end && this.selection.end > this.selection.start && this.selection.validPlots.length > 0
+        const nearValid = this.selection.start && this.selection.end && this.selection.end >= this.selection.start && this.selection.validPlots.length > 0
         return nearValid &&
             !!this.selection.axis &&
                 typeof(this.selection.numDaysQualityFilter) === 'number' &&

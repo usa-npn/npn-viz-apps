@@ -91,7 +91,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return this.start &&
                this.end &&
                this.axis &&
-               (this.start < this.end) &&
+               (this.start <= this.end) &&
                this.validPlots.length > 0;
     }
 

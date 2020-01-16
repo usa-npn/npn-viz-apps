@@ -163,7 +163,7 @@ export class SpeciesPhenoColorControlComponent extends BaseControlComponent {
         }
         if(this.stepComponent instanceof StartEndSpeciesPhenoColorStepComponent) {
             const {start,end} = this.stepComponent.selection;
-            if(start && end && start < end) {
+            if(start && end && start <= end) {
                 const years = [];
                 for(let i = start; i <= end; i++) {
                     years.push(i);

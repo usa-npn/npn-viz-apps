@@ -31,12 +31,16 @@ import { Observable } from 'rxjs';
     styles:[`
     .stories {
         width: 100%;
-        height: 100%;
+        height: 100% !important;
         background-size: cover !important;
+        display:flex;
+        flex-direction: column;
     }
     .stories mat-grid-list {
+        flex-grow: 1;
         width: 95%;
         margin: auto;
+        overflow: auto !important;
     }
     .stories mat-card {
         width: 100%;

@@ -47,9 +47,9 @@ const PARTNERS_TAB_IDX = 3;
         </div>
     </mat-tab>
 
-    <mat-tab label="Resources for observers" *ngIf="supportsPartners">
+    <mat-tab label="Partners" *ngIf="supportsPartners">
         <ng-template mat-tab-label>
-            <div class="rd-tab-label resources">
+            <div class="rd-tab-label partners">
                 <label>Partners</label>
             </div>
         </ng-template>

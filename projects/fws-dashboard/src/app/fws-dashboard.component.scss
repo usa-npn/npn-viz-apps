@@ -159,6 +159,11 @@ $color-tab4: #6f5e53;
                 content: '\f02d';
             }
         }
+        &.partners {
+            &:before {
+                content: '\f0c0';
+            }
+        }
     }
     .rd-tab-content {
         min-height: $min-content-height;

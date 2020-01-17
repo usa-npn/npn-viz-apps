@@ -2,7 +2,7 @@
     "backgroundImage": "assets/DSC_0646.jpg",
     "stories": [
         {
-            "title": "How fast is it warming up this year where I live?",
+            "title": "How fast is it warming up this year compared to last year where I live?",
             "tagline": "This graph shows the heat accumulated across the year at a single location, and how that compares to previous years.",
             "description": "\n  <b>What am I looking at?</b> \n <p>This graph shows the daily accumulation of heat (also known as <a href=\"https://www.usanpn.org/data/agdd_maps\" target=\"_blank\">“Growing Degree Days”</a>) for the current year at your location, and compares it to previous years of heat accumulation. The long-term average of accumulation over the period of 1981-2010 is shown in black, the current year in blue, and the prior year in orange. You can also see the prediction for accumulation over the next 6 days, shown in red.</p> \n <b>What does this tell me?</b> \n <p>Heat accumulation is a metric of climate that is a common driver of phenological activity. Many species respond by leafing, flowering, or emerging at particular heat accumulation thresholds. This graph can show you whether heat is accumulating faster than normal where you live, which may mean earlier than average signs of phenological activity.</p> \n <b>How can I modify this graph?</b> \n <p>If there is a particular heat accumulation threshold that is of interest to you, you can set the threshold in the Features menu to see if it has been met and if so, when. In addition, you can modify the Degree Base temperature for the accumulation curve and the Location in the Layer/Point menu.</p>",
             "external": {
@@ -158,9 +158,9 @@
           }
         },
         {
-          "title": "When will flowers be available for pollinators?",
-          "tagline": "This Phenology Calendar shows reports of open flowers from the past two years.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported open flowering for three genera of plants (Asclepias, Symphyotrichum, and Solidago) that are important for pollinators from 2018 to 2019. The colored lines indicate at least one observer reported 'yes' for open flowers on that day. The gray line indicates at least one observer reported 'no' for open flowers on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect open flowers for key genera from the <a href=\"https://www.usanpn.org/nn/NectarConnectors\" target=\"_blank\">Nectar Connector campaign.</a></p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To set a location, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
+          "title": "When will northern red oak change color this fall?",
+          "tagline": "This Phenology Calendar shows reports of colored leaves from the past four years.",
+          "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported the colored leaves phenophase for Northern red oak across Northeast states from 2015 to 2018. The colored line indiciates at least one observer reported 'yes' for colored leaves on that day. The gray line indicates at least one observer reported 'no' for colored leaves on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect colored leaves on Northern red oak in the fall. Aside from a few stray reports of colored leaves in the summer months, the majority of 'yes' reports for colored leaves begin around mid- to late-September.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Northeast to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
           "external": {
             "$class": "CalendarSelection",
             "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
@@ -170,63 +170,59 @@
             "negative": true,
             "negativeColor": "#aaa",
             "years": [
-              2018,
-              2019
+              2015, 
+              2016, 
+              2017, 
+              2018
             ],
             "plots": [
               {
                 "color": "#d62728",
                 "species": {
+                  "species_id": 102,
+                  "common_name": "northern red oak",
                   "kingdom": "Plantae",
-                  "genus": "Asclepias",
-                  "genus_id": 440,
-                  "genus_name": "Asclepias",
-                  "genus_common_name": ""
+                  "genus": "Quercus",
+                  "species": "rubra"
                 },
                 "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
+                  "pheno_class_id": 4,
+                  "pheno_class_name":"Colored leaves or needles",
+                  "pheno_class_sequence":40
                 },
-                "speciesRank": "genus",
-                "phenophaseRank": "class"
-              },
-              {
-                "color": "#1f77b4",
-                "species": {
-                  "kingdom": "Plantae",
-                  "genus": "Symphyotrichum",
-                  "genus_id": 1032,
-                  "genus_name": "Symphyotrichum",
-                  "genus_common_name": ""
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "speciesRank": "genus",
-                "phenophaseRank": "class"
-              },
-              {
-                "color": "#2ca02c",
-                "species": {
-                  "kingdom": "Plantae",
-                  "genus": "Solidago",
-                  "genus_id": 1003,
-                  "genus_name": "Solidago",
-                  "genus_common_name": ""
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "speciesRank": "genus",
+                "speciesRank": "species",
                 "phenophaseRank": "class"
               }
             ],
             "boundaries": [
+              {
+                "data": [
+                  [
+                    42,
+                    -80.6
+                  ],
+                  [
+                    39.8,
+                    -80.6
+                  ],
+                  [
+                    38.2,
+                    -73
+                  ],
+                  [
+                    46,
+                    -65
+                  ],
+                  [
+                    48,
+                    -68
+                  ],
+                  [
+                    44,
+                    -80
+                  ]
+                ]
+              }
             ],
             "labelOffset": 15,
             "bandPadding": 0.55,

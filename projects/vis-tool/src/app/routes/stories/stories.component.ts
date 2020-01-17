@@ -41,6 +41,12 @@ import { Observable } from 'rxjs';
         width: 95%;
         margin: auto;
         overflow: auto !important;
+        scrollbar-width: none; /* Firefox disable scrollbars */
+        -ms-overflow-style: none;  /* IE 10+ disable scrollbars */
+    }
+    .stories mat-grid-list::-webkit-scrollbar {
+        width: 0px;
+        background: transparent; /* Chrome/Safari/Webkit disable scrollbars */
     }
     .stories mat-card {
         width: 100%;

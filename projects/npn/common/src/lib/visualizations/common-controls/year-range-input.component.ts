@@ -5,12 +5,12 @@ import {Component,Input,Output,EventEmitter,OnInit} from '@angular/core';
     template: `
     <mat-form-field class="start-year">
         <mat-select placeholder="Start year" [(ngModel)]="start">
-            <mat-option *ngFor="let y of validStarts.reverse()" [value]="y">{{y}}</mat-option>
+            <mat-option *ngFor="let y of validStarts" [value]="y">{{y}}</mat-option>
         </mat-select>
     </mat-form-field>
     <mat-form-field class="end-year">
         <mat-select placeholder="End year" [(ngModel)]="end" [disabled]="!start">
-            <mat-option *ngFor="let y of validEnds.reverse()" [value]="y">{{y}}</mat-option>
+            <mat-option *ngFor="let y of validEnds" [value]="y">{{y}}</mat-option>
         </mat-select>
     </mat-form-field>
     `,
@@ -43,7 +43,7 @@ export class YearRangeInputComponent {
         while(current <= max) {
             years.push(current++);
         }
-        return years;
+        return years.reverse();
     })();
     validEnds:number[] = [];
 
@@ -73,7 +73,7 @@ export class YearRangeInputComponent {
                 while(current < max) {
                     ends.push(current++);
                 }
-                this.validEnds = ends;
+                this.validEnds = ends.reverse();
                 // if(this.end > max) {
                 //     this.end = undefined;
                 // }

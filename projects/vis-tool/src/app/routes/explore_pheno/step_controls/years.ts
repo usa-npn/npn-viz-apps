@@ -33,7 +33,7 @@ const VALID_YEARS = (function(){
     <div class="year-input-wrapper" *ngFor="let plotYear of selection.years;index as idx">
         <mat-form-field class="year-input">
             <mat-select placeholder="Year {{idx+1}}" [(ngModel)]="selection.years[idx]" (ngModelChange)="selection.update()" id="year_{{idx}}">
-                <mat-option *ngFor="let y of selectableYears(selection.years[idx]).reverse()" [value]="y">{{y}}</mat-option>
+                <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y}}</mat-option>
             </mat-select>
         </mat-form-field>
         <button *ngIf="idx > 0 || selection.years.length > 1" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
@@ -70,7 +70,7 @@ export class YearsControlComponent extends BaseControlComponent {
                 return yr === y || this.selection.years.indexOf(yr) === -1;
             });
         }
-        return VALID_YEARS;
+        return VALID_YEARS.reverse();
     }
 
     addYear() {

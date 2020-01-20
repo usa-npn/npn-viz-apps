@@ -17,6 +17,7 @@ const LEGEND_VPAD = 4;
 const MARGIN_VPAD = 5;
 const TITLE_FONT_SIZE = 18;
 const SWATCH_SIZE = 20;
+const BAR_OPACITY = '0.75';
 
 enum ObserverActivityVisMode {
     NEW_OBSERVERS = 'New Observers',
@@ -80,7 +81,9 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
         this.x = scaleBand<number>().rangeRound([0,sizing.width]).padding(0.05).domain(d3.range(0,12));
         this.xAxis = axisBottom<number>(this.x).tickFormat((i) => d3_month_fmt(new Date(1900,i)));
         this.y = scaleLinear().range([sizing.height,0]).domain([0,20]); // just a default domain
-        this.yAxis = axisLeft<number>(this.y).tickFormat(d3.format('.0d'));
+        this.yAxis = axisLeft<number>(this.y)
+            .tickSize(-sizing.width)
+            .tickFormat(d3.format('.0d'));
 
         chart.append('g')
             .attr('class', 'x axis')
@@ -148,7 +151,8 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
                 .attr('x',0)
                 .attr('width',SWATCH_SIZE)
                 .attr('height',SWATCH_SIZE)
-                .attr('fill',(d,i) => z(i));
+                .attr('fill',(d,i) => z(i))
+                .style('opacity',BAR_OPACITY);
             // add labels
             legend.append('text')
                 .attr('x',SWATCH_SIZE+4)
@@ -156,6 +160,19 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
                 .attr('dy','0.1em')
                 .text(d => d);
         }
+    }
+
+    protected commonUpdates(): void {
+        super.commonUpdates();
+        const {chart} = this;
+        // undo/change some of the commonUpdates
+        const _yAxis = chart.select('.y.axis');
+        _yAxis.select('path.domain')
+            .attr('stroke','none')
+            .style('stroke','none');
+        _yAxis.selectAll('.tick>line')
+            .attr('stroke',i => i === 0 ? '#000' : '#ddd')
+            .style('stroke',i => i === 0 ? '#000' : '#ddd');
     }
 
     protected redrawSvg(): void {
@@ -198,6 +215,8 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
                 .attr('y',d => y(d[1]))
                 .attr('height',d => y(d[0]) - y(d[1]))
                 .attr('width',x.bandwidth() -10)
+                .style('opacity',BAR_OPACITY);
+            /* tooltips not working nicely, flashing
             .on('mouseover', () => tooltip.style('display',null))
             .on('mouseout', () => tooltip.style('display','none'))
             .on('mousemove', function(d) {
@@ -206,7 +225,7 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
                 var yPosition = d3.mouse(container)[1] + sizing.margin.top - 5;
                 tooltip.attr('transform',`translate(${xPosition},${yPosition})`);
                 tooltip.select('text').text(d[1]-d[0]);
-            });
+            });*/
         this.commonUpdates();
     }
 }

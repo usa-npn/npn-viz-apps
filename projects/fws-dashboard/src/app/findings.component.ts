@@ -2,7 +2,7 @@ import {Component,Input,HostBinding,Inject,Optional, ViewEncapsulation} from '@a
 import {MatSnackBar,MatDialog,MatDialogRef} from '@angular/material';
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
 
-import {EntityBase,EntityService, DashboardModeState, DashboardMode} from './entity.service';
+import {EntityBase,EntityService, DashboardModeState, DashboardMode, Refuge, PhenologyTrail} from './entity.service';
 import {VisSelection,VisualizationSelectionFactory,NPN_BASE_HREF} from '@npn/common';
 import {NewVisualizationDialogComponent} from './new-visualization-dialog.component';
 
@@ -192,7 +192,13 @@ export class FindingsComponent {
 
     addVisualization($event){
         console.log('add.$event',$event);
-        let s = this.selectionFactory.newSelection($event.dragData);
+        // most selections will simply ignore $entity but some like observer activity
+        // metrics, with the introduction of the pheno trail work, need the overall
+        // $entity to decide how to label legend items when not performing grouping
+        const $entity = this.entity instanceof Refuge
+            ? {title: this.entity.title, network_id: this.entity.network_id }
+            : {title: this.entity.title, network_ids: (this.entity as PhenologyTrail).network_ids };
+        let s = this.selectionFactory.newSelection({...{$entity},...$event.dragData});
         console.log('add.selection',s);
         let dialogRef = this.visDialog(s);
         dialogRef.afterClosed().subscribe(selection => {

@@ -161,6 +161,11 @@
           "title": "When will flowers be available for pollinators?",
           "tagline": "This Phenology Calendar shows reports of open flowers from the past two years.",
           "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported open flowering for three genera of plants (Asclepias, Symphyotrichum, and Solidago) that are important for pollinators from 2018 to 2019. The colored lines indicate at least one observer reported 'yes' for open flowers on that day. The gray line indicates at least one observer reported 'no' for open flowers on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect open flowers for key genera from the <a href=\"https://www.usanpn.org/nn/NectarConnectors\" target=\"_blank\">Nectar Connector campaign.</a></p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To set a location, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
+          "image": {
+            "src": "assets/Swamp_milkweed_monarch_TeuneEnglishLanguageWikipedia_CCA-SA3.0.jpg",
+            "alt": "monarch on milkweed",
+            "credit": "Teune, Eng. Lang. Wikipedia, CC BY-SA 3.0"
+          },
           "external": {
             "$class": "CalendarSelection",
             "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",

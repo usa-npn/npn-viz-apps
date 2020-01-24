@@ -42,8 +42,9 @@
           "tagline": "This Activity Curve shows the overlap between open flowers in common milkweed plants and activity of monarch butterflies in the Midwest this year.",
           "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of invidual milkweed plants with open flowers and the mean number of monarch butterflies observed in Midwest states in 2019. You can see the change in the proportion of individuals with open flowers and number of butterflies in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting milkweed open flowers in early June in the Midwest, and by mid July, nearly all observers were reporting a 'yes' for open flowers. Observers started reporting monarch butterflies in early May, with a peak in number of butterflies observed in mid July. An additional smaller peak in monarch activity was reported in mid September, but milkweed flowers declined by this time.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the pheno classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
           "image": {
-            "src": "assets/BFP_7227-X2.jpg",
-            "alt": "caterpillar"
+            "src": "assets/Swamp_milkweed_monarch_TeuneEnglishLanguageWikipedia_CCA-SA3.0.jpg",
+            "alt": "monarch on milkweed",
+            "credit": "Teune, Eng. Lang. Wikipedia, CC BY-SA 3.0"
           },
           "external": {
             "$class": "ActivityCurvesSelection",
@@ -162,9 +163,9 @@
           "tagline": "This Phenology Calendar shows reports of open flowers from the past two years.",
           "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported open flowering for three genera of plants (Asclepias, Symphyotrichum, and Solidago) that are important for pollinators from 2018 to 2019. The colored lines indicate at least one observer reported 'yes' for open flowers on that day. The gray line indicates at least one observer reported 'no' for open flowers on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect open flowers for key genera from the <a href=\"https://www.usanpn.org/nn/NectarConnectors\" target=\"_blank\">Nectar Connector campaign.</a></p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To set a location, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
           "image": {
-            "src": "assets/Swamp_milkweed_monarch_TeuneEnglishLanguageWikipedia_CCA-SA3.0.jpg",
-            "alt": "monarch on milkweed",
-            "credit": "Teune, Eng. Lang. Wikipedia, CC BY-SA 3.0"
+            "src": "assets/BeeonSolidago_CourtneyCelleyUSFWS.jpg",
+            "alt": "bee on solidago",
+            "credit": "Courtney Celley, USFWS"
           },
           "external": {
             "$class": "CalendarSelection",
@@ -242,6 +243,11 @@
           "title": "How does winter temperature relate to leafing in the Soapberry family?",
           "tagline": "This scatterplot graph shows how minimum winter temperatures relate to the onset of spring leafing in the Soapberry family, which includes maples and chestnuts.",
           "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between minimum winter temperatures and the onset of leafing within the Soapberry family (Sapindaceae) using all available data across the United States for the years 2010-2019. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>Minimum winter temperatures can drive phenological activity in the spring. In some species, colder temperatures have been found to suppress leaf-out whereas warmer temperatures promote earlier leaf-out. In this case, warmer temperatures are associated with earlier leaf-out within species of the Soapberry family.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring. You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
+          "image": {
+            "src": "assets/Soapberry_Sapindus.saponaria_stephpimmlyon_CC.BY-NC.2.0.jpg",
+            "alt": "soapberry sapindus",
+            "credit": "stephpimmlyon, CC.BY-NC.2.0"
+          },
           "settings": {
               "speciesTitleFormat": "scientific-name"
           },

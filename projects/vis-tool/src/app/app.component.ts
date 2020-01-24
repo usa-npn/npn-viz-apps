@@ -33,7 +33,17 @@ interface MenuItem {
  */
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styles:[`
+  mat-drawer {
+      scrollbar-width: none; /* Firefox disable scrollbars */
+      -ms-overflow-style: none;  /* IE 10+ disable scrollbars */
+  }
+  mat-drawer::-webkit-scrollbar {
+      width: 0px;
+      background: transparent; /* Chrome/Safari/Webkit disable scrollbars */
+  }
+  `]
 })
 export class AppComponent {
   faArrowLeft = faArrowLeft;

@@ -44,7 +44,7 @@ export class VisualizationDownloadComponent {
             .attr('xmlns', 'http://www.w3.org/2000/svg');
         let parent = svg.parentNode as HTMLElement,
             html = parent.innerHTML,
-            imgsrc = 'data:image/svg+xml;base64,' + window.btoa(html),
+            imgsrc = 'data:image/svg+xml;base64,' + window.btoa(html.replace('\u00B0', '')),
             canvas = document.querySelector(`#dlcanvas-${this.svgWrapperId}`) as HTMLCanvasElement,
             link = document.querySelector(`#dllink-${this.svgWrapperId}`) as HTMLAnchorElement;
         canvas.width = +wrappedSvg.attr('width');

@@ -11,8 +11,8 @@
               "meta": {},
               "layerCategory": "Daily Temperature Accumulations",
               "layerName": "gdd:agdd",
-              "extentValue": "today",
-              "doy": "today",
+              "extentValue": "sixDayForecast",
+              "doy": "sixDayForecast",
               "showLastYear": true
           }
         },

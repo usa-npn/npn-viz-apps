@@ -257,7 +257,7 @@
             "meta": {},
             "networkIds": [],
             "stationIds": [],
-            "individualPhenometrics": false,
+            "individualPhenometrics": true,
             "numDaysQualityFilter": 15,
             "plots": [
               {

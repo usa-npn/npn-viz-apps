@@ -48,14 +48,14 @@ export class StoriesService {
       let today = new Date();
       today.setHours(0,0,0,0);
 
-      let sixDayForcastDate = this.addDays(today, 6);
+      let sixDayForcastDate = this.addDays(today, 10);
 
       //calculate today's doy
       let start = new Date(today.getFullYear(), 0, 0);
       let diff = (+today - +start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
       let oneDay = 1000 * 60 * 60 * 24;
       let doy = Math.floor(diff / oneDay);
-      let sixDayForcastDoy = doy + 6;
+      let sixDayForcastDoy = doy + 10;
 
       storiesConfig.stories.forEach(s => {
         if(s.external['extentValue'] == 'today') {

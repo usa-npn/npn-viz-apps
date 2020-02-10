@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Refuge } from './entity.service';
 import { NetworkService, StationAwareVisSelection, Station } from '@npn/common';
 import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
+import { timeHours } from 'd3';
 
 @Component({
     selector: 'refuge-visualization-scope-selection',
@@ -10,14 +11,22 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
       <mat-radio-button class="vis-scope-radio" [value]="'refuge'">Show data for all sites at "{{refuge.title}}"</mat-radio-button>
       <mat-radio-button class="vis-scope-radio" [value]="'station'">Show data for select sites at "{{refuge.title}}"</mat-radio-button>
       <mat-radio-button class="vis-scope-radio" [value]="'stationGroup'">Compare data for select sites at "{{refuge.title}}"</mat-radio-button>
+      <mat-radio-button class="vis-scope-radio" [value]="'outsideGroup'">Compare refuge data to sites within a radius</mat-radio-button>
     </mat-radio-group>
     <hr *ngIf="visScope !== 'refuge'" />
+    <h3 class="radius-label" *ngIf="visScope === 'outsideGroup'">Radius (in miles)</h3>
+    <mat-select class="vis-scope-input" class="radius-input" [(ngModel)]="radius" (selectionChange)="outsideGroupChange()" *ngIf="visScope === 'outsideGroup'">
+        <mat-option [value]="10">10</mat-option>
+        <mat-option [value]="20">20</mat-option>
+        <mat-option [value]="30">30</mat-option>
+    </mat-select>
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
-    <div *ngIf="(visScope === 'station' || visScope === 'stationGroup')">
+    <div *ngIf="(visScope === 'station' || visScope === 'stationGroup' || visScope === 'outsideGroup')">
+    <h3 *ngIf="(visScope === 'outsideGroup')">Select Sites to Exclude</h3>
         <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()"
             [disabled]="visScope === 'station' && s.selected && selection.stationIds?.length === 1">{{s.station_name}}</mat-checkbox>
     </div>
-    <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
+    <!--<pre *ngIf="selection">{{selection.external | json}}</pre>-->
     `,
     styles: [`
         .vis-scope-input {
@@ -30,6 +39,12 @@ import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
         .station-input {
             display: block;
             padding-left: 34px;
+        },
+        .radius-label {
+            padding-top:20px;
+        }
+        .radius-input {
+            padding-bottom:20px;
         }
     `]
 })
@@ -40,6 +55,7 @@ export class RefugeVisualizationScopeSelectionComponent {
     refuge: Refuge;
     visScope: string = 'refuge';
     stationFetch: boolean = false;
+    radius = 10;
     private _stations:Promise<Station []>;
     stations: Station[];
     constructor(private networkService: NetworkService) { }
@@ -68,6 +84,7 @@ export class RefugeVisualizationScopeSelectionComponent {
     }
 
     private loadStations() {
+        
         if (!this._stations) {
             this.stationFetch = true;
             this._stations = this.networkService.getStations(this.refuge.network_id)
@@ -78,6 +95,7 @@ export class RefugeVisualizationScopeSelectionComponent {
                 });
         }
         return this._stations;
+        
     }
 
     scopeChanged() {
@@ -95,13 +113,30 @@ export class RefugeVisualizationScopeSelectionComponent {
                 this.loadStations().then((stations:Station[]) => {
                     // all selected for station mode and all de-selected for stationGroup mode
                     stations.forEach(s => s.selected = this.visScope === 'station');
+                    if(this.visScope === 'outsideGroup') {
+                        this.outsideGroupChange();
+                    }
                 });
-                if(this.visScope === 'outsideGroup') {
-                    // TODO populate selection.groups
-                }
                 break;
         }
     }
+
+    outsideGroupChange(){
+        let exludeIds = this.stations.filter(s => s.selected).map(s => s.station_id);
+
+        this.selection.groups = [{
+            label: this.refuge.title,
+            mode: SelectionGroupMode.NETWORK,
+            id: this.refuge.network_id,
+            excludeIds: exludeIds
+          },{
+            label: `Sites within ${this.radius} miles`,
+            mode: SelectionGroupMode.OUTSIDE,
+            id: this.refuge.network_id,
+            outsideRadiusMiles: this.radius
+          }]; 
+    }
+
     stationChange() {
         switch(this.visScope) {
             case 'station':
@@ -118,7 +153,7 @@ export class RefugeVisualizationScopeSelectionComponent {
                     });
                 break;
             case 'outsideGroup':
-                // TODO
+                this.outsideGroupChange();
                 break;
         }
     }

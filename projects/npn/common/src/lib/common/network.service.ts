@@ -26,6 +26,18 @@ export class NetworkService {
     }
 
     /**
+     * Get station ids nearby to a network (functional for only networks with boundaries).
+     * 
+     * @param networkId A single networkId
+     * @param radius The radius to constrain the results by.
+     */
+    getNearbyStationIds(networkId:number,radius:number):Promise<number []> {
+        return this.serviceUtils.cachedGet(
+            this.serviceUtils.dataApiUrl3(`/v0/stations/nearby_stations/${networkId}/${radius}`)
+        ).then(response => response.Station_IDs);
+    }
+
+    /**
      * Get a single Network by id
      * 
      * @todo unfortunate that this takes a single networkId and yet returns an array, the function should unwrap the response so callers don't have to.

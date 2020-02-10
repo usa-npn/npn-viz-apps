@@ -452,7 +452,7 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
                     // exclude any stations the group excludes
                     .then((ids:number[]) => ids.filter(id => (group.excludeIds||[]).indexOf(id) === -1));
             case SelectionGroupMode.OUTSIDE:
-                return Promise.reject('TODO SelectionGroupMode.OUTSIDE not implemented yet');
+                return this.networkService.getNearbyStationIds(group.id,group.outsideRadiusMiles);
         }
     }
 

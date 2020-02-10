@@ -14,12 +14,14 @@ import { timeHours } from 'd3';
       <mat-radio-button class="vis-scope-radio" [value]="'outsideGroup'">Compare refuge data to sites within a radius</mat-radio-button>
     </mat-radio-group>
     <hr *ngIf="visScope !== 'refuge'" />
-    <h3 class="radius-label" *ngIf="visScope === 'outsideGroup'">Radius (in miles)</h3>
-    <mat-select class="vis-scope-input" class="radius-input" [(ngModel)]="radius" (selectionChange)="outsideGroupChange()" *ngIf="visScope === 'outsideGroup'">
-        <mat-option [value]="10">10</mat-option>
-        <mat-option [value]="20">20</mat-option>
-        <mat-option [value]="30">30</mat-option>
-    </mat-select>
+    <mat-form-field *ngIf="visScope === 'outsideGroup'" class="radius-form-field">
+        <mat-label>Radius (in miles)</mat-label>
+        <mat-select class="vis-scope-input" class="radius-input" [(ngModel)]="radius" (selectionChange)="outsideGroupChange()">
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="20">20</mat-option>
+            <mat-option [value]="30">30</mat-option>
+        </mat-select>
+    </mat-form-field>   
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
     <div *ngIf="(visScope === 'station' || visScope === 'stationGroup' || visScope === 'outsideGroup')">
     <h3 *ngIf="(visScope === 'outsideGroup')">Select Sites to Exclude</h3>
@@ -40,11 +42,11 @@ import { timeHours } from 'd3';
             display: block;
             padding-left: 34px;
         },
-        .radius-label {
-            padding-top:20px;
+        .radius-form-field {
+            margin:20px 0 20px 0;
         }
         .radius-input {
-            padding-bottom:20px;
+            width:200px;
         }
     `]
 })

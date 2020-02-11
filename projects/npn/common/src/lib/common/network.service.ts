@@ -33,7 +33,7 @@ export class NetworkService {
      */
     getNearbyStationIds(networkId:number,radius:number):Promise<number []> {
         return this.serviceUtils.cachedGet(
-            this.serviceUtils.dataApiUrl3(`/v0/stations/nearby_stations/${networkId}/${radius}`)
+            this.serviceUtils.dataApiUrl2(`/v0/stations/nearby_stations/${networkId}/${radius}`)
         ).then(response => response.Station_IDs);
     }
 

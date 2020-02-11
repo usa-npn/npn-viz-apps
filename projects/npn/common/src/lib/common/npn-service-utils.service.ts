@@ -26,10 +26,6 @@ export class NpnServiceUtils {
         return `${this.config.dataApiRoot2}${suffix}`;
     }
 
-    public dataApiUrl3(suffix: string) {
-        return `${this.config.dataApiRoot3}${suffix}`;
-    }
-
     public geoServerUrl(suffix: string) {
         return `${this.config.geoServerRoot}${suffix}`;
     }

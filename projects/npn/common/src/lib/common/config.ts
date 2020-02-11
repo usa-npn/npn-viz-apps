@@ -9,7 +9,6 @@ export class NpnConfiguration {
     dataApiRoot: string; // URL of NPN data web services (e.g. //data-dev.usanpn.org:3006)
     dataApiUseStatisticsCache?: boolean; // the value for the useCache parameter for data statistics calls.
     dataApiRoot2: string; // URL of NPN data2 web services (new, e.g. https://data-dev.usanpn.org/webservices).
-    dataApiRoot3: string; // URL of NPN data3 web services (new e.g. https://data-dev.usanpn.org:3004).
     popApiRoot: string;
     geoServerRoot: string; // URL of the NPN geo server
     [x: string]: any; // not going to dictate what else it might have

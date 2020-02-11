@@ -525,10 +525,10 @@ export abstract class NetworkAwareVisSelection extends VisSelection implements S
             return Promise.reject('selection has no SelectionGroups defined');
         }
         // to be safe clean out any station_id parameters that might have been set
-        params = this.resetStationIdParams(params);
-        const promises:Promise<GroupHttpParams>[] = this.groups.map(group => this.getStationIdsForGroup(group)
+        const resetParams = this.resetStationIdParams(params);
+        const promises:Promise<GroupHttpParams>[] = this.groups.map(group =>this.getStationIdsForGroup(group)
             .then((ids:number[]) => {
-                params = ids.reduce((params,id,i) => params.set(`station_id[${i}]`,`${id}`),params);
+                params = ids.reduce((params,id,i) => params.set(`station_id[${i}]`,`${id}`),resetParams);
                 return ({group,params});
             }));
         return Promise.all(promises);

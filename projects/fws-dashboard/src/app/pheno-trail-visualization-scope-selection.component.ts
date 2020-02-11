@@ -55,7 +55,7 @@ export class NetworkWrapper {
         stations.forEach(s => {
             s.selected = !!this.selection.groups ? !!this.selection.groups.find(g => g.id === s.station_id) : false;
             s.group = {
-              label: s.station_name,
+              label: `${this.network.name} - ${s.station_name}`,
               mode: SelectionGroupMode.STATION,
               id: s.station_id
             };

@@ -4,6 +4,7 @@ import {FindingsComponent} from './findings.component';
 import {EntityBase,EntityService, DashboardMode, DashboardModeState} from './entity.service';
 
 import {MatTabChangeEvent} from '@angular/material';
+import {faHandshake,faBook,faPaw,faSearch} from "@fortawesome/free-solid-svg-icons";
 
 const WHAT_WERE_FINDING_TAB_IDX = 0;
 const FOCAL_SPECIES_TAB_IDX = 1;
@@ -17,6 +18,7 @@ const PARTNERS_TAB_IDX = 3;
     <mat-tab label="What we're finding">
         <ng-template mat-tab-label>
             <div class="rd-tab-label findings">
+                <mat-icon class="rd-tab-icon"><fa-icon [icon]="faSearch"></fa-icon></mat-icon>
                 <label>What we're finding</label>
             </div>
         </ng-template>
@@ -28,6 +30,7 @@ const PARTNERS_TAB_IDX = 3;
     <mat-tab label="Focal Species">
         <ng-template mat-tab-label>
             <div class="rd-tab-label focal-species">
+                <mat-icon class="rd-tab-icon"><fa-icon [icon]="faPaw"></fa-icon></mat-icon>
                 <label>Focal Species</label>
             </div>
         </ng-template>
@@ -39,6 +42,7 @@ const PARTNERS_TAB_IDX = 3;
     <mat-tab label="Resources for observers">
         <ng-template mat-tab-label>
             <div class="rd-tab-label resources">
+                <mat-icon class="rd-tab-icon"><fa-icon [icon]="faBook"></fa-icon></mat-icon>
                 <label>Resources for observers</label>
             </div>
         </ng-template>
@@ -50,6 +54,7 @@ const PARTNERS_TAB_IDX = 3;
     <mat-tab label="Partners" *ngIf="supportsPartners">
         <ng-template mat-tab-label>
             <div class="rd-tab-label partners">
+                <mat-icon class="rd-tab-icon"><fa-icon [icon]="faHandshake"></fa-icon></mat-icon>
                 <label>Partners</label>
             </div>
         </ng-template>
@@ -74,6 +79,11 @@ export class FwsDashboardComponent implements OnInit {
     renderResources:boolean = false;
     supportsPartners:boolean = false;
     renderPartners:boolean = false;
+
+    faHandshake = faHandshake;
+    faBook = faBook;
+    faPaw = faPaw;
+    faSearch = faSearch;
 
     @ViewChild(FindingsComponent)
     private findingsComponent:FindingsComponent;

@@ -128,41 +128,20 @@ $color-tab4: #6f5e53;
         }
     }
 
+    .rd-tab-icon{
+        position: absolute;
+        top: .75em;
+        right: 42%;
+        transform: translateX(-50%);
+        font-size: 2.2em;
+    }
 
     .rd-tab-label {
         position: relative;
         text-transform: uppercase;
         >label {
             color: inherit;
-            margin-top: 3.25em;
-        }
-        &:before {
-            font-family: 'FontAwesome';
-            position: absolute;
-            top: 0.5em;
-            right: 45%;
-            transform: translateX(-50%);
-            font-size: 2em;
-        }
-        &.focal-species {
-            &:before {
-                content: '\f1b0';
-            }
-        }
-        &.findings {
-            &:before {
-                content: '\f002';
-            }
-        }
-        &.resources {
-            &:before {
-                content: '\f02d';
-            }
-        }
-        &.partners {
-            &:before {
-                content: '\f0c0';
-            }
+            margin-top: 4.25em;
         }
     }
     .rd-tab-content {

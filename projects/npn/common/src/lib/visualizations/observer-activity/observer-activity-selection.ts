@@ -1,5 +1,5 @@
-import {NpnServiceUtils, NetworkService} from '../../common';
-import {NetworkAwareVisSelection,selectionProperty, StationAwareVisSelection, GroupHttpParams} from '../vis-selection';
+import { NpnServiceUtils, NetworkService } from '../../common';
+import { selectionProperty, StationAwareVisSelection, GroupHttpParams } from '../vis-selection';
 import { HttpParams } from '@angular/common/http';
 
 export interface ObserverActivityMonth {

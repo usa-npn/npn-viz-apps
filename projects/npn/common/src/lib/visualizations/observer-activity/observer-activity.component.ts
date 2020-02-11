@@ -10,7 +10,7 @@ import { Axis, axisBottom, axisLeft } from 'd3-axis';
 import { Selection } from 'd3-selection';
 import { ScaleBand, scaleBand, ScaleLinear, scaleLinear, ScaleOrdinal, scaleOrdinal } from 'd3-scale';
 import * as d3 from 'd3';
-import { getStaticColor } from '@npn/common/common';
+import { getStaticColor } from '../../common';
 
 const DEFAULT_TOP_MARGIN = 100;
 const LEGEND_VPAD = 4;

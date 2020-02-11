@@ -68,9 +68,9 @@ export class YearsControlComponent extends BaseControlComponent {
             // validYears including y but excluding any others in the selection
             return VALID_YEARS.filter(yr => {
                 return yr === y || this.selection.years.indexOf(yr) === -1;
-            });
+            }).reverse();
         }
-        return VALID_YEARS;
+        return VALID_YEARS.reverse();
     }
 
     addYear() {

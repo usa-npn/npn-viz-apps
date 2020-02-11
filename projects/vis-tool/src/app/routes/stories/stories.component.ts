@@ -31,12 +31,22 @@ import { Observable } from 'rxjs';
     styles:[`
     .stories {
         width: 100%;
-        height: 100%;
+        height: 100% !important;
         background-size: cover !important;
+        display:flex;
+        flex-direction: column;
     }
     .stories mat-grid-list {
+        flex-grow: 1;
         width: 95%;
         margin: auto;
+        overflow: auto !important;
+        scrollbar-width: none; /* Firefox disable scrollbars */
+        -ms-overflow-style: none;  /* IE 10+ disable scrollbars */
+    }
+    .stories mat-grid-list::-webkit-scrollbar {
+        width: 0px;
+        background: transparent; /* Chrome/Safari/Webkit disable scrollbars */
     }
     .stories mat-card {
         width: 100%;
@@ -69,6 +79,7 @@ import { Observable } from 'rxjs';
         flex-shrink: 0;
     }
     .mat-card-subtitle {
+        color: black !important;
         flex-grow: 1;
         overflow: auto;
     }

@@ -65,6 +65,8 @@ import { SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
                 </agm-info-window>
             </agm-map>
             <map-layer-legend *ngIf="!thumbnail && selection.legend" [legend]="selection.legend"></map-layer-legend>
+            <img src = 'assets/USA-NPN-logo-RGB2019.png' class='npnlogo'/>
+            <img src = 'assets/usgs-logo.png' class='usgslogo'/>
         </div>
     </div>
     `,

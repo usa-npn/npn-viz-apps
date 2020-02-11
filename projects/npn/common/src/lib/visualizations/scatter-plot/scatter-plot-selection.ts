@@ -45,7 +45,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     $class:string = 'ScatterPlotSelection';
 
     @selectionProperty()
-    start: number = 2010;
+    start: number = 2011;
     @selectionProperty()
     end: number = (new Date()).getFullYear();
     @selectionProperty()
@@ -105,7 +105,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return this.start &&
                this.end &&
                this.axis &&
-               (this.start < this.end) &&
+               (this.start <= this.end) &&
                this.validPlots.length > 0;
     }
 

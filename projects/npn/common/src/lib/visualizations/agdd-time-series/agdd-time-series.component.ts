@@ -99,7 +99,7 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
     }
 
     private updateAxes() {
-        //console.log('AGDD: updateAxes');
+        // console.log('AGDD: updateAxes');
         this.removeLines();
         const {data,chart,sizing,y,yAxis,x,xAxis,selection} = this;
         let {yMax} = this;
@@ -138,18 +138,20 @@ export class AgddTimeSeriesComponent extends SvgVisualizationBaseComponent {
             .attr('class', 'y axis')
             .call(yAxis)
             .append('text')
+            .attr('fill','#000')
             .attr('transform', 'rotate(-90)')
             .attr('y', '0')
             .attr('dy','-3.75em')
             .attr('x',-1*(sizing.height/2)) // looks odd but to move in the Y we need to change X because of transform
             .style('text-anchor', 'middle')
-            .text('Accumulated Growing Degree Days');
+            .text('Accumulated Growing Degree Day Units (AGDDs)');
 
         chart.append('g')
             .attr('class', 'x axis')
             .attr('transform', 'translate(0,' + sizing.height + ')')
             .call(xAxis)
             .append('text')
+            .attr('fill','#000')
             .attr('y','0')
             .attr('dy','2.5em')
             .attr('x',(sizing.width/2))

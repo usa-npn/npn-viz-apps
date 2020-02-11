@@ -79,7 +79,7 @@ export class CurveControlComponent extends MonitorsDestroy {
         while(c <= thisYear) {
             years.push(c++);
         }
-        return years;
+        return years.reverse();
     })();
 
     ngOnInit() {

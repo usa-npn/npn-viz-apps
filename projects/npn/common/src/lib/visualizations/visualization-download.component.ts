@@ -43,8 +43,14 @@ export class VisualizationDownloadComponent {
         wrappedSvg.attr('version', 1.1)
             .attr('xmlns', 'http://www.w3.org/2000/svg');
         let parent = svg.parentNode as HTMLElement,
-            html = parent.innerHTML,
-            imgsrc = 'data:image/svg+xml;base64,' + window.btoa(html),
+            html = parent.innerHTML;
+        // see here (the unicode problem)
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding
+        let htmlForBase64 = encodeURIComponent(html).replace(/%([0-9A-F]{2})/g,
+            function toSolidBytes(match, p1) {
+                return String.fromCharCode(<any>'0x' + p1);
+            });
+        let imgsrc = 'data:image/svg+xml;base64,' + window.btoa(htmlForBase64),
             canvas = document.querySelector(`#dlcanvas-${this.svgWrapperId}`) as HTMLCanvasElement,
             link = document.querySelector(`#dllink-${this.svgWrapperId}`) as HTMLAnchorElement;
         canvas.width = +wrappedSvg.attr('width');

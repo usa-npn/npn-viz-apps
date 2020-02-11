@@ -153,7 +153,7 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                         (stationIds||[]).forEach((id,idx) => params = params.set(`station_ids[${idx}]`,`${id}`))
                         return params;
                     })).pipe(
-                        switchMap(params => this.speciesService.getAllSpeciesHigher(params,criteria.years))
+                        switchMap(params => this.speciesService.getAllSpeciesHigher(params,criteria.years, this.selection.groupId, this.selection.personId))
                     )),
             tap(() => this.fetchingSpeciesList = false)
         );

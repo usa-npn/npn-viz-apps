@@ -38,15 +38,24 @@ export class StoriesService {
         private sharingService:SharingService
     ) {}
 
+    addDays(date, days) {
+      const copy = new Date(Number(date))
+      copy.setDate(date.getDate() + days)
+      return copy
+    }
+
     mapDynamicDates(storiesConfig: StoriesConfiguration) {
       let today = new Date();
       today.setHours(0,0,0,0);
+
+      let sixDayForcastDate = this.addDays(today, 10);
 
       //calculate today's doy
       let start = new Date(today.getFullYear(), 0, 0);
       let diff = (+today - +start) + ((start.getTimezoneOffset() - today.getTimezoneOffset()) * 60 * 1000);
       let oneDay = 1000 * 60 * 60 * 24;
       let doy = Math.floor(diff / oneDay);
+      let sixDayForcastDoy = doy + 10;
 
       storiesConfig.stories.forEach(s => {
         if(s.external['extentValue'] == 'today') {
@@ -57,6 +66,15 @@ export class StoriesService {
         }
         if(s.external['year'] == 'today') {
           s.external['year'] = today.getFullYear();
+        }
+        if(s.external['extentValue'] == 'sixDayForecast') {
+          s.external['extentValue'] = sixDayForcastDate.toISOString();
+        }
+        if(s.external['doy'] == 'sixDayForecast') {
+          s.external['doy'] = sixDayForcastDoy;
+        }
+        if(s.external['year'] == 'sixDayForecast') {
+          s.external['year'] = sixDayForcastDate.getFullYear();
         }
       })
       return storiesConfig;

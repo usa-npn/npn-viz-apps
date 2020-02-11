@@ -127,7 +127,13 @@ export class SpeciesService {
         return this.higherSpeciesCache[cacheKey].then(results => JSON.parse(JSON.stringify(results)));
     }
 
-    private _allSpeciesPromises(params:HttpParams = new HttpParams(),years:number[] = []): Promise<TaxonomicSpecies[]>[] {
+    private _allSpeciesPromises(params:HttpParams = new HttpParams(),years:number[] = [], networkId = null, personId = null): Promise<TaxonomicSpecies[]>[] {
+        if(networkId != null) {
+            params = params.set('network_id', networkId);
+        }
+        if(personId != null) {
+            params = params.set('person_id', personId);
+        }
         years = years||[]; // in case null is actually passed in
         // if we aren't doing any filtering then use the getSpecies service because
         // it's much faster for that use case, it just doesn't return numbers of observations
@@ -156,8 +162,8 @@ export class SpeciesService {
                 .map(range => this._filterSpecies(params.set('start_date',`${range[0]}-01-01`).set('end_date',`${range[1]}-12-31`)));
     }
 
-    getAllSpeciesConsolidated(params:HttpParams = new HttpParams(),years:number[] = null): Promise<TaxonomicSpecies[]> {
-        return Promise.all(this._allSpeciesPromises(params,years))
+    getAllSpeciesConsolidated(params:HttpParams = new HttpParams(),years:number[] = null, networkId = null, personId = null): Promise<TaxonomicSpecies[]> {
+        return Promise.all(this._allSpeciesPromises(params,years,networkId,personId))
             .then((results:TaxonomicSpecies[][]) => {
                 console.log('getAllSpeciesConsolidated.results',results.map(r => r.length).join(', '));
                 let consolidated:TaxonomicSpecies[];
@@ -188,8 +194,8 @@ export class SpeciesService {
             });
     }
 
-    getAllSpeciesHigher(params:HttpParams = new HttpParams(),years:number[] = null): Promise<SpeciesTaxonomicInfo> {
-        return this.getAllSpeciesConsolidated(params,years)
+    getAllSpeciesHigher(params:HttpParams = new HttpParams(),years:number[] = null,networkId = null,personId=null): Promise<SpeciesTaxonomicInfo> {
+        return this.getAllSpeciesConsolidated(params,years,networkId,personId)
             .then((species:TaxonomicSpecies[]) => {
                 const gatherById = key => mapByNumericId(species,key);
                 const classIds = gatherById('class_id');

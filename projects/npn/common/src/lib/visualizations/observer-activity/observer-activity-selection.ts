@@ -100,23 +100,6 @@ export class ObserverActivitySelection extends StationAwareVisSelection {
                         const d = data as ObserverActivityData;
                         return [d];
                     });
-            })
-        /*
-        // TODO is at the moment always just a single set of data...
-        return new Promise((resolve,reject) => {
-            this.working = true;
-            this.serviceUtils.cachedGet(url,params)
-                .then(data => {
-                    // group label or?
-                    data.label = `TODO: ${data.network_name}`;
-                    data.months = [1,2,3,4,5,6,7,8,9,10,11,12].map(i => dataForMonth(i,data));
-                    this.working = false;
-                    // TODO temporarily to give multiple stacks
-                    const d = data as ObserverActivityData;
-                    resolve([d,d]);
-                })
-                .catch(reject);
-        });
-        */
+            });
     }
 }

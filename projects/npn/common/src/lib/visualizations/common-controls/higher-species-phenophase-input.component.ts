@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { VisSelection, NetworkAwareVisSelection } from '../vis-selection';
+import { VisSelection, StationAwareVisSelection, NetworkAwareVisSelection } from '../vis-selection';
 import { Subject, Observable, from, combineLatest, of } from 'rxjs';
 import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
 import { MonitorsDestroy,
@@ -153,7 +153,27 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                         (stationIds||[]).forEach((id,idx) => params = params.set(`station_ids[${idx}]`,`${id}`))
                         return params;
                     })).pipe(
-                        switchMap(params => this.speciesService.getAllSpeciesHigher(params,criteria.years, this.selection.groupId, this.selection.personId))
+                        switchMap(params => {
+                            /*
+                            IMPORTANT: the network_id/person_id parameters are being added here to cover a special case when the
+                            vis tool is opened restricted to a network (groupId) or individual (personId).  The application very
+                            intentionally does not typically use these request parameters but translates results to lists of stations
+                            instead to support geographic boundaries.  Doing this creates a situation where a visitor _could_ more
+                            easily create a selection that results in no data on a visualization if they are using boundaries that do
+                            not intersect with the location of their stations.  This is assumed acceptable since they will either not
+                            use boundaries or know where their sites are located and draw boundaries accordingly...
+                             */
+                            if(this.selection instanceof StationAwareVisSelection) {
+                                const {groupId,personId} = this.selection;
+                                if(!!groupId) {
+                                    params = params.set('network_id', groupId);
+                                }
+                                if(!!personId) {
+                                    params = params.set('person_id', personId);
+                                }
+                            }
+                            return this.speciesService.getAllSpeciesHigher(params,criteria.years);
+                        })
                     )),
             tap(() => this.fetchingSpeciesList = false)
         );

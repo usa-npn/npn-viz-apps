@@ -4,6 +4,13 @@ import { NetworkService, StationAwareVisSelection, Station } from '@npn/common';
 import { SelectionGroupMode } from '@npn/common/visualizations/vis-selection';
 import { timeHours } from 'd3';
 
+/** 
+    Radius Dropdown Options for "Compare refuge data to sites within a radius".
+    text is what you want the user to see and value is the real value in the form.
+*/
+const RADIUS_OPTIONS = [{value:10,text:"10"},{value:25,text:"25"},{value:50,text:"50"}];
+const RADIUS_DEFAULT = 0; //The index of the default radius selected when page first loads
+
 @Component({
     selector: 'refuge-visualization-scope-selection',
     template: `
@@ -53,21 +60,10 @@ export class RefugeVisualizationScopeSelectionComponent {
     selection: StationAwareVisSelection;
     @Input()
     refuge: Refuge;
-    /** 
-        RADIUS DROPDOWN OPTIONS - Use this to control which radius options are shown
-        in the dropdown when selecting "Compare refuge data to sites within a radius".
-        text is what you want the user to see and value is the real value in the form.
-    */
-    radiusDropdownOptions = [
-        {value:10,text:"10"}, 
-        {value:25,text:"25"},
-        {value:50,text:"50"}];
-    /** Whatever this is set to will be the default that is selected in the dropdown */    
-    radius = 10;
-
+    radiusDropdownOptions = RADIUS_OPTIONS; 
+    radius = RADIUS_OPTIONS[RADIUS_DEFAULT].value;
     visScope: string = 'refuge';
     stationFetch: boolean = false;
-    
     private _stations:Promise<Station []>;
     stations: Station[];
     constructor(private networkService: NetworkService) { }
@@ -88,10 +84,17 @@ export class RefugeVisualizationScopeSelectionComponent {
             this.loadStations().then((stations:Station[]) => stations.forEach(s => {
                 if(this.visScope === 'station') {
                     s.selected = selection.stationIds.indexOf(s.station_id) !== -1;
+                } else if(this.visScope === 'outsideGroup'){
+                    s.selected = selection.groups[0].excludeIds.indexOf(s.station_id) !== -1;
                 } else {
                     s.selected = !!selection.groups.reduce((found,g) => (found||(g.id === s.station_id ? s : undefined)),undefined);
                 }
             }));
+            if(this.visScope === 'outsideGroup'){
+                this.radius = this.selection.groups[1].outsideRadiusMiles 
+                          ? this.selection.groups[1].outsideRadiusMiles 
+                          : RADIUS_OPTIONS[RADIUS_DEFAULT].value;
+            }
         }
     }
 

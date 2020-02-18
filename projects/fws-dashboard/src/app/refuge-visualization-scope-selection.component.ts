@@ -18,8 +18,8 @@ import { timeHours } from 'd3';
         <mat-label>Radius (in miles)</mat-label>
         <mat-select class="vis-scope-input" class="radius-input" [(ngModel)]="radius" (selectionChange)="outsideGroupChange()">
             <mat-option [value]="10">10</mat-option>
-            <mat-option [value]="20">20</mat-option>
-            <mat-option [value]="30">30</mat-option>
+            <mat-option [value]="25">25</mat-option>
+            <mat-option [value]="50">50</mat-option>
         </mat-select>
     </mat-form-field>   
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>

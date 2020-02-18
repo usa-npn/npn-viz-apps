@@ -17,9 +17,7 @@ import { timeHours } from 'd3';
     <mat-form-field *ngIf="visScope === 'outsideGroup'" class="radius-form-field">
         <mat-label>Radius (in miles)</mat-label>
         <mat-select class="vis-scope-input" class="radius-input" [(ngModel)]="radius" (selectionChange)="outsideGroupChange()">
-            <mat-option [value]="10">10</mat-option>
-            <mat-option [value]="25">25</mat-option>
-            <mat-option [value]="50">50</mat-option>
+            <mat-option *ngFor="let opt of radiusDropdownOptions" [value]="opt.value">{{opt.text}}</mat-option>
         </mat-select>
     </mat-form-field>   
     <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
@@ -55,9 +53,21 @@ export class RefugeVisualizationScopeSelectionComponent {
     selection: StationAwareVisSelection;
     @Input()
     refuge: Refuge;
+    /** 
+        RADIUS DROPDOWN OPTIONS - Use this to control which radius options are shown
+        in the dropdown when selecting "Compare refuge data to sites within a radius".
+        text is what you want the user to see and value is the real value in the form.
+    */
+    radiusDropdownOptions = [
+        {value:10,text:"10"}, 
+        {value:25,text:"25"},
+        {value:50,text:"50"}];
+    /** Whatever this is set to will be the default that is selected in the dropdown */    
+    radius = 10;
+
     visScope: string = 'refuge';
     stationFetch: boolean = false;
-    radius = 10;
+    
     private _stations:Promise<Station []>;
     stations: Station[];
     constructor(private networkService: NetworkService) { }

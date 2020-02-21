@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, Species, TaxonomicPhenophaseRank, TaxonomicClass, TaxonomicOrder, TaxonomicFamily, Phenophase, PhenophaseClass, getSpeciesPlotKeys, SpeciesService } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, getStaticColor, STATIC_COLORS } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -62,19 +62,32 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     })
     private _curves:ActivityCurve[];
 
+    /** The maximum number of plots we want to allow. */
+    readonly MAX_PLOTS:number = 6;
+
     constructor(
-        protected serviceUtils:NpnServiceUtils,
-        protected datePipe: DatePipe,
-        protected speciesService:SpeciesService
+        public serviceUtils:NpnServiceUtils,
+        public datePipe: DatePipe,
+        public speciesService:SpeciesService,
+        public networkService:NetworkService
     ) {
-        super(serviceUtils);
-        this.curves = [{color:'#0000ff',orient:'left'},{color:'orange',orient:'right'}].map((o,i) => {
-            let c = new ActivityCurve();
-            c.id = i;
-            c.color = o.color;
-            c.orient = o.orient;
-            return c;
-        });
+        super(serviceUtils,networkService);
+        // create a default empty curve
+        const curve0 = new ActivityCurve();
+        curve0.color = STATIC_COLORS[0];
+        curve0.id = 0;
+        this.curves = [curve0];
+    }
+
+    /**
+     * Indicates whether or not adding one more plot will result in a visualization exceeding
+     * the maximum number of allowed plots.
+     */
+    get canAddPlot():boolean {
+        const groups = this.groups ? this.groups.length : 0;
+        const next_plots = (this._curves ? this._curves.length : 0)+1;
+        const next_count = groups ? (groups * next_plots) : next_plots;
+        return next_count <= this.MAX_PLOTS;
     }
 
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
@@ -133,7 +146,10 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     set frequency(f:ActivityFrequency) {
         this._frequency = f;
         // any change in frequency invalidates any data held by curves
-        (this._curves||[]).forEach(c => c.data(null));
+        (this._curves||[]).forEach((c:any) => {
+            c._frequency = f;
+            c.data(null);
+        });
         this.updateCheck(true);
     }
 
@@ -143,7 +159,6 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
 
     set interpolate(i:INTERPOLATE) {
         this._interpolate = i;
-        (this._curves||[]).forEach(c => c.interpolate = i);
         this.updateCheck();
     }
 
@@ -156,17 +171,12 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
     }
     set dataPoints(dp:boolean) {
         this._dataPoints = dp;
-        (this._curves||[]).forEach(c => c.dataPoints = dp);
         this.updateCheck(false);
     }
 
     set curves(cs:ActivityCurve[]) {
         this._curves = cs;
-        (this._curves||[]).forEach(c => {
-            c.selection = this;
-            c.interpolate = this._interpolate;
-            c.dataPoints = this._dataPoints;
-        });
+        (this._curves||[]).forEach(c => c.selection = this);
     }
 
     get curves():ActivityCurve[] {
@@ -177,46 +187,36 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         return (this._curves||[]).filter(c => c.isValid());
     }
 
-    private endDate(year) {
-        var now = new Date();
-        if(year === now.getFullYear()) {
-            return this.datePipe.transform(now,'yyyy-MM-dd');
-        }
-        return year+'-12-31';
-    }
-
-    loadCurveData(): Promise<any> {
+    /**
+     * Load all the curves and their data.  It's ipmortant to understand that this function
+     * may return more curves than are defined on the selection and the resulting curves may
+     * not be references to those held on this selection.
+     */
+    loadCurves(): Promise<ActivityCurve[]> {
         this.working = true;
         return this.toURLSearchParams(new HttpParams()
                 .set('request_src','npn-vis-activity-curves')
                 .set('frequency',`${this.frequency.value}`)
             ).then((baseParams:HttpParams) => {
-                const promises:Promise<any[]>[] = this.curves
-                    .filter(c => c.data(null).isValid())
-                    .map(c => {
-                        let curveParams = baseParams
-                            .set('start_date',`${c.year}-01-01`)
-                            .set('end_date',this.endDate(c.year));
-                        const keys = getSpeciesPlotKeys(c);
-                        curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${c.species[keys.speciesIdKey]}`);
-                        if((c.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                            curveParams = curveParams.set('taxonomy_aggregate','1');
+                const promises:Promise<ActivityCurve[]>[] = this.curves
+                    .filter(c => (c.data(null) as ActivityCurve).isValid())
+                    .map(c => c.loadData(baseParams));
+                return Promise.all(promises)
+                    .then((curves:ActivityCurve[][]) => {
+                        this.working = false;
+                        const toPlot = curves.reduce((arr,list) => arr.concat(list),[]);
+                        if(this.groups && this.groups.length) {
+                            toPlot.forEach((curve,index) => curve.color = getStaticColor(index));
                         }
-                        curveParams = curveParams.set(`${keys.phenophaseIdKey}[0]`,`${c.phenophase[keys.phenophaseIdKey]}`);
-                        if(c.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                            curveParams = curveParams.set('pheno_class_aggregate','1');
-                        }
-                        return this.serviceUtils.cachedPost(this.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json'),curveParams.toString())
-                            .then(data => c.data(data));
+                        return toPlot;
+                    })
+                    .catch(err => {
+                        this.working = false;
+                        //throw err;
+                        this.handleError(err);
+                        return [];
                     });
-                    return Promise.all(promises)
-                        .then(() => this.working = false)
-                        .catch(err => {
-                            this.working = false;
-                            //throw err;
-                            this.handleError(err);
-                        });
-            });        
+            });    
     }
 
     protected handleError(error: any): void {

@@ -7,18 +7,27 @@ import {NpnLibModule,NpnCommonModule,VisualizationsModule,NPN_BASE_HREF,NpnConfi
 import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
 import {ResourcesComponent} from './resources.component';
-import {RefugeDashboardComponent} from './refuge-dashboard.component';
-import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent,VisualizationScopeSelectionComponent} from './new-visualization-dialog.component';
-import {RefugeService} from './refuge.service';
+import {FwsDashboardComponent} from './fws-dashboard.component';
+import {PhenologyTrailPartnersComponent} from './phenology-trail-partners.component';
+import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent} from './new-visualization-dialog.component';
+import { RefugeVisualizationScopeSelectionComponent } from "./refuge-visualization-scope-selection.component";
+import { PhenoTrailVisualizationScopeSelectionComponent } from './pheno-trail-visualization-scope-selection.component';
+import { PhenoTrailVisualizationScopeGroupsComponent } from './pheno-trail-visualization-scope-groups.component';
+import { PhenoTrailVisualizationScopeGroupComponent } from './pheno-trail-visualization-scope-group.component';
+import { PhenoTrailVisualizationScopeStationGroupsComponent } from './pheno-trail-visualization-scope-station-groups.component';
+
+import {EntityService} from './entity.service';
 
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatCheckboxModule,MatGridListModule,MatCardModule,MatListModule,
         MatTooltipModule,MatSnackBarModule,MatDialogModule,MatStepperModule,
         MatButtonModule,MatRadioModule,MatProgressSpinnerModule,MatSelectModule,
-        MatInputModule,MatFormFieldModule,MatTabsModule,MatButtonToggleModule} from '@angular/material';
+        MatInputModule,MatFormFieldModule,MatTabsModule,MatButtonToggleModule,MatIconModule} from '@angular/material';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {environment} from '../environments/environment';
 import {AgmCoreModule} from '@agm/core';
@@ -34,12 +43,17 @@ export function npnConfigurationFactory() {
 
 @NgModule({
   declarations: [
-    RefugeDashboardComponent,
+    FwsDashboardComponent,
+    PhenologyTrailPartnersComponent,
     FocalSpeciesComponent,
     FindingsComponent,
     ResourcesComponent,
     NewVisualizationBuilderComponent,
-    VisualizationScopeSelectionComponent,
+    RefugeVisualizationScopeSelectionComponent,
+    PhenoTrailVisualizationScopeSelectionComponent,
+    PhenoTrailVisualizationScopeGroupsComponent,
+    PhenoTrailVisualizationScopeGroupComponent,
+    PhenoTrailVisualizationScopeStationGroupsComponent,
     NewVisualizationDialogComponent
   ],
   entryComponents: [
@@ -53,6 +67,7 @@ export function npnConfigurationFactory() {
     NpnCommonModule,
     HttpClientModule,
     FormsModule,ReactiveFormsModule,
+    FontAwesomeModule,MatIconModule,
     MatCheckboxModule,MatGridListModule,
     MatCardModule,MatListModule,
     MatTooltipModule,MatSnackBarModule,
@@ -66,9 +81,9 @@ export function npnConfigurationFactory() {
     }),
     DndModule.forRoot()
   ],
-  bootstrap: [RefugeDashboardComponent],
+  bootstrap: [FwsDashboardComponent],
   providers: [
-      RefugeService,
+      EntityService,
       {provide:NPN_BASE_HREF,useFactory:baseHrefFactory},
       {provide:NPN_CONFIGURATION,useFactory:npnConfigurationFactory}
   ]

@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
-import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor } from '../common';
+import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT, GroupHttpParams, SelectionGroup } from './vis-selection';
 
 export interface SiteOrSummaryPlot extends SpeciesPlot {
     [x: string]: any;
@@ -8,6 +8,7 @@ export interface SiteOrSummaryPlot extends SpeciesPlot {
 
 export interface SiteOrSummaryPlotData {
     plot: SiteOrSummaryPlot;
+    group?: SelectionGroup;
     data: any[];
 }
 
@@ -30,9 +31,10 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
 
     constructor(
         protected serviceUtils:NpnServiceUtils,
-        protected speciesService:SpeciesService
+        protected speciesService:SpeciesService,
+        protected networkService:NetworkService
     ) {
-        super(serviceUtils);
+        super(serviceUtils,networkService);
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
@@ -113,25 +115,42 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 }
                 return filtered;
             };
+        const fetchDataForPlot = (baseParams,plot,plotIndex,group?) => {
+            const keys = getSpeciesPlotKeys(plot);
+            let params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
+            if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+                params = params.set('taxonomy_aggregate','1');
+            }
+            if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+                params = params.set('pheno_class_aggregate','1');
+            }
+            params = params.set('climate_data','1');
+            return this.serviceUtils.cachedPost(url,params.toString())
+                .then(data => filterLqd(data,plot,plotIndex))
+                .then(data => ({plot,data,group}));
+        };
         this.working = true;
         return this.toURLSearchParams()
-            .then(baseParams => Promise.all(
-                    this.validPlots.map((plot,plotIndex) => {
-                        const keys = getSpeciesPlotKeys(plot);
-                        let params = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
-                            .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
-                        if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                            params = params.set('taxonomy_aggregate','1');
-                        }
-                        if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                            params = params.set('pheno_class_aggregate','1');
-                        }
-                        params = params.set('climate_data','1');
-                        return this.serviceUtils.cachedPost(url,params.toString())
-                            .then(data => filterLqd(data,plot,plotIndex))
-                            .then(data => ({plot,data}))
-                    })
-            ))
+            .then(baseParams => {
+                const validPlots = this.validPlots;
+                return (this.groups && this.groups.length )
+                    ? this.toGroupHttpParams(baseParams)
+                        .then((groupParams:GroupHttpParams[]) => {
+                            // multiply plots by groups
+                            let plotIndex = 0; // just for logging
+                            const promises = groupParams.reduce((promises,gp) => {
+                                validPlots.forEach(p => {
+                                    const plot = JSON.parse(JSON.stringify(p));
+                                    plot.color = getStaticColor(plotIndex);
+                                    promises.push(fetchDataForPlot(gp.params,plot,plotIndex++,gp.group));
+                                });
+                                return promises;
+                            },[]);
+                            return Promise.all(promises);
+                        })
+                    : Promise.all(validPlots.map((plot,plotIndex) => fetchDataForPlot(baseParams,plot,plotIndex)));
+            })
             .then((results) => {
                 this.working = false;
                 return results;

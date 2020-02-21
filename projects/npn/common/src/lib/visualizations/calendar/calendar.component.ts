@@ -9,6 +9,7 @@ import {SvgVisualizationBaseComponent} from '../svg-visualization-base.component
 import {Axis,axisBottom,axisRight} from 'd3-axis';
 import {ScaleBand,scaleBand} from 'd3-scale';
 import * as d3 from 'd3';
+import { ObservationDatePlotData } from '../observation-date-vis-selection';
 
 @Component({
     selector: 'calendar',
@@ -28,7 +29,7 @@ export class CalendarComponent extends SvgVisualizationBaseComponent {
     yAxis: Axis<number>
 
     private processed:ObservationDateData;
-    private data:any[];
+    private data:ObservationDatePlotData[];
 
     constructor(protected rootElement: ElementRef, protected media: ObservableMedia) {
         super(rootElement,media);

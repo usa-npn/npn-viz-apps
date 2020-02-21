@@ -1,9 +1,9 @@
-import {Component,Inject,Input,OnInit, ViewEncapsulation} from '@angular/core';
+import {Component,Inject,Input,OnInit, ViewEncapsulation, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA,MatDialogRef} from '@angular/material';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import {Refuge} from './refuge.service';
-import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSelection,
+import {EntityBase, Refuge, PhenologyTrail, DashboardMode, DashboardModeState} from './entity.service';
+import {VisSelection,NetworkAwareVisSelection,StationAwareVisSelection,
         ActivityCurvesSelection,ScatterPlotSelection,CalendarSelection,
         ObserverActivitySelection,ObservationFrequencySelection,ClippedWmsMapSelection} from '@npn/common';
 
@@ -15,11 +15,12 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step *ngIf="stationAware" [stepControl]="step1FormGroup" label="Select sites">
             <div class="step-wrapper">
                 <div class="step-content">
-                    <visualization-scope-selection [selection]="selection" [refuge]="refuge"></visualization-scope-selection>
+                    <refuge-visualization-scope-selection *ngIf="mode === 'refuge'" [selection]="selection" [refuge]="entity" #scopeSelection></refuge-visualization-scope-selection>
+                    <pheno-trail-visualization-scope-selection *ngIf="mode === 'phenology_trail'" [selection]="selection" [phenoTrail]="entity" #scopeSelection></pheno-trail-visualization-scope-selection>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
-                    <button mat-raised-button matStepperNext>Next</button>
+                    <button mat-raised-button matStepperNext [disabled]="!!scopeSelection && !scopeSelection.valid">Next</button>
                 </div>
             </div>
         </mat-step>
@@ -27,12 +28,12 @@ import {VisSelection,NetworkService,NetworkAwareVisSelection,StationAwareVisSele
         <mat-step [stepControl]="step2FormGroup" label="Build visualization">
             <div *ngIf="showVis" class="step-wrapper">
                 <div class="step-content">
-                    <new-visualization-builder [selection]="selection" [refuge]="refuge"></new-visualization-builder>
+                    <new-visualization-builder [selection]="selection" [entity]="entity"></new-visualization-builder>
                 </div>
                 <div class="step-nav">
                     <button mat-raised-button (click)="dialogRef.close()">Cancel</button>
                     <button mat-raised-button *ngIf="stationAware" matStepperPrevious>Back</button>
-                    <button mat-raised-button matStepperNext>Next</button>
+                    <button mat-raised-button matStepperNext [disabled]="!selection.isValid()">Next</button>
                 </div>
             </div>
         </mat-step>
@@ -110,9 +111,12 @@ export class NewVisualizationDialogComponent implements OnInit {
     step3FormGroup: FormGroup;
     showVis:number;
     showDetails:boolean;
-
-    refuge:Refuge;
+    mode:DashboardMode = DashboardModeState.get();
+    entity:EntityBase;
     selection: VisSelection;
+
+    @ViewChild('scopeSelection')
+    scopeSelection:any; // should there be a common base class?
 
     constructor(private formBuilder: FormBuilder,
                 private dialogRef: MatDialogRef<NewVisualizationDialogComponent>,
@@ -127,7 +131,7 @@ export class NewVisualizationDialogComponent implements OnInit {
             thirdCtrl: ['',Validators.required]
         });
         this.selection = data.selection as VisSelection;
-        this.refuge = data.refuge;
+        this.entity = data.entity;
         this.edit = data.edit;
     }
 
@@ -143,7 +147,11 @@ export class NewVisualizationDialogComponent implements OnInit {
         this.showVis = !this.stationAware ? 1 : 0;
         if(s instanceof NetworkAwareVisSelection) {
             if(!s.networkIds || !s.networkIds.length) { // don't change on edit (not necessary but seems appropriate)
-                s.networkIds = [this.refuge.network_id];
+                if(this.entity instanceof Refuge) {
+                    s.networkIds = [this.entity.network_id];
+                } else if (this.entity instanceof PhenologyTrail) {
+                    s.networkIds = this.entity.network_ids.slice();
+                }
             }
         }
         if(this.edit) {
@@ -180,6 +188,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     <clipped-wms-map-control *ngIf="clipped" [selection]="clipped"></clipped-wms-map-control>
 
     <npn-visualization *ngIf="selection" [selection]="selection"></npn-visualization>
+    <!--pre *ngIf="selection">{{selection.external | json}}</pre-->
     `,
     styles:[`
         npn-visualization {
@@ -192,7 +201,7 @@ export class NewVisualizationBuilderComponent implements OnInit {
     @Input()
     selection: VisSelection;
     @Input()
-    refuge: Refuge;
+    entity: EntityBase;
 
     scatter: ScatterPlotSelection;
     calendar: CalendarSelection;
@@ -215,80 +224,12 @@ export class NewVisualizationBuilderComponent implements OnInit {
         } else if (s instanceof ObservationFrequencySelection) {
             this.observationFreq = s;
         } else if (s instanceof ClippedWmsMapSelection) {
+            // this visualization only supported for Refuge
             this.clipped = s;
-            s.fwsBoundary = this.refuge.boundary_id;
+            s.fwsBoundary = (this.entity as Refuge).boundary_id;
         }
         s.resize();
     }
 }
 
-@Component({
-    selector: 'visualization-scope-selection',
-    template: `
-    <mat-radio-group name="visScope" class="vis-scope-input" [(ngModel)]="visScope" (change)="scopeChanged()">
-      <!--mat-radio-button class="vis-scope-radio" [value]="'all'">No restrictions</mat-radio-button-->
-      <mat-radio-button class="vis-scope-radio" [value]="'refuge'">Show data for all sites at "{{refuge.title}}"</mat-radio-button>
-      <mat-radio-button class="vis-scope-radio" [value]="'station'">Show data for select sites at "{{refuge.title}}"</mat-radio-button>
-    </mat-radio-group>
-    <mat-progress-spinner *ngIf="stationFetch" mode="indeterminate"></mat-progress-spinner>
-    <div *ngIf="visScope === 'station' && stations && stations.length">
-        <mat-checkbox *ngFor="let s of stations" class="station-input" [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
-    </div>
-    `,
-    styles:[`
-        .vis-scope-input {
-          display: inline-flex;
-          flex-direction: column;
-        }
-        .vis-scope-radio {
-          margin: 5px;
-        }
-        .station-input {
-            display: block;
-        }
-    `]
-})
-export class VisualizationScopeSelectionComponent {
-    @Input()
-    selection: VisSelection;
-    @Input()
-    refuge: Refuge;
 
-    visScope:string = 'refuge';
-    stationFetch:boolean = false;
-    stations:any[];
-
-    constructor(private networkService:NetworkService) {}
-
-    scopeChanged() {
-        this.selection.networkIds = [];
-        this.selection.stationIds = [];
-        switch(this.visScope) {
-            case 'all':
-                break;
-            case 'refuge':
-                this.selection.networkIds = [this.refuge.network_id];
-                break;
-            case 'station':
-                this.selection.networkIds = [this.refuge.network_id];
-                if(!this.stations) {
-                    this.stationFetch = true;
-                    this.networkService.getStations(this.refuge.network_id)
-                        .then(stations => {
-                            stations.forEach(s => s.selected = true);
-                            this.stations = stations;
-                            this.stationFetch = false;
-                        })
-                        .catch(e => {
-                            this.stationFetch = false;
-                            console.error(e);
-                        });
-                }
-                break;
-        }
-    }
-
-    stationChange() {
-        this.selection.stationIds = this.stations.filter(s => s.selected).map(s => s.station_id);
-    }
-}

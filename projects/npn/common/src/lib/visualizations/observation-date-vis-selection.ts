@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
-import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT } from './vis-selection';
-import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService } from '../common';
+import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT, SelectionGroup, GroupHttpParams } from './vis-selection';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor } from '../common';
 
 export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
@@ -15,6 +15,12 @@ export interface ObservationDataDataPoint {
 export interface ObservationDateData {
     labels: string[];
     data: ObservationDataDataPoint[];
+}
+
+export interface ObservationDatePlotData {
+    plot: ObservationDatePlot;
+    group?: SelectionGroup;
+    data: any;
 }
 
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
@@ -31,12 +37,16 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     @selectionProperty()
     plots: ObservationDatePlot[] = [];
 
+    /** The maximum number of plots we want to allow. */
+    readonly MAX_PLOTS:number = 10;
+
     constructor(
         protected serviceUtils:NpnServiceUtils,
         protected speciesTitle:TaxonomicSpeciesTitlePipe,
-        protected speciesService:SpeciesService
+        protected speciesService:SpeciesService,
+        protected networkService:NetworkService
     ) {
-        super(serviceUtils);
+        super(serviceUtils,networkService);
     }
 
     isValid(): boolean {
@@ -45,8 +55,22 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
 
     get validPlots(): ObservationDatePlot[] {
         return (this.plots || []).filter(p => {
-            return p.color && p.species && p.phenophase;
+            return p.species && p.phenophase && 
+                // color only required if not grouping
+                (p.color || (this.groups && this.groups.length > 0));
         });
+    }
+
+    /**
+     * Indicates whether or not adding one more plot will result in a visualization exceeding
+     * the maximum number of allowed plots.
+     */
+    get canAddPlot():boolean {
+        const years = this.years ? this.years.length : 0;
+        const groups = this.groups ? this.groups.length : 0;
+        const next_plots = ((this.plots ? this.plots.length : 0)+1)*years;
+        const next_count = groups ? (groups * next_plots) : next_plots;
+        return next_count <= this.MAX_PLOTS;
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
@@ -84,12 +108,12 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             });
     }
 
-    postProcessData(data: any): ObservationDateData {
+    postProcessData(data: ObservationDatePlotData[]): ObservationDateData {
         if (!data || !data.length) {
             return null;
         }
-        const validPlots = this.validPlots;
-        let y = (validPlots.length * this.years.length) -1;
+        const plots = data.map(d => d.plot);
+        let y = (plots.length * this.years.length) -1;
         const addDoys = (doys, color) => {
             doys.forEach(doy => {
                 response.data.push({
@@ -103,8 +127,10 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             labels: [],
             data: []
         };
-        validPlots.forEach((plot,i) => {
-            const rData:any= data[i][0];
+        data.forEach(d => {
+            const plot = d.plot;
+            const group = d.group;
+            const rData:any= d.data;
             let pPhases = {years:{}}; // empty
             const pPhaseKey = plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS ? 'pheno_classes' : 'phenophases';
             if(rData && rData[pPhaseKey] && rData[pPhaseKey].length) {
@@ -118,7 +144,12 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                     addDoys(pPhases.years[year].positive,plot.color);
                 }
                 const pp = plot.phenophase as any;
-                response.labels.splice(0, 0, ' (' + year + '): ' + this.speciesTitle.transform(plot.species,plot.speciesRank) + ' - ' + (pp.phenophase_name||pp.pheno_class_name));
+                response.labels.splice(0, 0, 
+                    ` ${year}: `+
+                    this.speciesTitle.transform(plot.species,plot.speciesRank) +
+                    ' - '+
+                    (pp.phenophase_name||pp.pheno_class_name)+
+                    (!!group ? ` (${group.label})` : ''));
                 y--;
             })
         });
@@ -126,29 +157,55 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         return response;
     }
 
-    getData(): Promise<any> {
+    getData(): Promise<ObservationDatePlotData[]> {
+        // work around TypeScript Promise.all issue
+        return this._getData();
+    }
+
+    private _getData(): Promise<any> {
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
+        const fetchDataForPlot = (baseParams,plot,group?) => {
+            const keys = getSpeciesPlotKeys(plot);
+            let plotParams = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
+                .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
+            if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+                plotParams = plotParams.set('taxonomy_aggregate','1');
+            }
+            if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+                plotParams = plotParams.set('pheno_class_aggregate','1');
+            }
+            return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString())
+                .then((results:any[]) => {
+                    const data = results[0];
+                    return {plot,data,group};
+                });
+        };
         this.working = true;
         const serviceUrl = this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json');
         return this.toURLSearchParams()
             // one request per valid plot
-            .then(params => Promise.all(
-                    this.validPlots.map(plot => {
-                        const keys = getSpeciesPlotKeys(plot);
-                        let plotParams = params.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
-                            .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
-                        if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                            plotParams = plotParams.set('taxonomy_aggregate','1');
-                        }
-                        if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                            plotParams = plotParams.set('pheno_class_aggregate','1');
-                        }
-                        return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString());
-                    })
-                )
-            )
+            .then(baseParams => {
+                const validPlots = this.validPlots;
+                return (this.groups && this.groups.length)
+                    ? this.toGroupHttpParams(baseParams)
+                        .then((groupParams:GroupHttpParams[]) => {
+                            let plotIndex = 0;
+                            // just to make TypeScript happy...
+                            const arr:Promise<ObservationDatePlotData>[] = [];
+                            const promises = validPlots.reduce((promises,p) => {
+                                groupParams.forEach(gp => {
+                                    const plot = JSON.parse(JSON.stringify(p));
+                                    plot.color = getStaticColor(plotIndex++);
+                                    promises.push(fetchDataForPlot(gp.params,plot,gp.group));
+                                });
+                                return promises;
+                            },arr);
+                            return Promise.all(promises);
+                        })
+                    : Promise.all(validPlots.map(plot => fetchDataForPlot(baseParams,plot)));
+            })
             .then(result => {
                 this.working = false;
                 return result;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NpnServiceUtils, TaxonomicSpeciesTitlePipe, SpeciesService } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesTitlePipe, SpeciesService, NetworkService } from '../../common';
 import { CalendarSelection } from './calendar-selection';
 
 @Injectable()
@@ -9,10 +9,11 @@ export class CalendarSelectionFactory {
     constructor(
         private serviceUtils:NpnServiceUtils,
         private speciesTitle:TaxonomicSpeciesTitlePipe,
-        private speciesService:SpeciesService
+        private speciesService:SpeciesService,
+        private networkService:NetworkService
     ) {}
 
     newSelection(): CalendarSelection {
-        return new CalendarSelection(this.serviceUtils,this.speciesTitle,this.speciesService);
+        return new CalendarSelection(this.serviceUtils,this.speciesTitle,this.speciesService,this.networkService);
     }
 }

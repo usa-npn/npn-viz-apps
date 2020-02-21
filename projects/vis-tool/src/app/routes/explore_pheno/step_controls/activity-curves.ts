@@ -1,6 +1,6 @@
 import { BaseStepComponent, BaseControlComponent } from './base';
 import { Component, ViewEncapsulation, QueryList, ViewChildren } from '@angular/core';
-import { ActivityCurvesSelection, ActivityCurve, SPECIES_PHENO_INPUT_COLORS, CurveControlComponent } from '@npn/common';
+import { ActivityCurvesSelection, ActivityCurve, STATIC_COLORS, CurveControlComponent } from '@npn/common';
 import { VisConfigStep, StepState } from '../interfaces';
 import { faChartLine } from '@fortawesome/pro-light-svg-icons';
 
@@ -110,8 +110,7 @@ export class ActivityCurvesControlComponent extends BaseControlComponent {
     addCurve() {
         const curve = new ActivityCurve();
         curve.id = this.selection.curves.length;
-        curve.color = SPECIES_PHENO_INPUT_COLORS[curve.id];
-        curve.interpolate = this.selection.curves[0].interpolate;
+        curve.color = STATIC_COLORS[curve.id];
         curve.selection = this.selection;
         this.selection.curves.push(curve);
     }

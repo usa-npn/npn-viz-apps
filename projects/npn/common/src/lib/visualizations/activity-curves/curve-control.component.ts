@@ -4,8 +4,9 @@ import {FormControl} from '@angular/forms';
 import {MonitorsDestroy} from '../../common';
 import {ActivityCurve} from './activity-curve';
 import {ActivityCurvesSelection} from './activity-curves-selection';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
+import { VisSelectionEvent } from '../vis-selection';
 
 @Component({
     selector: 'curve-selection-control',
@@ -82,6 +83,12 @@ export class CurveControlComponent extends MonitorsDestroy {
     })();
 
     ngOnInit() {
+        this.selection.pipe(
+            filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
+            debounceTime(500),
+            takeUntil(this.componentDestroyed)
+        ).subscribe(() => this.updateCriteria());
+
         this.yearControl = new FormControl(this.curve.year,/*Validators.required*/(c) => {
             if(this.required && !c.value) {
                 return {

@@ -22,7 +22,7 @@ import {ActivityCurvesSelectionFactory,ActivityCurvesComponent,CurveControlCompo
 import {ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,ClippedStatValuePipe,ClippedWmsMapSelectionFactory} from './clipped-wms-map';
 //import {ClippedWmsMapVisModule} from './clipped-wms-map';
 import {ObserverActivitySelectionFactory,ObserverActivityComponent,ObserverActivityControl} from './observer-activity';
-import {ObservationFrequencySelectionFactory,ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent} from './observation-frequency';
+import {ObservationFrequencySelectionFactory,ObservationFrequencyComponent,ObservationFrequencyControl} from './observation-frequency';
 
 import {
     MapSelectionFactory,
@@ -45,11 +45,9 @@ import {
 import {VisualizationComponent} from './visualization.component';
 
 import {VisualizationSelectionFactory} from './visualization-selection-factory.service';
-import {SpeciesPhenophaseInputComponent,YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
+import {YearRangeInputComponent,HigherSpeciesPhenophaseInputComponent} from './common-controls';
 
-import {BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,
+import {MatFormFieldModule,MatButtonModule, MatCheckboxModule, MatSelectModule,MatRadioModule,
         MatExpansionModule,MatAutocompleteModule,
         MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule,
         MatDatepickerModule, MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material';
@@ -68,7 +66,7 @@ import {NpnGriddedModule} from '../gridded';
     CommonModule,
     FormsModule,ReactiveFormsModule,
     FontAwesomeModule,
-    MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,
+    MatFormFieldModule,MatButtonModule, MatCheckboxModule,MatSelectModule,MatRadioModule,
     MatExpansionModule,MatAutocompleteModule,
     MatInputModule, MatSliderModule, MatProgressBarModule, MatTooltipModule, MatDatepickerModule,
     MatNativeDateModule,
@@ -83,12 +81,11 @@ import {NpnGriddedModule} from '../gridded';
       CalendarComponent,CalendarControlComponent,
       ActivityCurvesComponent,CurveControlComponent,ActivityCurvesControlComponent,
       ObserverActivityComponent,ObserverActivityControl,
-      ObservationFrequencyComponent,ObservationFrequencyControl,ObvervationFrequencyStationControlComponent /* not exported private */,
+      ObservationFrequencyComponent,ObservationFrequencyControl,
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,ClippedStatValuePipe /* not exported */,
       MapVisualizationComponent,
       VisualizationDownloadComponent,
       VisualizationComponent,
-      SpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       HigherSpeciesPhenophaseInputComponent,
 
@@ -107,7 +104,6 @@ import {NpnGriddedModule} from '../gridded';
       ClippedWmsMapComponent,ClippedWmsMapControl,ClippedWmsMapStatisticsComponent,
       MapVisualizationComponent,
       VisualizationComponent,
-      SpeciesPhenophaseInputComponent,
       HigherSpeciesPhenophaseInputComponent,
       YearRangeInputComponent,
       ExtentControl,

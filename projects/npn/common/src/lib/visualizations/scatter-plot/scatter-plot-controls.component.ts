@@ -1,22 +1,29 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input } from '@angular/core';
 
 import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
+import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
+import * as d3 from 'd3';
+import { MonitorsDestroy } from '@npn/common/common';
+import { takeUntil, filter, debounceTime } from 'rxjs/operators';
+import { VisSelectionEvent } from '../vis-selection';
+import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 
 @Component({
     selector: 'scatter-plot-control',
     template: `
-    <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="updateChange()" (onEndChange)="updateChange()"></year-range-input>
+    <div *ngIf="!selection.canAddPlot" class="max-plots-reached"><fa-icon [icon]="faExclamationTriangle"></fa-icon> One more plot would exceed the maximum of {{selection.MAX_PLOTS}} allowed</div>
+    <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="yearChange()" (onEndChange)="yearChange()"></year-range-input>
 
     <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
-        <species-phenophase-input
-            [(species)]="spi.species" [(phenophase)]="spi.phenophase" [(color)]="spi.color"
+        <higher-species-phenophase-input
+            gatherColor="true"
             [selection]="selection"
-            [gatherColor]="true"
-            (onSpeciesChange)="updateChange()"
-            (onPhenophaseChange)="updateChange()"
-            (onColorChange)="redrawChange($event)"></species-phenophase-input>
-        <button *ngIf="idx > 0" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
-        <button *ngIf="selection.plots.length < 3 && idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid()" (click)="addPlot()">Add</button>
+            [criteria]="criteria"
+            [plot]="spi"
+            (plotChange)="selection.update()">
+        </higher-species-phenophase-input>
+        <button *ngIf="selection.plots.length > 1" mat-button class="remove-plot" (click)="removePlot(idx)">Remove</button>
+        <button *ngIf="idx === (selection.plots.length-1)" mat-button class="add-plot" [disabled]="!plotsValid() || !selection.canAddPlot" (click)="addPlot()">Add</button>
     </div>
 
     <div>
@@ -28,8 +35,7 @@ import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
 
         <mat-checkbox [(ngModel)]="selection.regressionLines" (change)="redrawChange()">Fit Lines</mat-checkbox>
 
-        <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="updateChange()">Use Individual Phenometrics</mat-checkbox>
-
+        <mat-checkbox [(ngModel)]="selection.individualPhenometrics" (change)="selection.update()">Use Individual Phenometrics</mat-checkbox>
     </div>
     `,
     styles: [`
@@ -44,37 +50,44 @@ import {ScatterPlotSelection,AXIS} from './scatter-plot-selection';
         }
     `]
 })
-export class ScatterPlotControls implements OnInit {
+export class ScatterPlotControlsComponent extends MonitorsDestroy {
     @Input()
     selection: ScatterPlotSelection;
     axis = AXIS;
+    criteria:HigherSpeciesPhenophaseInputCriteria;
 
-    updateSent:boolean = false;
+    faExclamationTriangle = faExclamationTriangle;
 
     ngOnInit() {
+        this.selection.pipe(
+            filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
+            debounceTime(500),
+            takeUntil(this.componentDestroyed)
+        ).subscribe(() => this.updateCriteria());
+        
         if(this.selection.plots.length === 0) {
             this.addPlot();
         }
+        setTimeout(() => this.updateCriteria());
     }
 
-    updateChange() {
-        if(this.selection.isValid()) {
-            this.selection.update();
-            this.updateSent = true;
-        }
+    yearChange() {
+        this.updateCriteria();
+        this.selection.update();
+    }
+
+    updateCriteria() {
+        this.criteria = {
+            years: d3.range(this.selection.start,this.selection.end+1),
+            stationIds: this.selection.getStationIds()
+        };
     }
 
     redrawChange(change?) {
-        if(this.selection.isValid()) {
-            if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
-                this.updateChange();
-            } else {
-                if(this.updateSent) {
-                    this.selection.redraw();
-                } else {
-                    this.updateChange();
-                }
-            }
+        if(change && !change.oldValue && change.newValue) { // e.g. no color to a color means a plot that wasn't valid is now potentially valid.
+            this.selection.update();
+        } else {
+            this.selection.redraw();
         }
     }
 
@@ -84,7 +97,7 @@ export class ScatterPlotControls implements OnInit {
 
     removePlot(index:number) {
         this.selection.plots.splice(index,1);
-        this.updateChange();
+        this.selection.update();
     }
 
     plotsValid() {

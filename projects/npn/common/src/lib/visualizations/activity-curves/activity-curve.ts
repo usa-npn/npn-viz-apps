@@ -1,4 +1,4 @@
-import {selectionProperty,GET_EXTERNAL,SET_EXTERNAL} from '../vis-selection';
+import {selectionProperty,GET_EXTERNAL,SET_EXTERNAL, GroupHttpParams, SelectionGroup} from '../vis-selection';
 import {
     TaxonomicSpeciesTitlePipe,
     DoyPipe,
@@ -7,17 +7,26 @@ import {
     TaxonomicSpeciesRank,
     TaxonomicPhenophaseType,
     TaxonomicPhenophaseRank,
-    SpeciesTitlePipe
+    SpeciesTitlePipe,
+    getSpeciesPlotKeys
 } from '../../common';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 
 import * as d3 from 'd3';
+import { HttpParams } from '@angular/common/http';
+
+export interface ActivityCurveMagnitudeData {
+    start_doy?: number;
+    end_doy?: number;
+    start_date: string;
+    end_date: string;
+}
 
 export class ActivityCurve implements SpeciesPlot {
     @selectionProperty()
     id:number;
 
-    interpolate? :INTERPOLATE;
+    childId:number = 0;
 
     @selectionProperty()
     speciesRank:TaxonomicSpeciesRank;
@@ -49,14 +58,40 @@ export class ActivityCurve implements SpeciesPlot {
     orient:string;
 
     doyFocus:number;
-    dataPoints:boolean = true;
 
-    private $data:any;
+    private $data:ActivityCurveMagnitudeData[];
     private $metricData:any;
     private $x;
     private $y;
 
     selection:ActivityCurvesSelection;
+    private _group:SelectionGroup;
+    private _children:ActivityCurve[];
+
+    private get children():ActivityCurve[] {
+        return this._children||[];
+    }
+
+    private get curveId():string {
+        return `${this.id}-${this.childId}`;
+    }
+
+    private copy(childIndex:number):ActivityCurve {
+        const copy = new ActivityCurve();
+        copy.id = this.id;
+        copy.childId = childIndex;
+        copy.color = this.color;
+        copy.orient = this.orient;
+        copy.speciesRank = this.speciesRank;
+        copy._species = this._species;
+        copy._metric = this._metric;
+        copy.phenophaseRank = this.phenophaseRank;
+        copy._phenophase = this._phenophase;
+        copy._year = this._year;
+        copy._color = this._color;
+        copy.selection = this.selection;
+        return copy;
+    }
 
     get external() { return GET_EXTERNAL.apply(this,arguments); }
     set external(o) { SET_EXTERNAL.apply(this,arguments); }
@@ -64,6 +99,10 @@ export class ActivityCurve implements SpeciesPlot {
     private reset() {
         delete this.$data;
         delete this.$metricData;
+        this.children.forEach(c => {
+            delete c.$data;
+            delete c.$metricData;
+        });
     }
 
     private updateCheck(requiresUpdate?:boolean) {
@@ -82,6 +121,7 @@ export class ActivityCurve implements SpeciesPlot {
     set year(y) {
         this.reset();
         this._year = y;
+        this.children.forEach(c => c._year = y);
         this.updateCheck(true);
     }
 
@@ -91,6 +131,7 @@ export class ActivityCurve implements SpeciesPlot {
     set phenophase(p:TaxonomicPhenophaseType) {
         this.reset();
         this._phenophase = p;
+        this.children.forEach(c => c._phenophase = p);
         this.updateCheck(true);
     }
 
@@ -106,8 +147,12 @@ export class ActivityCurve implements SpeciesPlot {
         return this._metric;
     }
     set metric(m) {
-        this.reset();
+        delete this.$metricData;
         this._metric = m;
+        this.children.forEach(c => {
+            delete c.$metricData;
+            c._metric = m
+        });
         this.updateCheck();
     }
 
@@ -117,6 +162,7 @@ export class ActivityCurve implements SpeciesPlot {
     set species(s:TaxonomicSpeciesType) {
         this.reset();
         this._species = s;
+        this.children.forEach(c => c._species = s);
         this.phenophase = undefined;
         this._metrics = this._species && this._species.kingdom 
             ? (ACTIVITY_CURVE_KINGDOM_METRICS[this._species.kingdom]||[])
@@ -124,7 +170,7 @@ export class ActivityCurve implements SpeciesPlot {
         this._originalMetrics = this._metrics;
         if(this._metric && this._metrics.indexOf(this._metric) === -1) {
             // previous metric has become invalid
-            delete this.metric;
+            this.metric = undefined;
         }
         if(this._metrics.length && !this._metric) {
             this.metric = this._metrics[0];
@@ -169,7 +215,7 @@ export class ActivityCurve implements SpeciesPlot {
 
     doyDataValue() {
         let self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             value,d,i;
         if(self.doyFocus && data) {
             for(i = 0; i < data.length; i++) {
@@ -191,9 +237,11 @@ export class ActivityCurve implements SpeciesPlot {
     legendLabel(includeMetric:boolean) {
         let doyFocusValue = this.doyDataValue();
         const pp = this.phenophase as any;
-        return this.year+': '+SPECIES_TITLE(this.species,this.speciesRank)+' - '+(pp.phenophase_name||pp.pheno_class_name)+
-            (includeMetric ? (' ('+this.metric.label+')') : '')+
-            (typeof(doyFocusValue) !== 'undefined' ? (' ['+doyFocusValue+']') : '');
+        return `${this.year}: `+
+               SPECIES_TITLE(this.species,this.speciesRank)+' - '+(pp.phenophase_name||pp.pheno_class_name)+
+               (includeMetric ? ` (${this.metric.label})` : '')+
+               (this._group ? ` (${this._group.label})` : '')+
+               (typeof(doyFocusValue) !== 'undefined' ? ` [${doyFocusValue}]` : '');
     }
 
     /**
@@ -203,7 +251,12 @@ export class ActivityCurve implements SpeciesPlot {
         return this.metric? this.metric.id : undefined;
     }
 
-    data(_?):any {
+    group(g:SelectionGroup):ActivityCurve {
+        this._group = g;
+        return this;
+    }
+
+    data(_?:ActivityCurveMagnitudeData[]):ActivityCurveMagnitudeData[]|ActivityCurve {
         if(arguments.length) {
             delete this.$data;
             delete this.$metricData;
@@ -255,6 +308,55 @@ export class ActivityCurve implements SpeciesPlot {
         return data;
     }
 
+    private endDate(year) {
+        var now = new Date();
+        if(year === now.getFullYear()) {
+            return this.selection.datePipe.transform(now,'yyyy-MM-dd');
+        }
+        return year+'-12-31';
+    }
+
+    /**
+     * Load data for this curve, or curves.  This function will return
+     * multiple curves if its selection is using grouping.  In that case the
+     * returned curves will be copies of this curve with the corresponding data populated
+     * on them.  Changes to this curve (what to plot, year, etc.) will ripple down into
+     * the curve copies so when rendered (via draw) on a visualization they will update.
+     * 
+     * @param baseParams 
+     */
+    loadData(baseParams:HttpParams):Promise<ActivityCurve []> {
+        let curveParams = baseParams
+            .set('start_date',`${this.year}-01-01`)
+            .set('end_date',this.endDate(this.year));
+        const keys = getSpeciesPlotKeys(this);
+        curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${this.species[keys.speciesIdKey]}`);
+        if((this.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
+            curveParams = curveParams.set('taxonomy_aggregate','1');
+        }
+        curveParams = curveParams.set(`${keys.phenophaseIdKey}[0]`,`${this.phenophase[keys.phenophaseIdKey]}`);
+        if(this.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
+            curveParams = curveParams.set('pheno_class_aggregate','1');
+        }
+        const apiUrl = this.selection.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json');
+        if(this.selection.groups && this.selection.groups.length) {
+            return this.selection.toGroupHttpParams(curveParams)
+                .then((groupParams:GroupHttpParams[]) => {
+                    // parallel arrays
+                    this._children = groupParams.map((gp,i) => this.copy(i));
+                    return Promise.all(
+                        this._children.map((curve,i) => this.selection.serviceUtils
+                            .cachedPost(apiUrl,groupParams[i].params.toString())
+                            .then(data => curve.group(groupParams[i].group).data(data) as ActivityCurve))
+                    )
+                });
+        } else {
+            return this.selection.serviceUtils
+                .cachedPost(apiUrl,curveParams.toString())
+                .then(data => [this.data(data) as ActivityCurve]);
+        }   
+    }
+
     axis() {
         var y = this.y(),
             ticks = y.ticks(), // default is ~10 ticks
@@ -298,7 +400,12 @@ export class ActivityCurve implements SpeciesPlot {
     plotted(): boolean {
         // not keeping track of a flag but curves are plotted if they
         // are valid and have data
-        return this.isValid() && this.data();
+        const data = this.data() as ActivityCurveMagnitudeData[];
+        if(this.isValid() && !!data) {
+            return true; // this curve is plotted
+        }
+        // plotted if any children are plotted
+        return this.children.reduce((plotted,child) => (plotted||(child.plotted ? true: false)),false);
     }
 
     shouldRevisualize():boolean {
@@ -307,7 +414,7 @@ export class ActivityCurve implements SpeciesPlot {
 
     domain() {
         var self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             extents;
         if(data && self.metric) {
             extents = d3.extent(data,function(d){
@@ -326,15 +433,26 @@ export class ActivityCurve implements SpeciesPlot {
         }
     }
 
+    /**
+     * Searches this curve's data for a data point nearest to a doy.
+     * 
+     * @param doy The doy to find the nearest data to.
+     * @returns ActivityCurveMagnitudeData or undefined
+     */
+    nearest(doy:number):ActivityCurveMagnitudeData {
+        const data = this.data() as ActivityCurveMagnitudeData[];
+        return data.reduce((found,md) => (found||(doy >= md.start_doy && doy <= md.end_doy ? md : undefined)),undefined);
+    }
+
     draw(chart) {
         let self = this,
-            data = self.data(),
+            data = self.data() as ActivityCurveMagnitudeData[],
             datas = [[]],
             x,y,i,d,dn,line,
             r = 3;
-        chart.selectAll(`g.curve.curve-${self.id}`).remove();
+        chart.selectAll(`g.curve.curve-${self.curveId}`).remove();
         const g = chart.append('g')
-            .attr('class',`curve curve-${self.id}`);
+            .attr('class',`curve curve-${self.curveId}`);
         if(data && data.length) {
             // detect any gaps in the data, break it into multiple curves/points
             // to plot
@@ -351,7 +469,7 @@ export class ActivityCurve implements SpeciesPlot {
             let x_functor = (d) => x(d.start_doy+Math.round((d.end_doy-d.start_doy)/2)),
                 y_functor = (d) => y(d[self.metric.id]);
             line = d3.line();
-            switch(self.interpolate) {
+            switch(self.selection.interpolate) {
                 case INTERPOLATE.monotone:
                     line.curve(d3.curveMonotoneX);
                     break;
@@ -367,10 +485,10 @@ export class ActivityCurve implements SpeciesPlot {
             console.debug('ActivityCurve.draw',self.species,self.phenophase,self.year,self.metric,self.domain(),y.domain());
             console.debug('draw.datas',datas);
             datas.forEach(function(curve_data,i){
-                if(curve_data.length === 1 || self.dataPoints) {
+                if(curve_data.length === 1 || self.selection.dataPoints) {
                     curve_data.forEach(function(d){
                         g.append('circle')
-                            .attr('class','curve-point curve-point-'+self.id)
+                            .attr('class','curve-point curve-point-'+self.curveId)
                             .attr('r',r)
                             .attr('fill',self.color)
                             .attr('cx',x_functor(d))
@@ -379,7 +497,7 @@ export class ActivityCurve implements SpeciesPlot {
                 }
                 if(curve_data.length > 1) {
                     g.append('path')
-                        .attr('class','curve curve-'+self.id)
+                        .attr('class','curve curve-'+self.curveId)
                         .attr('fill','none')
                         .attr('stroke',self.color)
                         .attr('stroke-linejoin','round')

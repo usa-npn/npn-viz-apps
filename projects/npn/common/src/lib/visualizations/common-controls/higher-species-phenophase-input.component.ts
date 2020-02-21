@@ -1,13 +1,18 @@
-import { MonitorsDestroy, SpeciesService, SpeciesPlot, TaxonomicSpeciesRank, SpeciesTaxonomicInfo, PhenophaseTaxonomicInfo } from '@npn/common/common';
 import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { VisSelection, BoundarySelection, StationAwareVisSelection } from '../vis-selection';
+import { VisSelection, StationAwareVisSelection, NetworkAwareVisSelection } from '../vis-selection';
 import { Subject, Observable, from, combineLatest, of } from 'rxjs';
 import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
-import { TaxonomicSpeciesTitlePipe } from '@npn/common/common/species-title.pipe';
+import { MonitorsDestroy,
+         SpeciesService,
+         SpeciesPlot,
+         TaxonomicSpeciesRank,
+         SpeciesTaxonomicInfo,
+         PhenophaseTaxonomicInfo,
+         TaxonomicSpeciesTitlePipe,
+         TaxonomicPhenophaseRank,
+         STATIC_COLORS } from '../../common';
 import { HttpParams } from '@angular/common/http';
-import { TaxonomicPhenophaseRank } from '@npn/common/common/phenophase';
-import { SPECIES_PHENO_INPUT_COLORS } from './species-phenophase-input.component';
 import { faInfoCircle } from '@fortawesome/pro-light-svg-icons';
 
 export interface HigherSpeciesPhenophaseInputCriteria {
@@ -16,11 +21,7 @@ export interface HigherSpeciesPhenophaseInputCriteria {
 }
 
 /**
- * It would be nice if interfaces were actually meaningful at runtime.
- * Using concrete classes, due to getters/setters, could be problematic
- * SO WRT to validity of phenophases for date ranges this control works on 
- * convention rather than introspection as follows; plot.year, selection.year,
- * selection.years, selection.start/end (TODO).
+ * Filtering of applicable species is based upon the `criteria` input.
  */
 @Component({
     selector: 'higher-species-phenophase-input',
@@ -49,7 +50,7 @@ export interface HigherSpeciesPhenophaseInputCriteria {
         <mat-progress-bar *ngIf="fetchingPhenophaseList" mode="query"></mat-progress-bar>
         <mat-hint *ngIf="phenophaseHint" align="end"><fa-icon [icon]="hintIcon" [matTooltip]="phenophaseHint"></fa-icon></mat-hint>
     </mat-form-field>
-    <mat-form-field *ngIf="gatherColor" class="color-input">
+    <mat-form-field *ngIf="actuallyGatherColor" class="color-input">
         <mat-select  [placeholder]="colorPlaceholder" [formControl]="color">
         <mat-select-trigger><div class="color-swatch" [ngStyle]="{'background-color':color.value}"></div></mat-select-trigger>
         <mat-option *ngFor="let c of colorList" [value]="c"><div class="color-swatch" [ngStyle]="{'background-color':c}"></div></mat-option>
@@ -114,9 +115,16 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     phenophaseHint;
     phenophaseTaxInfo:PhenophaseTaxonomicInfo; // just for debug purposes
 
+    ignoreGatherColor:boolean = false;
+    /**
+     * Whether or not to gather color and set on the plot
+     * This input is ignored if the selection is an instanceof NetworkAwareVisSelection
+     * and is using grouping.  In that scenario visualizations will need to calculate
+     * colors based on groups.length*plots.length.
+     */
     @Input() gatherColor:boolean = false;
     color:FormControl = new FormControl();
-    colorList:string[] = SPECIES_PHENO_INPUT_COLORS;
+    colorList:string[] = STATIC_COLORS;
 
     private group:FormGroup;
 
@@ -131,6 +139,13 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
     }
 
     ngOnInit() {
+        this.criteriaUpdate
+            .pipe(takeUntil(this.componentDestroyed))
+            .subscribe(() => this.ignoreGatherColor =
+                (this.selection instanceof NetworkAwareVisSelection &&
+                 !!this.selection.groups &&
+                 this.selection.groups.length > 0));
+
         const $speciesTaxonomicInfo:Observable<SpeciesTaxonomicInfo> = this.criteriaUpdate.pipe(
             tap(() => this.fetchingSpeciesList = true),
             switchMap(criteria => from((criteria.stationIds||Promise.resolve([])).then(stationIds => {
@@ -138,7 +153,27 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                         (stationIds||[]).forEach((id,idx) => params = params.set(`station_ids[${idx}]`,`${id}`))
                         return params;
                     })).pipe(
-                        switchMap(params => this.speciesService.getAllSpeciesHigher(params,criteria.years, this.selection.groupId, this.selection.personId))
+                        switchMap(params => {
+                            /*
+                            IMPORTANT: the network_id/person_id parameters are being added here to cover a special case when the
+                            vis tool is opened restricted to a network (groupId) or individual (personId).  The application very
+                            intentionally does not typically use these request parameters but translates results to lists of stations
+                            instead to support geographic boundaries.  Doing this creates a situation where a visitor _could_ more
+                            easily create a selection that results in no data on a visualization if they are using boundaries that do
+                            not intersect with the location of their stations.  This is assumed acceptable since they will either not
+                            use boundaries or know where their sites are located and draw boundaries accordingly...
+                             */
+                            if(this.selection instanceof StationAwareVisSelection) {
+                                const {groupId,personId} = this.selection;
+                                if(!!groupId) {
+                                    params = params.set('network_id', groupId);
+                                }
+                                if(!!personId) {
+                                    params = params.set('person_id', personId);
+                                }
+                            }
+                            return this.speciesService.getAllSpeciesHigher(params,criteria.years);
+                        })
                     )),
             tap(() => this.fetchingSpeciesList = false)
         );
@@ -229,13 +264,13 @@ console.log('speciesTaxInfo',info);
         // TODO deal with station_ids?
         const $phenophaseTaxInfo:Observable<PhenophaseTaxonomicInfo> = combineLatest(
             this.species.valueChanges,
-            this.criteriaUpdate
+            this.criteriaUpdate.pipe(debounceTime(500)),
         ).pipe(
             tap(() => this.fetchingPhenophaseList = true),
             switchMap(input => {
 console.log('$phenophaseTaxInfo.input',input);
                 const [species,criteria] = input;
-                return !!species
+                return !!species && typeof(species) === 'object'
                 ? from(
                     (criteria.years && criteria.years.length
                     ? this.speciesService.getPhenodefinitionsForYears(species,this.speciesRank.value,criteria.years)
@@ -336,7 +371,7 @@ console.log('phenophaseTaxInfo',info);
                 // TODO expand the condition that decides when a plot is complete...
                 map(v => !!v.speciesRank && !!v.species && typeof(v.species) === 'object'
                     && !!v.phenophase
-                    && (!this.gatherColor || !!v.color)
+                    && (!this.actuallyGatherColor || !!v.color)
                     ? v
                     : null
                 ),
@@ -349,7 +384,7 @@ console.log('phenophaseTaxInfo',info);
                     this.plot.species = v ? v.species : null;
                     this.plot.phenophaseRank = TaxonomicPhenophaseRank.CLASS;
                     this.plot.phenophase = v ? v.phenophase : null;
-                    if(this.gatherColor) {
+                    if(this.actuallyGatherColor) {
                         this.plot.color = v ? v.color : null;
                     } else {
                         delete this.plot.color; // just to be safe, mostly stesting
@@ -433,6 +468,10 @@ console.log('phenophaseTaxInfo',info);
 
     get phenophasePlaceholder():string {
         return 'Phenophase class' /*+ ((this.phenophaseList||[]).length ? ` (${(this.phenophaseList||[]).length})`: '')*/ + (this.required ? ' *' : '');
+    }
+
+    get actuallyGatherColor():boolean {
+        return this.gatherColor && !this.ignoreGatherColor;
     }
 
     get colorPlaceholder():string {

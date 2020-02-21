@@ -12,7 +12,7 @@ import { ActivityCurvesSelection } from './activity-curves-selection';
 import { Axis, axisBottom } from 'd3-axis';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import * as d3 from 'd3';
-import { ActivityCurve } from './activity-curve';
+import { ActivityCurve, ActivityCurveMagnitudeData } from './activity-curve';
 
 const ROOT_DATE = new Date(2010,0);
 const D3_DATE_FMT = d3.timeFormat('%m/%d');
@@ -54,6 +54,10 @@ const X_TICK_CFG = {
     }
 };
 
+const DEFAULT_TOP_MARGIN = 80;
+const LEGEND_VPAD = 4;
+const MARGIN_VPAD = 10;
+
 @Component({
     selector: 'activity-curves',
     templateUrl: '../svg-visualization-base.component.html',
@@ -66,17 +70,23 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     xAxis: Axis<number>;
 
     filename:string = 'activity-curves.png';
-    margins: VisualizationMargins = {top: 80,left: 80,right: 80,bottom: 80};
+    margins: VisualizationMargins = {top: DEFAULT_TOP_MARGIN,left: 80,right: 80,bottom: 80};
+
+    private _curves:ActivityCurve[];
 
     constructor(protected rootElement: ElementRef,protected media:ObservableMedia,private legendDoyPipe: LegendDoyPipe) {
         super(rootElement,media);
+    }
+
+    get curves():ActivityCurve[] {
+        return (this._curves||[]).filter(c => c.isValid());
     }
 
     /**
      * Organizes the valid curves into a map of metric to curves using that metric.
      */
     private byMetric() {
-        return this.selection.validCurves.reduce((map,c) => {
+        return this.curves.reduce((map,c) => {
             map[c.metric.id] = map[c.metric.id]||{
                 metric: c.metric,
                 curves: []
@@ -90,12 +100,12 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
      * Tests to see if the curves are all using the same metric.
      */
     private usingCommonMetric() {
-        const validCurves = this.selection.validCurves;
+        const curves = this.curves;
         // could be byMetric().length === 1 but this could be more performant
-        return validCurves.length > 0
+        return curves.length > 0
             // all curves using same metric.
-            ? validCurves.reduce((metric,curve) => metric === curve.metric ? metric : undefined,
-                validCurves[0].metric)
+            ? curves.reduce((metric,curve) => metric === curve.metric ? metric : undefined,
+                curves[0].metric)
             : undefined;
     }
 
@@ -113,47 +123,22 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 // the 150 below was picked just based on the site of the 'Activity Curves' title
                 .attr('transform',`translate(90,-${sizing.margin.top-10})`) // relative to the chart, not the svg
                 .style('font-size','1em');
-        const r = 5, vpad = 4;
         
-        let rowIndex = 0;
-        let inRow = 0;
-        let xTrans = 0;
-        const maxInRow = 3;
-        selection.validCurves.forEach((c) => {
-                if(c.plotted()) {
-                    const yTrans = (((inRow+1)*(this.baseFontSize() as number))+(inRow*vpad));
-                    const legendItem = legend.append('g')
-                        .attr('class',`legend-item curve-${c.id} row-${rowIndex}`)
-                        .attr('transform',`translate(${xTrans},${yTrans})`);
-                    legendItem.append('circle')
-                        .attr('r',r)
-                        .attr('fill',c.color);
-                    legendItem.append('text')
-                        .style('font-size', this.baseFontSize(true))
-                        .attr('x',(2*r))
-                        .attr('y',(r/2))
-                        .text(c.legendLabel(!commonMetric));
-                    if(++inRow === maxInRow) {
-                        const items = legend.selectAll(`.legend-item.row-${rowIndex}`);
-                        // based on children added calculate the current row width
-                        // and add it to how far we move items in the x direction
-                        let maxWidth = 0;
-                        items.each(function() {
-                            let w = (r*2)+10; // diameter of circle plue some padding
-                            d3.select(this)
-                                .selectAll('text')
-                                .each(function() {
-                                    w += (this as any).getBBox().width;
-                                });
-                            if(w > maxWidth) {
-                                maxWidth = w;
-                            }
-                        });
-                        rowIndex++;
-                        xTrans += maxWidth;
-                        inRow = 0;
-                    }
-                }
+        const r = 5;
+        this.curves.filter(c => c.plotted())
+            .forEach((curve,index) => {
+                const yTrans = (((index+1)*(this.baseFontSize() as number))+(index*LEGEND_VPAD));
+                const legendItem = legend.append('g')
+                    .attr('class',`legend-item curve-${curve.id} row-${index}`)
+                    .attr('transform',`translate(0,${yTrans})`);
+                legendItem.append('circle')
+                    .attr('r',r)
+                    .attr('fill',curve.color);
+                legendItem.append('text')
+                    .style('font-size', this.baseFontSize(true))
+                    .attr('x',(2*r))
+                    .attr('y',(r/2))
+                    .text(curve.legendLabel(!commonMetric));
             });
     }
 
@@ -181,13 +166,13 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .attr('x',0)
                 .text('hover doy');
         let focusOff = () => {
-                selection.validCurves.forEach(function(c) { delete c.doyFocus; });
+                this.curves.forEach(function(c) { delete c.doyFocus; });
                 hover.style('display','none');
                 this.updateLegend();
             },
             focusOn = () => {
                 // only turn on if something has been plotted
-                if(selection.validCurves.reduce(function(plotted,c){
+                if(this.curves.reduce(function(plotted,c){
                         return plotted||c.plotted();
                     },false)) {
                     hover.style('display',null);
@@ -200,15 +185,12 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 xCoord = coords[0],
                 yCoord = coords[1],
                 doy = Math.round(x.invert(xCoord)),
-                validCurves = selection.validCurves,
-                dataPoint = validCurves.reduce(function(dp,curve){
+                dataPoint:ActivityCurveMagnitudeData = self.curves.reduce(function(dp:ActivityCurveMagnitudeData,curve){
                     if(!dp && curve.plotted()) {
-                        dp = curve.data().reduce(function(found,point){
-                            return found||(doy >= point.start_doy && doy <= point.end_doy ? point : undefined);
-                        },undefined);
+                        dp = curve.nearest(doy);
                     }
                     return dp;
-                },undefined) as any; // TS thinks dataPoint is an "ActivityCurve"
+                },undefined);
             hoverLine.attr('transform','translate('+xCoord+')');
             hoverDoy
                 .style('text-anchor',doy < 324 ? 'start' : 'end')
@@ -216,7 +198,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
                 .text(dataPoint ?
                     self.legendDoyPipe.transform(dataPoint.start_doy)+' - '+self.legendDoyPipe.transform(dataPoint.end_doy) :
                     self.legendDoyPipe.transform(doy));
-            validCurves.forEach(function(c) { c.doyFocus = doy; });
+            self.curves.forEach(function(c) { c.doyFocus = doy; });
             self.updateLegend();
         }
         svg.append('rect')
@@ -234,40 +216,52 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
     }
 
     protected reset(): void {
+        // make room for the legend based on the number of plots
+        this.margins.top = DEFAULT_TOP_MARGIN;
+        const fontSize = this.baseFontSize() as number;
+        if(this.selection) {
+            const plotCount = this.curves.filter(c => c.plotted()).length;
+            if(plotCount) {
+                this.margins.top = ((plotCount+1)*fontSize)+(plotCount*LEGEND_VPAD)+MARGIN_VPAD;
+            }
+        }
         super.reset();
         let chart = this.chart,
-            sizing = this.sizing,
-            selection = this.selection;
+            sizing = this.sizing;
 
         this.x = scaleLinear().range([0,sizing.width]).domain([1,365]);
         this.xAxis = axisBottom<number>(this.x).tickFormat(DATE_FMT);
 
-        selection.validCurves.forEach(c => c.x(this.x).y(this.newY()));
+        this.curves.forEach(c => c.x(this.x).y(this.newY()));
 
-        chart.append('g')
+        const titleFontSize = 18;
+        const titleDy = this.margins.top-titleFontSize-fontSize;
+        this.chart.append('g')
              .attr('class','chart-title')
              .append('text')
              .attr('y', '0')
-             .attr('dy','-3em')
+             .attr('dy',`-${titleDy}`)
              .attr('x', '0')
              .attr('dx','-3em')
              .style('text-anchor','start')
-             .style('font-size','18px')
+             .style('font-size',`${titleFontSize}px`)
              .text('Activity Curves');
         this.commonUpdates();
     }
 
     protected update(): void {
         this.reset();
-        let selection = this.selection;
-        selection.loadCurveData().then(() => this.redraw());
+        this.selection.loadCurves().then(curves => {
+            this._curves = curves;
+            this.reset();
+            this.redraw()
+        });
     }
 
     protected redrawSvg(): void {
         let chart = this.chart,
             sizing = this.sizing,
-            selection = this.selection,
-            validCurves = selection.validCurves;
+            selection = this.selection;
 
         chart.selectAll('g .axis').remove();
 
@@ -335,7 +329,7 @@ export class ActivityCurvesComponent extends SvgVisualizationBaseComponent {
         this.commonUpdates();
 
         // draw the curves
-        validCurves.forEach(c => c.draw(chart));
+        this.curves.forEach(c => c.draw(chart));
 
         this.updateLegend();
         this.hover();

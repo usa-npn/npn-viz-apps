@@ -1,8 +1,8 @@
-import {Component,OnInit,Input,ElementRef,HostBinding,Inject,Injectable,Optional, ViewEncapsulation} from '@angular/core';
+import {Component,Input,HostBinding,Inject,Optional, ViewEncapsulation} from '@angular/core';
 import {MatSnackBar,MatDialog,MatDialogRef} from '@angular/material';
 import { MediaChange, ObservableMedia } from "@angular/flex-layout";
 
-import {Refuge,RefugeService} from './refuge.service';
+import {EntityBase,EntityService, DashboardModeState, DashboardMode, Refuge, PhenologyTrail} from './entity.service';
 import {VisSelection,VisualizationSelectionFactory,NPN_BASE_HREF} from '@npn/common';
 import {NewVisualizationDialogComponent} from './new-visualization-dialog.component';
 
@@ -35,12 +35,12 @@ const VIS_TEMPLATES = [{
 }];
 
 @Component({
-  selector: 'refuge-findings',
+  selector: 'fws-dashboard-findings',
   template: `
 <mat-list *ngIf="adminMode" class="new-vis-list">
   <div>
     <button mat-icon-button (click)="toggleAdminMode()" class="toggle-admin-mode"><i class="fa fa-2x fa-times-circle" aria-hidden="true"></i></button>
-    <p>Click and drag the visualizations below onto your Refuge Dashboard. You can have up to 10 visualizations on your Dashboard at one time. You can have multiple versions of each visualization type.</p>
+    <p>Click and drag the visualizations below onto your Dashboard. You can have up to 10 visualizations on your Dashboard at one time. You can have multiple versions of each visualization type.</p>
   </div>
   <mat-list-item class="vis-template"
                 *ngFor="let template of visTemplates"
@@ -50,6 +50,9 @@ const VIS_TEMPLATES = [{
                 dnd-draggable [dragData]="template"
                 [dropZones]="['newvis-dropZone']">
     <img class="new-vis-thumbnail" src="{{baseHref}}{{template.$thumbnail}}" />
+  </mat-list-item>
+  <mat-list-item *ngIf="(visTemplates.length%2) === 1">
+    <!-- empty item to just to keep the number even -->
   </mat-list-item>
   <mat-list-item class="trash"
                 matTooltip="Drag and drop visualization here to remove"
@@ -61,8 +64,8 @@ const VIS_TEMPLATES = [{
   </mat-list-item>
 </mat-list>
 
-<div class="visualizations" *ngIf="refuge" dnd-sortable-container [sortableData]="refuge.selections" [dropZones]="['list-dropZone','trash-dropZone']" >
-    <mat-card  *ngFor="let selection of refuge.selections; first as isFirst; let i = index"
+<div class="visualizations" *ngIf="entity" dnd-sortable-container [sortableData]="entity.selections" [dropZones]="['list-dropZone','trash-dropZone']" >
+    <mat-card  *ngFor="let selection of entity.selections; first as isFirst; let i = index"
               dnd-sortable [sortableIndex]="i"
               [dragEnabled]="adminMode"
               [dragData]="selection"
@@ -77,7 +80,7 @@ const VIS_TEMPLATES = [{
         </div>
         <npn-visualization [selection]="selection" [thumbnail]="!mobileMode && i > 0"></npn-visualization>
     </mat-card>
-    <mat-card *ngIf="adminMode && refuge.selections.length < maxVisualizations"
+    <mat-card *ngIf="adminMode && entity.selections.length < maxVisualizations"
         dnd-droppable [dropZones]="['newvis-dropZone']"
         (onDropSuccess)="addVisualization($event)"
         [ngClass]="{'new-vis-placeholder': true, 'look-at-me': lookAtVisDrop}"></mat-card>
@@ -87,9 +90,8 @@ const VIS_TEMPLATES = [{
   styleUrls: ['./findings.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FindingsComponent implements OnInit {
-    @Input()
-    refuge:Refuge;
+export class FindingsComponent {
+    _entity:EntityBase;
     @Input()
     userIsAdmin:boolean = false;
     isTouchDevice:boolean = false;
@@ -98,13 +100,15 @@ export class FindingsComponent implements OnInit {
 
     @HostBinding('class.adminMode') adminMode:boolean = false;
     maxVisualizations:number = 10;
-    visTemplates:any[] = VIS_TEMPLATES;
+    visTemplates:any[];
     guidOrder:string[];
     dragStartIndex:number;
     lookAtVisDrop:boolean = false;
     mobileMode:boolean = false;
 
-    constructor(private refugeService:RefugeService,
+    DashboardMode = DashboardMode;
+
+    constructor(private entityService:EntityService,
                 private selectionFactory: VisualizationSelectionFactory,
                 public dialog: MatDialog,
                 private snackBar: MatSnackBar,
@@ -122,27 +126,34 @@ export class FindingsComponent implements OnInit {
         }
     }
 
+    ngOnInit() {
+        this.visTemplates = (DashboardModeState.get() === DashboardMode.PHENO_TRAIL)
+            ? VIS_TEMPLATES.filter(t => t.$class !== 'ClippedWmsMapSelection')
+            : VIS_TEMPLATES;
+    }
+
     toggleAdminMode() {
         this.adminMode = !this.adminMode;
         this.resizeAllAfterDelay();
         $('body').toggleClass('fws-customize-mode');
     }
 
-    setRefuge(refuge:Refuge) {
-        this.refuge = refuge;
-        refuge.selections.forEach((s,i) => {
+    @Input()
+    set entity(entity:EntityBase) {
+        this._entity = entity;
+        entity.selections.forEach((s,i) => {
             //s.debug = (i === 0);
             s.update()
         });
-        this.guidOrder = refuge.selections.map(s => s.guid);
+        this.guidOrder = entity.selections.map(s => s.guid);
     }
 
-    ngOnInit() {
-        this.setRefuge(this.refuge);
+    get entity():EntityBase {
+        return this._entity;
     }
 
     resizeAll() {
-        this.refuge.selections.forEach((s,i) => {
+        this.entity.selections.forEach((s,i) => {
             //s.debug = i === 0;
             s.resize()
         });
@@ -155,7 +166,7 @@ export class FindingsComponent implements OnInit {
     }
 
     makeCurrent(s:VisSelection) {
-        let selections = this.refuge.selections,
+        let selections = this.entity.selections,
             index = selections.indexOf(s);
         if(index) {
             console.log('MAKE CURRENT',index);
@@ -172,7 +183,7 @@ export class FindingsComponent implements OnInit {
             width: '90vw',
             disableClose: true,
             data: {
-                refuge: this.refuge,
+                entity: this.entity,
                 selection: s,
                 edit:edit
             }
@@ -181,12 +192,18 @@ export class FindingsComponent implements OnInit {
 
     addVisualization($event){
         console.log('add.$event',$event);
-        let s = this.selectionFactory.newSelection($event.dragData);
+        // most selections will simply ignore $entity but some like observer activity
+        // metrics, with the introduction of the pheno trail work, need the overall
+        // $entity to decide how to label legend items when not performing grouping
+        const $entity = this.entity instanceof Refuge
+            ? {title: this.entity.title, network_id: this.entity.network_id }
+            : {title: this.entity.title, network_ids: (this.entity as PhenologyTrail).network_ids };
+        let s = this.selectionFactory.newSelection({...{$entity},...$event.dragData});
         console.log('add.selection',s);
         let dialogRef = this.visDialog(s);
         dialogRef.afterClosed().subscribe(selection => {
             if(selection) {
-                this.refuge.selections.push(selection);
+                this.entity.selections.push(selection);
                 this.save();
             }
         });
@@ -194,22 +211,22 @@ export class FindingsComponent implements OnInit {
 
     editVisualization(s:VisSelection,$event) {
         $event.stopPropagation();
-        let index = this.refuge.selections.indexOf(s);
+        let index = this.entity.selections.indexOf(s);
         console.log(`edit.selection[${index}]`,s);
         let copy = this.selectionFactory.cloneSelection(s),
             dialogRef = this.visDialog(copy,true);
         dialogRef.afterClosed().subscribe(selection => {
             if(selection) {
                 // replace
-                this.refuge.selections[index] = selection;
+                this.entity.selections[index] = selection;
                 this.save();
             }
         });
     }
 
     isReordered() {
-        if(this.guidOrder && this.guidOrder.length === this.refuge.selections.length) {
-            return this.refuge.selections.reduce((reordered,s,i) => {
+        if(this.guidOrder && this.guidOrder.length === this.entity.selections.length) {
+            return this.entity.selections.reduce((reordered,s,i) => {
                 return reordered||(s.guid !== this.guidOrder[i] ? true: false);
             },false);
         }
@@ -223,9 +240,9 @@ export class FindingsComponent implements OnInit {
     }
 
     save(noSnackBar?:boolean) {
-        this.refugeService.saveRefuge(this.refuge)
-            .then(refuge => {
-                this.setRefuge(refuge)
+        this.entityService.save(this.entity)
+            .then(entity => {
+                this.entity = entity;
                 if(!noSnackBar) {
                     this.snackBar.open('Visualizations saved',null,{duration:2000});
                 }
@@ -238,19 +255,19 @@ export class FindingsComponent implements OnInit {
     dragStart($event) {
         // this seems inconstent but it seems that $event in the onDragStart/End
         // events is the dragData, unlike onDragSuccess
-        this.dragStartIndex = $event ? this.refuge.selections.indexOf($event) : undefined;
+        this.dragStartIndex = $event ? this.entity.selections.indexOf($event) : undefined;
         console.log('dragStart.$event',$event,this.dragStartIndex);
     }
 
     trashVisualization($event) {
         console.log('trash.$event',$event);
         let selection = $event.dragData,
-            index = this.refuge.selections.indexOf(selection);
+            index = this.entity.selections.indexOf(selection);
         console.log(`trashing selection ${index}`);
-        this.refuge.selections.splice(index,1);
-        this.refugeService.saveRefuge(this.refuge)
-            .then(refuge => {
-                this.setRefuge(refuge);
+        this.entity.selections.splice(index,1);
+        this.entityService.save(this.entity)
+            .then(entity => {
+                this.entity = entity;
                 this.snackBar.open('Visualization Deleted','Undo',{
                         duration: 5000,
                     }).onAction().subscribe(() => {
@@ -259,7 +276,7 @@ export class FindingsComponent implements OnInit {
                         // change on resize or some such
                         index = typeof(this.dragStartIndex) !== 'undefined' ? this.dragStartIndex : index;
                         console.log(`restoring selection ${index}`);
-                        this.refuge.selections.splice(index,0,this.selectionFactory.cloneSelection(selection));
+                        this.entity.selections.splice(index,0,this.selectionFactory.cloneSelection(selection));
                         this.save(true);
                     });
             })

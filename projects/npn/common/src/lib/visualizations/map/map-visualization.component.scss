@@ -13,16 +13,24 @@
     }
     .npnlogo {
         position:absolute;
-        width: 150px;
+        width: 180px;
         bottom: 75px;
         right: 70px;
         z-index: 1;
     }
     .usgslogo {
         position:absolute;
-        width: 150px;
+        height: 50px;
+        width: 130px;
         bottom: 15px;
         right: 70px;
+        z-index: 1;
+    }
+    .ualogo {
+        position:absolute;
+        height: 50px;
+        bottom: 15px;
+        right: 205px;
         z-index: 1;
     }
     npn-logo.working {

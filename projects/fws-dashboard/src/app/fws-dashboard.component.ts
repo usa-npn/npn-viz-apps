@@ -19,7 +19,7 @@ const PARTNERS_TAB_IDX = 3;
         <ng-template mat-tab-label>
             <div class="rd-tab-label findings">
                 <mat-icon class="rd-tab-icon"><fa-icon [icon]="faSearch"></fa-icon></mat-icon>
-                <label>What we're finding</label>
+                <label>What we're findingg</label>
             </div>
         </ng-template>
         <div class="rd-tab-content" *ngIf="renderVisualizations">

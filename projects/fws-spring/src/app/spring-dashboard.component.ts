@@ -11,7 +11,7 @@ import { MatTabChangeEvent } from '@angular/material';
     <mat-tab>
         <ng-template mat-tab-label>
             <div class="spring-tab-label current-spring">
-                <label>Current Status of Springs</label>
+                <label>Current Status of Spring</label>
             </div>
         </ng-template>
         <div class="spring-tab-content">

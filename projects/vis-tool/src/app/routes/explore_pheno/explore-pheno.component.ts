@@ -200,7 +200,7 @@ export class ExplorePhenoComponent extends MonitorsDestroy {
                 // resume and kick visualization
                 this.activeVis.selection.resume();
                 this.activeVis.selection.update();
-            },750);
+            },1500);
         }
     }
 }

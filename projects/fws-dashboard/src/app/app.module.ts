@@ -6,7 +6,7 @@ import {NpnLibModule,NpnCommonModule,VisualizationsModule,NPN_BASE_HREF,NpnConfi
 
 import {FocalSpeciesComponent} from './focal-species.component';
 import {FindingsComponent} from './findings.component';
-import {ResourcesComponent} from './resources.component';
+import {ResourcesComponent, SafeHtmlPipe} from './resources.component';
 import {FwsDashboardComponent} from './fws-dashboard.component';
 import {PhenologyTrailPartnersComponent} from './phenology-trail-partners.component';
 import {NewVisualizationDialogComponent,NewVisualizationBuilderComponent} from './new-visualization-dialog.component';
@@ -54,7 +54,8 @@ export function npnConfigurationFactory() {
     PhenoTrailVisualizationScopeGroupsComponent,
     PhenoTrailVisualizationScopeGroupComponent,
     PhenoTrailVisualizationScopeStationGroupsComponent,
-    NewVisualizationDialogComponent
+    NewVisualizationDialogComponent,
+    SafeHtmlPipe
   ],
   entryComponents: [
       NewVisualizationDialogComponent

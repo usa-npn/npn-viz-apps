@@ -24,6 +24,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { environment } from '../environments/environment';
 import { AgmCoreModule } from '@agm/core';
 import { StartOfSpringDialog, SosDoyTransform } from './start-of-spring-dialog.component';
+import { SafeHtmlPipe } from 'projects/fws-dashboard/src/app/resources.component';
 
 export function baseHrefFactory() {
   return window['npn_base_href'];
@@ -62,7 +63,8 @@ export function npnConfigurationFactory() {
     StatusOfSpringComponent,
     StartOfSpringComponent,
     StartOfSpringDialog,
-    SosDoyTransform
+    SosDoyTransform,
+    SafeHtmlPipe
   ],
   providers: [
     RefugeService,

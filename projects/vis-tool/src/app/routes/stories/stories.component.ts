@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
             <mat-grid-tile *ngFor="let story of cfg.stories">
                 <mat-card class="story-card">
                     <mat-card-title>{{story.title}}</mat-card-title>
-                    <mat-card-subtitle>{{story.tagline}}</mat-card-subtitle>
+                    <mat-card-subtitle><div [innerHTML]="story.tagline"></div></mat-card-subtitle>
                     <mat-card-actions align="end">
                         <geocode-zip *ngIf="story.external.$class === 'AgddTimeSeriesSelection'" [external]="story.external"></geocode-zip>
                         <button mat-button (click)="storiesService.visit(story)"

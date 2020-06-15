@@ -15,7 +15,7 @@ import { Subject, merge, timer } from 'rxjs';
         <!-- <h3 class="mat-h2">{{data.tagline}}</h3> -->
         <div>
         <div *ngIf="data.image" style="float: left; padding: 10px">
-            <img src="{{data.image.src}}" alt="{{data.image.alt}}" width="300px" height="300px">
+            <img src="{{data.image.src}}" alt="{{data.image.alt}}" width="auto" height="300px">
             <p *ngIf="data.image.credit"><i>Image credit: {{data.image.credit}}</i></p>
         </div>
         <div [innerHTML]="data.description"></div>

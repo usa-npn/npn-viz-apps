@@ -7,7 +7,7 @@ import { BaseStepComponent, BaseControlComponent } from "./base";
 // TODO ? export from @npn/common
 import { ObservationDateVisSelection } from '@npn/common/visualizations/observation-date-vis-selection';
 
-const CONTROL_TITLE = 'Select species phenophase';
+const CONTROL_TITLE = 'Select species/phenophase';
 const STEP_TEMPLATE = `
 <div *ngFor="let plot of selection.plots" class="plot">
     <div class="swatch" [ngStyle]="{'background-color':plot.color}"></div>

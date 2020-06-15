@@ -101,7 +101,7 @@ export class MapSpeciesPhenoStepComponent extends BaseStepComponent {
     encapsulation: ViewEncapsulation.None
 })
 export class MapSpeciesPhenoControlComponent extends BaseControlComponent {
-    title:string = 'Select species phenophase';
+    title:string = 'Select species/phenophase';
     selection:MapSelection;
     iconPaths = MAP_VIS_SVG_PATHS;
     criteria:HigherSpeciesPhenophaseInputCriteria;

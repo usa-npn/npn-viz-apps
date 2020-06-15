@@ -1,342 +1,382 @@
 {
-    "backgroundImage": "assets/spring-stories-bg.jpg",
-    "stories": [
-        {
-            "title": "How fast is it warming up this year where I live?",
-            "tagline": "This graph shows the heat accumulated across the year at a single location, and how that compares to previous years.",
-            "description": "\n  <b>What am I looking at?</b> \n <p>This graph shows the daily accumulation of heat (also known as <a href=\"https://www.usanpn.org/data/agdd_maps\" target=\"_blank\">“Growing Degree Days”</a>) for the current year at your location, and compares it to previous years of heat accumulation. The long-term average of accumulation over the period of 1981-2010 is shown in black, the current year in blue, and the prior year in orange. You can also see the prediction for accumulation over the next 6 days, shown in red.</p> \n <b>What does this tell me?</b> \n <p>Heat accumulation is a metric of climate that is a common driver of phenological activity. Many species respond by leafing, flowering, or emerging at particular heat accumulation thresholds. This graph can show you whether heat is accumulating faster than normal where you live, which may mean earlier than average signs of phenological activity.</p> \n <b>How can I modify this graph?</b> \n <p>If there is a particular heat accumulation threshold that is of interest to you, you can set the threshold in the Features menu to see if it has been met and if so, when. In addition, you can modify the Degree Base temperature for the accumulation curve and the Location in the Layer/Point menu.</p>",
-            "external": {
-              "$class": "AgddTimeSeriesSelection",
-              "guid": "7ae58e6c-4318-41d9-a2fb-1f4a5e1c3497",
-              "meta": {},
-              "layerCategory": "Daily Temperature Accumulations",
-              "layerName": "gdd:agdd",
-              "extentValue": "sixDayForecast",
-              "doy": "sixDayForecast",
-              "showLastYear": true
-          }
-        },
-        {
-          "title": "Where did spring arrive early this year?",
-          "tagline": "This map shows where spring leaf out arrived earlier or later compared to the long-term average.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This map shows where spring leaf out arrived earlier or later this year compared to the long-term average based on the period from 1981-2010. The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>Locations that are red are earlier than the average start of spring leaf out and locations that are blue are later than the average date. Early spring leaf out may result in a greater risk of frost damage to plants that begin leafing out or flowering before final winter frost events.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the map displayed by changing the Layer Category in the Map menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
+  "backgroundImage": "assets/spring-stories-bg.jpg",
+  "stories": [
+      {
+          "title": "How fast is it warming up this year where I live?",
+          "tagline": "This graph shows the heat accumulated across the year at a single location, and how that compares to previous years.",
+          "description": "\n  <b>What am I looking at?</b> \n <p>This graph shows the daily accumulation of heat (also known as <a href=\"https://www.usanpn.org/data/agdd_maps\" target=\"_blank\">“Growing Degree Days”</a>) for the current year at your location, and compares it to previous years of heat accumulation. The long-term average of accumulation over the period of 1981-2010 is shown in black, the current year in blue, and the prior year in orange. You can also see the prediction for accumulation over the next 6 days, shown in red.</p> \n <b>What does this tell me?</b> \n <p>Heat accumulation is a metric of climate that is a common driver of phenological activity. Many species respond by leafing, flowering, or emerging at particular heat accumulation thresholds. This graph can show you whether heat is accumulating faster than normal where you live, which may mean earlier than average signs of phenological activity.</p> \n <b>How can I modify this graph?</b> \n <p>If there is a particular heat accumulation threshold that is of interest to you, you can set the threshold in the Features menu to see if it has been met and if so, when. In addition, you can modify the Degree Base temperature for the accumulation curve and the Location in the Layer/Point menu.</p>",
           "external": {
-            "$class": "MapSelection",
-            "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
+            "$class": "AgddTimeSeriesSelection",
+            "guid": "7ae58e6c-4318-41d9-a2fb-1f4a5e1c3497",
             "meta": {},
-            "networkIds": [],
-            "stationIds": [],
-            "individualPhenometrics": false,
-            "numDaysQualityFilter": 30,
-            "plots": [],
-            "opacity": 0.8,
-            "boundaries": [],
-            "layerCategory": "Spring Indices",
-            "layerName": "si-x:leaf_anomaly",
-            "extentValue": "today",
-            "year": "today"
-          }
-        },
-        {
-          "title": "Are milkweed flowers available when monarchs need them?",
-          "tagline": "This Activity Curve shows the overlap between open flowers in common milkweed plants and activity of monarch butterflies in the Midwest this year.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of invidual milkweed plants with open flowers and the mean number of monarch butterflies observed in Midwest states in 2019. You can see the change in the proportion of individuals with open flowers and number of butterflies in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting milkweed open flowers in early June in the Midwest, and by mid July, nearly all observers were reporting a 'yes' for open flowers. Observers started reporting monarch butterflies in early May, with a peak in number of butterflies observed in mid July. An additional smaller peak in monarch activity was reported in mid September, but milkweed flowers declined by this time.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the pheno classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
-          "image": {
-            "src": "assets/Swamp_milkweed_monarch_TeuneEnglishLanguageWikipedia_CCA-SA3.0.jpg",
-            "alt": "monarch on milkweed",
-            "credit": "Teune, Eng. Lang. Wikipedia, CC BY-SA 3.0"
-          },
-          "external": {
-            "$class": "ActivityCurvesSelection",
-            "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcba7",
-            "meta": {},
-            "networkIds": [],
-            "stationIds": [],
-            "interpolate": 2,
-            "dataPoints": true,
-            "frequency": {
-              "value": 14,
-              "label": "Biweekly"
-            },
-            "curves": [
-              {
-                "id": 0,
-                "color": "#2ca02c",
-                "year": 2019,
-                "species": {
-                  "kingdom": "Plantae",
-                  "itis_taxonomic_sn": 28731,
-                  "functional_type": "Deciduous broadleaf",
-                  "class_id": 15,
-                  "class_common_name": "Flowering Plants",
-                  "class_name": "Magnoliopsida",
-                  "order_id": 97,
-                  "order_common_name": "",
-                  "order_name": "Sapindales",
-                  "family_id": 235,
-                  "family_name": "Apocynaceae",
-                  "family_common_name": "Dogbane Family"
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name": "Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "metric": {
-                  "id": "proportion_individuals_with_yes_record",
-                  "sampleSize": "status_records_sample_size",
-                  "label": "Proportion Yes Records"
-                },
-                "speciesRank": "family",
-                "phenophaseRank": "class"
-              },
-              {
-                "id": 1,
-                "color": "#e7ba52",
-                "species": {
-                  "species_id": 396,
-                  "common_name": "monarch",
-                  "genus": "Danaus",
-                  "species": "plexippus",
-                  "kingdom": "Animalia",
-                  "itis_taxonomic_sn": 117273,
-                  "functional_type": "Insect",
-                  "class_id": 15,
-                  "class_common_name": "Flowering Plants",
-                  "class_name": "Magnoliopsida",
-                  "order_id": 97,
-                  "order_common_name": "",
-                  "order_name": "Sapindales",
-                  "family_id": 329,
-                  "family_name": "Sapindaceae",
-                  "family_common_name": "Soapberry Family"
-                },
-                "phenophase": {
-                  "pheno_class_id": 62,
-                  "pheno_class_name": "Active individuals",
-                  "pheno_class_sequence":10
-                },
-                "metric": {
-                  "id": "mean_numanimals_in-phase",
-                  "sampleSize": "in-phase_per_hr_sites_sample_size",
-                  "label": "Animals In Phase"
-                },
-                "year": 2019,
-                "speciesRank": "species",
-                "phenophaseRank": "class"
-              }
-            ],
-            "boundaries": [
-              {
-                "data": [
-                  [
-                    49,
-                    -104
-                  ],
-                  [
-                    36.5,
-                    -102
-                  ],
-                  [
-                    36.5,
-                    -90
-                  ],
-                  [
-                    42,
-                    -82
-                  ],
-                  [
-                    47,
-                    -82
-                  ],
-                  [
-                    50,
-                    -92
-                  ]
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "title": "When will flowers be available for pollinators?",
-          "tagline": "This Phenology Calendar shows reports of open flowers from the past two years.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported open flowering for three genera of plants (Asclepias, Symphyotrichum, and Solidago) that are important for pollinators from 2018 to 2019. The colored lines indicate at least one observer reported 'yes' for open flowers on that day. The gray line indicates at least one observer reported 'no' for open flowers on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect open flowers for key genera from the <a href=\"https://www.usanpn.org/nn/NectarConnectors\" target=\"_blank\">Nectar Connector campaign.</a></p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To set a location, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
-          "image": {
-            "src": "assets/BeeonSolidago_CourtneyCelleyUSFWS.jpg",
-            "alt": "bee on solidago",
-            "credit": "Courtney Celley, USFWS"
-          },
-          "external": {
-            "$class": "CalendarSelection",
-            "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
-            "meta": {},
-            "networkIds": [],
-            "stationIds": [],
-            "negative": true,
-            "negativeColor": "#aaa",
-            "years": [
-              2018,
-              2019
-            ],
-            "plots": [
-              {
-                "color": "#d62728",
-                "species": {
-                  "kingdom": "Plantae",
-                  "genus": "Asclepias",
-                  "genus_id": 440,
-                  "genus_name": "Asclepias",
-                  "genus_common_name": ""
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "speciesRank": "genus",
-                "phenophaseRank": "class"
-              },
-              {
-                "color": "#1f77b4",
-                "species": {
-                  "kingdom": "Plantae",
-                  "genus": "Symphyotrichum",
-                  "genus_id": 1032,
-                  "genus_name": "Symphyotrichum",
-                  "genus_common_name": ""
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "speciesRank": "genus",
-                "phenophaseRank": "class"
-              },
-              {
-                "color": "#2ca02c",
-                "species": {
-                  "kingdom": "Plantae",
-                  "genus": "Solidago",
-                  "genus_id": 1003,
-                  "genus_name": "Solidago",
-                  "genus_common_name": ""
-                },
-                "phenophase": {
-                  "pheno_class_id": 7,
-                  "pheno_class_name":"Open flowers or pollen cones",
-                  "pheno_class_sequence":70
-                },
-                "speciesRank": "genus",
-                "phenophaseRank": "class"
-              }
-            ],
-            "boundaries": [
-            ],
-            "labelOffset": 15,
-            "bandPadding": 0.55,
-            "fontSizeDelta": 2
-          }
-        },
-        {
-          "title": "How does winter temperature relate to leafing in the Soapberry family?",
-          "tagline": "This scatterplot graph shows how minimum winter temperatures relate to the onset of spring leafing in the Soapberry family, which includes maples and chestnuts.",
-          "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between minimum winter temperatures and the onset of leafing within the Soapberry family (Sapindaceae) using all available data across the United States for the years 2010-2019. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>Minimum winter temperatures can drive phenological activity in the spring. In some species, colder temperatures have been found to suppress leaf-out whereas warmer temperatures promote earlier leaf-out. In this case, warmer temperatures are associated with earlier leaf-out within species of the Soapberry family.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring. You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
-          "image": {
-            "src": "assets/Soapberry_Sapindus.saponaria_stephpimmlyon_CC.BY-NC.2.0.jpg",
-            "alt": "soapberry sapindus",
-            "credit": "stephpimmlyon, CC.BY-NC.2.0"
-          },
-          "settings": {
-              "speciesTitleFormat": "scientific-name"
-          },
-          "external": {
-            "$class": "ScatterPlotSelection",
-            "guid": "67259fcc-e6d8-450d-a5c8-c8a15a9db1ew",
-            "meta": {},
-            "networkIds": [],
-            "stationIds": [],
-            "individualPhenometrics": true,
-            "numDaysQualityFilter": 15,
-            "plots": [
-              {
-                "species": {
-                  "common_name": "red maple",
-                  "genus": "Acer",
-                  "species": "rubrum",
-                  "kingdom": "Plantae",
-                  "itis_taxonomic_sn": 28728,
-                  "functional_type": "Deciduous broadleaf",
-                  "class_id": 15,
-                  "class_common_name": "Flowering Plants",
-                  "class_name": "Magnoliopsida",
-                  "order_id": 97,
-                  "order_common_name": "",
-                  "order_name": "Sapindales",
-                  "family_id": 329,
-                  "family_name": "Sapindaceae",
-                  "family_common_name": "Soapberry Family"
-                },
-                "phenophase": {
-                  "pheno_class_id": 3,
-                  "pheno_class_name": "Leaves or needles",
-                  "pheno_class_sequence":30
-                },
-                "color": "#1f77b4",
-                "speciesRank": "family",
-                "phenophaseRank": "class",
-                "regressionLine": {
-                  "id": "3.1",
-                  "color": "#1f77b4",
-                  "p1": [
-                    29.033138,
-                    97.24825831553183
-                  ],
-                  "p2": [
-                    47.503029,
-                    113.90751637626815
-                  ],
-                  "r2": 0.00898847014561707
-                }
-              }
-            ],
-            "start": 2010,
-            "end": 2019,
-            "regressionLines": true,
-            "axis": {
-              "key": "tmin_winter",
-              "label": "Tmin Winter"
-            },
-            "minDoy": 30,
-            "maxDoy": 180
-          }
-        },
-        {
-          "title": "Where did eastern tent caterpillars first emerge in southern states in 2019?",
-          "tagline": "This Pheno Forecast shows when enough heat had accumulated to trigger emergence of eastern tent caterpillars.",
-          "description": "\n <b>What am I looking at? </b> \n <p>This Pheno Forecast shows the first locations (in yellow) to reach the required accumulation of heat to trigger emergence of eastern tent caterpillars in 2019, which occured on March 10. The map also shows bands of color indicating locations that are 2-3 weeks, 1-2 weeks, and 7 days away from emergence, as well as those that are in areas of delining activity and past the time of caterpillar activity.</p> \n <b>What does this tell me?</b> \n <p>Our Pheno Forecasts predict key life cycle stages in invasive and pest species. These maps help managers to know when to expect emergence to more effectively plan treatment actities. Learn more about these Pheno Forecasts at <a href=\"https://www.usanpn.org/data/forecasts\" target=\"_blank\">www.usanpn.org/data/forecasts</a>.</p> \n <b>How can I modify this visualization?</b> \n <p>We have Pheno Forecasts available for other insect pests and invasive plants. You can change the species displayed by selecting from the Base Layer menu. You can also use the Base Layer menu to change the date of the forecast by choosing a date from the calendar. You can also add observations of eastern tent caterpillars collected through Nature's Notebook by going to the Species/Phenophase menu and selecting a Species (or higher Taxonomic group) and Phenophase Class.</p>",
-          "image": {
-            "src": "assets/eastern_tent_caterpillar.jpg",
-            "alt": "eastern tent caterpillar",
-            "credit": "Tom Potterfield, Wikipedia"
-          },
-          "external": {
-            "$class": "MapSelection",
-            "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
-            "meta": {},
-            "networkIds": [],
-            "stationIds": [],
-            "individualPhenometrics": false,
-            "numDaysQualityFilter": 30,
-            "plots": [],
-            "opacity": 0.8,
-            "boundaries": [],
-            "layerCategory": "Phenoforecasts",
-            "layerName": "eastern_tent_caterpillar",
-            "extentValue": "2019-03-10T00:00:00.000Z",
-            "year": 2019
-          }
+            "layerCategory": "Daily Temperature Accumulations",
+            "layerName": "gdd:agdd",
+            "extentValue": "sixDayForecast",
+            "doy": "sixDayForecast",
+            "showLastYear": true
         }
-    ]
+      },
+      {
+        "title": "Where did spring arrive early this year?",
+        "tagline": "This map shows where spring leaf out arrived earlier or later compared to the long-term average.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This map shows where spring leaf out arrived earlier or later this year compared to the long-term average based on the period from 1981-2010. The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>Locations that are red are earlier than the average start of spring leaf out and locations that are blue are later than the average date. Early spring leaf out may result in a greater risk of frost damage to plants that begin leafing out or flowering before final winter frost events.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the map displayed by changing the Layer Category in the Map menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
+        "external": {
+          "$class": "MapSelection",
+          "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
+          "meta": {},
+          "networkIds": [],
+          "stationIds": [],
+          "individualPhenometrics": false,
+          "numDaysQualityFilter": 30,
+          "plots": [],
+          "opacity": 0.8,
+          "boundaries": [],
+          "layerCategory": "Spring Indices",
+          "layerName": "si-x:leaf_anomaly",
+          "extentValue": "today",
+          "year": "today"
+        }
+      },
+      {
+        "title": "Do invasive shrubs leaf-out earlier than native shrubs?",
+        "tagline": "This Phenology Calendar shows reports of initial shoot and leaf growth for invasive multiflora rose and native Northern spicebush in the Eastern U.S. in 2020.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported initial growth (breaking leaf buds) in mutiflora rose, an invasive shrub, and Northern spicebush, a native shrub, in the eastern U.S. in 2020. A colored line indicates at least one observer reported 'yes' for initial shoot or leaf growth on that day. A gray line indicates at least one observer reported 'no' for initial shoot or leaf growth on that day, and no observer reported 'yes.' </p> \n <b>What does this tell me?</b> \n <p>Invasive shrubs are top competitors for native shrubs - they can break bud earlier in the spring and hold onto leaves longer in the fall. This phenomenon is called Extended Leaf Phenology, and allows these early-leafing invaders to take advantage of the greater amount of light reaching the forest floor in early spring. These observations show observers reported earlier initial shoot or leaf growth in invasive multiflora rose than in Northern spicebush this year.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Eastern U.S. to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
+        "image": {
+          "src": "assets/spicebush_Lindera benzoin_leaves_Erynn Maynard.png.jpg",
+          "alt": "Leaves of Northern spicebush",
+          "credit": "Erynn Maynard Bean"
+        },
+        "external": {
+          "$class": "CalendarSelection",
+          "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
+          "meta": {},
+          "networkIds": [],
+          "stationIds": [],
+          "negative": true,
+          "negativeColor": "#aaa",
+          "years": [
+            2020
+          ],
+          "plots": [
+            {
+              "color": "#d62728",
+              "species": {
+                "species_id": 1248,
+                "common_name": "multiflora rose",
+                "genus": "Rosa",
+                "species": "multiflora",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 24833,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 96,
+                "order_common_name": "Oleaster, Buckthorn, Rose and Elm Families",
+                "order_name": "Rosales",
+                "family_id": 325,
+                "family_name": "Rosaceae",
+                "family_common_name": "Rose Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 1,
+                "pheno_class_name":"Initial shoot or leaf growth",
+                "pheno_class_sequence":10
+              },
+              "speciesRank": "species",
+              "phenophaseRank": "class"
+            },
+            {
+              "color": "#1f77b4",
+              "species": {
+                "species_id": 915,
+                "common_name": "northern spicebush",
+                "genus": "Lindera",
+                "species": "benzoin",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 18147,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 84,
+                "order_common_name": "Laurel Family",
+                "order_name": "Laurales",
+                "family_id": 287,
+                "family_name": "Lauraceae",
+                "family_common_name": "Laurel Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 1,
+                "pheno_class_name":"Initial shoot or leaf growth",
+                "pheno_class_sequence":10
+              },
+              "speciesRank": "species",
+              "phenophaseRank": "class"
+            }
+          ],
+          "boundaries": [
+            {
+              "data": [
+                [
+                  50.01,
+                  -97.24
+                ],
+                [
+                  23.94,
+                  -94.20
+                ],
+                [
+                  24.32,
+                  -62.01
+                ],
+                [
+                  48.89,
+                  -65.4
+                ],
+                [
+                  50.01,
+                  -97.24
+                ]
+              ]
+            }
+          ],
+          "labelOffset": 15,
+          "bandPadding": 0.55,
+          "fontSizeDelta": 2
+        }
+      },
+      {
+        "title": "Does arrival of White-winged Doves coincide with open flowers on saguaro cacti?",
+        "tagline": "This Activity Curve shows the overlap between open flowers on saguaro cacti and activity of migrating White-winged Doves in Arizona in 2020.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of individual saguaros with open flowers and the mean number of White-winged Doves observed in Arizona in 2020. You can see the change in the proportion of individuals with open flowers and number of White-winged Doves in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting an increasing number of White-winged Doves beginning in early April. Observers started reporting saguaro open flowers in mid-March.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the Phenophase Classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
+        "image": {
+          "src": "assets/WhitewingedDove5_TomGrey.jpg",
+          "alt": "White winged dove on saguaro",
+          "credit": "Tom Grey"
+        },
+        "external": {
+          "$class": "ActivityCurvesSelection",
+          "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcba7",
+          "meta": {},
+          "networkIds": [],
+          "stationIds": [],
+          "interpolate": 2,
+          "dataPoints": true,
+          "frequency": {
+            "value": 14,
+            "label": "Biweekly"
+          },
+          "curves": [
+            {
+              "id": 0,
+              "color": "#2ca02c",
+              "year": 2020,
+              "species": {
+                "species_id": 210,
+                "common_name": "saguaro",
+                "genus": "Carnegiea",
+                "species": "gigantea",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 506151,
+                "functional_type": "Cactus",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 72,
+                "order_common_name": "Cactus, Miner's-lettuce and Buckwheat Families",
+                "order_name": "Caryophyllales",
+                "family_id": 251,
+                "family_name": "Cactaceae",
+                "family_common_name": "Cactus Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 7,
+                "pheno_class_name": "Open flowers or pollen cones",
+                "pheno_class_sequence":70
+              },
+              "metric": {
+                "id": "proportion_individuals_with_yes_record",
+                "sampleSize": "status_records_sample_size",
+                "label": "Proportion Yes Records"
+              },
+              "speciesRank": "species",
+              "phenophaseRank": "class"
+            },
+            {
+              "id": 1,
+              "color": "#e7ba52",
+              "species": {
+                "species_id": 1128,
+                "common_name": "white-winged dove",
+                "genus": "Zenaida",
+                "species": "asiatica",
+                "kingdom": "Animalia",
+                "itis_taxonomic_sn": 177121,
+                "functional_type": "Bird",
+                "class_id": 5,
+                "class_common_name": "Birds",
+                "class_name": "Aves",
+                "order_id": 24,
+                "order_common_name": "Pigeons and Doves",
+                "order_name": "Columbiformes",
+                "family_id": 123,
+                "family_name": "Columbidae",
+                "family_common_name": "Pigeons and Doves"
+              },
+              "phenophase": {
+                "pheno_class_id": 62,
+                "pheno_class_name": "Active individuals",
+                "pheno_class_sequence":10
+              },
+              "metric": {
+                "id": "mean_numanimals_in-phase",
+                "sampleSize": "in-phase_per_hr_sites_sample_size",
+                "label": "Animals In Phase"
+              },
+              "year": 2020,
+              "speciesRank": "species",
+              "phenophaseRank": "class"
+            }
+          ],
+          "boundaries": [
+            {
+              "id": 2,
+              "boundaryName": "Arizona",
+              "typeId": 1,
+              "boundaryTypeName": "US States"
+            }
+          ]
+        }
+      },
+      {
+        "title": "Do maples leaf out earlier at southern latitudes compared to northern latitudes?",
+        "tagline": "This Scatterplot graph shows the relationship between latitude and leaf onset in the genus <i>Acer</i>.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between latitude and the onset of leafing within the genus <i>Acer</i> (maples) using all available data across the United States for the years 2011-2020. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>The leaf out of deciduous trees in the springtime is described as the 'green wave' that sweeps up the U.S. from south to north. This graph reflects this phenomenon by showing maples at southern latitudes leaf out earlier than trees further north.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the abiotic variables you are exploring, data precision filter, and range of dates displayed.  You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
+        "image": {
+          "src": "assets/maple_5-07.jpg",
+          "alt": "Leaves of red maple",
+          "credit": "Ellen G Denny"
+        },
+        "settings": {
+            "speciesTitleFormat": "scientific-name"
+        },
+        "external": {
+          "$class": "ScatterPlotSelection",
+          "guid": "67259fcc-e6d8-450d-a5c8-c8a15a9db1ew",
+          "meta": {},
+          "networkIds": [],
+          "stationIds": [],
+          "individualPhenometrics": true,
+          "numDaysQualityFilter": 7,
+          "plots": [
+            {
+              "species": {
+                "genus": "Acer",
+                "genus_id": 372,
+                "genus_name": "Acer",
+                "genus_common_name": "",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 28728,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 97,
+                "order_common_name": "",
+                "order_name": "Sapindales",
+                "family_id": 329,
+                "family_name": "Sapindaceae",
+                "family_common_name": "Soapberry Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 3,
+                "pheno_class_name": "Leaves or needles",
+                "pheno_class_sequence":30
+              },
+              "color": "#1f77b4",
+              "speciesRank": "genus",
+              "phenophaseRank": "class",
+              "regressionLine": {
+                "id": "3.1",
+                "color": "#1f77b4",
+                "p1": [
+                  29.033138,
+                  97.24825831553183
+                ],
+                "p2": [
+                  47.503029,
+                  113.90751637626815
+                ],
+                "r2": 0.00898847014561707
+              }
+            }
+          ],
+          "start": 2011,
+          "end": 2020,
+          "regressionLines": true,
+          "axis": {
+            "key": "latitude",
+            "label": "Latitude"
+          },
+          "minDoy": 1,
+          "maxDoy": 182
+        }
+      },
+      {
+        "title": "Can the USA-NPN's Spring Index predict flowering in dogwoods?",
+        "tagline": "This map shows the Spring First Bloom Index overlaid with observations of open flowers in flowering dogwoods.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This map shows the predicted Spring First Bloom Index, overlaid with icons showing reported open flowers in flowering dogwood (<i>Cornus florida</i>). The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>This visualization shows how the First Bloom map, which is based on a predictive model of early-season plant blooming, aligns with reports of open flowers in dogwoods. Icons that are a similar color to the map show locations where reports of open flowers match up with predicted blooming.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Pheno Classes displayed in the Species/Phenophase menu. You can change the map displayed by changing the Layer Category in the Base Layer menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
+        "image": {
+          "src": "assets/Dogwood_flower_closeup_Photo credit EnLorax_Wikimedia Commons.png",
+          "alt": "open flowers on dogwood",
+          "credit": "EnLorax via Wikimedia Commons"
+        },
+        "external": {
+          "$class": "MapSelection",
+          "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
+          "meta": {},
+          "networkIds": [],
+          "stationIds": [],
+          "individualPhenometrics": false,
+          "numDaysQualityFilter": 30,
+          "plots": [
+            {
+              "color": "#d62728",
+              "species": {
+                "species_id": 12,
+                "common_name": "flowering dogwood",
+                "genus": "Cornus",
+                "species": "florida",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 27806,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 75,
+                "order_common_name": "Dogwood, Hydrangea and Tupelo Families",
+                "order_name": "Cornales",
+                "family_id": 262,
+                "family_name": "Cornaceae",
+                "family_common_name": "Dogwood Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 7,
+                "pheno_class_name": "Open flowers or pollen cones",
+                "pheno_class_sequence":70
+              },
+              "speciesRank": "species",
+              "phenophaseRank": "class"
+            }
+          ],
+          "opacity": 0.8,
+          "boundaries": [],
+          "layerCategory": "Spring Indices",
+          "layerName": "si-x:average_bloom_ncep",
+          "extentValue": "today",
+          "year": "today"
+        }
+      }
+  ]
 }

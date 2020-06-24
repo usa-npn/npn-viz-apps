@@ -149,7 +149,7 @@ export interface GriddedPointData {
     formatted: string;
 }
 
-export const CATEGORY_PEST = 'Phenoforecasts';
+export const CATEGORY_PEST = 'Pheno Forecasts';
 export const CATEGORY_TEMP_ACCUM_30_YR_AVG = 'Temperature Accumulations, Daily 30-year Average';
 export const CATEGORY_TEMP_ACCUM_CURRENT = 'Temperature Accumulations, Current Day';
 export const CATEGORY_TEMP_ACCUM_CURRENT_AK = 'Temperature Accumulations, Current Day, Alaska';
@@ -216,6 +216,10 @@ export const MAP_LAYERS:MapLayerDefs = {
             meta: {
                 agddDefaultThreshold: 450
             }
+        },{
+            name: 'precipitation:buffelgrass_prism',
+            title: 'Buffelgrass',
+            abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>'
         },{
             name: 'eastern_tent_caterpillar',
             title: 'Eastern Tent Caterpillar',

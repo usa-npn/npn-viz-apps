@@ -35,6 +35,8 @@ export abstract class MapLayer implements SupportsOpacity {
     get layerDefinition():MapLayerDefinition { return this.layer_def; }
 
     get layerBasis():string {
+        if (this.layerName == "precipitation:buffelgrass_prism")
+            return this.layerName;
         return this.layer_def && this.layer_def.layerBasis
             ? this.layer_def.layerBasis
             : this.layerName;

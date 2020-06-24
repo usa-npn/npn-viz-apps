@@ -58,7 +58,12 @@ export class NpnMapLayerService {
                         case MapLayerType.STANDARD:
                             return new WmsMapLayer(map,layerDef,this);
                         case MapLayerType.PEST:
-                            return new PestMapLayer(map,layerDef,this);
+                            {
+                                if(layerDef.name == 'precipitation:buffelgrass_prism')
+                                    return new WmsMapLayer(map,layerDef,this);
+                                else
+                                    return new PestMapLayer(map,layerDef,this);
+                            }
                     }
                 }
             }));
@@ -81,8 +86,11 @@ export class NpnMapLayerService {
             ? this.getLayerDefinition(input as string)
             : Promise.resolve(input as MapLayerDefinition);
         return definition.then(layerDef => {
-            const layerBasis = layerDef.layerBasis;
+            let layerBasis = layerDef.layerBasis;
             const layerName = layerDef.name;
+            if(layerName == 'precipitation:buffelgrass_prism') {
+                layerBasis = layerName;
+            }
             if(this.legends[layerName]) {
                 return Promise.resolve(this.legends[layerName]);
             }
@@ -107,7 +115,7 @@ export class NpnMapLayerService {
                                     return found;
                                 }
                                 const styleName = findChildren('Name',$jq(e)).first().text();
-                                return styleName === layerName ? e : null;
+                                return styleName === layerName || styleName == 'buffelgrass_inches' ? e : null;
                             },null)
                         : userStyles.toArray()[0]; 
                     let color_map = findChildren('ColorMap',$jq(userStyleElm));

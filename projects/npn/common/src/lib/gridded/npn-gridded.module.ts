@@ -13,7 +13,7 @@ import { WcsDataService } from './wcs-data.service';
 import { BoundaryService } from './boundary.service';
 
 import {
-    LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
+    LegendGddUnitsPipe, LegendBuffelgrassUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
     AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
     ThirtyYearAvgDayOfYearPipe,GriddedPipeProvider
 } from './pipes';
@@ -28,7 +28,7 @@ import {
     declarations: [
         MapLayerLegendComponent,
         SupportsOpacityControl,
-        LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
+        LegendBuffelgrassUnitsPipe, LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe,
     ],
@@ -38,7 +38,7 @@ import {
     ],
     providers: [
         DatePipe, DecimalPipe,
-        LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
+        LegendBuffelgrassUnitsPipe, LegendGddUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
         AgddDefaultTodayTimePipe, LegendSixAnomalyPipe, LegendDoyPipe, ExtentDatesPipe,
         ThirtyYearAvgDayOfYearPipe, GriddedPipeProvider,
         NpnMapLayerService,

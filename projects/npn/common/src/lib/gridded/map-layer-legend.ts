@@ -45,7 +45,13 @@ export abstract class MapLayerLegend {
                 };
             };
             this.lformat = ldef.legend_label_filter ? get_filter(ldef.legend_label_filter) : IDENTITY;
-            this.gformat = ldef.gridded_label_filter ? get_filter(ldef.gridded_label_filter) : undefined;
+            if(ldef.name == 'precipitation:buffelgrass_prism') {
+                let gridded_label_filter_clone = Object.assign({}, ldef.gridded_label_filter);
+                gridded_label_filter_clone.name = 'legendBuffelgrassUnits';
+                this.gformat = ldef.gridded_label_filter ? get_filter(gridded_label_filter_clone) : undefined;
+            } else {
+                this.gformat = ldef.gridded_label_filter ? get_filter(ldef.gridded_label_filter) : undefined;
+            }
             let data:LegendData[];
             if(Array.isArray(color_map)) {
                 data = color_map;

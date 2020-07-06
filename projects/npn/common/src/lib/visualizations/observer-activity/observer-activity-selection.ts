@@ -22,6 +22,11 @@ export interface ObserverActivityData {
     // previously simply relied on network_name as returned by the server....
 }
 
+export enum ObserverActivityVisMode {
+    NEW_OBSERVERS = 'New Observers',
+    ACTIVE_OBSERVERS = 'Active Observers'
+};
+
 export class ObserverActivitySelection extends StationAwareVisSelection {
     @selectionProperty()
     $class:string = 'ObserverActivitySelection';
@@ -31,6 +36,9 @@ export class ObserverActivitySelection extends StationAwareVisSelection {
 
     @selectionProperty()
     year:number;
+
+    @selectionProperty()
+    mode:ObserverActivityVisMode = ObserverActivityVisMode.ACTIVE_OBSERVERS;
 
     constructor(protected serviceUtils:NpnServiceUtils,protected networkService:NetworkService) {
         super(serviceUtils,networkService);

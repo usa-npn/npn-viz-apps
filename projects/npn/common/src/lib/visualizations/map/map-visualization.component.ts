@@ -111,8 +111,25 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
      * redraws are triggered by layer related changes.
      */
     protected redraw():void {
+        if(this.selection.layerName == "precipitation:buffelgrass_prism") {
+            this.zoom = 6;
+            this.latitude = 33.4;
+            this.longitude = -112;
+        }
+        else if(this.selection.layerName.includes("alaska")) {
+            this.zoom = 4;
+            this.latitude = 62;
+            this.longitude = -152;
+        }
+        else {
+            this.zoom = 4;
+            this.latitude = 38.8402805;
+            this.longitude = -97.61142369999999;
+        }
         console.log('MapVisualization.redraw');
         this.getMap().then(map => this.selection.updateLayer(map).then(() => {
+            map.setCenter(new google.maps.LatLng(this.latitude, this.longitude));
+            map.setZoom(this.zoom);
             if(this.legend) {
                 this.legend.redraw();
             }

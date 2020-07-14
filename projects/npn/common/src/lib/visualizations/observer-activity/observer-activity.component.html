@@ -7,7 +7,7 @@
         <div [class]="clazz" id="{{id}}"><svg class="svg-visualization"></svg></div>
     </div>
     <mat-radio-group style="display:block; margin-top: 10px;" *ngIf="!thumbnail"
-        [(ngModel)]="mode"
+        [(ngModel)]="selection.mode"
         (change)="redraw()">
         <mat-radio-button [value]="modes.ACTIVE_OBSERVERS" style="margin-right: 5px;">{{modes.ACTIVE_OBSERVERS}}</mat-radio-button>
         <mat-radio-button [value]="modes.NEW_OBSERVERS">{{modes.NEW_OBSERVERS}}</mat-radio-button>

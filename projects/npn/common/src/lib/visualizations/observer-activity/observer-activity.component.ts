@@ -4,7 +4,7 @@ import { ObservableMedia } from "@angular/flex-layout";
 import { VisualizationMargins } from '../visualization-base.component';
 import { SvgVisualizationBaseComponent, DEFAULT_MARGINS } from '../svg-visualization-base.component';
 
-import { ObserverActivitySelection, ObserverActivityData } from './observer-activity-selection';
+import { ObserverActivitySelection, ObserverActivityData, ObserverActivityVisMode } from './observer-activity-selection';
 
 import { Axis, axisBottom, axisLeft } from 'd3-axis';
 import { Selection } from 'd3-selection';
@@ -19,11 +19,6 @@ const TITLE_FONT_SIZE = 18;
 const SWATCH_SIZE = 20;
 const BAR_OPACITY = '0.75';
 
-enum ObserverActivityVisMode {
-    NEW_OBSERVERS = 'New Observers',
-    ACTIVE_OBSERVERS = 'Active Observers'
-};
-
 @Component({
   selector: 'observer-activity',
   templateUrl: './observer-activity.component.html',
@@ -31,7 +26,6 @@ enum ObserverActivityVisMode {
 })
 export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
     modes = ObserverActivityVisMode;
-    mode:ObserverActivityVisMode = ObserverActivityVisMode.ACTIVE_OBSERVERS;
 
     @Input()
     selection:ObserverActivitySelection;
@@ -181,9 +175,9 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
         }
         console.debug('ObserverActivityComponent:data',this.data);
         this.title.text(`${this.selection.year}`);
-        this.yAxisLabel.text(this.mode);
+        this.yAxisLabel.text(this.selection.mode);
         this.updateLegend();
-        const dataKey = this.mode === ObserverActivityVisMode.ACTIVE_OBSERVERS ? 'activeObservers' : 'newObservers';
+        const dataKey = this.selection.mode === ObserverActivityVisMode.ACTIVE_OBSERVERS ? 'activeObservers' : 'newObservers';
         const visData = d3.range(0,12)
             .map(month => this.data.reduce((map,d,index) => {
                 map[`${index}`] = d.months[month][dataKey];

@@ -116,7 +116,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
             this.latitude = 33.4;
             this.longitude = -112;
         }
-        else if(this.selection.layerName.includes("alaska")) {
+        else if(this.selection.layerName != null && this.selection.layerName.includes("alaska")) {
             this.zoom = 4;
             this.latitude = 62;
             this.longitude = -152;

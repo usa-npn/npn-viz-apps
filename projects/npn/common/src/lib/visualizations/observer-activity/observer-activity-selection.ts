@@ -1,4 +1,4 @@
-import { NpnServiceUtils, NetworkService } from '../../common';
+import { NpnServiceUtils, NetworkService, CURRENT_YEAR, CURRENT_YEAR_VALUE } from '../../common';
 import { selectionProperty, StationAwareVisSelection, GroupHttpParams } from '../vis-selection';
 import { HttpParams } from '@angular/common/http';
 
@@ -48,8 +48,12 @@ export class ObserverActivitySelection extends StationAwareVisSelection {
         return !!this.year;
     }
 
+    get actualYear():number {
+        return this.year === CURRENT_YEAR ? CURRENT_YEAR_VALUE : this.year;
+    }
+
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        return super.toURLSearchParams(params.set('year',`${this.year}`));
+        return super.toURLSearchParams(params.set('year',`${this.actualYear}`));
     }
 
     getData():Promise<ObserverActivityData[]> {
@@ -64,7 +68,7 @@ export class ObserverActivitySelection extends StationAwareVisSelection {
         // if $entity is not set then this selection was created prior to the phenology trail
         // work and so needs to behave as it did previously, only single network id, etc.
         if(!this.$entity) {
-            return this.serviceUtils.cachedGet(url,{year: this.year,network_id: this.networkIds[0]})
+            return this.serviceUtils.cachedGet(url,{year: this.actualYear,network_id: this.networkIds[0]})
                 .then(data => {
                     this.working = false;
                     data.label = `${data.network_name}`;

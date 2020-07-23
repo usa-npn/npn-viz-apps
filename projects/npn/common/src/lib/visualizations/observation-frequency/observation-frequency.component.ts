@@ -159,7 +159,7 @@ export class ObservationFrequencyComponent extends SvgVisualizationBaseComponent
             return;
         }
         console.debug('ObservationFrequencyComponent.redrawSvg:data',this.data);
-        this.title.text(`${this.selection.year}`);
+        this.title.text(`${this.selection.actualYear}`);
         this.updateLegend();
         const visData = d3.range(0,12)
             .map(month => this.data.reduce((map,d,index) => {

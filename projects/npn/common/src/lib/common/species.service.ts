@@ -6,6 +6,7 @@ import { HttpParams } from '@angular/common/http';
 import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicGenus, TaxonomicOrder, TaxonomicSpeciesRank, TaxonomicSpeciesType } from './species';
 import { Phenophase, TaxonomicPhenophaseRank, PhenophaseClass } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';
+import { CURRENT_YEAR, CURRENT_YEAR_VALUE } from './constants';
 
 export interface SpeciesTaxonomicInfo {
     species: TaxonomicSpecies[];
@@ -146,7 +147,9 @@ export class SpeciesService {
             // sets of input request parameters for filtering
             // e.g. [2013,2010,2012] ->
             // [['2010-01-01','2010-12-31'],['2012-01-01','2013-12-31']]
-            : years.slice().sort().reduce((rngs,year) => {
+            : years.slice()
+                .map(y => y === CURRENT_YEAR ? CURRENT_YEAR_VALUE : y)
+                .sort().reduce((rngs,year) => {
                     if(!rngs.length) {
                         rngs[0] = [year,year];
                     } else {

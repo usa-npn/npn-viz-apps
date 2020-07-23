@@ -4,7 +4,7 @@ import {CalendarSelection} from './calendar-selection';
 import { HigherSpeciesPhenophaseInputCriteria } from '../common-controls';
 import { filter, debounceTime, takeUntil } from 'rxjs/operators';
 import { VisSelectionEvent } from '../vis-selection';
-import { MonitorsDestroy } from '@npn/common/common';
+import { MonitorsDestroy, CURRENT_YEAR, CURRENT_YEAR_LABEL  } from '@npn/common/common';
 import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 
 const THIS_YEAR = (new Date()).getFullYear();
@@ -26,7 +26,7 @@ const VALID_YEARS = (function(){
         <div class="year-input-wrapper" *ngFor="let plotYear of selection.years;index as idx">
             <mat-form-field class="year-input">
                 <mat-select placeholder="Year {{idx+1}}" [(ngModel)]="selection.years[idx]" (ngModelChange)="yearChange()" id="year_{{idx}}">
-                    <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y}}</mat-option>
+                    <mat-option *ngFor="let y of selectableYears(selection.years[idx])" [value]="y">{{y === CURRENT_YEAR ? CURRENT_YEAR_LABEL : y}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <button *ngIf="selection.years?.length > 0" mat-button class="remove-year" (click)="removeYear(idx)">Remove</button>
@@ -66,7 +66,7 @@ const VALID_YEARS = (function(){
             margin-right: 15px;
         }
         .year-input {
-            width: 60px;
+            width: 90px;
         }
         .phenophase-input-wrapper {
             display: block;
@@ -83,24 +83,33 @@ export class CalendarControlComponent extends MonitorsDestroy {
     /** set to true if want to gather input about allowing users to have visualization time controls */
     @Input()
     onVisControlOptions:boolean = false;
+    @Input()
+    allowCurrentYear:boolean = false;
 
     maxYears = 5;
     criteria:HigherSpeciesPhenophaseInputCriteria;
     faExclamationTriangle = faExclamationTriangle;
 
+    validYears = VALID_YEARS.slice();
+    CURRENT_YEAR = CURRENT_YEAR;
+    CURRENT_YEAR_LABEL = CURRENT_YEAR_LABEL;
+
     selectableYears(y:number) {
         if(y) {
             // validYears including y but excluding any others in the selection
-            return VALID_YEARS.filter(yr => {
+            return this.validYears.filter(yr => {
                 return yr === y || this.selection.years.indexOf(yr) === -1;
             });
         }
-        return VALID_YEARS;
+        return this.validYears;
     }
 
     ngOnInit() {
         if(this.onVisControlOptions) {
             this.selection.meta = this.selection.meta||{};
+        }
+        if(this.allowCurrentYear) {
+            this.validYears.push(CURRENT_YEAR);
         }
         this.selection.pipe(
             filter(event => event === VisSelectionEvent.SCOPE_CHANGE),

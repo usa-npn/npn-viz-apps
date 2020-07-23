@@ -1,7 +1,7 @@
 import {Component,Input,SimpleChanges, Output, EventEmitter} from '@angular/core';
 import {FormControl} from '@angular/forms';
 
-import {MonitorsDestroy} from '../../common';
+import {MonitorsDestroy, CURRENT_YEAR_VALUE, CURRENT_YEAR, CURRENT_YEAR_LABEL} from '../../common';
 import {ActivityCurve} from './activity-curve';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 import { takeUntil, filter, debounceTime } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { VisSelectionEvent } from '../vis-selection';
     template: `
     <mat-form-field class="year-input">
         <mat-select [placeholder]="'Year'+(required ? ' *':'')" [formControl]="yearControl">
-            <mat-option *ngFor="let y of validYears" [value]="y">{{y}}</mat-option>
+            <mat-option *ngFor="let y of validYears" [value]="y">{{y === CURRENT_YEAR ? CURRENT_YEAR_LABEL : y}}</mat-option>
         </mat-select>
         <mat-error *ngIf="yearControl.errors && yearControl.errors.required">Year is required</mat-error>
     </mat-form-field>
@@ -36,7 +36,7 @@ import { VisSelectionEvent } from '../vis-selection';
     `,
     styles: [`
         .year-input {
-            width: 75px;
+            width: 90px;
         }
         .metric-input {
             width: 255px;
@@ -54,6 +54,10 @@ export class CurveControlComponent extends MonitorsDestroy {
     selection: ActivityCurvesSelection;
     @Input()
     curve: ActivityCurve;
+    @Input()
+    allowCurrentYear:boolean = false;
+    CURRENT_YEAR = CURRENT_YEAR;
+    CURRENT_YEAR_LABEL = CURRENT_YEAR_LABEL;
 
     @Output()
     onSpeciesChange = new EventEmitter<any>();
@@ -72,17 +76,22 @@ export class CurveControlComponent extends MonitorsDestroy {
         this.onMetricChange.next({oldValue,newValue});
     }
 
-    validYears:number[] = (function() {
-        let thisYear = (new Date()).getFullYear(),
-            years: number[] = [],
-            c = 2010;
-        while(c <= thisYear) {
-            years.push(c++);
-        }
-        return years.reverse();
-    })();
+    validYears:number[] = [];
 
     ngOnInit() {
+        this.validYears = (function(allowCurrentYear) {
+            let thisYear = (new Date()).getFullYear(),
+                years: number[] = [],
+                c = 2010;
+            while(c <= thisYear) {
+                years.push(c++);
+            }
+            if(allowCurrentYear) {
+                years.push(CURRENT_YEAR);
+            }
+            return years.reverse();
+        })(this.allowCurrentYear);
+
         this.selection.pipe(
             filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
             debounceTime(500),

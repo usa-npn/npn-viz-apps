@@ -20,3 +20,4 @@ export { NpnServiceUtils } from './npn-service-utils.service';
 export * from './detect-ie';
 export * from './monitors-destroy';
 export * from './application-settings';
+export * from './constants';

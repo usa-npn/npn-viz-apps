@@ -31,7 +31,6 @@ export const enum VisSelectionEvent {
  * is run.
  */
 import 'reflect-metadata';
-import { Subject } from 'rxjs';
 const selectionPropertyMetadataKey = Symbol('npnSelectionProperty');
 const IDENTITY = d => d;
 /**

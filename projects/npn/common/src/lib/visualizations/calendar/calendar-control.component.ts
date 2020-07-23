@@ -46,6 +46,7 @@ const VALID_YEARS = (function(){
     </div>
 
     <mat-checkbox [(ngModel)]="selection.negative" (change)="redrawChange()">Display negative data</mat-checkbox>
+    <mat-checkbox [(ngModel)]="selection.meta.userNegativeToggle" *ngIf="onVisControlOptions" class="meta-userNegativeToggle">Allow users to toggle negative data</mat-checkbox>
 
     <label for="label-size-input">Label size
         <mat-slider id="label-size-input" min="0" max="10" step="0.25" [(ngModel)]="selection.fontSizeDelta" (change)="redrawChange()" [disabled]="!selection.isValid()"></mat-slider>
@@ -70,7 +71,8 @@ const VALID_YEARS = (function(){
         .phenophase-input-wrapper {
             display: block;
         }
-        label[for="label-size-input"] {
+        label[for="label-size-input"],
+        .meta-userNegativeToggle {
             margin-left: 15px;
         }
     `]
@@ -78,6 +80,10 @@ const VALID_YEARS = (function(){
 export class CalendarControlComponent extends MonitorsDestroy {
     @Input()
     selection: CalendarSelection;
+    /** set to true if want to gather input about allowing users to have visualization time controls */
+    @Input()
+    onVisControlOptions:boolean = false;
+
     maxYears = 5;
     criteria:HigherSpeciesPhenophaseInputCriteria;
     faExclamationTriangle = faExclamationTriangle;
@@ -93,6 +99,9 @@ export class CalendarControlComponent extends MonitorsDestroy {
     }
 
     ngOnInit() {
+        if(this.onVisControlOptions) {
+            this.selection.meta = this.selection.meta||{};
+        }
         this.selection.pipe(
             filter(event => event === VisSelectionEvent.SCOPE_CHANGE),
             debounceTime(500),

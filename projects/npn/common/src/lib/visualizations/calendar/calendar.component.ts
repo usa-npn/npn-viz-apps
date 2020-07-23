@@ -13,7 +13,7 @@ import { ObservationDatePlotData } from '../observation-date-vis-selection';
 
 @Component({
     selector: 'calendar',
-    templateUrl: '../svg-visualization-base.component.html',
+    templateUrl: 'calendar.component.html',
     styleUrls: ['../svg-visualization-base.component.scss']
 })
 export class CalendarComponent extends SvgVisualizationBaseComponent {

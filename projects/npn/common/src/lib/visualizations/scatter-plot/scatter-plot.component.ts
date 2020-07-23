@@ -119,7 +119,7 @@ export class ScatterPlotComponent extends SvgVisualizationBaseComponent {
             extent = d3.extent(nonNullData,getX),
             formatXTickLabels = selection.axis.axisFmt||this.defaultAxisFormat;
 
-        this.title.text(`${selection.start} - ${selection.end}`);
+        this.title.text(`${selection.start} - ${selection.actualEnd}`);
 
         this.x.domain([extent[0]-padding,extent[1]+padding]);
         this.xAxis.scale(this.x).tickFormat(d3.format('.2f')); // TODO per-selection tick formatting

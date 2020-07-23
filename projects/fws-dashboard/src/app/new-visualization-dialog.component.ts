@@ -181,7 +181,7 @@ export class NewVisualizationDialogComponent implements OnInit {
     selector: 'new-visualization-builder',
     template: `
     <activity-curves-control  *ngIf="activity" [selection]="activity" [allowCurrentYear]="true"></activity-curves-control>
-    <scatter-plot-control *ngIf="scatter" [selection]="scatter"></scatter-plot-control>
+    <scatter-plot-control *ngIf="scatter" [selection]="scatter" [allowCurrentYear]="true"></scatter-plot-control>
     <calendar-control *ngIf="calendar" [selection]="calendar" [onVisControlOptions]="true" [allowCurrentYear]="true"></calendar-control>
     <observer-activity-control *ngIf="observer" [selection]="observer" [allowCurrentYear]="true"></observer-activity-control>
     <observation-frequency-control *ngIf="observationFreq" [selection]="observationFreq" [allowCurrentYear]="true"></observation-frequency-control>

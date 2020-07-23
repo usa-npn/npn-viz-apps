@@ -1,4 +1,5 @@
 import {Component,Input,Output,EventEmitter,OnInit} from '@angular/core';
+import { CURRENT_YEAR, CURRENT_YEAR_LABEL } from '../../common';
 
 @Component({
     selector: 'year-range-input',
@@ -10,7 +11,7 @@ import {Component,Input,Output,EventEmitter,OnInit} from '@angular/core';
     </mat-form-field>
     <mat-form-field class="end-year">
         <mat-select placeholder="End year" [(ngModel)]="end" [disabled]="!start">
-            <mat-option *ngFor="let y of validEnds" [value]="y">{{y}}</mat-option>
+            <mat-option *ngFor="let y of validEnds" [value]="y">{{y === CURRENT_YEAR ? CURRENT_YEAR_LABEL : y}}</mat-option>
         </mat-select>
     </mat-form-field>
     `,
@@ -35,6 +36,10 @@ export class YearRangeInputComponent {
 
     @Input()
     maxSpan:number = 10;
+    @Input()
+    allowCurrentYear:boolean = false;
+    CURRENT_YEAR = CURRENT_YEAR;
+    CURRENT_YEAR_LABEL = CURRENT_YEAR_LABEL;
 
     validStarts:number[] = (function(){
         let max = (new Date()).getFullYear(),
@@ -72,6 +77,9 @@ export class YearRangeInputComponent {
                 }
                 while(current < max) {
                     ends.push(current++);
+                }
+                if(this.allowCurrentYear) {
+                    ends.push(CURRENT_YEAR);
                 }
                 this.validEnds = ends.reverse();
                 // if(this.end > max) {

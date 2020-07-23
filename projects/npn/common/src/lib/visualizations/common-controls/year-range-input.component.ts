@@ -16,9 +16,11 @@ import { CURRENT_YEAR, CURRENT_YEAR_LABEL } from '../../common';
     </mat-form-field>
     `,
     styles:[`
-        .start-year,
-        .end-year {
+        .start-year {
             width: 75px;
+        }
+        .end-year {
+            width: 90px;
         }
         mat-form-field {
             padding-right: 10px;

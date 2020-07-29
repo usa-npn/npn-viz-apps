@@ -124,7 +124,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     }
 
     getBoundary(): Promise<any> {
-        const url = this.serviceUtils.dataApiUrl('/v0/si-x/area/boundary');
+        const url = this.serviceUtils.dataApiUrl('/v1/si-x/area/boundary');
         const params = {
                 format: 'geojson',
                 fwsBoundary: this.fwsBoundary
@@ -139,7 +139,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     }
 
     getData(): Promise<any> {
-        let url = this.serviceUtils.dataApiUrl(`/v0/${this.layer.clippingService}`),
+        let url = this.serviceUtils.dataApiUrl(`/v1/${this.layer.clippingService}`),
             params = {
                 layerName: this.layer.layerName,
                 fwsBoundary: this.fwsBoundary,
@@ -152,7 +152,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
     }
 
     getStatistics(): Promise<any> {
-        const url = this.serviceUtils.dataApiUrl(`/v0/${this.layer.statisticsService}`);
+        const url = this.serviceUtils.dataApiUrl(`/v1/${this.layer.statisticsService}`);
         const params = {
                 layerName: this.layer.layerName,
                 fwsBoundary: this.fwsBoundary,

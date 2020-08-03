@@ -561,7 +561,7 @@ export const ACTIVITY_CURVE_KINGDOM_METRICS = {
             },
             {
                 id: 'mean_numanimals_in-phase',
-                sampleSize: 'in-phase_per_hr_sites_sample_size',
+                sampleSize: 'in-phase_site_visits_sample_size',
                 label: 'Animals In Phase',
                 valueFormat: DECIMAL
             },{

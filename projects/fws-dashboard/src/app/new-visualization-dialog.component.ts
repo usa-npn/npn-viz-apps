@@ -180,11 +180,11 @@ export class NewVisualizationDialogComponent implements OnInit {
 @Component({
     selector: 'new-visualization-builder',
     template: `
-    <activity-curves-control  *ngIf="activity" [selection]="activity"></activity-curves-control>
-    <scatter-plot-control *ngIf="scatter" [selection]="scatter"></scatter-plot-control>
-    <calendar-control *ngIf="calendar" [selection]="calendar"></calendar-control>
-    <observer-activity-control *ngIf="observer" [selection]="observer"></observer-activity-control>
-    <observation-frequency-control *ngIf="observationFreq" [selection]="observationFreq"></observation-frequency-control>
+    <activity-curves-control  *ngIf="activity" [selection]="activity" [allowCurrentYear]="true"></activity-curves-control>
+    <scatter-plot-control *ngIf="scatter" [selection]="scatter" [allowCurrentYear]="true"></scatter-plot-control>
+    <calendar-control *ngIf="calendar" [selection]="calendar" [onVisControlOptions]="true" [allowCurrentYear]="true"></calendar-control>
+    <observer-activity-control *ngIf="observer" [selection]="observer" [allowCurrentYear]="true"></observer-activity-control>
+    <observation-frequency-control *ngIf="observationFreq" [selection]="observationFreq" [allowCurrentYear]="true"></observation-frequency-control>
     <clipped-wms-map-control *ngIf="clipped" [selection]="clipped"></clipped-wms-map-control>
 
     <npn-visualization *ngIf="selection" [selection]="selection"></npn-visualization>

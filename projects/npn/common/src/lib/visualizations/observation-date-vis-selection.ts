@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT, SelectionGroup, GroupHttpParams } from './vis-selection';
-import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor } from '../common';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor, CURRENT_YEAR, CURRENT_YEAR_VALUE  } from '../common';
 
 export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
@@ -61,6 +61,10 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         });
     }
 
+    get actualYears():number[] {
+        return (this.years||[]).map(y => y === CURRENT_YEAR ? CURRENT_YEAR_VALUE : y);
+    }
+
     /**
      * Indicates whether or not adding one more plot will result in a visualization exceeding
      * the maximum number of allowed plots.
@@ -75,7 +79,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
         params = params.set('request_src', this.requestSrc);
-        this.years.forEach((y, i) => {
+        this.actualYears.forEach((y, i) => {
             params = params.set(`year[${i}]`, `${y}`);
         });
         return super.toURLSearchParams(params);
@@ -84,7 +88,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
     toPOPInput(input:POPInput = {...BASE_POP_INPUT}):Promise<POPInput> {
         return super.toPOPInput(input)
             .then(input => {
-                const yearRange = this.years.reduce((range,y) => {
+                const yearRange = this.actualYears
+                    .reduce((range,y) => {
                         if(!range) {
                             return [y,y];
                         }
@@ -136,7 +141,7 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             if(rData && rData[pPhaseKey] && rData[pPhaseKey].length) {
                 pPhases = rData[pPhaseKey][0];
             }
-            this.years.forEach(year => {
+            this.actualYears.forEach(year => {
                 if(pPhases.years[year]) {
                     if(this.negative) {
                         addDoys(pPhases.years[year].negative,this.negativeColor);

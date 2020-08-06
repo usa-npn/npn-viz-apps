@@ -8,7 +8,9 @@ import {
     TaxonomicPhenophaseType,
     TaxonomicPhenophaseRank,
     SpeciesTitlePipe,
-    getSpeciesPlotKeys
+    getSpeciesPlotKeys,
+    CURRENT_YEAR,
+    CURRENT_YEAR_VALUE
 } from '../../common';
 import {ActivityCurvesSelection} from './activity-curves-selection';
 
@@ -115,6 +117,9 @@ export class ActivityCurve implements SpeciesPlot {
         }
     }
 
+    get actualYear() {
+        return this._year === CURRENT_YEAR ? CURRENT_YEAR_VALUE : this._year;
+    }
     get year() {
         return this._year;
     }
@@ -237,7 +242,7 @@ export class ActivityCurve implements SpeciesPlot {
     legendLabel(includeMetric:boolean) {
         let doyFocusValue = this.doyDataValue();
         const pp = this.phenophase as any;
-        return `${this.year}: `+
+        return `${this.actualYear}: `+
                SPECIES_TITLE(this.species,this.speciesRank)+' - '+(pp.phenophase_name||pp.pheno_class_name)+
                (includeMetric ? ` (${this.metric.label})` : '')+
                (this._group ? ` (${this._group.label})` : '')+
@@ -327,8 +332,8 @@ export class ActivityCurve implements SpeciesPlot {
      */
     loadData(baseParams:HttpParams):Promise<ActivityCurve []> {
         let curveParams = baseParams
-            .set('start_date',`${this.year}-01-01`)
-            .set('end_date',this.endDate(this.year));
+            .set('start_date',`${this.actualYear}-01-01`)
+            .set('end_date',this.endDate(this.actualYear));
         const keys = getSpeciesPlotKeys(this);
         curveParams = curveParams.set(`${keys.speciesIdKey}[0]`,`${this.species[keys.speciesIdKey]}`);
         if((this.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
@@ -482,7 +487,7 @@ export class ActivityCurve implements SpeciesPlot {
             }
             line.x(x_functor);
             line.y(y_functor);
-            console.debug('ActivityCurve.draw',self.species,self.phenophase,self.year,self.metric,self.domain(),y.domain());
+            console.debug('ActivityCurve.draw',self.species,self.phenophase,self.actualYear,self.metric,self.domain(),y.domain());
             console.debug('draw.datas',datas);
             datas.forEach(function(curve_data,i){
                 if(curve_data.length === 1 || self.selection.dataPoints) {

@@ -12,7 +12,7 @@ import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
     selector: 'scatter-plot-control',
     template: `
     <div *ngIf="!selection.canAddPlot" class="max-plots-reached"><fa-icon [icon]="faExclamationTriangle"></fa-icon> One more plot would exceed the maximum of {{selection.MAX_PLOTS}} allowed</div>
-    <year-range-input [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="yearChange()" (onEndChange)="yearChange()"></year-range-input>
+    <year-range-input [allowCurrentYear]="allowCurrentYear" [(start)]="selection.start" [(end)]="selection.end" (onStartChange)="yearChange()" (onEndChange)="yearChange()"></year-range-input>
 
     <div class="phenophase-input-wrapper" *ngFor="let spi of selection.plots; index as idx">
         <higher-species-phenophase-input
@@ -53,6 +53,8 @@ import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 export class ScatterPlotControlsComponent extends MonitorsDestroy {
     @Input()
     selection: ScatterPlotSelection;
+    @Input()
+    allowCurrentYear:boolean = false;
     axis = AXIS;
     criteria:HigherSpeciesPhenophaseInputCriteria;
 
@@ -78,7 +80,7 @@ export class ScatterPlotControlsComponent extends MonitorsDestroy {
 
     updateCriteria() {
         this.criteria = {
-            years: d3.range(this.selection.start,this.selection.end+1),
+            years: d3.range(this.selection.start,this.selection.actualEnd+1),
             stationIds: this.selection.getStationIds()
         };
     }

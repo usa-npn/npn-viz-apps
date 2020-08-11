@@ -2,6 +2,7 @@ import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty, POPInput, BASE_POP_INPUT 
 import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 import { HttpParams } from '@angular/common/http';
 import * as d3 from 'd3';
+import { CURRENT_YEAR, CURRENT_YEAR_VALUE } from '@npn/common/common';
 
 const KEYS_TO_NORMALIZE  = {
     daylength: 'mean_daylength',
@@ -62,6 +63,9 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
 
     private d3DateFormat = d3.timeFormat('%x');
 
+    get actualEnd():number {
+        return this.end === CURRENT_YEAR ? CURRENT_YEAR_VALUE : this.end;
+    }
     /**
      * Indicates whether or not adding one more plot will result in a visualization exceeding
      * the maximum number of allowed plots.
@@ -103,9 +107,9 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
 
     isValid():boolean {
         return this.start &&
-               this.end &&
+               this.actualEnd &&
                this.axis &&
-               (this.start <= this.end) &&
+               (this.start <= this.actualEnd) &&
                this.validPlots.length > 0;
     }
 
@@ -113,7 +117,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         params = params.set('climate_data','1')
                     .set('request_src','npn-vis-scatter-plot')
                     .set('start_date',`${this.start}-01-01`)
-                    .set('end_date',`${this.end}-12-31`);
+                    .set('end_date',`${this.actualEnd}-12-31`);
         return super.toURLSearchParams(params);
     }
 
@@ -121,7 +125,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
         return super.toPOPInput(input)
             .then(input => {
                 input.startDate = `${this.start}-01-01`;
-                input.endDate = `${this.end}-12-31`;
+                input.endDate = `${this.actualEnd}-12-31`;
                 return input;
             });
     }

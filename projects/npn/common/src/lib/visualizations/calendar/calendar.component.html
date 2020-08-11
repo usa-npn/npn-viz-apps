@@ -1,0 +1,12 @@
+<div class="vis-container">
+    <div class="vis-working" *ngIf="selection.working">
+        <npn-logo spin="false"></npn-logo>
+    </div>
+    <div class="chart-container">
+        <visualization-download *ngIf="!thumbnail && !mobileMode" svgWrapperId="{{id}}" filename="{{filename}}"></visualization-download>
+        <div [class]="clazz" id="{{id}}"><svg class="svg-visualization"></svg></div>
+    </div>
+    <mat-checkbox *ngIf="!thumbnail && selection.meta?.userNegativeToggle" [(ngModel)]="selection.negative" (change)="selection.redraw()" class="meta-userNegativeToggle">Display negative data</mat-checkbox>
+    <div *ngIf="disclaimer && !thumbnail" class="vis-disclaimer">{{disclaimer}}</div>
+</div>
+<!--pre *ngIf="record">{{record | json}}</pre-->

@@ -27,6 +27,7 @@ export const ACTIVITY_CURVES_INTERPOLATES = [{
             [curve]="curve"
             [required]="i === 0"
             [gatherColor]="true"
+            [allowCurrentYear]="allowCurrentYear"
             (onSpeciesChange)="speciesMetricChange($event)"
             (onMetricChange)="speciesMetricChange($event)">
             </curve-selection-control>
@@ -88,6 +89,8 @@ export const ACTIVITY_CURVES_INTERPOLATES = [{
 export class ActivityCurvesControlComponent {
     @Input()
     selection: ActivityCurvesSelection;
+    @Input()
+    allowCurrentYear:boolean = false;
 
     frequencies:ActivityFrequency[] =  ACTIVITY_FREQUENCIES;
     interpolates:any[] = ACTIVITY_CURVES_INTERPOLATES;

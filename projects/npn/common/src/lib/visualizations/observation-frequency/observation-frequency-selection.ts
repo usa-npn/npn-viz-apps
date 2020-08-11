@@ -1,4 +1,4 @@
-import { NpnServiceUtils, NetworkService } from '../../common';
+import { NpnServiceUtils, NetworkService, CURRENT_YEAR, CURRENT_YEAR_VALUE } from '../../common';
 import { StationAwareVisSelection, selectionProperty, GroupHttpParams } from '../vis-selection';
 import { HttpParams } from '@angular/common/http';
 
@@ -39,12 +39,16 @@ export class ObservationFrequencySelection extends StationAwareVisSelection {
         super(serviceUtils,networkService);
     }
 
+    get actualYear():number {
+        return this.year === CURRENT_YEAR ? CURRENT_YEAR_VALUE : this.year;
+    }
+    
     isValid():boolean {
         return !!this.year && this.networkIds.length > 0;
     }
 
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        return super.toURLSearchParams(params.set('year',`${this.year}`));
+        return super.toURLSearchParams(params.set('year',`${this.actualYear}`));
     }
 
     getData():Promise<ObservationFrequencyData []> {
@@ -61,7 +65,7 @@ export class ObservationFrequencySelection extends StationAwareVisSelection {
         if(!this.$entity) {
             // the selection was created before the phenology trails work and must just contain a single network id
             // for a refuge, chase it to get the label for the visualization and then the data....
-            return this.serviceUtils.cachedGet(url,{year: this.year,network_id:this.networkIds[0]})
+            return this.serviceUtils.cachedGet(url,{year: this.actualYear,network_id:this.networkIds[0]})
                 .then((result:SiteVisitFreq) => {
                     this.working = false;
                     return [rollup(result,result.network_name)];

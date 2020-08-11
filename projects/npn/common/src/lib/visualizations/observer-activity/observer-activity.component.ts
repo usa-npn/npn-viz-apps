@@ -174,7 +174,7 @@ export class ObserverActivityComponent extends SvgVisualizationBaseComponent {
             return;
         }
         console.debug('ObserverActivityComponent:data',this.data);
-        this.title.text(`${this.selection.year}`);
+        this.title.text(`${this.selection.actualYear}`);
         this.yAxisLabel.text(this.selection.mode);
         this.updateLegend();
         const dataKey = this.selection.mode === ObserverActivityVisMode.ACTIVE_OBSERVERS ? 'activeObservers' : 'newObservers';

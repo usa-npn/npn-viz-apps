@@ -120,7 +120,7 @@ export class ClippedWmsMapSelection extends NetworkAwareVisSelection {
         if(this.layer && this.layer.forecast) {
             d.setTime(d.getTime()+(this.forecastDays*ONE_DAY_MILLIS));
         }
-        return this.datePipe.transform(d,'y-MM-dd');
+        return this.datePipe.transform(d,'yyyy-MM-dd');
     }
 
     getBoundary(): Promise<any> {

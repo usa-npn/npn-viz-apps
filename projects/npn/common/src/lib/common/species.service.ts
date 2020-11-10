@@ -340,7 +340,7 @@ export class SpeciesService {
         }
         
         if (date) {
-            params.date = this.datePipe.transform(date, 'y-MM-dd')
+            params.date = this.datePipe.transform(date, 'yyyy-MM-dd')
         } else {
             params.return_all = true;
         }
@@ -380,7 +380,7 @@ export class SpeciesService {
         }
         
         if (date) {
-            params.date = this.datePipe.transform(date, 'y-MM-dd')
+            params.date = this.datePipe.transform(date, 'yyyy-MM-dd')
         } else {
             params.return_all = true;
         }

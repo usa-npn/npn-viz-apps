@@ -112,7 +112,7 @@ export class CurveControlComponent extends MonitorsDestroy {
         this.yearControl.valueChanges
             .pipe(takeUntil(this.componentDestroyed))
             .subscribe(y => {
-                this.curve.year = y;
+                this.curve.year = (y === CURRENT_YEAR ? CURRENT_YEAR_VALUE : y);
                 this.updateCriteria();
             });
         setTimeout(() => this.updateCriteria());

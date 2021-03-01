@@ -7,7 +7,7 @@ import { PestMapLayer } from './pest-map-layer';
 
 export class PestMapLayerLegend extends MapLayerLegend {
     getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {
-        if(this.layerName == 'precipitation:buffelgrass_prism')
+        if(this.layerName == 'precipitation:buffelgrass_prism' || this.layerName == 'gdd:winter_wheat')
             return super.getGriddedPointData(latLng);
         const layer:PestMapLayer = this.getLayer() as PestMapLayer;
         return from(layer.getPestDescription())

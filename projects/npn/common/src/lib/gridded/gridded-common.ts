@@ -219,7 +219,7 @@ export const MAP_LAYERS:MapLayerDefs = {
         },{
             name: 'precipitation:buffelgrass_prism',
             title: 'Buffelgrass',
-            abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>'
+            abstract: 'Buffelgrass is an invasive plant that impacts native desert plant and animal communities in the Southwestern US. It creates substantial fire risk in ecosystems that are not adapted to large-scale intense burning. <a href="https://www.usanpn.org/data/forecasts/Buffelgrass" target="_blank">Learn more</a>'
         },{
             name: 'eastern_tent_caterpillar',
             title: 'Eastern Tent Caterpillar',
@@ -278,6 +278,11 @@ export const MAP_LAYERS:MapLayerDefs = {
             meta: {
                 agddDefaultThreshold: 20
             }
+        },
+        {
+            name: 'gdd:winter_wheat',
+            title: 'Winter Wheat',
+            abstract: 'The USA-NPN winter wheat development forecast predicts the developmental stage of winter wheat from emergence through seed development. Winter wheat is vulnerable to freezing temperatures once it resumes growth in the springtime. <a href="https://www.usanpn.org/data/forecasts/Winter_Wheat" target="_blank">Learn more</a>'
         }]
     },{
         "name": CATEGORY_TEMP_ACCUM_30_YR_AVG,

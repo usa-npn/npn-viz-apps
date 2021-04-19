@@ -39,8 +39,8 @@
       },
       {
         "title": "Do invasive shrubs leaf-out earlier than native shrubs?",
-        "tagline": "This Phenology Calendar shows reports of initial shoot and leaf growth for invasive multiflora rose and native Northern spicebush in the Eastern U.S. in 2020.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported initial growth (breaking leaf buds) in mutiflora rose, an invasive shrub, and Northern spicebush, a native shrub, in the eastern U.S. in 2020. A colored line indicates at least one observer reported 'yes' for initial shoot or leaf growth on that day. A gray line indicates at least one observer reported 'no' for initial shoot or leaf growth on that day, and no observer reported 'yes.' </p> \n <b>What does this tell me?</b> \n <p>Invasive shrubs are top competitors for native shrubs - they can break bud earlier in the spring and hold onto leaves longer in the fall. This phenomenon is called Extended Leaf Phenology, and allows these early-leafing invaders to take advantage of the greater amount of light reaching the forest floor in early spring. These observations show observers reported earlier initial shoot or leaf growth in invasive multiflora rose than in Northern spicebush this year.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Eastern U.S. to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
+        "tagline": "This Phenology Calendar shows reports of initial shoot and leaf growth for invasive multiflora rose and native Northern spicebush in the Eastern U.S. in 2021.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported initial growth (breaking leaf buds) in mutiflora rose, an invasive shrub, and Northern spicebush, a native shrub, in the eastern U.S. in 2021. A colored line indicates at least one observer reported 'yes' for initial shoot or leaf growth on that day. A gray line indicates at least one observer reported 'no' for initial shoot or leaf growth on that day, and no observer reported 'yes.' </p> \n <b>What does this tell me?</b> \n <p>Invasive shrubs are top competitors for native shrubs - they can break bud earlier in the spring and hold onto leaves longer in the fall. This phenomenon is called Extended Leaf Phenology, and allows these early-leafing invaders to take advantage of the greater amount of light reaching the forest floor in early spring. These observations show observers reported earlier initial shoot or leaf growth in invasive multiflora rose than in Northern spicebush this year.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Eastern U.S. to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
         "image": {
           "src": "assets/spicebush_Lindera benzoin_leaves_Erynn Maynard.png.jpg",
           "alt": "Leaves of Northern spicebush",
@@ -55,7 +55,7 @@
           "negative": true,
           "negativeColor": "#aaa",
           "years": [
-            2020
+            2021
           ],
           "plots": [
             {
@@ -147,17 +147,12 @@
         }
       },
       {
-        "title": "Does arrival of White-winged Doves coincide with open flowers on saguaro cacti?",
-        "tagline": "This Activity Curve shows the overlap between open flowers on saguaro cacti and activity of migrating White-winged Doves in Arizona in 2020.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of individual saguaros with open flowers and the mean number of White-winged Doves observed in Arizona in 2020. You can see the change in the proportion of individuals with open flowers and number of White-winged Doves in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting an increasing number of White-winged Doves beginning in early April. Observers started reporting saguaro open flowers in mid-March.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Number of Animals per Hour in the Curves menu. You can also use the Curves menu to change the Phenophase Classes displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
-        "image": {
-          "src": "assets/WhitewingedDove5_TomGrey.jpg",
-          "alt": "White winged dove on saguaro",
-          "credit": "Tom Grey"
-        },
+        "title": "When is peak pollen release in oak trees in the Western U.S.?",
+        "tagline": "This Activity Curve shows the timing of pollen release in plants in the <i>Quercus</i> genus in Western states from 2019 to 2021.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the proportion of 'yes' reports for pollen release in all plants in the <i>Quercus</i> genus in 2019, 2020, and 2020. You can see the timing of the peak in the proportion of 'yes' records in each year. </p> \n <b>What does this tell me?</b> \n <p>Observers reported the highest proportion of 'yes' records for <i>Quercus</i> pollen release for 2019 in late March, and the highest proportion for 2020 in mid-April. The proportion of 'yes' records for 2021 began increasing in late Feburary.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Total Individuals with Yes Records in the Curves menu. You can also use the Curves menu to change the  Phenophase Class displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
         "external": {
           "$class": "ActivityCurvesSelection",
-          "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcba7",
+          "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcbaq",
           "meta": {},
           "networkIds": [],
           "stationIds": [],
@@ -170,112 +165,134 @@
           "curves": [
             {
               "id": 0,
-              "color": "#2ca02c",
-              "year": 2020,
+              "color": "#ff7f0e",
+              "year": 2021,
               "species": {
-                "species_id": 210,
-                "common_name": "saguaro",
-                "genus": "Carnegiea",
-                "species": "gigantea",
+                "genus": "Quercus",
+                "genus_id": 946,
+                "genus_name": "Quercus",
+                "genus_common_name": "Quercus",
                 "kingdom": "Plantae",
-                "itis_taxonomic_sn": 506151,
-                "functional_type": "Cactus",
+                "itis_taxonomic_sn": 28728,
+                "functional_type": "Deciduous broadleaf",
                 "class_id": 15,
                 "class_common_name": "Flowering Plants",
                 "class_name": "Magnoliopsida",
-                "order_id": 72,
-                "order_common_name": "Cactus, Miner's-lettuce and Buckwheat Families",
-                "order_name": "Caryophyllales",
-                "family_id": 251,
-                "family_name": "Cactaceae",
-                "family_common_name": "Cactus Family"
+                "order_id": 79,
+                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
+                "order_name": "Fagales",
+                "family_id": 271,
+                "family_name": "Fagaceae",
+                "family_common_name": "Beech Family"
               },
               "phenophase": {
-                "pheno_class_id": 7,
-                "pheno_class_name": "Open flowers or pollen cones",
-                "pheno_class_sequence":70
+                "pheno_class_id": 8,
+                "pheno_class_name": "Pollen release",
+                "pheno_class_sequence":80
               },
               "metric": {
-                "id": "proportion_individuals_with_yes_record",
+                "id": "proportion_yes_records",
                 "sampleSize": "status_records_sample_size",
                 "label": "Proportion Yes Records"
               },
-              "speciesRank": "species",
+              "speciesRank": "genus",
               "phenophaseRank": "class"
             },
             {
               "id": 1,
-              "color": "#e7ba52",
+              "color": "#bcbd22",
+              "year": 2020,
               "species": {
-                "species_id": 1128,
-                "common_name": "white-winged dove",
-                "genus": "Zenaida",
-                "species": "asiatica",
-                "kingdom": "Animalia",
-                "itis_taxonomic_sn": 177121,
-                "functional_type": "Bird",
-                "class_id": 5,
-                "class_common_name": "Birds",
-                "class_name": "Aves",
-                "order_id": 24,
-                "order_common_name": "Pigeons and Doves",
-                "order_name": "Columbiformes",
-                "family_id": 123,
-                "family_name": "Columbidae",
-                "family_common_name": "Pigeons and Doves"
+                "genus": "Quercus",
+                "genus_id": 946,
+                "genus_name": "Quercus",
+                "genus_common_name": "Quercus",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 28728,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 79,
+                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
+                "order_name": "Fagales",
+                "family_id": 271,
+                "family_name": "Fagaceae",
+                "family_common_name": "Beech Family"
               },
               "phenophase": {
-                "pheno_class_id": 62,
-                "pheno_class_name": "Active individuals",
-                "pheno_class_sequence":10
+                "pheno_class_id": 8,
+                "pheno_class_name": "Pollen release",
+                "pheno_class_sequence":80
               },
               "metric": {
-                "id": "mean_numanimals_in-phase",
-                "sampleSize": "in-phase_per_hr_sites_sample_size",
-                "label": "Animals In Phase"
+                "id": "proportion_yes_records",
+                "sampleSize": "status_records_sample_size",
+                "label": "Proportion Yes Records"
               },
-              "year": 2020,
-              "speciesRank": "species",
+              "speciesRank": "genus",
+              "phenophaseRank": "class"
+            },
+            {
+              "id": 2,
+              "color": "#8c564b",
+              "year": 2019,
+              "species": {
+                "genus": "Quercus",
+                "genus_id": 946,
+                "genus_name": "Quercus",
+                "genus_common_name": "Quercus",
+                "kingdom": "Plantae",
+                "itis_taxonomic_sn": 28728,
+                "functional_type": "Deciduous broadleaf",
+                "class_id": 15,
+                "class_common_name": "Flowering Plants",
+                "class_name": "Magnoliopsida",
+                "order_id": 79,
+                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
+                "order_name": "Fagales",
+                "family_id": 271,
+                "family_name": "Fagaceae",
+                "family_common_name": "Beech Family"
+              },
+              "phenophase": {
+                "pheno_class_id": 8,
+                "pheno_class_name": "Pollen release",
+                "pheno_class_sequence":80
+              },
+              "metric": {
+                "id": "proportion_yes_records",
+                "sampleSize": "status_records_sample_size",
+                "label": "Proportion Yes Records"
+              },
+              "speciesRank": "genus",
               "phenophaseRank": "class"
             }
           ],
-          "boundaries": [
-            {
-              "id": 2,
-              "boundaryName": "Arizona",
-              "typeId": 1,
-              "boundaryTypeName": "US States"
-            }
-          ]
+          "boundaries": [{"data":[[49.48725533070503,-126.1880660357664],[49.380450106380735,-115.67711713065692],[44.214352030529874,-110.75010983138685],[40.950539914859085,-110.42164267810219],[40.826381803238135,-101.6351463277372],[36.66553540133169,-102.04573026934304],[31.429974980585673,-102.62054778759122],[30.656068586093458,-106.56215362700728],[30.938216598013977,-126.27018282408757]]}]
         }
       },
       {
-        "title": "Do maples leaf out earlier at southern latitudes compared to northern latitudes?",
-        "tagline": "This Scatterplot graph shows the relationship between latitude and leaf onset in the genus <i>Acer</i>.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between latitude and the onset of leafing within the genus <i>Acer</i> (maples) using all available data across the United States for the years 2011-2020. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>The leaf out of deciduous trees in the springtime is described as the 'green wave' that sweeps up the U.S. from south to north. This graph reflects this phenomenon by showing maples at southern latitudes leaf out earlier than trees further north.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the abiotic variables you are exploring, data precision filter, and range of dates displayed.  You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
-        "image": {
-          "src": "assets/maple_5-07.jpg",
-          "alt": "Leaves of red maple",
-          "credit": "Ellen G Denny"
-        },
+        "title": "How do winter temperatures correspond to leafing in the Soapberry family?",
+        "tagline": "This Scatterplot graph shows how minimum winter temperatures relate to the onset of spring leafing in the Soapberry family, which includes maples and chestnuts.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between minimum winter temperatures and the onset of leafing within the Soapberry family (Sapindaceae) using all available data across the United States for the years 2012-2021. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>Minimum winter temperatures can drive phenological activity in the spring. In some species, colder temperatures have been found to suppress leaf-out whereas warmer temperatures promote earlier leaf-out.  In this case, warmer temperatures are associated with earlier leaf-out within species of the Soapberry family.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring.  You can also add an additional set of data points grouped by taxonomy to the Scatterplot.</p>",
         "settings": {
             "speciesTitleFormat": "scientific-name"
         },
         "external": {
           "$class": "ScatterPlotSelection",
-          "guid": "67259fcc-e6d8-450d-a5c8-c8a15a9db1ew",
+          "guid": "67259fcc-e6d8-450d-a5c8-c8a15a9db1et",
           "meta": {},
           "networkIds": [],
           "stationIds": [],
           "individualPhenometrics": true,
-          "numDaysQualityFilter": 7,
+          "numDaysQualityFilter": 14,
           "plots": [
             {
               "species": {
+                "common_name": "red maple",
                 "genus": "Acer",
-                "genus_id": 372,
-                "genus_name": "Acer",
-                "genus_common_name": "",
+                "species": "rubrum",
                 "kingdom": "Plantae",
                 "itis_taxonomic_sn": 28728,
                 "functional_type": "Deciduous broadleaf",
@@ -294,12 +311,12 @@
                 "pheno_class_name": "Leaves or needles",
                 "pheno_class_sequence":30
               },
-              "color": "#1f77b4",
-              "speciesRank": "genus",
+              "color": "#2ca02c",
+              "speciesRank": "family",
               "phenophaseRank": "class",
               "regressionLine": {
                 "id": "3.1",
-                "color": "#1f77b4",
+                "color": "#2ca02c",
                 "p1": [
                   29.033138,
                   97.24825831553183
@@ -312,14 +329,14 @@
               }
             }
           ],
-          "start": 2011,
-          "end": 2020,
+          "start": 2012,
+          "end": 2021,
           "regressionLines": true,
           "axis": {
-            "key": "latitude",
-            "label": "Latitude"
+            "key": "tmin_winter",
+            "label": "Tmin Winter"
           },
-          "minDoy": 1,
+          "minDoy": 31,
           "maxDoy": 182
         }
       },

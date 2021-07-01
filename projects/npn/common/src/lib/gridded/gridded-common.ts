@@ -219,7 +219,7 @@ export const MAP_LAYERS:MapLayerDefs = {
         },{
             name: 'precipitation:buffelgrass_prism',
             title: 'Buffelgrass',
-            abstract: 'Buffelgrass is an invasive plant that impacts native desert plant and animal communities in the Southwestern US. It creates substantial fire risk in ecosystems that are not adapted to large-scale intense burning. <a href="https://www.usanpn.org/data/forecasts/Buffelgrass" target="_blank">Learn more</a>'
+            abstract: 'Buffelgrass is an invasive plant that impacts native desert plant and animal communities and creates a substantial fire risk in the Southwestern US. Herbicide control measures require 50% or more plant greenness. We predict greenness based on 24-day precipitation totals. Data sources: PRISM (raster), RainLog, NOAA-GHCN (stations). <a href="https://www.usanpn.org/data/forecasts/Buffelgrass" target="_blank">Learn more</a>'
         },{
             name: 'eastern_tent_caterpillar',
             title: 'Eastern Tent Caterpillar',

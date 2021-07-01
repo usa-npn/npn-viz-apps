@@ -13,6 +13,7 @@ import {
 import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 import { NpnServiceUtils, SpeciesService, NetworkService } from '@npn/common/common';
 import { HttpParams } from '@angular/common/http';
+import {PointService} from '../../gridded/point.service'
 
 /**
  * Note: This type of selection contains more functionality than the underlying visualization
@@ -46,6 +47,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
     _year:number;
 
     private map:google.maps.Map;
+    private markers: google.maps.Marker[] = [];
     layer:MapLayer;
     legend:MapLayerLegend;
 
@@ -53,7 +55,8 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         private layerService:NpnMapLayerService,
         protected serviceUtils:NpnServiceUtils,
         protected speciesService:SpeciesService,
-        protected networkService:NetworkService
+        protected networkService:NetworkService,
+        private pointService:PointService
     ) {
         super(serviceUtils,speciesService,networkService);
     }
@@ -187,6 +190,175 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
         return this.validForLayer() || this.validForData();
     }
 
+    clearMarkers() {
+        for (let i = 0; i < this.markers.length; i++) {
+            this.markers[i].setMap(null);
+        }
+        this.markers = [];
+    }
+
+    addGoogleMapMarker(map, lat, lng, precipAccum, daysMissing, source) {
+        let markerColor = '#dfc27d'
+        if(precipAccum >= 1.0) {
+            markerColor = '#d9f0d3'
+        }
+        if(precipAccum > 1.7) {
+            markerColor = '#5aae61'
+        }
+        let position:google.maps.LatLng = new google.maps.LatLng(lat, lng);
+        const contentString =
+            '<div id="content">' +
+            '<div id="siteNotice">' +
+            "</div>" +
+            '<p>24-day rainfall total: ' + precipAccum.toPrecision(2) + '"</p>' +
+            '<p>Source: ' + source + '</p>' +
+            "</div>";
+        const infowindow = new google.maps.InfoWindow({
+            content: contentString,
+        });
+        const marker = new google.maps.Marker({
+            position,
+            map,
+            // title: `testing`,
+            // label: `lable test`,
+            icon: {
+                strokeColor: "#000",
+                strokeOpacity: 1,
+                strokeWeight: 1,
+                fillColor: markerColor,
+                fillOpacity: 1,
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 5,
+                anchor: new google.maps.Point(0, 0)
+            },
+            optimized: false,
+        });
+        marker.addListener("mouseover", () => {
+            infowindow.open(map, marker);
+        });
+        marker.addListener("mouseout", () => {
+            infowindow.close();
+        });
+        this.markers.push(marker);
+    }
+
+    loadAcisMarkers(map, startDate, endDate) {
+        this.pointService.getAcisClimateData(
+            startDate.toISOString().split('T')[0],
+            endDate.toISOString().split('T')[0]).subscribe(result => {
+            let x = result;
+            result['data'].forEach(station => {
+                let accum = 0;
+                let daysMiss = 0;
+                station['data'].forEach(day => {
+                    if(Number.isNaN(Number(day[0]))) { 
+                        daysMiss += 1
+                    } else {
+                        accum += Number(day[0])
+                    }
+                });
+                if (daysMiss <= 2) {
+                    this.addGoogleMapMarker(map, station['meta']['ll'][1], station['meta']['ll'][0], accum, daysMiss, 'NOAA-GHCN');
+                } 
+            });
+            this.loadingMarkers = false;
+        }, err => {
+            console.log(err);
+        });
+    }
+
+    rainlogData = []
+    rainlogGauges = []
+    loadRainlogMarkers(map, startDate, endDate,limit,idx) {
+        this.pointService.getRainlogData(
+            startDate.toISOString().split('T')[0],
+            endDate.toISOString().split('T')[0],
+            limit,
+            idx).subscribe((results :any[]) => {
+            if(results && results.length > 0) {
+                for(var r of results) {
+                    this.rainlogData.push(r);
+                }
+                this.loadRainlogMarkers(map, startDate, endDate,limit,idx+limit)
+            } else {
+                this.loadRainlogGauges(map, startDate, endDate,limit,0)
+            }
+        }, err => {
+            console.log(err);
+        });
+    }
+
+    loadRainlogGauges(map, startDate, endDate,limit,idx) {
+        this.pointService.getRainlogGauges(
+            startDate.toISOString().split('T')[0],
+            endDate.toISOString().split('T')[0],
+            limit,
+            idx).subscribe((results :any[]) => {
+            if(results && results.length > 0) {
+                for(var r of results) {
+                    this.rainlogGauges.push(r);
+                }
+                this.loadRainlogGauges(map, startDate, endDate,limit,idx+limit)
+            } else {
+                console.log('made it!');
+                for(var rd of this.rainlogData) {
+                    //link gauges to markers
+                    for(var rg of this.rainlogGauges) {
+                        if(rd['gaugeId'] == rg['gaugeId']) {
+                            rd['lat'] = rg['position']['lat'];
+                            rd['lng'] = rg['position']['lng'];
+                            //create markers and put onto gmap
+
+                            break;
+                        }
+                    }
+                }
+                var rainlogSummed = [];
+                this.rainlogData.reduce(function(res, value) {
+                    if (!res[value.gaugeId]) {
+                        res[value.gaugeId] = { 
+                            gaugeId: value.gaugeId, 
+                            count: 0,
+                            lat: value.lat,
+                            lng: value.lng,
+                            rainAmount: value.rainAmount,
+                            // readingDate: [value.readingDate]
+                        };
+                        rainlogSummed.push(res[value.gaugeId])
+                    }
+                    else {
+                        res[value.gaugeId].rainAmount += value.rainAmount;
+                        res[value.gaugeId].count += 1;
+                        // res[value.gaugeId].readingDate.push(value.readingDate)
+                    }
+                    return res;
+                }, {});
+                rainlogSummed.filter(station => (24 - station.count) < 2)
+                .forEach(station => {
+                    //add googlemap marker
+                    this.addGoogleMapMarker(map, station.lat, station.lng, station.rainAmount, 24 - station.count, 'RainLog');
+                });
+                console.log('here we are');
+            }
+        }, err => {
+            console.log(err);
+        });
+    }
+
+    private loadingMarkers = false;
+    loadMapMarkers(map) {
+        this.clearMarkers();
+        if(this.loadingMarkers)
+            return
+        this.loadingMarkers = true;
+        let buffelEndDate = this.layer.extent.current.date;
+        let buffelStartDate = new Date(new Date(buffelEndDate).setDate(buffelEndDate.getDate()-24));
+        this.rainlogData = []
+        this.rainlogGauges = []
+        this.loadRainlogMarkers(map,buffelStartDate,buffelEndDate,1000,0);
+        this.loadAcisMarkers(map,buffelStartDate,buffelEndDate);
+    }
+
     // NOTE: There is no protection against this being called multiple times in fast succession
     // e.g. setLayerName, updateLayer, change layerName, call updateLayer
     // and if this happened there could be two Promises arguing over the ability set `this.layer`
@@ -225,10 +397,16 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
                             layer.setStyleRange(this.styleRange);
                         }
                         this.updateExtentValue();
+                        if(layer.layerName == 'precipitation:buffelgrass_prism') {
+                            this.loadMapMarkers(map);
+                        }
                         layer.on();
                         return this.layer.getLegend().then(legend => {this.legend = legend});
                     });
             } else {
+                if(this.layer.layerName == 'precipitation:buffelgrass_prism') {
+                    this.loadMapMarkers(map);
+                }
                 this.layer.bounce();
             }
         } else {

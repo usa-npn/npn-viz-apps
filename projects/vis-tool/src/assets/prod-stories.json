@@ -1,5 +1,5 @@
 {
-  "backgroundImage": "assets/spring-stories-bg.jpg",
+  "backgroundImage": "assets/fall-stories-bg.jpg",
   "stories": [
       {
           "title": "How fast is it warming up this year where I live?",
@@ -38,14 +38,9 @@
         }
       },
       {
-        "title": "Do invasive shrubs leaf-out earlier than native shrubs?",
-        "tagline": "This Phenology Calendar shows reports of initial shoot and leaf growth for invasive multiflora rose and native Northern spicebush in the Eastern U.S. in 2021.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported initial growth (breaking leaf buds) in mutiflora rose, an invasive shrub, and Northern spicebush, a native shrub, in the eastern U.S. in 2021. A colored line indicates at least one observer reported 'yes' for initial shoot or leaf growth on that day. A gray line indicates at least one observer reported 'no' for initial shoot or leaf growth on that day, and no observer reported 'yes.' </p> \n <b>What does this tell me?</b> \n <p>Invasive shrubs are top competitors for native shrubs - they can break bud earlier in the spring and hold onto leaves longer in the fall. This phenomenon is called Extended Leaf Phenology, and allows these early-leafing invaders to take advantage of the greater amount of light reaching the forest floor in early spring. These observations show observers reported earlier initial shoot or leaf growth in invasive multiflora rose than in Northern spicebush this year.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Eastern U.S. to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
-        "image": {
-          "src": "assets/spicebush_Lindera benzoin_leaves_Erynn Maynard.png.jpg",
-          "alt": "Leaves of Northern spicebush",
-          "credit": "Erynn Maynard Bean"
-        },
+        "title": "When should I expect fall color in northern red oak in the Northeast?",
+        "tagline": "This Phenology Calendar shows reports of colored leaves for Northern red oak from the past four years.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Phenology Calendar shows when observers reported the colored leaves phenophase for Northern red oak across Northeast states from 2018 to 2021. The colored line indiciates at least one observer reported 'yes' for colored leaves on that day. The gray line indicates at least one observer reported 'no' for colored leaves on that day, and no observer reported 'yes.'</p> \n <b>What does this tell me?</b> \n <p>You can use this Calendar to know when to expect colored leaves on Northern red oak in the fall. Aside from a few stray reports of colored leaves in the summer months, the majority of 'yes' reports for colored leaves begin around mid- to late-September.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species (or higher Taxonomic group) and Phenophase Class displayed on the Calendar in the Select Species/Phenophase menu and the Years displayed in the Years menu. To change the location from the Northeast to a different area, use the Boundary menu. You can change the size of the labels and color bands as well as whether the 'no' data are displayed in the Features menu.</p>",
         "external": {
           "$class": "CalendarSelection",
           "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
@@ -55,61 +50,25 @@
           "negative": true,
           "negativeColor": "#aaa",
           "years": [
-            2021
+            2021, 
+            2020, 
+            2019, 
+            2018
           ],
           "plots": [
             {
               "color": "#d62728",
               "species": {
-                "species_id": 1248,
-                "common_name": "multiflora rose",
-                "genus": "Rosa",
-                "species": "multiflora",
+                "species_id": 102,
+                "common_name": "northern red oak",
                 "kingdom": "Plantae",
-                "itis_taxonomic_sn": 24833,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 96,
-                "order_common_name": "Oleaster, Buckthorn, Rose and Elm Families",
-                "order_name": "Rosales",
-                "family_id": 325,
-                "family_name": "Rosaceae",
-                "family_common_name": "Rose Family"
+                "genus": "Quercus",
+                "species": "rubra"
               },
               "phenophase": {
-                "pheno_class_id": 1,
-                "pheno_class_name":"Initial shoot or leaf growth",
-                "pheno_class_sequence":10
-              },
-              "speciesRank": "species",
-              "phenophaseRank": "class"
-            },
-            {
-              "color": "#1f77b4",
-              "species": {
-                "species_id": 915,
-                "common_name": "northern spicebush",
-                "genus": "Lindera",
-                "species": "benzoin",
-                "kingdom": "Plantae",
-                "itis_taxonomic_sn": 18147,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 84,
-                "order_common_name": "Laurel Family",
-                "order_name": "Laurales",
-                "family_id": 287,
-                "family_name": "Lauraceae",
-                "family_common_name": "Laurel Family"
-              },
-              "phenophase": {
-                "pheno_class_id": 1,
-                "pheno_class_name":"Initial shoot or leaf growth",
-                "pheno_class_sequence":10
+                "pheno_class_id": 4,
+                "pheno_class_name":"Colored leaves or needles",
+                "pheno_class_sequence":40
               },
               "speciesRank": "species",
               "phenophaseRank": "class"
@@ -119,24 +78,28 @@
             {
               "data": [
                 [
-                  50.01,
-                  -97.24
+                  42,
+                  -80.6
                 ],
                 [
-                  23.94,
-                  -94.20
+                  39.8,
+                  -80.6
                 ],
                 [
-                  24.32,
-                  -62.01
+                  38.2,
+                  -73
                 ],
                 [
-                  48.89,
-                  -65.4
+                  46,
+                  -65
                 ],
                 [
-                  50.01,
-                  -97.24
+                  48,
+                  -68
+                ],
+                [
+                  44,
+                  -80
                 ]
               ]
             }
@@ -147,9 +110,9 @@
         }
       },
       {
-        "title": "When is peak pollen release in oak trees in the Western U.S.?",
-        "tagline": "This Activity Curve shows the timing of pollen release in plants in the <i>Quercus</i> genus in Western states from 2019 to 2021.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the proportion of 'yes' reports for pollen release in all plants in the <i>Quercus</i> genus in 2019, 2020, and 2020. You can see the timing of the peak in the proportion of 'yes' records in each year. </p> \n <b>What does this tell me?</b> \n <p>Observers reported the highest proportion of 'yes' records for <i>Quercus</i> pollen release for 2019 in late March, and the highest proportion for 2020 in mid-April. The proportion of 'yes' records for 2021 began increasing in late Feburary.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Total Individuals with Yes Records in the Curves menu. You can also use the Curves menu to change the  Phenophase Class displayed. You can also use this menu to add additional curves for other Years, Taxanomic Groups or Phenophase Classes.</p>",
+        "title": "Are nectar plants flowering when monarchs need them in the Midwest?",
+        "tagline": "This Activty Curve shows the overlap between open flowers in nectar plants and activity of monarch butterflies in the Midwest in 2021.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This Activity Curve shows the overlap between the proportion of invidual nectar plants in the three most observed genera with open flowers and the proportion of sites reporting yes to monarch butterfly adults observed in Midwest states in 2021. You can see the change in the proportion of individuals with open flowers and the number of sites with reports of monarchs in each 2-week period across the year. </p> \n <b>What does this tell me?</b> \n <p>Observers started reporting open flowers in early May in the Midwest, and by mid-July, most observers were reporting 'yes' for open flowers. Observers started reporting monarch butterflies in early May, with a peak in sites with monarchs observed in mid-July. Activity of nectar plant open flowers declined for these three genera by early October, with a small proportion of individual plants with open flowers through the end of October, and sites reporting monarchs declined by late October.</p> \n <b>How can I modify this visualization?</b> \n <p>You can explore other metrics such as Total Yes Records and Total Animals in Phase in the Curves menu. You can also use the Curves menu to change the pheno classes displayed or change the Taxonimic Rank to explore individual species. You can also use this menu to add additional curves for other Years or Phenophase Classes.</p>",
         "external": {
           "$class": "ActivityCurvesSelection",
           "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcbaq",
@@ -165,33 +128,22 @@
           "curves": [
             {
               "id": 0,
-              "color": "#ff7f0e",
+              "color": "#2ca02c",
               "year": 2021,
               "species": {
-                "genus": "Quercus",
-                "genus_id": 946,
-                "genus_name": "Quercus",
-                "genus_common_name": "Quercus",
-                "kingdom": "Plantae",
-                "itis_taxonomic_sn": 28728,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 79,
-                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
-                "order_name": "Fagales",
-                "family_id": 271,
-                "family_name": "Fagaceae",
-                "family_common_name": "Beech Family"
+                "genus": "Asclepias",
+                "genus_id": 440,
+                "genus_name": "Asclepias",
+                "genus_common_name": "Milkweeds (Asclepias)",
+                "kingdom": "Plantae"
               },
               "phenophase": {
-                "pheno_class_id": 8,
-                "pheno_class_name": "Pollen release",
-                "pheno_class_sequence":80
+                "pheno_class_id": 7,
+                "pheno_class_name": "Open flowers or pollen cones",
+                "pheno_class_sequence":70
               },
               "metric": {
-                "id": "proportion_yes_records",
+                "id": "proportion_individuals_with_yes_record",
                 "sampleSize": "status_records_sample_size",
                 "label": "Proportion Yes Records"
               },
@@ -200,33 +152,22 @@
             },
             {
               "id": 1,
-              "color": "#bcbd22",
-              "year": 2020,
+              "color": "#5254a3",
+              "year": 2021,
               "species": {
-                "genus": "Quercus",
-                "genus_id": 946,
-                "genus_name": "Quercus",
-                "genus_common_name": "Quercus",
-                "kingdom": "Plantae",
-                "itis_taxonomic_sn": 28728,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 79,
-                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
-                "order_name": "Fagales",
-                "family_id": 271,
-                "family_name": "Fagaceae",
-                "family_common_name": "Beech Family"
+                "genus_id": 604,
+                "genus_name": "Echinacea",
+                "genus": "Echinacea",
+                "genus_common_name": "Purple Coneflowers (Echinacea)",
+                "kingdom": "Plantae"
               },
               "phenophase": {
-                "pheno_class_id": 8,
-                "pheno_class_name": "Pollen release",
-                "pheno_class_sequence":80
+                "pheno_class_id": 7,
+                "pheno_class_name": "Open flowers or pollen cones",
+                "pheno_class_sequence":70
               },
               "metric": {
-                "id": "proportion_yes_records",
+                "id": "proportion_individuals_with_yes_record",
                 "sampleSize": "status_records_sample_size",
                 "label": "Proportion Yes Records"
               },
@@ -235,47 +176,74 @@
             },
             {
               "id": 2,
-              "color": "#8c564b",
-              "year": 2019,
+              "color": "#c51b8a",
+              "year": 2021,
               "species": {
-                "genus": "Quercus",
-                "genus_id": 946,
-                "genus_name": "Quercus",
-                "genus_common_name": "Quercus",
-                "kingdom": "Plantae",
-                "itis_taxonomic_sn": 28728,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 79,
-                "order_common_name": "Birch, Beech, Walnut and Bayberry Families",
-                "order_name": "Fagales",
-                "family_id": 271,
-                "family_name": "Fagaceae",
-                "family_common_name": "Beech Family"
+                "genus": "Monarda",
+                "genus_id": 809,
+                "genus_name": "Monarda",
+                "genus_common_name": "Beebalms (Monarda)",
+                "kingdom": "Plantae"
               },
               "phenophase": {
-                "pheno_class_id": 8,
-                "pheno_class_name": "Pollen release",
-                "pheno_class_sequence":80
+                "pheno_class_id": 7,
+                "pheno_class_name": "Open flowers or pollen cones",
+                "pheno_class_sequence":70
               },
               "metric": {
-                "id": "proportion_yes_records",
+                "id": "proportion_individuals_with_yes_record",
                 "sampleSize": "status_records_sample_size",
                 "label": "Proportion Yes Records"
               },
               "speciesRank": "genus",
               "phenophaseRank": "class"
+            },
+            {
+              "id": 3,
+              "color": "#ff7f0e",
+              "year": 2021,
+              "species": {
+                "species_id": 396,
+                "common_name": "monarch",
+                "genus": "Danaus",
+                "species": "plexippus",
+                "kingdom": "Animalia",
+                "itis_taxonomic_sn": 117273,
+                "functional_type": "Insect",
+                "class_id": 8,
+                "class_common_name": "Insects",
+                "class_name": "Insecta",
+                "order_id": 43,
+                "order_common_name": "Butterflies and Moths",
+                "order_name": "Lepidoptera",
+                "family_id": 181,
+                "family_name": "Nymphalidae",
+                "family_common_name": "Brush-footed Butterflies",
+                "genus_id": 578,
+                "genus_name": "Danaus",
+                "genus_common_name": "Milkweed Butterflies (Danaus)"
+              },
+              "phenophase": {
+                "pheno_class_id": 62,
+                "pheno_class_name": "Active individuals",
+                "pheno_class_sequence":10
+              },
+              "metric": {
+                "id": "proportion_sites_with_yes_record",
+                "sampleSize": "status_records_sample_size",
+                "label": "Proportion Sites with Yes Records"
+              },
+              "speciesRank": "species",
+              "phenophaseRank": "class"
             }
           ],
-          "boundaries": [{"data":[[49.48725533070503,-126.1880660357664],[49.380450106380735,-115.67711713065692],[44.214352030529874,-110.75010983138685],[40.950539914859085,-110.42164267810219],[40.826381803238135,-101.6351463277372],[36.66553540133169,-102.04573026934304],[31.429974980585673,-102.62054778759122],[30.656068586093458,-106.56215362700728],[30.938216598013977,-126.27018282408757]]}]
+          "boundaries": [{"data":[[49.63422875960917,-97.49124068808877],[40.06142344165686,-95.84890492166542],[36.31956538877517,-94.69926988516906],[36.38570093727173,-89.03321149100849],[38.72885879369986,-84.43467134502308],[38.600622810148145,-82.0532844837092],[40.06142344165686,-80.41094871728585],[48.66748917236026,-80.82153265889168]]}]
         }
       },
       {
-        "title": "How do winter temperatures correspond to leafing in the Soapberry family?",
-        "tagline": "This Scatterplot graph shows how minimum winter temperatures relate to the onset of spring leafing in the Soapberry family, which includes maples and chestnuts.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between minimum winter temperatures and the onset of leafing within the Soapberry family (Sapindaceae) using all available data across the United States for the years 2012-2021. The relationship is calculated as a simple linear regression between these two variables. The onset dates for leafing are the first observed date of the leaf phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>Minimum winter temperatures can drive phenological activity in the spring. In some species, colder temperatures have been found to suppress leaf-out whereas warmer temperatures promote earlier leaf-out.  In this case, warmer temperatures are associated with earlier leaf-out within species of the Soapberry family.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring.  You can also add an additional set of data points grouped by taxonomy to the Scatterplot.</p>",
+        "title": "What is the relationship between summer temperature and timing of colored leaves in the Southeast?",
+        "tagline": "This Scatterplot graph shows the relationship between summer temperature and colored leaf onset in maples in the Southeast region.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This graph shows the relationship between mean summer maximum temperature and the onset of colored leaves within the genus Acer (maples) using all available data in the Southeast region for the years 2011-2020. The relationship is calculated as a simple linear regression between these two variables. The onset dates for colored leaves are the first observed date of the phenophases for a given individual plant and year. </p> \n <b>What does this tell me?</b> \n <p>The onset of colored leaves in the fall has a slight relationship with the maximum temperature in preceding summer, indicated by the R squared value of 0.11 which means the fit line represents 11% of the variability of the data around its mean. Trees that experienced higher maximum summer temperatures had a later onset in colored leaves in that year.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Phenophase Class displayed on the Scatterplot in the Species/Phenophase menu and the years displayed in the Years menu. To set a more specific location use the Boundary menu. Using the Features menu you can change the size of the labels and color bands as well as which climatic variables you are exploring.  You can also add an additional set of data points grouped by taxonomy to the scatterplot.</p>",
         "settings": {
             "speciesTitleFormat": "scientific-name"
         },
@@ -286,69 +254,41 @@
           "networkIds": [],
           "stationIds": [],
           "individualPhenometrics": true,
-          "numDaysQualityFilter": 14,
+          "numDaysQualityFilter": 7,
           "plots": [
             {
               "species": {
-                "common_name": "red maple",
-                "genus": "Acer",
-                "species": "rubrum",
-                "kingdom": "Plantae",
-                "itis_taxonomic_sn": 28728,
-                "functional_type": "Deciduous broadleaf",
-                "class_id": 15,
-                "class_common_name": "Flowering Plants",
-                "class_name": "Magnoliopsida",
-                "order_id": 97,
-                "order_common_name": "",
-                "order_name": "Sapindales",
-                "family_id": 329,
-                "family_name": "Sapindaceae",
-                "family_common_name": "Soapberry Family"
+                "genus_id": 372,
+                "genus_name": "Acer",
+                "genus_common_name": "Maples (Acer)",
+                "genus": "Maples (Acer)"
               },
               "phenophase": {
-                "pheno_class_id": 3,
-                "pheno_class_name": "Leaves or needles",
-                "pheno_class_sequence":30
+                "pheno_class_id": 4,
+                "pheno_class_name": "Colored leaves or needles",
+                "pheno_class_sequence":40
               },
-              "color": "#2ca02c",
-              "speciesRank": "family",
+              "color": "#ff7f0e",
+              "speciesRank": "genus",
               "phenophaseRank": "class",
-              "regressionLine": {
-                "id": "3.1",
-                "color": "#2ca02c",
-                "p1": [
-                  29.033138,
-                  97.24825831553183
-                ],
-                "p2": [
-                  47.503029,
-                  113.90751637626815
-                ],
-                "r2": 0.00898847014561707
-              }
-            }
+              "regressionLine": {"id":"372.4","color":"#ff7f0e","p1":[21.1,253.32804762276422],"p2":[33.5,290.17522145161695],"r2":0.11103815688568354}}
           ],
-          "start": 2012,
-          "end": 2021,
+          "boundaries": [{"data":[[36.84105772732253,-94.8650687167642],[36.559184521667504,-89.5037405917642],[38.990267056686115,-84.4939749667642],[37.680455030572624,-81.6814749667642],[39.19490992450397,-78.2537405917642],[35.56452148736697,-74.9138968417642],[23.761345147725784,-79.7478812167642],[29.11006032152869,-94.0740530917642]]}],
+          "start": 2011,
+          "end": 2020,
           "regressionLines": true,
           "axis": {
-            "key": "tmin_winter",
-            "label": "Tmin Winter"
+            "key": "tmax_summer",
+            "label": "Tmax Summer (C°)"
           },
-          "minDoy": 31,
-          "maxDoy": 182
+          "minDoy": 244,
+          "maxDoy": 365
         }
       },
       {
-        "title": "Can the USA-NPN's Spring Index predict flowering in dogwoods?",
-        "tagline": "This map shows the Spring First Bloom Index overlaid with observations of open flowers in flowering dogwoods.",
-        "description": "\n <b>What am I looking at?</b> \n <p>This map shows the predicted Spring First Bloom Index, overlaid with icons showing reported open flowers in flowering dogwood (<i>Cornus florida</i>). The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>This visualization shows how the First Bloom map, which is based on a predictive model of early-season plant blooming, aligns with reports of open flowers in dogwoods. Icons that are a similar color to the map show locations where reports of open flowers match up with predicted blooming.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Pheno Classes displayed in the Species/Phenophase menu. You can change the map displayed by changing the Layer Category in the Base Layer menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
-        "image": {
-          "src": "assets/Dogwood_flower_closeup_Photo credit EnLorax_Wikimedia Commons.png",
-          "alt": "open flowers on dogwood",
-          "credit": "EnLorax via Wikimedia Commons"
-        },
+        "title": "How well does the USA-NPN's Spring Index predict flowering in lilacs?",
+        "tagline": "This map shows the Spring First Bloom Index overlaid with observations of open flowers in common lilacs.",
+        "description": "\n <b>What am I looking at?</b> \n <p>This map shows the predicted Spring First Bloom Index, overlaid with icons showing reported open flowers in common lilac (<i>Syringa vulgaris</i>). The map is based on an integrative model that predicts the start of spring called the <a href=\"https://www.usanpn.org/news/spring\" target=\"_blank\">Spring Indices</a>. This model was developed using a long-term dataset of lilacs and honeysuckles and has been identified as a climate change indicator by the <a href=\"https://www.globalchange.gov/browse/indicators/indicator-start-spring\" target=\"_blank\">U.S. Global Change Research Program</a>. </p> \n <b>What does this tell me?</b> \n <p>This visualization shows how the First Bloom map, which is based on a predictive model of early-season plant blooming, aligns with reports of open flowers in common lilacs. Icons that are a similar color to the map show locations where reports of open flowers match up with predicted blooming.</p> \n <b>How can I modify this visualization?</b> \n <p>You can change the Species and Pheno Classes displayed in the Species/Phenophase menu. You can change the map displayed by changing the Layer Category in the Base Layer menu. Within the Spring Indices category, you can display either the Leaf or Bloom model, and view annual historical maps and current year status and anomaly maps.</p>",
         "external": {
           "$class": "MapSelection",
           "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
@@ -356,27 +296,27 @@
           "networkIds": [],
           "stationIds": [],
           "individualPhenometrics": false,
-          "numDaysQualityFilter": 30,
+          "numDaysQualityFilter": 7,
           "plots": [
             {
               "color": "#d62728",
               "species": {
-                "species_id": 12,
-                "common_name": "flowering dogwood",
+                "species_id": 36,
+                "common_name": "common lilac",
                 "genus": "Cornus",
-                "species": "florida",
+                "species": "vulgaris",
                 "kingdom": "Plantae",
-                "itis_taxonomic_sn": 27806,
+                "itis_taxonomic_sn": 32996,
                 "functional_type": "Deciduous broadleaf",
                 "class_id": 15,
                 "class_common_name": "Flowering Plants",
                 "class_name": "Magnoliopsida",
-                "order_id": 75,
-                "order_common_name": "Dogwood, Hydrangea and Tupelo Families",
-                "order_name": "Cornales",
-                "family_id": 262,
-                "family_name": "Cornaceae",
-                "family_common_name": "Dogwood Family"
+                "order_id": 83,
+                "order_common_name": "Mint, Olive and Plantain Families",
+                "order_name": "Lamiales",
+                "family_id": 305,
+                "family_name": "Oleaceae",
+                "family_common_name": "Olive Family"
               },
               "phenophase": {
                 "pheno_class_id": 7,

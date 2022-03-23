@@ -94,8 +94,12 @@ export class PestMapLayer extends MapLayer {
         }
     }
     private _on(): PestMapLayer {
+        let speciesName = this.layer_def.title;
+        if (speciesName == 'Spongy Moth') {
+            speciesName = 'Gypsy Moth';
+        }
         const params: any = {
-            species: this.layer_def.title
+            species: speciesName
         };
         this.layer_def.extent.current.addToParams(params, MapLayerServiceType.WMS);
         this.overlay = new GroundOverlayWrapper(this.layerService.serviceUtils.get(this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestMap'), params),this.opacity,this.map);
@@ -122,7 +126,10 @@ export class PestMapLayer extends MapLayer {
     }
 
     getPestDescription():Promise<PestDescription> {
-        const species = this.title;
+        let species = this.title;
+        if (species == 'Spongy Moth') {
+            species = 'Gypsy Moth';
+        }
         return this.layerService.serviceUtils.cachedGet(
             this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestDescriptions')
         ).then((descriptions:PestDescription[]) => descriptions.find(d => d.species === species));

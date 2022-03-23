@@ -237,8 +237,8 @@ export const MAP_LAYERS:MapLayerDefs = {
             }
         },{
             name: 'gypsy_moth',
-            title: 'Gypsy Moth',
-            abstract: 'European gypsy moth caterpillars feed on deciduous trees, causing major defoliation and tree mortality. They are considered one of the worst forest pests in the United States. <a href="https://www.usanpn.org/data/forecasts/Gypsy_moth" target="_blank">Learn more</a>',
+            title: 'Spongy Moth',
+            abstract: 'European spongy moth caterpillars feed on deciduous trees, causing major defoliation and tree mortality. They are considered one of the worst forest pests in the United States. <a href="https://www.usanpn.org/data/forecasts/Gypsy_moth" target="_blank">Learn more</a>',
             meta: {
                 agddSupports30YearAvg: false,
                 agddBaseTemp: 37.4,

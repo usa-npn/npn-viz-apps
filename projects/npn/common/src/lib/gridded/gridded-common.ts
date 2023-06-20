@@ -228,13 +228,23 @@ export const MAP_LAYERS:MapLayerDefs = {
                 agddSupports30YearAvg: false,
                 agddDefaultThreshold: 90
             }
-        },{
-            name: 'emerald_ash_borer',
-            title: 'Emerald Ash Borer',
-            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>',
-            meta: {
-                agddDefaultThreshold: 450
-            }
+        // },{
+        //     name: 'emerald_ash_borer',
+        //     title: 'Emerald Ash Borer',
+        //     abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>',
+        //     meta: {
+        //         agddDefaultThreshold: 450
+        //     }
+        }, {
+            name: 'gdd:eab_adult',
+            title: 'Emerald Ash Borer Adult',
+            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
+        },
+        {
+            name: 'gdd:eab_egg_hatch',
+            title: 'Emerald Ash Borer Egg Hatch',
+            abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
+        // }, {
         },{
             name: 'gypsy_moth',
             title: 'Spongy Moth',
@@ -283,7 +293,18 @@ export const MAP_LAYERS:MapLayerDefs = {
             name: 'gdd:winter_wheat',
             title: 'Winter Wheat',
             abstract: 'The USA-NPN winter wheat development forecast predicts the developmental stage of winter wheat from emergence through seed development. Winter wheat is vulnerable to freezing temperatures once it resumes growth in the springtime. <a href="https://www.usanpn.org/data/forecasts/Winter_Wheat" target="_blank">Learn more</a>'
-        }]
+        },
+        {
+            name: 'gdd:red_brome_flowering',
+            title: 'Red Brome Flowering',
+            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
+        },
+        {
+            name: 'gdd:red_brome_senescence',
+            title: 'Red Brome Senescence',
+            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
+        }
+        ]
     },{
         "name": CATEGORY_TEMP_ACCUM_30_YR_AVG,
         "supports_data": false,
@@ -491,6 +512,7 @@ export const BASE_WMS_ARGS = {
     height: BOX_SIZE,
     width: BOX_SIZE,
     srs: 'EPSG:3857' // 'EPSG:4326'
+    // ENV: 'doy:220'
 };
 
 @Injectable()

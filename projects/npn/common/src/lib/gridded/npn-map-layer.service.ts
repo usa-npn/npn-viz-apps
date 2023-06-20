@@ -59,7 +59,12 @@ export class NpnMapLayerService {
                             return new WmsMapLayer(map,layerDef,this);
                         case MapLayerType.PEST:
                             {
-                                if(layerDef.name == 'precipitation:buffelgrass_prism' || layerDef.name == 'gdd:winter_wheat')
+                                if(layerDef.name == 'precipitation:buffelgrass_prism' 
+                                || layerDef.name == 'gdd:eab_adult' 
+                                || layerDef.name == 'gdd:eab_egg_hatch'
+                                || layerDef.name == 'gdd:winter_wheat'
+                                || layerDef.name == 'gdd:red_brome_flowering'
+                                || layerDef.name == 'gdd:red_brome_senescence')
                                     return new WmsMapLayer(map,layerDef,this);
                                 else
                                     return new PestMapLayer(map,layerDef,this);
@@ -88,7 +93,12 @@ export class NpnMapLayerService {
         return definition.then(layerDef => {
             let layerBasis = layerDef.layerBasis;
             const layerName = layerDef.name;
-            if(layerName == 'precipitation:buffelgrass_prism' || layerName == 'gdd:winter_wheat') {
+            if(layerName == 'precipitation:buffelgrass_prism' 
+            || layerName == 'gdd:eab_adult' 
+            || layerName == 'gdd:eab_egg_hatch' 
+            || layerName == 'gdd:winter_wheat'
+            || layerName == 'gdd:red_brome_flowering'
+            || layerName == 'gdd:red_brome_senescence') {
                 layerBasis = layerName;
             }
             if(this.legends[layerName]) {
@@ -115,7 +125,13 @@ export class NpnMapLayerService {
                                     return found;
                                 }
                                 const styleName = findChildren('Name',$jq(e)).first().text();
-                                return styleName === layerName || styleName == 'buffelgrass_inches' || styleName == 'winter_wheat' ? e : null;
+                                return styleName === layerName 
+                                || styleName == 'buffelgrass_inches'
+                                || styleName == 'eab_adult' 
+                                || styleName == 'eab_egg_hatch' 
+                                || styleName == 'winter_wheat'
+                                || styleName == 'red_brome_flowering'
+                                || styleName == 'red_brome_senescence' ? e : null;
                             },null)
                         : userStyles.toArray()[0]; 
                     let color_map = findChildren('ColorMap',$jq(userStyleElm));

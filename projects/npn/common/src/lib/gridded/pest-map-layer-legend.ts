@@ -7,7 +7,12 @@ import { PestMapLayer } from './pest-map-layer';
 
 export class PestMapLayerLegend extends MapLayerLegend {
     getGriddedPointData(latLng:google.maps.LatLng):Observable<GriddedPointData> {
-        if(this.layerName == 'precipitation:buffelgrass_prism' || this.layerName == 'gdd:winter_wheat')
+        if(this.layerName == 'precipitation:buffelgrass_prism' 
+        || this.layerName == 'gdd:eab_adult'
+        || this.layerName == 'gdd:eab_egg_hatch' 
+        || this.layerName == 'gdd:winter_wheat'
+        || this.layerName == 'gdd:red_brome_flowering'
+        || this.layerName == 'gdd:red_brome_senescence')
             return super.getGriddedPointData(latLng);
         const layer:PestMapLayer = this.getLayer() as PestMapLayer;
         return from(layer.getPestDescription())

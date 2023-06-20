@@ -23,6 +23,20 @@ export class LegendBuffelgrassUnitsPipe implements PipeTransform {
     }
 }
 
+@Pipe({name: 'legendDoyUnits'})
+export class LegendDoyUnitsPipe implements PipeTransform {
+    constructor(private decimalPipe:DecimalPipe) {}
+    transform(n:number,includeUnits?:boolean) {
+        if(n<1)
+            return 'No Data';
+        var date = new Date(n * 24 * 60 * 60 * 1000);
+        var currentYear = new Date().getFullYear();
+        date.setFullYear(currentYear);
+        var dateStringParts = date.toJSON().slice(0,10).split('-');
+        return dateStringParts[1] + '/' + dateStringParts[2] + '/' + dateStringParts[0];//this.decimalPipe.transform(n,'1.0-0')+(includeUnits ? ' DAYS' : '');
+    }
+}
+
 @Pipe({name: 'agddDefaultTodayElevation'})
 export class AgddDefaultTodayElevationPipe implements PipeTransform {
     constructor(private datePipe:DatePipe) {}
@@ -169,6 +183,7 @@ export class GriddedPipeProvider {
         private agddDefaultTodayElevation:AgddDefaultTodayElevationPipe,
         private legendGddUnits:LegendGddUnitsPipe,
         private legendBuffelgrassUnits:LegendBuffelgrassUnitsPipe,
+        private legendDoyUnits:LegendDoyUnitsPipe,
         private thirtyYearAvgDayOfYear:ThirtyYearAvgDayOfYearPipe,
         private date:DatePipe
     ) {
@@ -180,6 +195,7 @@ export class GriddedPipeProvider {
         this.pipes.agddDefaultTodayElevation = agddDefaultTodayElevation;
         this.pipes.legendGddUnits = legendGddUnits;
         this.pipes.legendBuffelgrassUnits = legendBuffelgrassUnits;
+        this.pipes.legendDoyUnits = legendDoyUnits;
         this.pipes.thirtyYearAvgDayOfYear = thirtyYearAvgDayOfYear;
         this.pipes.date = date;
     }

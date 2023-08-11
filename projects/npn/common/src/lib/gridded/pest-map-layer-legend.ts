@@ -36,7 +36,7 @@ export class PestMapLayerLegend extends MapLayerLegend {
                         }
                         return from(
                             this.wcsDataService.serviceUtils.get(
-                                this.wcsDataService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod}/pointTimeSeries`),
+                                this.wcsDataService.serviceUtils.dataApiUrl(`/v1/agdd/${pest.agddMethod}/pointTimeSeries`),
                                 params
                             )
                         ).pipe(

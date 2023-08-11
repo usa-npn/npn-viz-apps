@@ -102,7 +102,7 @@ export class PestMapLayer extends MapLayer {
             species: speciesName
         };
         this.layer_def.extent.current.addToParams(params, MapLayerServiceType.WMS);
-        this.overlay = new GroundOverlayWrapper(this.layerService.serviceUtils.get(this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestMap'), params),this.opacity,this.map);
+        this.overlay = new GroundOverlayWrapper(this.layerService.serviceUtils.get(this.layerService.serviceUtils.dataApiUrl('/v1/phenoforecasts/pestMap'), params),this.opacity,this.map);
         this.overlay.on();
         return this;
     }
@@ -131,12 +131,12 @@ export class PestMapLayer extends MapLayer {
             species = 'Gypsy Moth';
         }
         return this.layerService.serviceUtils.cachedGet(
-            this.layerService.serviceUtils.dataApiUrl('/v0/agdd/pestDescriptions')
+            this.layerService.serviceUtils.dataApiUrl('/v1/phenoforecasts/pestDescriptions')
         ).then((descriptions:PestDescription[]) => descriptions.find(d => d.species === species));
     }
 
     getTimeSeriesUrl():Promise<string> {
         return this.getPestDescription()
-            .then(pest => this.layerService.serviceUtils.dataApiUrl(`/v0/agdd/${pest.agddMethod||'simple'}/pointTimeSeries`));
+            .then(pest => this.layerService.serviceUtils.dataApiUrl(`/v1/agdd/${pest.agddMethod||'simple'}/pointTimeSeries`));
     }
 }

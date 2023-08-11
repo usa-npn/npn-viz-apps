@@ -254,7 +254,7 @@ export class AgddTimeSeriesSelection extends VisSelection {
         if(!this._timeSeriesUrl) {
             this._timeSeriesUrl = this.layer instanceof PestMapLayer
                 ? this.layer.getTimeSeriesUrl()
-                : Promise.resolve(this.serviceUtils.dataApiUrl(`/v0/agdd/simple/pointTimeSeries`));
+                : Promise.resolve(this.serviceUtils.dataApiUrl(`/v1/agdd/simple/pointTimeSeries`));
         }
         return this._timeSeriesUrl;
     }

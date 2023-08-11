@@ -220,7 +220,7 @@ export class StartOfSpringDialog {
             .x((d:any) => x(d.date))
             .y((d:any) => y(d.doy));
 
-        this.npnSvcUtils.cachedGet(this.npnSvcUtils.dataApiUrl('/v0/si-x/area/statistics/timeseries'),{
+        this.npnSvcUtils.cachedGet(this.npnSvcUtils.dataApiUrl('/v1/si-x/area/statistics/timeseries'),{
             layerName: 'si-x:average_leaf_best',
             fwsBoundary: this.refuge.boundary_id,
             yearStart: startYear,

@@ -257,9 +257,9 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
                         accum += Number(day[0])
                     }
                 });
-                if (daysMiss <= 2) {
+                //if (daysMiss <= 2) {
                     this.addGoogleMapMarker(map, station['meta']['ll'][1], station['meta']['ll'][0], accum, daysMiss, 'NOAA-GHCN');
-                } 
+                //} 
             });
             this.loadingMarkers = false;
         }, err => {
@@ -333,7 +333,7 @@ export class MapSelection extends SiteOrSummaryVisSelection implements SupportsO
                     }
                     return res;
                 }, {});
-                rainlogSummed.filter(station => (24 - station.count) < 2)
+                rainlogSummed//.filter(station => (24 - station.count) < 2)
                 .forEach(station => {
                     //add googlemap marker
                     this.addGoogleMapMarker(map, station.lat, station.lng, station.rainAmount, 24 - station.count, 'RainLog');

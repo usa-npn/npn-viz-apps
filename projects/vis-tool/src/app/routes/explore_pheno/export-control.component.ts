@@ -50,7 +50,7 @@ export class ExportControlComponent implements StepComponent {
             .then(input => completePOPDates(input))
             // save the POP input and get back a hash
             .then(searchJson => this.serviceUtils.http.post<any>(
-                    this.serviceUtils.popApipUrl('/pop/search'),
+                    this.serviceUtils.popApipUrl('/search'),
                     {searchJson}
                 ).toPromise()
                 // just tease out the hash

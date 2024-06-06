@@ -245,6 +245,17 @@ export const MAP_LAYERS:MapLayerDefs = {
             title: 'Emerald Ash Borer Egg Hatch',
             abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
         // }, {
+        },
+        {
+            name: 'gdd:slf_adult',
+            title: 'Spotted Lanternfly Adult',
+            abstract: 'The spotted lanternfly is an invasive planthopper that threatens several major agriculture crops in the U.S. including grape, orchard, stone fruit, and hops. Spotted lanternfly damages plants by sucking sap from trunks, stems, and branches as well as by depositing a sticky residue that leads to mold growth. Several U.S. states have quarantine areas in place to help prevent SLFs spread. <a href="https://www.usanpn.org/data/maps/forecasts/spotted_lanternfly" target="_blank">Learn more</a>'
+        },
+        {
+            name: 'gdd:slf_egg_hatch',
+            title: 'Spotted Lanternfly Egg Hatch',
+            abstract: 'The spotted lanternfly is an invasive planthopper that threatens several major agriculture crops in the U.S. including grape, orchard, stone fruit, and hops. Spotted lanternfly damages plants by sucking sap from trunks, stems, and branches as well as by depositing a sticky residue that leads to mold growth. Several U.S. states have quarantine areas in place to help prevent SLFs spread. <a href="https://www.usanpn.org/data/maps/forecasts/spotted_lanternfly" target="_blank">Learn more</a>'
+        // }, {
         },{
             name: 'gypsy_moth',
             title: 'Spongy Moth',

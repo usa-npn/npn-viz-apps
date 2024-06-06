@@ -62,6 +62,8 @@ export class NpnMapLayerService {
                                 if(layerDef.name == 'precipitation:buffelgrass_prism' 
                                 || layerDef.name == 'gdd:eab_adult' 
                                 || layerDef.name == 'gdd:eab_egg_hatch'
+                                || layerDef.name == 'gdd:slf_adult' 
+                                || layerDef.name == 'gdd:slf_egg_hatch'
                                 || layerDef.name == 'gdd:winter_wheat'
                                 || layerDef.name == 'gdd:red_brome_flowering'
                                 || layerDef.name == 'gdd:red_brome_senescence')
@@ -96,6 +98,8 @@ export class NpnMapLayerService {
             if(layerName == 'precipitation:buffelgrass_prism' 
             || layerName == 'gdd:eab_adult' 
             || layerName == 'gdd:eab_egg_hatch' 
+            || layerName == 'gdd:slf_adult' 
+            || layerName == 'gdd:slf_egg_hatch' 
             || layerName == 'gdd:winter_wheat'
             || layerName == 'gdd:red_brome_flowering'
             || layerName == 'gdd:red_brome_senescence') {
@@ -129,6 +133,8 @@ export class NpnMapLayerService {
                                 || styleName == 'buffelgrass_inches'
                                 || styleName == 'eab_adult' 
                                 || styleName == 'eab_egg_hatch' 
+                                || styleName == 'slf_adult' 
+                                || styleName == 'slf_egg_hatch' 
                                 || styleName == 'winter_wheat'
                                 || styleName == 'red_brome_flowering'
                                 || styleName == 'red_brome_senescence' ? e : null;

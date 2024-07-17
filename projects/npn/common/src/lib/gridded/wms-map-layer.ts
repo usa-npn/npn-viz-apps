@@ -59,7 +59,10 @@ export class WmsMapLayer extends MapLayer {
                     args.sld_body = this.sldBody;
                 }
                 let all_args = { ...base, ...this.wmsArgs, ...args };
-                return this.griddedUrls.wmsBaseUrl + '?' + encodeHttpParams(all_args);
+                // if (layer_def.name == 'gdd:asian_longhorned_beetle') {
+                //     all_args.replace("gdd:asian_longhorned_beetle","gdd:asian_longhorned_beetle,gdd:states&CQL_FILTER=INCLUDE;NAME%20IN%20(%27Ohio%27,%27Pennsylvania%27,%27New%20York%27,%27Connecticut%27,%27Rhode%20Island%27,%27Massachusetts%27,%27South%20Carolina%27,%27Missippi%27)&styles=gdd:alb2,gdd:hatch");
+                // }
+                return this.griddedUrls.wmsBaseUrl + '?' + encodeHttpParams(all_args).replace("gdd%3Aasian_longhorned_beetle","gdd%3Aasian_longhorned_beetle,gdd%3Astates&CQL_FILTER=INCLUDE;NAME%20IN%20(%27Ohio%27,%27Pennsylvania%27,%27New%20York%27,%27Connecticut%27,%27Rhode%20Island%27,%27Massachusetts%27,%27South%20Carolina%27,%27Missippi%27)&styles=gdd%3Aalb2,gdd%3Ahatch");
             },
             tileSize: new google.maps.Size(BOX_SIZE, BOX_SIZE),
             //isPng: true,

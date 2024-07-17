@@ -59,6 +59,7 @@ export class NpnMapLayerService {
                             return new WmsMapLayer(map,layerDef,this);
                         case MapLayerType.PEST:
                             {
+                                console.log('keff' + layerDef.name);
                                 if(layerDef.name == 'precipitation:buffelgrass_prism' 
                                 || layerDef.name == 'gdd:eab_adult' 
                                 || layerDef.name == 'gdd:eab_egg_hatch'
@@ -66,7 +67,8 @@ export class NpnMapLayerService {
                                 || layerDef.name == 'gdd:slf_egg_hatch'
                                 || layerDef.name == 'gdd:winter_wheat'
                                 || layerDef.name == 'gdd:red_brome_flowering'
-                                || layerDef.name == 'gdd:red_brome_senescence')
+                                || layerDef.name == 'gdd:red_brome_senescence'
+                                || layerDef.name == 'gdd:asian_longhorned_beetle')
                                     return new WmsMapLayer(map,layerDef,this);
                                 else
                                     return new PestMapLayer(map,layerDef,this);
@@ -102,7 +104,8 @@ export class NpnMapLayerService {
             || layerName == 'gdd:slf_egg_hatch' 
             || layerName == 'gdd:winter_wheat'
             || layerName == 'gdd:red_brome_flowering'
-            || layerName == 'gdd:red_brome_senescence') {
+            || layerName == 'gdd:red_brome_senescence'
+            || layerName == 'gdd:asian_longhorned_beetle') {
                 layerBasis = layerName;
             }
             if(this.legends[layerName]) {
@@ -136,6 +139,7 @@ export class NpnMapLayerService {
                                 || styleName == 'slf_adult' 
                                 || styleName == 'slf_egg_hatch' 
                                 || styleName == 'winter_wheat'
+                                || styleName == 'alb2'
                                 || styleName == 'red_brome_flowering'
                                 || styleName == 'red_brome_senescence' ? e : null;
                             },null)

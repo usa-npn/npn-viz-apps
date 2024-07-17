@@ -42,7 +42,8 @@ export abstract class MapLayer implements SupportsOpacity {
         || this.layerName == "gdd:slf_adult"
         || this.layerName == "gdd:slf_egg_hatch"
         || this.layerName == "gdd:red_brome_flowering"
-        || this.layerName == "gdd:red_brome_senescence")
+        || this.layerName == "gdd:red_brome_senescence"
+        || this.layerName == "gdd:asian_longhorned_beetle")
             return this.layerName;
         return this.layer_def && this.layer_def.layerBasis
             ? this.layer_def.layerBasis

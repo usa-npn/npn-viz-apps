@@ -195,7 +195,7 @@ export const MAP_LAYERS:MapLayerDefs = {
                 agddDefaultThreshold: 900
             }
         },{
-            name: 'asian_longhorned_beetle',
+            name: 'gdd:asian_longhorned_beetle',
             title: 'Asian Longhorned Beetle',
             abstract: 'As a generalist pest, Asian longhorned beetle poses a great potential threat to eastern forests. It is currently contained in three small quarantined areas (a fourth was recently eradicated). Burning firewood where you buy it is critical to stopping the spread of this pest. <a href="https://www.usanpn.org/data/forecasts/Asian_Longhorned_beetle" target="_blank">Learn more</a>',
             meta: {

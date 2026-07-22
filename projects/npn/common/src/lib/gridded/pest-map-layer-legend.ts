@@ -12,6 +12,8 @@ export class PestMapLayerLegend extends MapLayerLegend {
         || this.layerName == 'gdd:eab_egg_hatch' 
         || this.layerName == 'gdd:slf_adult'
         || this.layerName == 'gdd:slf_egg_hatch' 
+        || this.layerName == 'gdd:japanese_beetle_adult'
+        || this.layerName == 'gdd:japanese_beetle_egg_hatch' 
         || this.layerName == 'gdd:asian_longhorned_beetle'
         || this.layerName == 'gdd:winter_wheat'
         || this.layerName == 'gdd:red_brome_flowering'
@@ -117,6 +119,9 @@ export class PestMapLayerLegend extends MapLayerLegend {
         }
         else if (legend.ldef.name === 'winter_moth') {
             treatmentMethod = 'Window for Managing Caterpillars';
+        }
+        else if (legend.ldef.name === 'gdd:asian_longhorned_beetle') {
+            treatmentMethod = 'Hatching denotes states where beetle has been detected.';
         }
         if (treatmentMethod) {
             svg.append('g').append('text').attr('dx', 5)

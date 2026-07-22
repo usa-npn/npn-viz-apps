@@ -41,6 +41,8 @@ export abstract class MapLayer implements SupportsOpacity {
         || this.layerName == "gdd:eab_egg_hatch"
         || this.layerName == "gdd:slf_adult"
         || this.layerName == "gdd:slf_egg_hatch"
+        || this.layerName == "gdd:japanese_beetle_adult"
+        || this.layerName == "gdd:japanese_beetle_egg_hatch"
         || this.layerName == "gdd:red_brome_flowering"
         || this.layerName == "gdd:red_brome_senescence"
         || this.layerName == "gdd:asian_longhorned_beetle")

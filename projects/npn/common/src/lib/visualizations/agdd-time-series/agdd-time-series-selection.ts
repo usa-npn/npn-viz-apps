@@ -330,10 +330,11 @@ export class AgddTimeSeriesSelection extends VisSelection {
         if(!this._averageData) {
             const [latitude,longitude] = this.latLng;
             // this doesn't feel quite robust enough
-            const layer = this.baseTemp === 32 ? 'gdd:30yr_avg_agdd' : 'gdd:30yr_avg_agdd_50f';
+            //const layer = this.baseTemp === 32 ? 'gdd:30yr_avg_agdd' : 'gdd:30yr_avg_agdd_50f';
+            const base = this.baseTemp === 32 ? '32' : '50';
             this._averageData = this.serviceUtils.get(
-                this.serviceUtils.apiUrl('/npn_portal/stations/getTimeSeries.json'),
-                {latitude,longitude,layer})
+                this.serviceUtils.dataApiUrl('/v1/agdd/simple/pointTimeSeries/30yearAvgPreprocessed'),
+                {latitude,longitude,base})
                 .then(COERCE_TIME_SERIES_RESPONSE)
                 .then(data => ({
                     data,

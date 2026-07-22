@@ -40,7 +40,7 @@ export class WmsMapLayer extends MapLayer {
             getTileUrl: (coord: google.maps.Point, zoom: number) => {
                 let proj = this.map.getProjection(), zfactor = Math.pow(2, zoom), top = proj.fromPointToLatLng(new google.maps.Point(coord.x * BOX_SIZE / zfactor, coord.y * BOX_SIZE / zfactor)), bot = proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * BOX_SIZE / zfactor, (coord.y + 1) * BOX_SIZE / zfactor)), ctop = srsConversion(top), cbot = srsConversion(bot), base = {};
                 let ddoy = null;
-                if ((layer_def.name == 'gdd:eab_adult' || layer_def.name == 'gdd:eab_egg_hatch' || layer_def.name == 'gdd:slf_adult' || layer_def.name == 'gdd:slf_egg_hatch') && this.extent && this.extent.current) {
+                if ((layer_def.name == 'gdd:eab_adult' || layer_def.name == 'gdd:eab_egg_hatch' || layer_def.name == 'gdd:slf_adult' || layer_def.name == 'gdd:slf_egg_hatch' || layer_def.name == 'gdd:japanese_beetle_adult' || layer_def.name == 'gdd:japanese_beetle_egg_hatch') && this.extent && this.extent.current) {
                     this.extent.current.addToParams(base, MapLayerServiceType.WMS);
                     var now = this.extent.current.date;
                     var start = new Date(now.getFullYear(), 0, 0);
@@ -62,7 +62,7 @@ export class WmsMapLayer extends MapLayer {
                 // if (layer_def.name == 'gdd:asian_longhorned_beetle') {
                 //     all_args.replace("gdd:asian_longhorned_beetle","gdd:asian_longhorned_beetle,gdd:states&CQL_FILTER=INCLUDE;NAME%20IN%20(%27Ohio%27,%27Pennsylvania%27,%27New%20York%27,%27Connecticut%27,%27Rhode%20Island%27,%27Massachusetts%27,%27South%20Carolina%27,%27Missippi%27)&styles=gdd:alb2,gdd:hatch");
                 // }
-                return this.griddedUrls.wmsBaseUrl + '?' + encodeHttpParams(all_args).replace("gdd%3Aasian_longhorned_beetle","gdd%3Aasian_longhorned_beetle,gdd%3Astates&CQL_FILTER=INCLUDE;NAME%20IN%20(%27Ohio%27,%27Pennsylvania%27,%27New%20York%27,%27Connecticut%27,%27Rhode%20Island%27,%27Massachusetts%27,%27South%20Carolina%27,%27Missippi%27)&styles=gdd%3Aalb2,gdd%3Ahatch");
+                return this.griddedUrls.wmsBaseUrl + '?' + encodeHttpParams(all_args).replace("gdd%3Aasian_longhorned_beetle","gdd%3Aasian_longhorned_beetle,gdd%3Astates&CQL_FILTER=INCLUDE;NAME%20IN%20(%27Ohio%27,%27New%20York%27,%27Massachusetts%27,%27South%20Carolina%27,%27Missippi%27)&styles=gdd%3Aalb2,gdd%3Ahatch");
             },
             tileSize: new google.maps.Size(BOX_SIZE, BOX_SIZE),
             //isPng: true,

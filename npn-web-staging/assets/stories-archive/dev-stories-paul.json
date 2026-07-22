@@ -1,0 +1,439 @@
+{
+    "backgroundImage": "assets/default-stories-bg.jpg",
+    "stories": [
+        {
+            "title": "Maple bud out 2017 vs 2018 (Scatter)",
+            "tagline": "Will change species title format to scientific...",
+            "description": "\n        <p>Red and sugar maples in latin</p>\n        <p><img src='https://cf.ltkcdn.net/garden/images/std/189484-200x266-Fall-Sugar-Maple.jpg' alt='maple' /></p>\n        <p>That there is a picture of a maple tree...</p>\n        ",
+            "settings": {
+                "speciesTitleFormat": "scientific-name"
+            },
+            "external": {
+              "$class": "ScatterPlotSelection",
+              "guid": "67259fcc-e6d8-450d-a5c8-c8a15a9db16c",
+              "meta": {},
+              "networkIds": [],
+              "stationIds": [],
+              "individualPhenometrics": false,
+              "numDaysQualityFilter": 30,
+              "plots": [
+                {
+                  "species": {
+                    "common_name": "red maple",
+                    "genus": "Acer",
+                    "species": "rubrum",
+                    "kingdom": "Plantae",
+                    "species_id": 3,
+                    "number_observations": 675361
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "color": "#1f77b4",
+                  "speciesRank": "species",
+                  "phenophaseRank": "class",
+                  "regressionLine": {
+                    "id": "3.1",
+                    "color": "#1f77b4",
+                    "p1": [
+                      29.033138,
+                      97.24825831553183
+                    ],
+                    "p2": [
+                      47.503029,
+                      113.90751637626815
+                    ],
+                    "r2": 0.00898847014561707
+                  }
+                },
+                {
+                  "species": {
+                    "common_name": "sugar maple",
+                    "genus": "Acer",
+                    "species": "saccharum",
+                    "kingdom": "Plantae",
+                    "species_id": 61,
+                    "number_observations": 258618
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "color": "#ff7f0e",
+                  "speciesRank": "species",
+                  "phenophaseRank": "class",
+                  "regressionLine": {
+                    "id": "61.1",
+                    "color": "#ff7f0e",
+                    "p1": [
+                      35.637402,
+                      118.00896192880883
+                    ],
+                    "p2": [
+                      46.908298,
+                      117.31913841321025
+                    ],
+                    "r2": 0.00001688077918198329
+                  }
+                }
+              ],
+              "start": 2017,
+              "end": 2018,
+              "regressionLines": true,
+              "axis": {
+                "key": "latitude",
+                "label": "Latitude"
+              },
+              "minDoy": 1,
+              "maxDoy": 365
+            }
+        },
+        {
+            "title": "Maple colors 2017 vs 2018",
+            "tagline": "How did maple leaf colors stack up between 2017 and 2018?",
+            "description": "\n        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vestibulum risus ipsum, vel accumsan dolor suscipit ac. Nunc sit amet magna ex. Phasellus posuere tincidunt nisi, et pulvinar mauris tempor a. Cras egestas justo vitae arcu pellentesque suscipit. Sed sodales, dolor quis ultrices blandit, libero sapien ultricies urna, sit amet posuere ligula tortor a magna. Aenean sit amet nisl eu eros tristique suscipit. Quisque convallis pharetra dignissim. Suspendisse potenti. Cras in accumsan tortor. Nunc mollis euismod ante, et ullamcorper nibh condimentum vitae. Sed malesuada, dolor ac consequat facilisis, enim magna consequat nisi, vitae iaculis mi urna et elit. Aliquam erat volutpat.</p>\n        <p>Pellentesque eu felis accumsan, cursus dui eget, congue sem. Mauris orci mauris, accumsan vel ullamcorper ac, feugiat ut felis. Nam egestas arcu magna, vel pellentesque purus consequat et. Nam eleifend, tortor a aliquam aliquam, lacus arcu consectetur nulla, eu molestie velit dui eu ligula. Maecenas tincidunt interdum sapien id hendrerit. Proin a lorem aliquet lectus tincidunt facilisis et at augue. Nulla eget porta velit. Mauris facilisis molestie convallis.</p>\n        ",
+            "external": {
+              "$class": "CalendarSelection",
+              "guid": "5d7ac0b5-e292-44b8-8611-29aabad5f1c0",
+              "meta": {},
+              "networkIds": [],
+              "stationIds": [],
+              "negative": true,
+              "negativeColor": "#aaa",
+              "years": [
+                2017,
+                2018
+              ],
+              "plots": [
+                {
+                  "color": "#d62728",
+                  "species": {
+                    "common_name": "red maple",
+                    "genus": "Acer",
+                    "species": "rubrum",
+                    "kingdom": "Plantae",
+                    "species_id": 3,
+                    "number_observations": 675361
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                },
+                {
+                  "color": "#1f77b4",
+                  "species": {
+                    "common_name": "sugar maple",
+                    "genus": "Acer",
+                    "species": "saccharum",
+                    "kingdom": "Plantae",
+                    "species_id": 61,
+                    "number_observations": 258618
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                }
+              ],
+              "labelOffset": 15,
+              "bandPadding": 0.55,
+              "fontSizeDelta": 2
+            }
+        },
+        {
+            "title": "Red vs Sugar activity 2017",
+            "tagline": "Who had more activity?",
+            "description": "\n        <p>Integer vel dui tellus. Pellentesque gravida nunc vel varius sollicitudin. Etiam sed arcu libero. Phasellus commodo luctus quam, non posuere massa fermentum nec. Aenean in rutrum lectus, ac accumsan eros. Ut suscipit sit amet magna eu laoreet. Praesent tincidunt velit nec turpis facilisis, vel finibus velit accumsan.</p>\n        ",
+            "external": {
+              "$class": "ActivityCurvesSelection",
+              "guid": "ac288c2d-b702-4981-ba5d-c2aa33dbcba7",
+              "meta": {},
+              "networkIds": [],
+              "stationIds": [],
+              "interpolate": 2,
+              "dataPoints": true,
+              "frequency": {
+                "value": 7,
+                "label": "Weekly"
+              },
+              "curves": [
+                {
+                  "id": 0,
+                  "color": "#1f77b4",
+                  "species": {
+                    "species_id": 3,
+                    "common_name": "red maple",
+                    "genus": "Acer",
+                    "species": "rubrum",
+                    "kingdom": "Plantae",
+                    "itis_taxonomic_sn": 28728,
+                    "functional_type": "Deciduous broadleaf",
+                    "class_id": 15,
+                    "class_common_name": "Flowering Plants",
+                    "class_name": "Magnoliopsida",
+                    "order_id": 97,
+                    "order_common_name": "",
+                    "order_name": "Sapindales",
+                    "family_id": 329,
+                    "family_name": "Sapindaceae",
+                    "family_common_name": "Soapberry Family",
+                    "species_type": [
+                      {
+                        "Species_Type_ID": 1,
+                        "Species_Type": "Ornamental",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 2,
+                        "Species_Type": "Deciduous",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": "http://www.usanpn.org/files/shared/images/ss12white_oak_deciduous_final.png"
+                      },
+                      {
+                        "Species_Type_ID": 5,
+                        "Species_Type": "Allergen",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 26,
+                        "Species_Type": "Focal",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": null,
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 29,
+                        "Species_Type": "Calibration",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 31,
+                        "Species_Type": "Green Wave Campaign",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      }
+                    ]
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "metric": {
+                    "id": "num_yes_records",
+                    "sampleSize": "status_records_sample_size",
+                    "label": "Total Yes Records"
+                  },
+                  "year": 2017,
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                },
+                {
+                  "id": 1,
+                  "color": "#ff7f0e",
+                  "year": 2017,
+                  "species": {
+                    "species_id": 61,
+                    "common_name": "sugar maple",
+                    "genus": "Acer",
+                    "species": "saccharum",
+                    "kingdom": "Plantae",
+                    "itis_taxonomic_sn": 28731,
+                    "functional_type": "Deciduous broadleaf",
+                    "class_id": 15,
+                    "class_common_name": "Flowering Plants",
+                    "class_name": "Magnoliopsida",
+                    "order_id": 97,
+                    "order_common_name": "",
+                    "order_name": "Sapindales",
+                    "family_id": 329,
+                    "family_name": "Sapindaceae",
+                    "family_common_name": "Soapberry Family",
+                    "species_type": [
+                      {
+                        "Species_Type_ID": 1,
+                        "Species_Type": "Ornamental",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 2,
+                        "Species_Type": "Deciduous",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": "http://www.usanpn.org/files/shared/images/ss12white_oak_deciduous_final.png"
+                      },
+                      {
+                        "Species_Type_ID": 5,
+                        "Species_Type": "Allergen",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      },
+                      {
+                        "Species_Type_ID": 31,
+                        "Species_Type": "Green Wave Campaign",
+                        "Comment": null,
+                        "User_Display": 1,
+                        "Kingdom": "Plantae",
+                        "Image_Path": null
+                      }
+                    ]
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "metric": {
+                    "id": "num_yes_records",
+                    "sampleSize": "status_records_sample_size",
+                    "label": "Total Yes Records"
+                  },
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                }
+              ]
+            }
+        },
+        {
+            "title": "AGDD Where you are for May 8 2019",
+            "tagline": "How much temperature has accumulated?",
+            "description": "\n      <p>Heat accumulation in the spring is commonly used to predict the timing of phenological transitions in plants and animals.  Read more about it <a href=\"https://www.usanpn.org/data/agdd_maps\" target=\"_blank\">here</a>.</p>\n      ",
+            "external": {
+                "$class": "AgddTimeSeriesSelection",
+                "guid": "7ae58e6c-4318-41d9-a2fb-1f4a5e1c3497",
+                "meta": {},
+                "layerCategory": "Daily Temperature Accumulations",
+                "layerName": "gdd:agdd",
+                "extentValue": "2019-05-08T00:00:00.000Z",
+                "doy": 160
+            }
+        },
+        {
+            "title": "Red Maples on a map (2017)",
+            "tagline": "shared map URL.",
+            "description": "\n      <p>Integer vel dui tellus. Pellentesque gravida nunc vel varius sollicitudin. Etiam sed arcu libero. Phasellus commodo luctus quam, non posuere massa fermentum nec. Aenean in rutrum lectus, ac accumsan eros. Ut suscipit sit amet magna eu laoreet. Praesent tincidunt velit nec turpis facilisis, vel finibus velit accumsan.</p>\n      ",
+            "external": {
+              "$class": "MapSelection",
+              "guid": "6103bb17-3fd6-4198-a568-432bad6cadbf",
+              "meta": {},
+              "networkIds": [],
+              "stationIds": [],
+              "individualPhenometrics": false,
+              "numDaysQualityFilter": 30,
+              "plots": [
+                {
+                  "species": {
+                    "common_name": "red maple",
+                    "genus": "Acer",
+                    "species": "rubrum",
+                    "kingdom": "Plantae",
+                    "species_id": 3,
+                    "number_observations": 664416
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                }
+              ],
+              "opacity": 0.75,
+              "year": 2017
+            }
+        },
+        {
+            "title": "Red Maples on a map with boundaries (2016)",
+            "tagline": "April 28 Daily Temp Accumulations (near breaking leaf buds)",
+            "description": "<p>Using pre-defined Maine boundary and hand-drawn boundary around Minnesota</p>",
+            "external": {
+              "$class": "MapSelection",
+              "guid": "2cac2682-7315-48db-8d11-8dc8306aabf9",
+              "meta": {},
+              "networkIds": [],
+              "stationIds": [],
+              "individualPhenometrics": false,
+              "numDaysQualityFilter": 30,
+              "plots": [
+                {
+                  "species": {
+                    "common_name": "red maple",
+                    "genus": "Acer",
+                    "species": "rubrum",
+                    "kingdom": "Plantae",
+                    "species_id": 3,
+                    "number_observations": 664416
+                  },
+                  "phenophase": {
+                    "pheno_class_id": 1,
+                    "pheno_class_name": "Initial shoot or leaf growth"
+                  },
+                  "speciesRank": "species",
+                  "phenophaseRank": "class"
+                }
+              ],
+              "opacity": 0.6,
+              "boundaries": [
+                {
+                  "id": 39,
+                  "boundaryName": "Maine",
+                  "typeId": 1,
+                  "boundaryTypeName": "US States"
+                },
+                {
+                  "data": [
+                    [
+                      49.739156976352305,
+                      -98.31454869999999
+                    ],
+                    [
+                      42.634499829496264,
+                      -97.43564244999999
+                    ],
+                    [
+                      42.375321715881704,
+                      -88.38290807499999
+                    ],
+                    [
+                      45.90581165455448,
+                      -91.89853307499999
+                    ],
+                    [
+                      48.763915959200844,
+                      -87.15243932499999
+                    ]
+                  ]
+                }
+              ],
+              "layerCategory": "Daily Temperature Accumulations",
+              "layerName": "gdd:30yr_avg_agdd",
+              "extentValue": "118.0",
+              "year": 2016
+            }
+        }
+    ]
+}

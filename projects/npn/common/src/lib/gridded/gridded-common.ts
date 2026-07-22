@@ -247,6 +247,17 @@ export const MAP_LAYERS:MapLayerDefs = {
         // }, {
         },
         {
+            name: 'gdd:japanese_beetle_adult',
+            title: 'Japanese Beetle Adult',
+            abstract: 'The Japanese beetle is considered to be among the most damaging turfgrass pests in eastern and Midwestern states. It has also brought large-scale destruction to garden plants and agricultural crops. <a href="https://www.usanpn.org/data/maps/forecasts/Japanese_beetle" target="_blank">Learn more</a>'
+        },
+        {
+            name: 'gdd:japanese_beetle_egg_hatch',
+            title: 'Japanese Beetle Egg Hatch',
+            abstract: 'The Japanese beetle is considered to be among the most damaging turfgrass pests in eastern and Midwestern states. It has also brought large-scale destruction to garden plants and agricultural crops. <a href="https://www.usanpn.org/data/maps/forecasts/Japanese_beetle" target="_blank">Learn more</a>'
+        // }, {
+        },
+        {
             name: 'gdd:slf_adult',
             title: 'Spotted Lanternfly Adult',
             abstract: 'The spotted lanternfly is an invasive planthopper that threatens several major agriculture crops in the U.S. including grape, orchard, stone fruit, and hops. Spotted lanternfly damages plants by sucking sap from trunks, stems, and branches as well as by depositing a sticky residue that leads to mold growth. Several U.S. states have quarantine areas in place to help prevent SLFs spread. <a href="https://www.usanpn.org/data/maps/forecasts/spotted_lanternfly" target="_blank">Learn more</a>'

@@ -55,7 +55,7 @@ const CATEGORY_SPRING_INDICES = 'Spring Indices';
     <div *ngIf="selection.layer" class="layer-controls">
         <extent-control [selection]="selection"></extent-control>
         <supports-opacity-control [supportsOpacity]="selection"></supports-opacity-control>
-        <gridded-range-slider *ngIf="selection.layerName != 'gdd:asian_longhorned_beetle' && selection.layerName != 'gdd:eab_adult' && selection.layerName != 'gdd:eab_egg_hatch' && selection.layerName != 'gdd:slf_adult' && selection.layerName != 'gdd:slf_egg_hatch'" [selection]="selection"></gridded-range-slider>
+        <gridded-range-slider *ngIf="selection.layerName != 'gdd:asian_longhorned_beetle' && selection.layerName != 'gdd:eab_adult' && selection.layerName != 'gdd:eab_egg_hatch' && selection.layerName != 'gdd:slf_adult' && selection.layerName != 'gdd:slf_egg_hatch' && selection.layerName != 'gdd:japanese_beetle_adult' && selection.layerName != 'gdd:japanese_beetle_egg_hatch'" [selection]="selection"></gridded-range-slider>
         <p *ngIf="selection.layer.hasAbstract()" [innerHTML]="selection.layer.getAbstract()"></p>
     </div>
     `,

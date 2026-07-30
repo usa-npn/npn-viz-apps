@@ -11,6 +11,13 @@ export class NpnConfiguration {
     dataApiRoot2: string; // URL of NPN data2 web services (new, e.g. https://data-dev.usanpn.org/webservices).
     popApiRoot: string;
     geoServerRoot: string; // URL of the NPN geo server
+    // URL root of the Tinybird API (e.g. https://api.us-west-2.aws.tinybird.co).
+    // Requests to URLs beneath this root have a JWT attached by TinybirdAuthInterceptor.
+    // Optional: when absent no request is ever matched and the interceptor is inert.
+    tinybirdApiRoot?: string;
+    // URL that mints short lived Tinybird JWTs (e.g. https://services2-dev.usanpn.org/v1/data/token).
+    // Optional: when absent TinybirdTokenService will not attempt to fetch a token.
+    tinybirdTokenUrl?: string;
     [x: string]: any; // not going to dictate what else it might have
 }
 

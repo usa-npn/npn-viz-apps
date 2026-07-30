@@ -9,8 +9,10 @@ const npnConfiguration:NpnConfiguration = {
   dataApiRoot2: 'https://data-dev.usanpn.org/webservices',
   popApiRoot: 'https://data-dev.usanpn.org/popservices',
   dataApiUseStatisticsCache: false,
-  geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+  geoServerRoot: '//geoserver-dev.usanpn.org/geoserver',
   // geoServerRoot: 'https://geoserver.usanpn.org/geoserver'
+  tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
+  tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

@@ -1,4 +1,4 @@
-export { NpnCommonModule, NPN_BASE_HREF } from './npn-common.module';
+export { NpnCommonModule, NPN_BASE_HREF, tinybirdTokenPrefetch } from './npn-common.module';
 export * from './species';
 export * from './phenophase';
 export * from './station';
@@ -17,6 +17,8 @@ export { LegendDoyPipe } from './legend-doy.pipe';
 export * from './guid';
 export * from './config';
 export { NpnServiceUtils } from './npn-service-utils.service';
+export { TinybirdTokenService, TinybirdTokenResponse, TINYBIRD_TOKEN_EXPIRY_SKEW } from './tinybird-token.service';
+export { TinybirdAuthInterceptor } from './tinybird-auth.interceptor';
 export * from './detect-ie';
 export * from './monitors-destroy';
 export * from './application-settings';

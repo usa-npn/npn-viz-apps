@@ -5,6 +5,7 @@ import { CacheService } from './cache.service';
 import { SpeciesService } from './species.service';
 import { SpeciesFilterService } from './species-filter.service';
 import { PhenophaseFilterService } from './phenophase-filter.service';
+import { ObservationService } from './observation.service';
 import { NetworkService } from './network.service';
 import { StationService } from './station.service';
 
@@ -63,6 +64,7 @@ export function tinybirdTokenPrefetch(tokenService: TinybirdTokenService): () =>
         SpeciesService,
         SpeciesFilterService,
         PhenophaseFilterService,
+        ObservationService,
         NetworkService,
         PointService,
         StationService,

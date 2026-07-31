@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor } from '../common';
+import { NpnServiceUtils,  SpeciesPlot, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, ObservationService, getStaticColor } from '../common';
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT, GroupHttpParams, SelectionGroup } from './vis-selection';
 
 export interface SiteOrSummaryPlot extends SpeciesPlot {
@@ -32,7 +32,8 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
     constructor(
         protected serviceUtils:NpnServiceUtils,
         protected speciesService:SpeciesService,
-        protected networkService:NetworkService
+        protected networkService:NetworkService,
+        protected observationService:ObservationService
     ) {
         super(serviceUtils,networkService);
     }
@@ -83,7 +84,6 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
-        const url = this.serviceUtils.apiUrl(`/npn_portal/observations/${this.individualPhenometrics ? 'getSummarizedData' : 'getSiteLevelData'}.json`);
         const filterLqd = (data,plot,plotIndex) => { // site
                 const minusUnwanted =  data.filter(filterUnwantedDataFunctor(plot));
                 const minusSuspect = minusUnwanted.filter(filterSuspectSummaryData);
@@ -126,7 +126,12 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
                 params = params.set('pheno_class_aggregate','1');
             }
             params = params.set('climate_data','1');
-            return this.serviceUtils.cachedPost(url,params.toString())
+            const data = this.individualPhenometrics
+                ? this.serviceUtils.cachedPost(
+                    this.serviceUtils.apiUrl('/npn_portal/observations/getSummarizedData.json'),
+                    params.toString())
+                : this.observationService.getSiteLevelData(params);
+            return data
                 .then(data => filterLqd(data,plot,plotIndex))
                 .then(data => ({plot,data,group}));
         };

@@ -9,6 +9,7 @@ export { CacheService } from './cache.service';
 export * from './species.service';
 export { SpeciesFilterService, toSpeciesFilterParams, TinybirdPipeResponse } from './species-filter.service';
 export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophasesParams } from './phenophase-filter.service';
+export { ObservationService } from './observation.service';
 export { NetworkService } from './network.service';
 export { StationService } from './station.service';
 export { getStaticColor } from './static-color';

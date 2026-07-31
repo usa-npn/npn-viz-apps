@@ -7,6 +7,7 @@ import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicGe
 import { Phenophase, TaxonomicPhenophaseRank, PhenophaseClass } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';
 import { SpeciesFilterService } from './species-filter.service';
+import { PhenophaseFilterService } from './phenophase-filter.service';
 import { CURRENT_YEAR, CURRENT_YEAR_VALUE } from './constants';
 
 export interface SpeciesTaxonomicInfo {
@@ -88,7 +89,7 @@ function mapByNumericId(list,key) {
 }
 @Injectable()
 export class SpeciesService {
-    constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe,private speciesFilterService: SpeciesFilterService) {}
+    constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe,private speciesFilterService: SpeciesFilterService,private phenophaseFilterService: PhenophaseFilterService) {}
 
     getAllSpecies(params?: any): Promise<Species[]> {
         // NOTE: when there are multiple species phenophase controls on the screen the result can
@@ -299,84 +300,43 @@ export class SpeciesService {
         };
     }
 
-    private _getPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
-        const params: any = {};
-        const url = rank === TaxonomicSpeciesRank.SPECIES
-            ? this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json')
-            : this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForTaxon.json')
-        let o;
+    /**
+     * Fetches the raw (not yet deduped) phenophase list for a species or taxon from
+     * the `species_phenophases`/`taxon_phenophases` Tinybird pipes, via
+     * `PhenophaseFilterService`. Shared by `_getPhenophases` and `_getPhenodefinitions`,
+     * which differ only in which dedupe strategy they apply to the result.
+     */
+    private _fetchPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
+        const dateStr = date ? this.datePipe.transform(date, 'yyyy-MM-dd') : undefined;
+        if (rank === TaxonomicSpeciesRank.SPECIES) {
+            return this.phenophaseFilterService.getPhenophasesForSpecies((species as Species).species_id, dateStr);
+        }
+        let taxonId: number;
         switch(rank) {
-            case TaxonomicSpeciesRank.SPECIES:
-                o = species as Species;
-                params.species_id = o.species_id;
-                break;
             case TaxonomicSpeciesRank.CLASS:
-                o = species as TaxonomicClass;
-                params.class_id = o.class_id;
+                taxonId = (species as TaxonomicClass).class_id;
                 break;
             case TaxonomicSpeciesRank.ORDER:
-                o = species as TaxonomicOrder;
-                params.order_id = o.order_id;
+                taxonId = (species as TaxonomicOrder).order_id;
                 break;
             case TaxonomicSpeciesRank.FAMILY:
-                o = species as TaxonomicFamily;
-                params.family_id = o.family_id;
+                taxonId = (species as TaxonomicFamily).family_id;
                 break;
             case TaxonomicSpeciesRank.GENUS:
-                o = species as TaxonomicGenus;
-                params.genus_id = o.genus_id;
+                taxonId = (species as TaxonomicGenus).genus_id;
                 break;
         }
-        
-        if (date) {
-            params.date = this.datePipe.transform(date, 'yyyy-MM-dd')
-        } else {
-            params.return_all = true;
-        }
-        return this.serviceUtils.cachedGet(url,params)
-            .then(phases => phases && phases.length
-                ? this.removeRedundantPhenophases(phases[0].phenophases as Phenophase[])
-                : []);
+        return this.phenophaseFilterService.getPhenophasesForTaxon(rank, taxonId, dateStr);
+    }
+
+    private _getPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
+        return this._fetchPhenophases(species, rank, date)
+            .then(phases => this.removeRedundantPhenophases(phases));
     }
 
     private _getPhenodefinitions(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
-        const params: any = {};
-        const url = rank === TaxonomicSpeciesRank.SPECIES
-            ? this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForSpecies.json')
-            : this.serviceUtils.apiUrl('/npn_portal/phenophases/getPhenophasesForTaxon.json')
-        let o;
-        switch(rank) {
-            case TaxonomicSpeciesRank.SPECIES:
-                o = species as Species;
-                params.species_id = o.species_id;
-                break;
-            case TaxonomicSpeciesRank.CLASS:
-                o = species as TaxonomicClass;
-                params.class_id = o.class_id;
-                break;
-            case TaxonomicSpeciesRank.ORDER:
-                o = species as TaxonomicOrder;
-                params.order_id = o.order_id;
-                break;
-            case TaxonomicSpeciesRank.FAMILY:
-                o = species as TaxonomicFamily;
-                params.family_id = o.family_id;
-                break;
-            case TaxonomicSpeciesRank.GENUS:
-                o = species as TaxonomicGenus;
-                params.genus_id = o.genus_id;
-                break;
-        }
-        
-        if (date) {
-            params.date = this.datePipe.transform(date, 'yyyy-MM-dd')
-        } else {
-            params.return_all = true;
-        }
-        return this.serviceUtils.cachedGet(url,params)
-            .then(phases => phases && phases.length
-                ? this.removeRedundantPhenodefinitions(phases[0].phenophases as Phenophase[])
-                : []);
+        return this._fetchPhenophases(species, rank, date)
+            .then(phases => this.removeRedundantPhenodefinitions(phases));
     }
 
     getAllPhenophases(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank): Promise<Phenophase[]> {

@@ -6,6 +6,7 @@ import { HttpParams } from '@angular/common/http';
 import { Species, TaxonomicSpecies, TaxonomicClass, TaxonomicFamily, TaxonomicGenus, TaxonomicOrder, TaxonomicSpeciesRank, TaxonomicSpeciesType } from './species';
 import { Phenophase, TaxonomicPhenophaseRank, PhenophaseClass } from './phenophase';
 import { NpnServiceUtils } from './npn-service-utils.service';
+import { SpeciesFilterService } from './species-filter.service';
 import { CURRENT_YEAR, CURRENT_YEAR_VALUE } from './constants';
 
 export interface SpeciesTaxonomicInfo {
@@ -87,17 +88,13 @@ function mapByNumericId(list,key) {
 }
 @Injectable()
 export class SpeciesService {
-    constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe) {}
+    constructor(private serviceUtils:NpnServiceUtils,private datePipe: DatePipe,private speciesFilterService: SpeciesFilterService) {}
 
     getAllSpecies(params?: any): Promise<Species[]> {
         // NOTE: when there are multiple species phenophase controls on the screen the result can
         // be multiple simultaneous queries...
         //console.log('SpeciesService.getAllSpecies:params', params);
-        params = params||{};
-        const url = this.serviceUtils.apiUrl('/npn_portal/species/getSpeciesFilter.json');
-        let postParams = new HttpParams()
-        Object.keys(params).forEach(key => postParams = postParams.set(`${key}`, `${params[key]}`));
-        return this.serviceUtils.cachedPost(url,postParams.toString());
+        return this.speciesFilterService.getSpecies(params||{});
     }
 
     // all species related results are cached locally but not in the session cache since they can get large
@@ -117,15 +114,7 @@ export class SpeciesService {
     }
 
     private _filterSpecies(params:HttpParams = new HttpParams()): Promise<TaxonomicSpecies[]> {
-        const input = params.toString();
-        const cacheKey = this.serviceUtils.cache.cacheKey({service:'getSpeciesFilter',input});
-        if(!this.higherSpeciesCache[cacheKey]) {
-            return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
-                this.serviceUtils.apiUrl('/npn_portal/species/getSpeciesFilter.json'),
-                input
-            );
-        }
-        return this.higherSpeciesCache[cacheKey].then(results => JSON.parse(JSON.stringify(results)));
+        return this.speciesFilterService.getSpecies(params);
     }
 
     /**

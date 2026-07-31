@@ -30,6 +30,10 @@ export class NpnServiceUtils {
         return `${this.config.geoServerRoot}${suffix}`;
     }
 
+    public tinybirdUrl(suffix: string) {
+        return `${this.config.tinybirdApiRoot}${suffix}`;
+    }
+
     public popApipUrl(suffix:string) {
         return `${this.config.popApiRoot}${suffix}`;
     }

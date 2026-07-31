@@ -3,6 +3,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { CacheService } from './cache.service';
 import { SpeciesService } from './species.service';
+import { SpeciesFilterService } from './species-filter.service';
 import { NetworkService } from './network.service';
 import { StationService } from './station.service';
 
@@ -59,6 +60,7 @@ export function tinybirdTokenPrefetch(tokenService: TinybirdTokenService): () =>
     providers: [
         CacheService,
         SpeciesService,
+        SpeciesFilterService,
         NetworkService,
         PointService,
         StationService,

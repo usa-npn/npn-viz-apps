@@ -14,4 +14,6 @@ export * from './wms-map-layer-legend';
 export * from './pest-map-layer';
 export * from './pest-map-layer-legend';
 export * from './default-map-layer-legend';
-export * from './boundary.service';
+export * from './boundary';
+export * from './boundary-api.service';
+export { BoundaryService } from './boundary.service';

@@ -1,5 +1,8 @@
 import { EventEmitter } from '@angular/core';
-import { newGuid, NpnServiceUtils, NetworkService, Station } from '../common';
+import {
+    newGuid, NpnServiceUtils, NetworkService, Station,
+    StationFilterService, latLngPathToPolygonWkt
+} from '../common';
 import { HttpParams } from '@angular/common/http';
 
 export const NULL_DATA = -9999;
@@ -539,6 +542,42 @@ export interface PredefinedBoundarySelection {
     boundaryName: string;
     typeId: number;
     boundaryTypeName: string;
+    /**
+     * Two letter state code, set instead of `polygonWkts` when this is a US State
+     * boundary. `find_stations` takes a `states` parameter, so a state resolves in a
+     * single request rather than one per polygon of its outline.
+     *
+     * Unlike the geometry this IS serialized -- it is a couple of characters, so a
+     * restored selection keeps working without the boundary step re-initializing.
+     */
+    stateCode?: string;
+    /**
+     * The boundary's geometry, cached as one WKT `POLYGON` per polygon, populated by the
+     * boundary control when the boundary is picked (and when a restored selection is
+     * re-initialized). Not set for boundaries resolved by `stateCode`.
+     *
+     * `find_stations` has no boundary-id parameter -- a boundary reaches the pipe only as
+     * a `polygon`, so the geometry has to ride along with the selection to be submitted
+     * later.
+     *
+     * NOT serialized: `stripBoundaryGeometry` drops it from the external form. A single
+     * state's polygons run to tens of KB and `_boundaries` is a `@selectionProperty()`,
+     * so keeping it would bloat every saved and shared selection URL.
+     */
+    polygonWkts?: string[];
+}
+
+/**
+ * Serializer for `_boundaries` -- strips the cached geometry so shareable selection URLs
+ * stay small. See `PredefinedBoundarySelection.polygonWkts`.
+ */
+export function stripBoundaryGeometry(boundary:BoundarySelection):BoundarySelection {
+    if(boundary && (boundary as PredefinedBoundarySelection).polygonWkts) {
+        const copy = {...(boundary as PredefinedBoundarySelection)};
+        delete copy.polygonWkts;
+        return copy;
+    }
+    return boundary;
 }
 
 export interface PolygonBoundarySelection {
@@ -572,8 +611,20 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
     _groupId;
     @selectionProperty()
     _stationIds?: any[] = [];
-    @selectionProperty()
+    @selectionProperty({ser: stripBoundaryGeometry})
     _boundaries:BoundarySelection[];
+
+    /**
+     * Constructed lazily from `serviceUtils` rather than injected, to avoid threading a
+     * new constructor argument through every selection subclass and every selection
+     * factory. It is stateless and depends only on `serviceUtils`; fold it into the
+     * constructor next time these signatures are touched.
+     */
+    private _stationFilter:StationFilterService;
+    protected get stationFilter():StationFilterService {
+        return this._stationFilter ||
+            (this._stationFilter = new StationFilterService(this.serviceUtils));
+    }
 
     constructor(protected serviceUtils:NpnServiceUtils,protected networkService:NetworkService) {
         super(networkService);
@@ -617,30 +668,47 @@ export abstract class StationAwareVisSelection extends NetworkAwareVisSelection 
         this.update();
     }
 
+    /**
+     * Translates each boundary into the station ids it contains via the `find_stations`
+     * pipe, which replaces both `getStationsByLocation.json` (hand-drawn) and
+     * `getStationsForBoundary.json` (pre-defined).
+     *
+     * The pipe takes `site_ids`/`states`/`polygon` and nothing else, so:
+     * - a US State boundary goes out as its `states` code -- one request, no geometry;
+     * - any other pre-defined boundary is submitted as its geometry, not its id, using
+     *   the WKT cached on the selection by the boundary control (`polygonWkts`);
+     * - `MULTIPOLYGON` is not accepted, so a boundary made of several polygons becomes
+     *   one request per polygon, batched and unioned by `findStationIdsInPolygons`;
+     * - `person_id`/`group_id` have no equivalent parameter and are no longer sent. Those
+     *   two only ever narrowed the boundary lookup for the network/individual-scoped case;
+     *   both are still applied downstream via `toURLSearchParams`.
+     */
     protected getStationIdPromises():Promise<number[]>[] {
-        const baseParams:any = {};
-        if(this.personId) {
-            baseParams.person_id = this.personId;
-        }
-        if(this.groupId) {
-            baseParams.group_id = this.groupId;
-        }
         const promises = this.boundaries.map(b => {
             if((b as any).data) {
                 const polySelection = b as PolygonBoundarySelection;
-                const polygon = polySelection.data.slice();
-                polygon.push(polySelection.data[0]); // close the loop
-                return this.serviceUtils.cachedGet(
-                        this.serviceUtils.apiUrl('/npn_portal/stations/getStationsByLocation.json'),
-                        {...baseParams,wkt: 'POLYGON(('+polygon.map(pair => `${pair[1]} ${pair[0]}`).join(',')+'))'}
-                    )
-                    .then(response => response.map(s => s.station_id))
+                return this.stationFilter
+                    .findStationsInPolygon(latLngPathToPolygonWkt(polySelection.data))
+                    .then(stations => stations.map(s => s.station_id));
             }
             const predefSelection = b as PredefinedBoundarySelection;
-            return this.serviceUtils.cachedGet(
-                this.serviceUtils.apiUrl('/npn_portal/stations/getStationsForBoundary.json'),
-                {...baseParams,boundary_id:predefSelection.id}
-            );
+            if(predefSelection.stateCode) {
+                return this.stationFilter.findStationsByStates([predefSelection.stateCode])
+                    .then(stations => stations.map(s => s.station_id));
+            }
+            const wkts = predefSelection.polygonWkts||[];
+            if(!wkts.length) {
+                // geometry never got cached onto the selection -- the boundary control
+                // populates it on pick and on re-init, so this means the selection was
+                // restored and acted on without the boundary step ever initializing
+                console.warn(
+                    `No cached geometry for boundary "${predefSelection.boundaryName}" ` +
+                    `(id=${predefSelection.id}); it cannot be used to filter stations.`);
+                return Promise.resolve([]);
+            }
+            // one request per polygon: the pipe rejects MULTIPOLYGON. Batched and
+            // rate-limit aware inside the service -- firing all of them at once fails.
+            return this.stationFilter.findStationIdsInPolygons(wkts);
         });
         // If this selection has an explicit list of stationIds then return them and ignore any
         // the parent class might supply by virtue of the value of the networkIds property.

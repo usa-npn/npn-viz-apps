@@ -12,6 +12,9 @@ export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophases
 export { ObservationService } from './observation.service';
 export { NetworkService } from './network.service';
 export { StationService } from './station.service';
+export {
+    StationFilterService, FoundStation, geometryToPolygonWkts, latLngPathToPolygonWkt
+} from './station-filter.service';
 export { getStaticColor } from './static-color';
 
 export * from './species-title.pipe';

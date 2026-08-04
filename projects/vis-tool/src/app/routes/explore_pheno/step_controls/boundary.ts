@@ -1,5 +1,5 @@
 import { BaseStepComponent, BaseControlComponent, BaseSubControlComponent } from "./base";
-import { MAP_STYLES, BoundaryService, BoundaryType, StationAwareVisSelection, newGuid, googleFeatureBounds } from "@npn/common";
+import { MAP_STYLES, BoundaryService, BoundaryType, StationAwareVisSelection, newGuid, googleFeatureBounds, geometryToPolygonWkts, US_STATES_BOUNDARY_TYPE_ID } from "@npn/common";
 import { VisConfigStep, StepState, ControlComponent } from "../interfaces";
 import { faDrawPolygon, faTimes, faExpandArrowsAlt, faPlus, faCompressArrowsAlt } from "@fortawesome/pro-light-svg-icons";
 import { Component, NgZone } from "@angular/core";
@@ -276,6 +276,8 @@ export class BoundaryControlComponent extends BaseControlComponent {
     addingPredefined:boolean = false;
     drawingManager:google.maps.drawing.DrawingManager;
     boundaryHolders:BoundaryHolder[];
+    /** resolves once `boundaryHolders` has been populated by `initBoundaries()` */
+    private boundariesReady:Promise<void>;
 
     constructor(private boundaryService:BoundaryService,private zone:NgZone) {
         super();
@@ -324,6 +326,34 @@ export class BoundaryControlComponent extends BaseControlComponent {
         return this.featuresCache[boundaryTypeId];
     }
 
+    /**
+     * Caches whatever `find_stations` will need to resolve this boundary to stations.
+     *
+     * The pipe has no boundary-id parameter, so a boundary reaches it either as a `states`
+     * code or as a `polygon`. US States take the former -- one request instead of one per
+     * polygon of the outline, which for Maine is 136. Everything else caches its geometry
+     * as WKT; that is not serialized with the selection (far too large), so this runs both
+     * when a boundary is picked and when a restored selection is re-initialized.
+     */
+    private cacheBoundaryGeometry(selection:PredefinedBoundarySelection):Promise<void> {
+        return this.boundaryService.getBoundaries(selection.typeId).toPromise()
+            .then(boundaries => {
+                const match = boundaries.filter(b => b.boundary_id == selection.id)[0];
+                if(selection.typeId === US_STATES_BOUNDARY_TYPE_ID) {
+                    selection.stateCode = match ? match.short_name : undefined;
+                    if(!selection.stateCode) {
+                        console.warn(`No state code for boundary "${selection.boundaryName}" (id=${selection.id})`);
+                    }
+                    return;
+                }
+                const geometry = match && match.full ? match.full.geometry : undefined;
+                selection.polygonWkts = geometryToPolygonWkts(geometry);
+                if(!selection.polygonWkts.length) {
+                    console.warn(`No geometry available for boundary "${selection.boundaryName}" (id=${selection.id})`);
+                }
+            });
+    }
+
     // initializes a new BoundaryHolder from a BoundarySelection (not added to map)
     initBoundary(boundarySelection:BoundarySelection):Promise<BoundaryHolder> {
         return this.mapPromise.then((map:google.maps.Map) => {
@@ -345,23 +375,44 @@ export class BoundaryControlComponent extends BaseControlComponent {
                         console.warn(`Unable to found boundary with id ${predefSelection.id}`);
                         return;
                     }
-                    return new BoundaryHolder(this,map,predefSelection,selected);
+                    // re-cache geometry: a restored selection arrives without it
+                    return this.cacheBoundaryGeometry(predefSelection)
+                        .then(() => new BoundaryHolder(this,map,predefSelection,selected));
                 });
         });
     }
 
     addBoundary(boundarySelection:BoundarySelection):Promise<BoundaryHolder> {
-        return this.initBoundary(boundarySelection)
+        // `boundaryHolders` does not exist until initBoundaries() resolves, and pushing
+        // to undefined throws. That window used to be a single microtask; caching the
+        // boundary geometry added a round trip per restored boundary and widened it.
+        return (this.boundariesReady||Promise.resolve())
+            .then(() => this.initBoundary(boundarySelection))
             .then(boundaryHolder => {
-                if(boundaryHolder.add()) {
-                    const boundaries = this.selection.boundaries;
-                    boundaries.push(boundarySelection);
-                    this.selection.boundaries = boundaries; // re-assign to get update or pick up new list
-                    this.boundaryHolders.push(boundaryHolder);
-                    return this.updateStyles()
-                        .then(() => boundaryHolder);
+                // initBoundary resolves undefined when the boundary isn't among the loaded
+                // features; calling .add() on that threw a TypeError that nothing caught,
+                // so the boundary silently failed to appear
+                if(!boundaryHolder || !boundaryHolder.add()) {
+                    console.warn('Unable to add boundary to the map',boundarySelection);
+                    return null;
                 }
-                return null;
+                // record it locally BEFORE assigning selection.boundaries: that setter
+                // calls update(), which runs synchronously through emit() ->
+                // JSON.stringify(this.external) and on into the visualization. Anything
+                // that throws in there used to abort this method before the holder was
+                // ever pushed, leaving the boundary drawn but absent from the list.
+                this.boundaryHolders.push(boundaryHolder);
+                const boundaries = this.selection.boundaries;
+                boundaries.push(boundarySelection);
+                this.selection.boundaries = boundaries; // re-assign to get update or pick up new list
+                return this.updateStyles()
+                    .then(() => boundaryHolder);
+            })
+            .catch(err => {
+                // this chain had no error handling at all, so every failure above --
+                // and everything the selection's update() reaches -- vanished silently
+                console.error('addBoundary failed',boundarySelection,err);
+                throw err;
             });
     }
 
@@ -369,7 +420,9 @@ export class BoundaryControlComponent extends BaseControlComponent {
         return Promise.all(
             this.selection.boundaries.map(bs => this.initBoundary(bs))
         ).then(holders => {
-            this.boundaryHolders = holders.filter(h => h.add());
+            // initBoundary resolves undefined for a boundary it can't find among the
+            // loaded features; h.add() on that threw and took the whole init with it
+            this.boundaryHolders = holders.filter(h => !!h && h.add());
             return this.updateStyles()
                 .then(() => this.fitBoundaries());
         });
@@ -466,7 +519,13 @@ export class BoundaryControlComponent extends BaseControlComponent {
         );
         map.data.addListener('mouseover',($event:google.maps.Data.MouseEvent) => this.mouseover($event.feature));
         map.data.addListener('mouseout',() => this.mouseout());
-        this.initBoundaries();
+        this.boundariesReady = this.initBoundaries()
+            .catch(err => {
+                // without this the failure is invisible and boundaryHolders stays
+                // undefined, breaking every later add
+                console.error('initBoundaries failed',err);
+                this.boundaryHolders = this.boundaryHolders||[];
+            });
     }
     
     ngOnInit() {

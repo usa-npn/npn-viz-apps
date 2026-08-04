@@ -11,6 +11,7 @@ import { SupportsOpacityControl } from './supports-opacity-control.component';
 import { GriddedUrls } from './gridded-common';
 import { WcsDataService } from './wcs-data.service';
 import { BoundaryService } from './boundary.service';
+import { BoundaryApiService } from './boundary-api.service';
 
 import {
     LegendGddUnitsPipe, LegendBuffelgrassUnitsPipe, LegendDoyUnitsPipe, AgddDefaultTodayElevationPipe, LegendAgddAnomalyPipe,
@@ -44,6 +45,7 @@ import {
         NpnMapLayerService,
         GriddedUrls,
         WcsDataService,
+        BoundaryApiService,
         BoundaryService
     ]
 })

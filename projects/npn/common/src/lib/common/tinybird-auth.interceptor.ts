@@ -7,6 +7,17 @@ import { NpnConfiguration, NPN_CONFIGURATION } from './config';
 import { TinybirdTokenService } from './tinybird-token.service';
 
 /**
+ * Default minimum spacing between outbound Tinybird requests.
+ *
+ * Tinybird rate limits the workspace token and answers bursts with
+ * `429 Too many requests: retry after 1 seconds`. A single visualization fans out into
+ * many pipe requests at once (species, phenophases per plot, a station lookup per
+ * boundary polygon), which was enough to trip it and break the UI. Override per
+ * environment with `tinybirdMinRequestSpacingMs`.
+ */
+export const TINYBIRD_DEFAULT_REQUEST_SPACING_MS = 500;
+
+/**
  * Attaches a Tinybird JWT to outbound requests aimed at the Tinybird API.
  *
  * Opt-in by URL rather than applied to every request.  The token is scoped to a
@@ -40,13 +51,47 @@ export class TinybirdAuthInterceptor implements HttpInterceptor {
         return url === normalized || url.indexOf(`${normalized}/`) === 0;
     }
 
+    /** epoch millis at which the next request is allowed to go out */
+    private nextSlot: number = 0;
+
+    private get spacingMs(): number {
+        const configured = this.config ? this.config.tinybirdMinRequestSpacingMs : undefined;
+        return typeof (configured) === 'number' ? configured : TINYBIRD_DEFAULT_REQUEST_SPACING_MS;
+    }
+
+    /**
+     * Claims the next send slot and resolves when it comes up.
+     *
+     * The claim itself is synchronous, so slots are handed out in arrival order and
+     * concurrent callers cannot collide (JS runs this to completion). Only the *start* of
+     * each request is spaced -- a slow request does not hold up the ones behind it, so
+     * this throttles the burst without serializing the whole pipeline.
+     */
+    private takeSlot(): Promise<void> {
+        const spacing = this.spacingMs;
+        if (spacing <= 0) {
+            return Promise.resolve();
+        }
+        const now = Date.now();
+        const sendAt = Math.max(now, this.nextSlot);
+        this.nextSlot = sendAt + spacing;
+        return sendAt === now
+            ? Promise.resolve()
+            : new Promise<void>(resolve => setTimeout(() => resolve(), sendAt - now));
+    }
+
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (!this.isTinybirdRequest(req.url)) {
             return next.handle(req);
         }
+        // Throttle first, then get the token: the token is shared and cached, so acquiring
+        // it costs nothing per request, whereas the slot is what keeps the burst off the
+        // wire. Requests served from CacheService never reach an interceptor, so cache hits
+        // are not delayed by this.
+        //
         // if no token can be had this rejects, failing the request with a message that
         // names the cause rather than letting it go out bare and come back a bare 403.
-        return from(this.tokenService.getToken())
+        return from(this.takeSlot().then(() => this.tokenService.getToken()))
             .pipe(switchMap(token => next.handle(req.clone({
                 setHeaders: { Authorization: `Bearer ${token}` }
             }))));

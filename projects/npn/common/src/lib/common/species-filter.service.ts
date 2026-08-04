@@ -86,7 +86,11 @@ export class SpeciesFilterService {
     getSpecies(source: HttpParams | any = {}): Promise<TaxonomicSpecies[]> {
         const url = this.serviceUtils.tinybirdUrl('/v0/pipes/species_filter.json');
         const params = toSpeciesFilterParams(source);
-        return this.serviceUtils.cachedGet(url, params)
+        // memory tier: the unfiltered list measures ~930K characters, which costs ~1.9MB
+        // of a ~5MB sessionStorage quota (Chromium accounts it in UTF-16) and is read on
+        // every criteria change. Note the memory tier copies on read -- required here,
+        // because `SpeciesService.getAllSpeciesConsolidated` mutates what it gets back.
+        return this.serviceUtils.memCachedGet(url, params)
             .then((response: TinybirdPipeResponse<TaxonomicSpecies>) => response.data);
     }
 }

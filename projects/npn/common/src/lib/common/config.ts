@@ -18,6 +18,11 @@ export class NpnConfiguration {
     // URL that mints short lived Tinybird JWTs (e.g. https://services2-dev.usanpn.org/v1/data/token).
     // Optional: when absent TinybirdTokenService will not attempt to fetch a token.
     tinybirdTokenUrl?: string;
+    // Minimum milliseconds between outbound Tinybird requests, enforced by
+    // TinybirdAuthInterceptor. Tinybird rate limits the workspace token and answers bursts
+    // with 429, which nothing recovers from generically. Optional: defaults to
+    // TINYBIRD_DEFAULT_REQUEST_SPACING_MS. Set 0 to disable throttling entirely.
+    tinybirdMinRequestSpacingMs?: number;
     // URL root of the Nature's Notebook v1 services API (e.g. https://services2-dev.usanpn.org),
     // home of endpoints like /v1/data/individual_phenometrics. Optional: when absent
     // ObservationService.getIndividualPhenometrics rejects rather than requesting a malformed URL.

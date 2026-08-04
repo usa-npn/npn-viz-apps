@@ -30,9 +30,12 @@ function collectLegacyIds(params: HttpParams, legacyName: string): number[] {
  *
  * Base shape verified against the live `/openapi.json` and real POSTs on 2026-07-29
  * (see `docs/plans/summarized-data.md`): 12 required fields, so anything not named here
- * -- `phenophase_id[n]`, `num_days_quality_filter_individual`, `climate_data`,
- * `request_src` -- is deliberately dropped rather than forwarded. Empty arrays are
- * acceptable for fields this client doesn't populate yet.
+ * -- `phenophase_id[n]`, `num_days_quality_filter_individual`, `request_src` -- is
+ * deliberately dropped rather than forwarded. Empty arrays are acceptable for fields this
+ * client doesn't populate yet.
+ *
+ * The selection's `climate_data` param is not forwarded under that name; `include_climate`
+ * below is the equivalent this endpoint understands, and it is always set.
  *
  * `taxonomy_aggregate`/`pheno_class_aggregate` are set by `fetchDataForPlot`
  * (`site-or-summary-vis-selection.ts`) whenever the plot is built at a taxonomic rank
@@ -57,7 +60,12 @@ export function toIndividualPhenometricsBody(params: HttpParams): any {
         stations: collectLegacyIds(params, 'station_id'),
         individual_ids: [],
         partnerGroups: [],
-        integrated_datasets: []
+        integrated_datasets: [],
+        // Requested on every call rather than mirroring the selection's `climate_data`
+        // param: plotting phenology against climate is a first class use of this data and
+        // the axis definitions expect the columns to be present. A string "1" -- the
+        // upstream schema types this as `include_climate?: string`, not a number or bool.
+        include_climate: '1'
     };
     if (params.has('taxonomy_aggregate')) {
         body.include_taxonomic_detail = '1';
@@ -115,7 +123,10 @@ export class ObservationService {
         }
         const url = this.serviceUtils.servicesApiUrl('/v1/data/individual_phenometrics');
         const body = toIndividualPhenometricsBody(params);
-        return this.serviceUtils.cachedPost<any[]>(url, body, { 'Content-Type': 'application/json' })
+        // memory tier: a single species-year measures ~3M characters, more than the whole
+        // ~5MB sessionStorage origin quota once UTF-16 accounting is applied, so this
+        // could never be cached there -- and every attempt used to wipe the cache clean.
+        return this.serviceUtils.memCachedPost<any[]>(url, body, { 'Content-Type': 'application/json' })
             .then(rows => (rows || []).map(lowercaseKeys))
             .catch(err => {
                 if (err && err.status === 413) {

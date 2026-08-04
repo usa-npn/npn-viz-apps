@@ -98,22 +98,6 @@ export class SpeciesService {
         return this.speciesFilterService.getSpecies(params||{});
     }
 
-    // all species related results are cached locally but not in the session cache since they can get large
-    private higherSpeciesCache = {};
-
-    private _allSpecies(params:HttpParams = new HttpParams()): Promise<TaxonomicSpecies[]> {
-        params = params.set('include_restricted','false');
-        const input = params.toString();
-        const cacheKey = this.serviceUtils.cache.cacheKey({service:'getSpecies',input});
-        if(!this.higherSpeciesCache[cacheKey]) {
-            return this.higherSpeciesCache[cacheKey] = this.serviceUtils.post(
-                this.serviceUtils.apiUrl('/npn_portal/species/getSpecies.json'),
-                input
-            );
-        }
-        return this.higherSpeciesCache[cacheKey].then(results => JSON.parse(JSON.stringify(results)));
-    }
-
     private _filterSpecies(params:HttpParams = new HttpParams()): Promise<TaxonomicSpecies[]> {
         return this.speciesFilterService.getSpecies(params);
     }
@@ -127,11 +111,14 @@ export class SpeciesService {
      */
     private _allSpeciesPromises(params:HttpParams = new HttpParams(),years:number[] = []): Promise<TaxonomicSpecies[]>[] {
         years = years||[]; // in case null is actually passed in
-        // if we aren't doing any filtering then use the getSpecies service because
-        // it's much faster for that use case, it just doesn't return numbers of observations
-        if(!years.length && !params.keys().length) {
-            return [this._allSpecies(params)];
-        }
+        // The unfiltered case used to take a separate, faster `/npn_portal/species/getSpecies.json`
+        // POST memoized in a local `higherSpeciesCache`. That endpoint now 404s, and because the
+        // cache stored the promise before it settled, one failure was memoized for the whole
+        // session -- every later call got the rejected promise back with no request ever going out,
+        // which is what left the species picker spinning with nothing in the network tab. The
+        // Tinybird `species_filter` pipe returns the same unfiltered list, so there is no longer a
+        // reason for a second path. Note this case now also carries `number_observations`, so
+        // `getAllSpeciesConsolidated` sorts it by observation count rather than leaving server order.
         return !years.length
             ? [this._filterSpecies(params)]
             // sets of input request parameters for filtering

@@ -5,7 +5,9 @@ export * from './station';
 export * from './network';
 export * from './static-color';
 
-export { CacheService } from './cache.service';
+export {
+    CacheService, MEMORY_CACHE_MAX_CHARS, SESSION_CACHE_MAX_ENTRY_CHARS
+} from './cache.service';
 export * from './species.service';
 export { SpeciesFilterService, toSpeciesFilterParams, TinybirdPipeResponse } from './species-filter.service';
 export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophasesParams } from './phenophase-filter.service';
@@ -24,7 +26,7 @@ export * from './guid';
 export * from './config';
 export { NpnServiceUtils } from './npn-service-utils.service';
 export { TinybirdTokenService, TinybirdTokenResponse, TINYBIRD_TOKEN_EXPIRY_SKEW } from './tinybird-token.service';
-export { TinybirdAuthInterceptor } from './tinybird-auth.interceptor';
+export { TinybirdAuthInterceptor, TINYBIRD_DEFAULT_REQUEST_SPACING_MS } from './tinybird-auth.interceptor';
 export * from './detect-ie';
 export * from './monitors-destroy';
 export * from './application-settings';

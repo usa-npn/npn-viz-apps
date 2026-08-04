@@ -93,7 +93,8 @@ export function tinybirdTokenPrefetch(tokenService: TinybirdTokenService): () =>
             provide: NPN_CONFIGURATION, useValue: {
                 apiRoot: '//www-dev.usanpn.org',
                 dataApiRoot: '//data-dev.usanpn.org:3006',
-                geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+                //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver'
+                geoServerRoot: '//geoserver.usanpn.org/geoserver'
             }
         }
     ]

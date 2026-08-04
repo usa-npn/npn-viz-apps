@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, Input, SimpleChanges } from '@angular/
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { VisSelection, StationAwareVisSelection, NetworkAwareVisSelection } from '../vis-selection';
 import { Subject, Observable, from, combineLatest, of } from 'rxjs';
-import { switchMap, map, takeUntil, debounceTime, filter, tap } from 'rxjs/operators';
+import { switchMap, map, takeUntil, debounceTime, filter, tap, shareReplay, catchError } from 'rxjs/operators';
 import { MonitorsDestroy,
          SpeciesService,
          SpeciesPlot,
@@ -172,7 +172,17 @@ export class HigherSpeciesPhenophaseInputComponent extends MonitorsDestroy {
                                     params = params.set('person_id', personId);
                                 }
                             }
-                            return this.speciesService.getAllSpeciesHigher(params,criteria.years);
+                            return from(this.speciesService.getAllSpeciesHigher(params,criteria.years))
+                                .pipe(catchError(err => {
+                                    // Without this a single failed request errors the whole
+                                    // pipeline: the combineLatest subscription below is torn
+                                    // down for good, the `tap` that clears fetchingSpeciesList
+                                    // never runs (spinner forever), and no later criteria change
+                                    // can recover it. Emit an empty result instead so the
+                                    // component stays alive and retries on the next change.
+                                    console.error('Unable to fetch species list',err);
+                                    return of({species:[],classes:[],orders:[],families:[],genera:[]});
+                                }));
                         })
                     )),
             tap(() => this.fetchingSpeciesList = false)
@@ -279,6 +289,16 @@ console.log('$phenophaseTaxInfo.input',input);
                 : of(null)
             }),
             tap(() => this.fetchingPhenophaseList = false),
+            // This observable has more than one subscriber ($phenoListChange below, which
+            // feeds the phenophase dropdown, and the phenophaseHint combineLatest further
+            // down).  Without multicasting each subscriber gets its own chain and the
+            // switchMap above runs once per subscriber, doubling every phenophase request.
+            // cachedGet can't collapse them because it only populates the cache once a
+            // response resolves and the duplicates are dispatched in the same tick.
+            // takeUntil precedes shareReplay so the shared subscription to the (hot)
+            // valueChanges/criteriaUpdate sources is torn down when the component dies.
+            takeUntil(this.componentDestroyed),
+            shareReplay(1),
         );
 
         // when the in

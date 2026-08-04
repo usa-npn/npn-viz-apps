@@ -55,18 +55,38 @@ export class NpnServiceUtils {
     }
 
     public cachedGet(url: string, params?: any, asText?: boolean): Promise<any> {
+        return this.cachedGetIn(false, url, params, asText);
+    }
+
+    /**
+     * `cachedGet` against the in-memory tier rather than sessionStorage.
+     *
+     * For endpoints whose responses are too large for Web Storage's ~5MB origin cap --
+     * anything approaching the `SESSION_CACHE_MAX_ENTRY_CHARS` limit, which the session
+     * tier now declines rather than overflowing on. Today that means the species list
+     * (~930K chars); see `memCachedPost` for individual phenometrics.
+     */
+    public memCachedGet(url: string, params?: any, asText?: boolean): Promise<any> {
+        return this.cachedGetIn(true, url, params, asText);
+    }
+
+    private cachedGetIn(memory: boolean, url: string, params?: any, asText?: boolean): Promise<any> {
         params = params || {};
         const cacheKey = {
             u: url,
             params: params
         };
-        const data = this.cache.get(cacheKey);
+        const data = memory ? this.cache.getMemory(cacheKey) : this.cache.get(cacheKey);
         if (data) {
             return Promise.resolve(data);
         }
         return this.get(url, params, asText)
             .then(data => {
-                this.cache.set(cacheKey, data);
+                if (memory) {
+                    this.cache.setMemory(cacheKey, data);
+                } else {
+                    this.cache.set(cacheKey, data);
+                }
                 return data;
             });
     }
@@ -97,17 +117,36 @@ export class NpnServiceUtils {
     }
 
     public cachedPost<T = any>(url:string,body:any,headers?:{[k:string]:string}):Promise<T> {
+        return this.cachedPostIn<T>(false,url,body,headers);
+    }
+
+    /**
+     * `cachedPost` against the in-memory tier rather than sessionStorage.
+     *
+     * Individual phenometrics measures ~3M characters for a single species-year, which
+     * exceeds the whole Web Storage origin quota on its own -- it could never be cached
+     * there, and each attempt used to wipe everything else out.
+     */
+    public memCachedPost<T = any>(url:string,body:any,headers?:{[k:string]:string}):Promise<T> {
+        return this.cachedPostIn<T>(true,url,body,headers);
+    }
+
+    private cachedPostIn<T = any>(memory:boolean,url:string,body:any,headers?:{[k:string]:string}):Promise<T> {
         const cacheKey = {
             u: url,
             params: body
         };
-        const data = this.cache.get(cacheKey);
+        const data = memory ? this.cache.getMemory(cacheKey) : this.cache.get(cacheKey);
         if(data) {
             return Promise.resolve(data);
         }
         return this.post<T>(url,body,headers)
             .then(response => {
-                this.cache.set(cacheKey,response);
+                if(memory) {
+                    this.cache.setMemory(cacheKey,response);
+                } else {
+                    this.cache.set(cacheKey,response);
+                }
                 return response;
             });
     }

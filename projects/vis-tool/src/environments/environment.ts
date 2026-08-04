@@ -12,7 +12,8 @@ const npnConfiguration:NpnConfiguration = {
   geoServerRoot: '//geoserver-dev.usanpn.org/geoserver',
   // geoServerRoot: 'https://geoserver.usanpn.org/geoserver'
   tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
-  tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token'
+  tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token',
+  servicesApiRoot: 'https://services2-dev.usanpn.org'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

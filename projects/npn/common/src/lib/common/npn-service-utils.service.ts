@@ -38,6 +38,10 @@ export class NpnServiceUtils {
         return `${this.config.popApiRoot}${suffix}`;
     }
 
+    public servicesApiUrl(suffix: string) {
+        return `${this.config.servicesApiRoot}${suffix}`;
+    }
+
     get dataApiUseStatisticsCache(): boolean {
         return typeof (this.config.dataApiUseStatisticsCache) === 'boolean' ?
             this.config.dataApiUseStatisticsCache : false;
@@ -88,11 +92,11 @@ export class NpnServiceUtils {
         return data;
     }
 
-    public post<T = any>(url:string,body:string):Promise<T> {
-        return <Promise<T>>this.http.post(url,body,{headers: {'Content-Type':'application/x-www-form-urlencoded'}}).toPromise();
+    public post<T = any>(url:string,body:any,headers:{[k:string]:string} = {'Content-Type':'application/x-www-form-urlencoded'}):Promise<T> {
+        return <Promise<T>>this.http.post(url,body,{headers}).toPromise();
     }
 
-    public cachedPost<T = any>(url:string,body:string):Promise<T> {
+    public cachedPost<T = any>(url:string,body:any,headers?:{[k:string]:string}):Promise<T> {
         const cacheKey = {
             u: url,
             params: body
@@ -101,7 +105,7 @@ export class NpnServiceUtils {
         if(data) {
             return Promise.resolve(data);
         }
-        return this.post<T>(url,body)
+        return this.post<T>(url,body,headers)
             .then(response => {
                 this.cache.set(cacheKey,response);
                 return response;

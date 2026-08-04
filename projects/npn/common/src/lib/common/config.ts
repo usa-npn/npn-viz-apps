@@ -18,6 +18,10 @@ export class NpnConfiguration {
     // URL that mints short lived Tinybird JWTs (e.g. https://services2-dev.usanpn.org/v1/data/token).
     // Optional: when absent TinybirdTokenService will not attempt to fetch a token.
     tinybirdTokenUrl?: string;
+    // URL root of the Nature's Notebook v1 services API (e.g. https://services2-dev.usanpn.org),
+    // home of endpoints like /v1/data/individual_phenometrics. Optional: when absent
+    // ObservationService.getIndividualPhenometrics rejects rather than requesting a malformed URL.
+    servicesApiRoot?: string;
     [x: string]: any; // not going to dictate what else it might have
 }
 

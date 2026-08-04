@@ -15,6 +15,13 @@ const npnConfiguration:NpnConfiguration = {
   // host) once the endpoint exists in this environment.
   // tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
   // tinybirdTokenUrl: 'https://services.usanpn.org/v1/data/token'
+  //
+  // Same story for the individual phenometrics endpoint (v1/data/individual_phenometrics)
+  // -- only confirmed against the dev host as of 2026-07-29 (docs/plans/summarized-data.md).
+  // With this unset, ObservationService.getIndividualPhenometrics rejects with a clear
+  // error rather than requesting a malformed URL. Uncomment (and confirm the host) once
+  // the endpoint is verified here.
+  // servicesApiRoot: 'https://services.usanpn.org'
 };
 export const environment = {
   production: true,

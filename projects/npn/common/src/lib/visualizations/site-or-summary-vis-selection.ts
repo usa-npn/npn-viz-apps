@@ -87,7 +87,9 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
         const filterLqd = (data,plot,plotIndex) => { // site
                 const minusUnwanted =  data.filter(filterUnwantedDataFunctor(plot));
                 const minusSuspect = minusUnwanted.filter(filterSuspectSummaryData);
-                const filtered = minusSuspect.filter(this.individualPhenometrics ? filterLqSummaryData : filterLqSiteData);
+                const filtered = minusSuspect.filter(this.individualPhenometrics
+                    ? (d => filterLqSummaryData(d, this.numDaysQualityFilter))
+                    : filterLqSiteData);
                 console.debug(`plot[${plotIndex}] filtered out ${data.length-minusUnwanted.length}/${data.length} unwanted records`);
                 console.debug(`plot[${plotIndex}] filtered out ${minusUnwanted.length-minusSuspect.length}/${minusUnwanted.length} suspect records`);
                 console.debug(`plot[${plotIndex}] filtered out ${minusSuspect.length-filtered.length}/${minusSuspect.length} LQD records`);
@@ -127,9 +129,7 @@ export abstract class SiteOrSummaryVisSelection extends StationAwareVisSelection
             }
             params = params.set('climate_data','1');
             const data = this.individualPhenometrics
-                ? this.serviceUtils.cachedPost(
-                    this.serviceUtils.apiUrl('/npn_portal/observations/getSummarizedData.json'),
-                    params.toString())
+                ? this.observationService.getIndividualPhenometrics(params)
                 : this.observationService.getSiteLevelData(params);
             return data
                 .then(data => filterLqd(data,plot,plotIndex))
@@ -182,6 +182,7 @@ function filterUnwantedDataFunctor(plot:SpeciesPlot):(any) => boolean {
     const keys = getSpeciesPlotKeys(plot);
     const speciesId = plot.species[keys.speciesIdKey];
     const phenoId = plot.phenophase[keys.phenophaseIdKey];
+    console.debug(`filterUnwantedDataFunctor expecting ${keys.speciesIdKey}=${speciesId} (${typeof speciesId}), ${keys.phenophaseIdKey}=${phenoId} (${typeof phenoId})`);
     return d => {
         const keep = speciesId == d[keys.speciesIdKey] &&
                         phenoId == d[keys.phenophaseIdKey];
@@ -200,8 +201,18 @@ function filterSuspectSummaryData(d):boolean {
     return !bad;
 }
 
-function filterLqSummaryData(d):boolean {
-    var keep = d.numdays_since_prior_no >= 0;
+/**
+ * The `/v1/data/individual_phenometrics` endpoint (unlike the legacy
+ * `getSummarizedData.json` it replaces) does not accept a
+ * `num_days_quality_filter_individual` param, so the day-count cap has to be re-applied
+ * here client-side. `null` (the API's sentinel for an absent value) is treated as
+ * failing. When `maxDays` is unset/non-positive (the quality filter is disabled) only
+ * the `>= 0` check applies, matching prior behavior.
+ */
+function filterLqSummaryData(d, maxDays?: number):boolean {
+    const value = d.numdays_since_prior_no;
+    const keep = value !== null && value !== undefined && value >= 0 &&
+        (!maxDays || maxDays <= 0 || value <= maxDays);
     if (!keep) {
         console.debug('filtering less precise data from summary output', d);
     }

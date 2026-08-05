@@ -7,16 +7,23 @@ import { TaxonomicSpeciesRank } from './species';
 
 /**
  * Params for the `species_phenophases` Tinybird pipe, translated from the single
- * species id + optional date that `SpeciesService` already has on hand.  When `date`
+ * species id + optional date(s) that `SpeciesService` already has on hand.  When `date`
  * is omitted the legacy `getPhenophasesForSpecies.json` behavior (return every
  * phenophase ever defined for the species) is requested via `return_all`.
+ *
+ * `endDate` turns the point-in-time lookup into a range: the pipe answers with the
+ * union of everything defined at any point between `date` and `endDate`, one row per
+ * phenophase.  It is only meaningful alongside `date` and is ignored without one.
  */
-export function toSpeciesPhenophasesParams(speciesId: string | number, date?: string): { [key: string]: string } {
+export function toSpeciesPhenophasesParams(speciesId: string | number, date?: string, endDate?: string): { [key: string]: string } {
     const params: { [key: string]: string } = {
         species_ids: `${speciesId}`
     };
     if (date) {
         params.date = date;
+        if (endDate) {
+            params.end_date = endDate;
+        }
     } else {
         params.return_all = 'true';
     }
@@ -36,7 +43,7 @@ const TAXON_RANK_PARAM: { [rank: string]: string } = {
  * `taxonId`; the legacy `getPhenophasesForTaxon.json` REST call took the equivalent
  * singular `*_id` and dispatched on the same rank.
  */
-export function toTaxonPhenophasesParams(rank: TaxonomicSpeciesRank, taxonId: string | number, date?: string): { [key: string]: string } {
+export function toTaxonPhenophasesParams(rank: TaxonomicSpeciesRank, taxonId: string | number, date?: string, endDate?: string): { [key: string]: string } {
     const idParam = TAXON_RANK_PARAM[rank];
     if (!idParam) {
         throw new Error(`toTaxonPhenophasesParams: unsupported rank "${rank}"`);
@@ -46,6 +53,9 @@ export function toTaxonPhenophasesParams(rank: TaxonomicSpeciesRank, taxonId: st
     };
     if (date) {
         params.date = date;
+        if (endDate) {
+            params.end_date = endDate;
+        }
     } else {
         params.return_all = 'true';
     }
@@ -64,16 +74,16 @@ export function toTaxonPhenophasesParams(rank: TaxonomicSpeciesRank, taxonId: st
 export class PhenophaseFilterService {
     constructor(private serviceUtils: NpnServiceUtils) {}
 
-    getPhenophasesForSpecies(speciesId: string | number, date?: string): Promise<Phenophase[]> {
+    getPhenophasesForSpecies(speciesId: string | number, date?: string, endDate?: string): Promise<Phenophase[]> {
         const url = this.serviceUtils.tinybirdUrl('/v0/pipes/species_phenophases.json');
-        const params = toSpeciesPhenophasesParams(speciesId, date);
+        const params = toSpeciesPhenophasesParams(speciesId, date, endDate);
         return this.serviceUtils.cachedGet(url, params)
             .then((response: TinybirdPipeResponse<Phenophase>) => response.data);
     }
 
-    getPhenophasesForTaxon(rank: TaxonomicSpeciesRank, taxonId: string | number, date?: string): Promise<Phenophase[]> {
+    getPhenophasesForTaxon(rank: TaxonomicSpeciesRank, taxonId: string | number, date?: string, endDate?: string): Promise<Phenophase[]> {
         const url = this.serviceUtils.tinybirdUrl('/v0/pipes/taxon_phenophases.json');
-        const params = toTaxonPhenophasesParams(rank, taxonId, date);
+        const params = toTaxonPhenophasesParams(rank, taxonId, date, endDate);
         return this.serviceUtils.cachedGet(url, params)
             .then((response: TinybirdPipeResponse<Phenophase>) => response.data);
     }

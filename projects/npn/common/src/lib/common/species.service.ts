@@ -292,11 +292,15 @@ export class SpeciesService {
      * the `species_phenophases`/`taxon_phenophases` Tinybird pipes, via
      * `PhenophaseFilterService`. Shared by `_getPhenophases` and `_getPhenodefinitions`,
      * which differ only in which dedupe strategy they apply to the result.
+     *
+     * Supplying `endDate` asks the pipes for the union over `date`..`endDate` rather than
+     * the phenophase list as of a single instant.
      */
-    private _fetchPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
+    private _fetchPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date, endDate?: Date): Promise<Phenophase[]> {
         const dateStr = date ? this.datePipe.transform(date, 'yyyy-MM-dd') : undefined;
+        const endDateStr = endDate ? this.datePipe.transform(endDate, 'yyyy-MM-dd') : undefined;
         if (rank === TaxonomicSpeciesRank.SPECIES) {
-            return this.phenophaseFilterService.getPhenophasesForSpecies((species as Species).species_id, dateStr);
+            return this.phenophaseFilterService.getPhenophasesForSpecies((species as Species).species_id, dateStr, endDateStr);
         }
         let taxonId: number;
         switch(rank) {
@@ -313,16 +317,16 @@ export class SpeciesService {
                 taxonId = (species as TaxonomicGenus).genus_id;
                 break;
         }
-        return this.phenophaseFilterService.getPhenophasesForTaxon(rank, taxonId, dateStr);
+        return this.phenophaseFilterService.getPhenophasesForTaxon(rank, taxonId, dateStr, endDateStr);
     }
 
-    private _getPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
-        return this._fetchPhenophases(species, rank, date)
+    private _getPhenophases(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date, endDate?: Date): Promise<Phenophase[]> {
+        return this._fetchPhenophases(species, rank, date, endDate)
             .then(phases => this.removeRedundantPhenophases(phases));
     }
 
-    private _getPhenodefinitions(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date): Promise<Phenophase[]> {
-        return this._fetchPhenophases(species, rank, date)
+    private _getPhenodefinitions(species: TaxonomicSpeciesType, rank: TaxonomicSpeciesRank, date?: Date, endDate?: Date): Promise<Phenophase[]> {
+        return this._fetchPhenophases(species, rank, date, endDate)
             .then(phases => this.removeRedundantPhenodefinitions(phases));
     }
 
@@ -342,22 +346,27 @@ export class SpeciesService {
         return this._getPhenodefinitions(species, rank, date);
     }
 
+    /**
+     * The phenophase pipes used to accept only a single `date`, answering with the list as
+     * of that instant.  Since the set of defined phenophases changes over time (e.g. species
+     * 3 lost ids 180-186 and gained 467/471/498/... during 2011) a year was approximated by
+     * probing Jan 1 and Dec 31 and unioning the two responses -- two requests per
+     * species/taxon per year, which on the scatter plot multiplied by every year in the
+     * criteria.  The pipes now take `end_date` and return that union directly, so one
+     * request does the whole year.
+     *
+     * This is also strictly more accurate than the two-probe approximation, which missed any
+     * phenophase both introduced and retired between the two sample dates.  Note that where a
+     * phenophase's *definition* changed mid-year the range response carries the later
+     * definition, whereas unioning Jan 1 first kept the earlier one; the `phenophase_id` set
+     * is unaffected, so the phenophase/class pickers see no difference.
+     */
     getPhenophasesForYear(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
-        let jan1 = new Date(year, 0, 1),
-            dec31 = new Date(year, 11, 31);
-        return Promise.all([
-            this.getPhenophasesForDate(species, rank, jan1),
-            this.getPhenophasesForDate(species, rank, dec31)
-        ]).then(lists => this.mergeRedundantPhenophaseLists(lists));
+        return this._getPhenophases(species, rank, new Date(year, 0, 1), new Date(year, 11, 31));
     }
 
     getPhenodefinitionsForYear(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, year: number) {
-        let jan1 = new Date(year, 0, 1),
-            dec31 = new Date(year, 11, 31);
-        return Promise.all([
-            this.getPhenodefinitionsForDate(species, rank, jan1),
-            this.getPhenodefinitionsForDate(species, rank, dec31)
-        ]).then(lists => this.mergeRedundantPhenodefinitionLists(lists));
+        return this._getPhenodefinitions(species, rank, new Date(year, 0, 1), new Date(year, 11, 31));
     }
 
     getPhenophasesForYears(species: TaxonomicSpeciesType, rank:TaxonomicSpeciesRank, years:number[]): Promise<Phenophase[]> {

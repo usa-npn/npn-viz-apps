@@ -3,6 +3,7 @@ export * from './species';
 export * from './phenophase';
 export * from './station';
 export * from './network';
+export * from './program';
 export * from './static-color';
 
 export {
@@ -13,6 +14,7 @@ export { SpeciesFilterService, toSpeciesFilterParams, TinybirdPipeResponse } fro
 export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophasesParams } from './phenophase-filter.service';
 export { ObservationService } from './observation.service';
 export { NetworkService } from './network.service';
+export { ProgramService } from './program.service';
 export { StationService } from './station.service';
 export {
     StationFilterService, FoundStation, geometryToPolygonWkts, latLngPathToPolygonWkt

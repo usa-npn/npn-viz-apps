@@ -1,5 +1,5 @@
 import { StepComponent, StepState, VisConfigStep } from './interfaces';
-import { VisSelection, VisualizationSelectionFactory, NetworkService } from '@npn/common';
+import { VisSelection, VisualizationSelectionFactory, ProgramService } from '@npn/common';
 import { Input, Component, EventEmitter, Output } from '@angular/core';
 import { faUser, faInfoCircle, faTimesCircle } from '@fortawesome/pro-light-svg-icons';
 import { clearPersonalized } from './step_controls/vis-selection';
@@ -41,26 +41,31 @@ export class PersonControlComponent implements StepComponent {
     clearIcon = faTimesCircle;
 
     constructor(private selectionFactory:VisualizationSelectionFactory,
-        private networkService:NetworkService) {}
+        private programService:ProgramService) {}
 
 
     groupName = '';
+    /**
+     * Resolves the `group_id` URL parameter to a program name for display.
+     *
+     * Called from the `id`/`tooltip` getters, so it runs on every change detection pass;
+     * the `groupName` sentinel is what keeps that to a single request. Returns undefined
+     * on the pass that starts the request -- the next pass, after it resolves, returns
+     * the name.
+     */
     getGroupName(group_id) {
         if(this.groupName == '') {
             this.groupName = '  ';
-            this.networkService.getNetwork(group_id).then(network => {
-                if(network && network[0] && network[0].name) {
-                    this.groupName = network[0].name;
-                    return this.groupName;
-                } else {
+            this.programService.getProgram(group_id)
+                .then(program => this.groupName = program && program.name ? program.name : 'not found')
+                .catch(err => {
+                    console.warn(`Unable to look up program ${group_id}`,err);
                     this.groupName = 'not found';
-                    return 'not found'
-                }
-            })
+                });
         } else {
             return this.groupName;
         }
-        
+
     }
 
     get id():any {

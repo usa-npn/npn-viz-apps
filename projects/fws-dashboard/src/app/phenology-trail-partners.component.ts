@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, HostListener } from '@angular/core';
 import { PhenologyTrail } from './entity.service';
-import { Network, Station, NetworkService, StationService, getStaticColor, MAP_STYLES } from '@npn/common';
+import { Program, Station, NetworkService, ProgramService, StationService, getStaticColor, MAP_STYLES } from '@npn/common';
 import { MapsAPILoader, AgmMap } from '@agm/core';
 import * as d3 from 'd3';
 
@@ -32,8 +32,8 @@ import * as d3 from 'd3';
   <div class="map-legend">
     <h3>Legend</h3>
     <ul>
-        <ng-container *ngFor="let network of networks | async; let i = index">
-            <li *ngIf="!!network"><div class="legend-box" [style.background-color]="network.colors?.color"></div> {{network.name}}</li>
+        <ng-container *ngFor="let program of programs | async; let i = index">
+            <li *ngIf="!!program"><div class="legend-box" [style.background-color]="program.colors?.color"></div> {{program.name}}</li>
         </ng-container>
     </ul>
   </div>
@@ -43,7 +43,7 @@ import * as d3 from 'd3';
 export class PhenologyTrailPartnersComponent implements OnInit {
     @ViewChild('AgmMap') agmMap: AgmMap;
     @Input() entity:PhenologyTrail;
-    networks:Promise<Network[]>;
+    programs:Promise<Program[]>;
     stations:Promise<Station[]>;
     selectedStation:Station;
     stationInfo:Station;
@@ -66,12 +66,13 @@ export class PhenologyTrailPartnersComponent implements OnInit {
 
     constructor(
         private networkService:NetworkService,
+        private programService:ProgramService,
         private stationService:StationService,
         private mapsAPILoader:MapsAPILoader
         )  { }
 
     ngOnInit() {
-        // map of network_id to a color
+        // map of program (network) id to a color
         const colorMap:any = this.entity.network_ids.reduce((map,id,i) => {
             const color = getStaticColor(i);
             const outline = d3.color(color).darker().toString();
@@ -79,12 +80,14 @@ export class PhenologyTrailPartnersComponent implements OnInit {
             return map;
         },{});
 
+        // stations carry the id as `network_id`, programs as `program_id`; they are the
+        // same identifier, so key off whichever this object has
         const mapColors = list => list.map(o => {
-            o.colors = colorMap[`${o.network_id}`];
+            o.colors = colorMap[`${o.program_id !== undefined ? o.program_id : o.network_id}`];
             return o;
         });
 
-        this.networks = this.networkService.getNetworks(this.entity.network_ids).then(mapColors);
+        this.programs = this.programService.getPrograms(this.entity.network_ids).then(mapColors);
         this.stations = this.networkService.getStations(this.entity.network_ids).then(mapColors).then(stations => {
             return this.mapsAPILoader.load().then( () => {
                 stations.forEach(station => {

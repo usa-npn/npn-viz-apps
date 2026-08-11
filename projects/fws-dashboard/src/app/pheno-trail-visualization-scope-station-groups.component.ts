@@ -1,14 +1,14 @@
 import { Input, Component } from '@angular/core';
 import { StationAwareVisSelection } from '@npn/common/visualizations/vis-selection';
-import { NetworkWrapper } from './pheno-trail-visualization-scope-selection.component';
+import { ProgramWrapper } from './pheno-trail-visualization-scope-selection.component';
 
 @Component({
     selector: 'pheno-trail-visualization-scope-station-groups',
     template: `
     <h3>Select Sites to Compare</h3>
-    <div *ngFor="let nw of networkWrappers">
-      {{nw.network.name}}
-      <div *ngFor="let s of nw.stations | async" class="station-input">
+    <div *ngFor="let pw of programWrappers">
+      {{pw.program.name}}
+      <div *ngFor="let s of pw.stations | async" class="station-input">
         <mat-checkbox [(ngModel)]="s.selected" (change)="stationChange()">{{s.station_name}}</mat-checkbox>
       </div>
     </div>
@@ -25,13 +25,13 @@ import { NetworkWrapper } from './pheno-trail-visualization-scope-selection.comp
 })
 export class PhenoTrailVisualizationScopeStationGroupsComponent {
   @Input() selection:StationAwareVisSelection;
-  @Input() networkWrappers: NetworkWrapper[];
+  @Input() programWrappers: ProgramWrapper[];
 
   /**
    * Toggle whether a station should be excluded for a selected group
    */
   stationChange(){
-    this.selection.groups = this.networkWrappers.reduce((groups,wrapper) => {
+    this.selection.groups = this.programWrappers.reduce((groups,wrapper) => {
         wrapper.stations.then(stations => {
           stations.filter(s => s.selected).forEach(s => groups.push(s.group));
         });

@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { NpnServiceUtils } from './npn-service-utils.service';
 import { Station } from './station';
-import { Network } from './network';
 
+/**
+ * Station lookups scoped by network id.
+ *
+ * Looking up the networks themselves now lives in `ProgramService` -- the domain calls
+ * them programs, and `{servicesApiRoot}/v1/programs` replaced the `/v0/networks`
+ * endpoints this used to own. What remains here still speaks "network" because the
+ * endpoints it calls do: `getAllStations.json` takes `network_ids[n]` parameters.
+ */
 @Injectable()
 export class NetworkService {
 
@@ -37,41 +44,4 @@ export class NetworkService {
         ).then(response => response.Station_IDs);
     }
 
-    /**
-     * Get a single Network by id
-     * 
-     * @todo unfortunate that this takes a single networkId and yet returns an array, the function should unwrap the response so callers don't have to.
-     * 
-     * @param networkId The id of the Network to fetch.
-     */
-    getNetwork(networkId:number): Promise<Network[]> {
-        return this.serviceUtils.cachedGet(
-            this.serviceUtils.dataApiUrl2(`/v0/networks/${networkId}`)
-        );
-    }
-
-    /**
-     * Get a set of Networks by id.
-     * 
-     * @param networkIds The networkIds.
-     */
-    getNetworks(networkIds:number[]): Promise<Network[]> {
-        // ARGH there is a service that can do this in one request but the dataApiUrl2 
-        // service doesn't do this and we don't yet have a link to the new services (not sure if they should be used)
-        // e.g. curl -X GET "https://data-dev.usanpn.org:3004/v0/networks?network_id=295,724" -H "accept: application/json"
-        // in a development setup dataApiRoot2 is https://data-dev.usanpn.org/webservices (prefixed with /webservices and no 3004)
-        /*
-        return this.serviceUtils.cachedGet(
-            this.serviceUtils.dataApiUrl2('/v0/networks'),
-            {network_id:networkIds.join(',')}
-        );*/
-        // not re-using the getNetwork function because I think it should be fixed to not return an array
-        // but currently fetching the networks with one request per which is less efficient than it could be
-        return Promise.all(
-            networkIds.map(id => this.serviceUtils.cachedGet(this.serviceUtils.dataApiUrl2(`/v0/networks/${id}`)))
-        ).then(results => {
-            // TODO: What to do when given a bad network id?
-            return results.map(result=> result.length == 1 ? result[0] : null).filter(network => !!network);
-        });
-    }
 }

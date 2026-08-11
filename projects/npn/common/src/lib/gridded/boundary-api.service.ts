@@ -22,8 +22,7 @@ const MAX_BOUNDARY_PAGES = 200;
 
 /**
  * Decodes the `simple` field returned by `/v1/boundaries?return_geometry=1`: base64 of
- * the JSON `{"geometry":{"type":"MultiPolygon","coordinates":[...]}}` -- the same
- * `FullGeometry` envelope the legacy `/v0/boundaries` returned as `full`, just encoded.
+ * the JSON `{"geometry":{"type":"MultiPolygon","coordinates":[...]}}`.
  * Coordinates are already `[lng,lat]`, the order `map.data.addGeoJson` expects.
  *
  * The row also carries `simple_wkt` (the same geometry as WKT). It is ignored: it would
@@ -43,10 +42,11 @@ function decodeSimpleGeometry(simple: string): Geometry {
 /**
  * Normalizes a raw boundary row into `Boundary`.
  *
- * Geometry has arrived under three different names across these endpoints -- `simple`
- * (v1, base64, current), `full.geometry` (legacy v0), and a flat `geometry` -- so all
- * three are accepted and normalized to the nested `full.geometry` that
- * `boundariesToFeatureCollection` reads. Everything downstream of here sees one shape.
+ * `simple` (base64) is what `/v1/boundaries` returns today; a nested `full.geometry` or a
+ * flat `geometry` are also accepted, since `return_geometry` is not yet honored
+ * server-side and the shape it eventually delivers is not settled. All three normalize to
+ * the nested `full.geometry` that `boundariesToFeatureCollection` reads, so everything
+ * downstream of here sees one shape.
  */
 export function normalizeBoundary(raw: any): Boundary {
     const geometry = raw.simple
@@ -79,17 +79,13 @@ export class BoundaryApiService {
      * https://services2-dev.usanpn.org/v1/boundaries/types on 2026-08-04: 200 with a bare
      * array of `{type_id,name,description}` -- already exactly what `BoundaryType`
      * declares, so no response translation is needed here.
-     *
-     * Falls back to the legacy `{dataApiRoot2}/v0/boundaries/types` when `servicesApiRoot`
-     * is unset. That is the deliberate state of `environment.prod.ts` (the v1 host is only
-     * confirmed on dev), so production stays on the URL it works with today until that
-     * config is filled in -- rather than losing the boundary picker entirely.
      */
     getBoundaryTypes(): Promise<BoundaryType[]> {
-        const url = this.serviceUtils.config.servicesApiRoot
-            ? this.serviceUtils.servicesApiUrl('/v1/boundaries/types')
-            : this.serviceUtils.dataApiUrl2('/v0/boundaries/types');
-        return this.serviceUtils.cachedGet(url)
+        if (!this.serviceUtils.config.servicesApiRoot) {
+            return Promise.reject(new Error(
+                'No boundary types endpoint configured (servicesApiRoot)'));
+        }
+        return this.serviceUtils.cachedGet(this.serviceUtils.servicesApiUrl('/v1/boundaries/types'))
             .then((types: BoundaryType[]) => types || []);
     }
 
@@ -104,16 +100,18 @@ export class BoundaryApiService {
      * - The response is a bare array with no total count, in any header or envelope.
      *   Reading past the end returns `200 []`, so a short page is the only available
      *   end-of-results signal.
-     * - `type_id` takes a plain integer (the legacy endpoint was sent `type_id="1"`).
+     * - `type_id` takes a plain integer.
      *
      * Pages are fetched in sequence rather than in parallel because the page count isn't
      * knowable up front -- the short page that ends the walk is also what tells us it was
      * the last one.
      */
     getBoundaries(typeId: number): Promise<Boundary[]> {
-        return this.serviceUtils.config.servicesApiRoot
-            ? this.getBoundaryPage(typeId, 0, [])
-            : this.getBoundariesLegacy(typeId);
+        if (!this.serviceUtils.config.servicesApiRoot) {
+            return Promise.reject(new Error(
+                'No boundaries endpoint configured (servicesApiRoot)'));
+        }
+        return this.getBoundaryPage(typeId, 0, []);
     }
 
     private getBoundaryPage(typeId: number, page: number, acc: Boundary[]): Promise<Boundary[]> {
@@ -138,18 +136,5 @@ export class BoundaryApiService {
             }
             return this.getBoundaryPage(typeId, page + 1, boundaries);
         });
-    }
-
-    /**
-     * Legacy `{dataApiRoot2}/v0/boundaries`, unpaged, used only when `servicesApiRoot` is
-     * unconfigured (production, today). `type_id` stays quoted here because that is what
-     * this endpoint has always been sent -- the unquoted form is correct for v1 but is not
-     * verifiable against this one from here, and production currently depends on it.
-     */
-    private getBoundariesLegacy(typeId: number): Promise<Boundary[]> {
-        return this.serviceUtils.get(
-            this.serviceUtils.dataApiUrl2('/v0/boundaries'),
-            { type_id: `"${typeId}"` }
-        ).then((boundaries: any[]) => (boundaries || []).map(normalizeBoundary));
     }
 }

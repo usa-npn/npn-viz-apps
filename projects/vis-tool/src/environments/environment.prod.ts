@@ -21,9 +21,14 @@ const npnConfiguration:NpnConfiguration = {
   // v1/data/magnitude_phenometrics) -- only confirmed against the dev host as of
   // 2026-08-11 (docs/plans/magnitude-site-level-data.md). With this unset,
   // ObservationService rejects each with a clear error rather than requesting a
-  // malformed URL. Uncomment (and confirm the host) once verified here -- it now gates
-  // three endpoints rather than one.
-  // servicesApiRoot: 'https://services.usanpn.org'
+  // malformed URL. Uncomment (and confirm the host) once verified here.
+  //
+  // NOTE: this now also gates boundaries (v1/boundaries, v1/boundaries/types). The
+  // legacy {dataApiRoot2}/v0/boundaries fallback BoundaryApiService used to take when
+  // this was unset has been removed -- those web services are being retired, so the
+  // fallback was headed for a 404. Until this is set, the boundary picker is
+  // non-functional in a production build.
+   servicesApiRoot: 'https://services2-dev.usanpn.org'
 };
 export const environment = {
   production: true,

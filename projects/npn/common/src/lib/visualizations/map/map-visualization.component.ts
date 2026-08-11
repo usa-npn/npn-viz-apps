@@ -8,6 +8,7 @@ import { MouseEvent } from '@agm/core';
 import { GriddedPointData, MapLayerLegend } from '@npn/common/gridded';
 import { Species, Phenophase } from '@npn/common/common';
 import { SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
+import { isNullData } from '../vis-selection';
 
 @Component({
     selector: 'map-visualization',
@@ -179,7 +180,7 @@ export class MapVisualizationComponent extends MapVisualizationBaseComponent {
             this.selection.getData().then((allPlotData:SiteOrSummaryPlotData[]) => {
                 const data = allPlotData.reduce((records,plotData,plotIndex) => {
                         const filtered = plotData.data
-                            .filter(d => d.mean_first_yes_doy !== -9999) // throw out invalid means
+                            .filter(d => !isNullData(d.mean_first_yes_doy)) // throw out invalid means
                             .map(d => {
                                 d.plot = plotData.plot;
                                 d.plotIndex = plotIndex;

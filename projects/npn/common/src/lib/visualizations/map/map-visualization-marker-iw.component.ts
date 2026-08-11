@@ -109,7 +109,7 @@ export class MapVisualizationMarkerIw {
     gddMarkerText(r) {
         if (this.selection.layerCategory == 'Pheno Forecasts' 
             || (this.selection.layerName && this.selection.layerName.includes('gdd'))) {
-            return r.mean_gddf != -9999 ? `${r.mean_gddf} (Daymet, start date Jan 1, base 32${String.fromCharCode(176)})` : 'not available';
+            return r.mean_agdd_in_f != null ? `${r.mean_agdd_in_f} (Daymet, start date Jan 1, base 32${String.fromCharCode(176)})` : 'not available';
         } else {
             return ``;
         }

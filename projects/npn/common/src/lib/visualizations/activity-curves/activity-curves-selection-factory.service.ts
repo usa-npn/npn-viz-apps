@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { NpnServiceUtils, SpeciesService, NetworkService } from '../../common';
+import { NpnServiceUtils, SpeciesService, NetworkService, ObservationService } from '../../common';
 import { ActivityCurvesSelection } from './activity-curves-selection';
 
 @Injectable()
@@ -9,10 +9,11 @@ export class ActivityCurvesSelectionFactory {
         protected serviceUtils:NpnServiceUtils,
         protected datePipe: DatePipe,
         protected speciesService:SpeciesService,
-        protected networkService:NetworkService
+        protected networkService:NetworkService,
+        protected observationService:ObservationService
     ) {}
 
     newSelection(): ActivityCurvesSelection {
-        return new ActivityCurvesSelection(this.serviceUtils,this.datePipe,this.speciesService,this.networkService);
+        return new ActivityCurvesSelection(this.serviceUtils,this.datePipe,this.speciesService,this.networkService,this.observationService);
     }
 }

@@ -1,4 +1,4 @@
-import { NULL_DATA, ONE_DAY_MILLIS, selectionProperty, POPInput, BASE_POP_INPUT } from '../vis-selection';
+import { ONE_DAY_MILLIS, selectionProperty, POPInput, BASE_POP_INPUT, isNullData } from '../vis-selection';
 import { SiteOrSummaryVisSelection, SiteOrSummaryPlotData } from '../site-or-summary-vis-selection';
 import { HttpParams } from '@angular/common/http';
 import * as d3 from 'd3';
@@ -7,7 +7,7 @@ import { CURRENT_YEAR, CURRENT_YEAR_VALUE } from '@npn/common/common';
 const KEYS_TO_NORMALIZE  = {
     daylength: 'mean_daylength',
     acc_prcp: 'mean_accum_prcp',
-    gdd: 'mean_gdd'
+    gdd: 'mean_agdd'
 };
 
 export const AXIS = [
@@ -46,7 +46,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
     $class:string = 'ScatterPlotSelection';
 
     @selectionProperty()
-    start: number = 2011;
+    start: number = (new Date()).getFullYear() - 3;
     @selectionProperty()
     end: number = (new Date()).getFullYear();
     @selectionProperty()
@@ -154,7 +154,7 @@ export class ScatterPlotSelection extends SiteOrSummaryVisSelection {
 
     axisNonNull(data:any[]): any[] {
         return data.filter((d) => {
-            return this.axisData(d) !== NULL_DATA;
+            return !isNullData(this.axisData(d));
         });
     }
 

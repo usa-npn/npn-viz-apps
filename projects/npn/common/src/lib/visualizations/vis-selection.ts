@@ -8,6 +8,15 @@ import { HttpParams } from '@angular/common/http';
 export const NULL_DATA = -9999;
 export const ONE_DAY_MILLIS: number = (24 * 60 * 60 * 1000);
 
+/**
+ * `/v1/data/*_phenometrics` uses real `null` rather than the legacy `-9999` sentinel
+ * (`site_metrics.pipe:86` -- "-9999 sentinels are real NULL throughout"). `null !== -9999`
+ * is true, so any guard still comparing against `NULL_DATA` lets nulls straight through;
+ * use this wherever such a guard reads phenometrics response data.
+ */
+export const isNullData = (v: any): boolean =>
+    v === null || v === undefined || v === NULL_DATA;
+
 export const enum VisSelectionEvent {
     RESET = 'reset', // go back to a "clean" slate
     REDRAW = 'redraw', // assuming you have data simply re-draw with that data

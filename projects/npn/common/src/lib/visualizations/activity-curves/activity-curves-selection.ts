@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
-import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, getStaticColor, STATIC_COLORS } from '../../common';
+import { NpnServiceUtils, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, getSpeciesPlotKeys, SpeciesService, NetworkService, ObservationService, getStaticColor, STATIC_COLORS } from '../../common';
 
 import { INTERPOLATE, ActivityCurve } from './activity-curve';
 import { StationAwareVisSelection, selectionProperty, BASE_POP_INPUT, POPInput } from '../vis-selection';
@@ -69,7 +69,8 @@ export class ActivityCurvesSelection extends StationAwareVisSelection {
         public serviceUtils:NpnServiceUtils,
         public datePipe: DatePipe,
         public speciesService:SpeciesService,
-        public networkService:NetworkService
+        public networkService:NetworkService,
+        public observationService:ObservationService
     ) {
         super(serviceUtils,networkService);
         // create a default empty curve

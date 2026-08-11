@@ -1,4 +1,4 @@
-import {selectionProperty,GET_EXTERNAL,SET_EXTERNAL, GroupHttpParams, SelectionGroup} from '../vis-selection';
+import {selectionProperty,GET_EXTERNAL,SET_EXTERNAL, GroupHttpParams, SelectionGroup, isNullData} from '../vis-selection';
 import {
     TaxonomicSpeciesTitlePipe,
     DoyPipe,
@@ -227,7 +227,7 @@ export class ActivityCurve implements SpeciesPlot {
                 d = data[i];
                 if(self.doyFocus >= d.start_doy && self.doyFocus <= d.end_doy) {
                     value = (self.metric.valueFormat||IDENTITY)(d[self.metric.id]);
-                    if(d[self.metric.sampleSize] !== -9999) {
+                    if(!isNullData(d[self.metric.sampleSize])) {
                         value += ' N:'+ d[self.metric.sampleSize];
                     }
                     return value;
@@ -287,11 +287,11 @@ export class ActivityCurve implements SpeciesPlot {
                     console.warn('Metric does not define a sampleSize property, cannot filter out invalid data points.');
                 }
                 data = data.filter(function(d){
-                    if(self.metric.sampleSize && d[self.metric.sampleSize] === -9999) {
+                    if(self.metric.sampleSize && isNullData(d[self.metric.sampleSize])) {
                         //console.log('SAMPLE_SIZE filter.');
                         return false;
                     }
-                    return d[self.metric.id] !== -9999;
+                    return !isNullData(d[self.metric.id]);
                 });
                 if(data.length !== self.$data.length) {
                     console.debug('filtered out '+(self.$data.length-data.length)+'/'+ self.$data.length +' of -9999 records for metric ',self.metric);
@@ -343,23 +343,22 @@ export class ActivityCurve implements SpeciesPlot {
         if(this.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
             curveParams = curveParams.set('pheno_class_aggregate','1');
         }
-        const apiUrl = this.selection.serviceUtils.apiUrl('/npn_portal/observations/getMagnitudeData.json');
         if(this.selection.groups && this.selection.groups.length) {
             return this.selection.toGroupHttpParams(curveParams)
                 .then((groupParams:GroupHttpParams[]) => {
                     // parallel arrays
                     this._children = groupParams.map((gp,i) => this.copy(i));
                     return Promise.all(
-                        this._children.map((curve,i) => this.selection.serviceUtils
-                            .cachedPost(apiUrl,groupParams[i].params.toString())
+                        this._children.map((curve,i) => this.selection.observationService
+                            .getMagnitudeData(groupParams[i].params)
                             .then(data => curve.group(groupParams[i].group).data(data) as ActivityCurve))
                     )
                 });
         } else {
-            return this.selection.serviceUtils
-                .cachedPost(apiUrl,curveParams.toString())
+            return this.selection.observationService
+                .getMagnitudeData(curveParams)
                 .then(data => [this.data(data) as ActivityCurve]);
-        }   
+        }
     }
 
     axis() {
@@ -576,7 +575,7 @@ export const ACTIVITY_CURVE_KINGDOM_METRICS = {
                 valueFormat: DECIMAL
             },{
                 id: 'mean_numanimals_in-phase_per_hr_per_acre',
-                sampleSize: 'phase_per_hr_per_acre_sites_sample_size',
+                sampleSize: 'in-phase_per_hr_per_acre_sites_sample_size',
                 label: 'Animals In Phase per Hour per Acre',
                 valueFormat: DECIMAL
             }])

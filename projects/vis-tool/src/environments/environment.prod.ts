@@ -16,11 +16,13 @@ const npnConfiguration:NpnConfiguration = {
   // tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
   // tinybirdTokenUrl: 'https://services.usanpn.org/v1/data/token'
   //
-  // Same story for the individual phenometrics endpoint (v1/data/individual_phenometrics)
-  // -- only confirmed against the dev host as of 2026-07-29 (docs/plans/summarized-data.md).
-  // With this unset, ObservationService.getIndividualPhenometrics rejects with a clear
-  // error rather than requesting a malformed URL. Uncomment (and confirm the host) once
-  // the endpoint is verified here.
+  // Same story for the individual/site-level/magnitude phenometrics endpoints
+  // (v1/data/individual_phenometrics, v1/data/site_phenometrics,
+  // v1/data/magnitude_phenometrics) -- only confirmed against the dev host as of
+  // 2026-08-11 (docs/plans/magnitude-site-level-data.md). With this unset,
+  // ObservationService rejects each with a clear error rather than requesting a
+  // malformed URL. Uncomment (and confirm the host) once verified here -- it now gates
+  // three endpoints rather than one.
   // servicesApiRoot: 'https://services.usanpn.org'
 };
 export const environment = {

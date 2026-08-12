@@ -105,9 +105,9 @@ which to use.
 
 ### 1e. The URL-root method names are content-free
 
-`apiUrl` / `dataApiUrl` / `dataApiUrl2` / `geoServerUrl` / `popApipUrl` (the typo is the
-real method name). A call site can't tell which backend it hits or why there are two data
-APIs. Already flagged by `@todo` in both `config.ts:4` and `npn-service-utils.service.ts:8`.
+`apiUrl` / `dataApiUrl` / `dataApiUrl2` / `geoServerUrl` (`popApipUrl` — the typo was the
+real method name — has since been deleted along with `popApiRoot`). A call site can't tell
+which backend it hits or why there are two data APIs. Already flagged by `@todo` in both `config.ts:4` and `npn-service-utils.service.ts:8`.
 
 ### Target shape
 
@@ -123,7 +123,7 @@ permitted to build a URL:
 | `ObservationService` | `observations/*` | **missing** — 5 selections inline this |
 | `AgddService` | `v1/agdd/*` | **missing** — 3 files inline this |
 | `PestService` | `v1/phenoforecasts/*` | **missing** |
-| `PopService` | `popApiRoot/search` | **missing** |
+| `SavedSearchService` | `v1/saved_search` | exists — replaced the planned `PopService`; also owns the observation portal URL the export is forwarded to |
 
 Three services were never created, so their endpoints scattered into whatever class needed
 the data. No single bad decision — just repeated path-of-least-resistance when the right

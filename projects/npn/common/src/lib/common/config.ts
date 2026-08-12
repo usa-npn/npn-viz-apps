@@ -9,7 +9,6 @@ export class NpnConfiguration {
     dataApiRoot: string; // URL of NPN data web services (e.g. //data-dev.usanpn.org:3006)
     dataApiUseStatisticsCache?: boolean; // the value for the useCache parameter for data statistics calls.
     dataApiRoot2: string; // URL of NPN data2 web services (new, e.g. https://data-dev.usanpn.org/webservices).
-    popApiRoot: string;
     geoServerRoot: string; // URL of the NPN geo server
     // URL root of the Tinybird API (e.g. https://api.us-west-2.aws.tinybird.co).
     // Requests to URLs beneath this root have a JWT attached by TinybirdAuthInterceptor.
@@ -27,6 +26,16 @@ export class NpnConfiguration {
     // home of endpoints like /v1/data/individual_phenometrics. Optional: when absent
     // ObservationService.getIndividualPhenometrics rejects rather than requesting a malformed URL.
     servicesApiRoot?: string;
+    // Full URL of the Phenology Observation Portal's search page (e.g.
+    // https://data.usanpn.org/observations), which a saved search is opened at as
+    // `?search={hash}`. A whole URL rather than a host root, because the path is part of
+    // what identifies the page -- so there is no `NpnServiceUtils` helper for it and
+    // SavedSearchService appends to it directly.
+    //
+    // This is a web app, not a web service: nothing is ever requested from it by this
+    // code, it is only ever a window.open target. Optional: when absent
+    // SavedSearchService.exportUrl rejects rather than opening a malformed URL.
+    observationPortalUrl?: string;
     [x: string]: any; // not going to dictate what else it might have
 }
 

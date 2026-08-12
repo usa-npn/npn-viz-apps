@@ -5,8 +5,8 @@ const npnConfiguration:NpnConfiguration = {
   apiRoot: '//services-staging.usanpn.org',
   dataApiRoot: 'https://services-staging.usanpn.org/geo-services',
   dataApiRoot2: 'https://services-staging.usanpn.org/web-services',
-  popApiRoot: 'https://services-staging.usanpn.org/pop-services',
   dataApiUseStatisticsCache: false,
+  observationPortalUrl: 'https://data.usanpn.org/observations',
   geoServerRoot: '//geoserver.usanpn.org/geoserver',
   // Tinybird access is intentionally left unconfigured here.  As of 2026-07-30
   // https://services.usanpn.org/v1/data/token 404s and staging 503s -- only the dev

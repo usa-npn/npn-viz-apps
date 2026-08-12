@@ -7,13 +7,18 @@ const npnConfiguration:NpnConfiguration = {
   dataApiRoot: 'https://data-dev.usanpn.org/geoservices',
   // dataApiRoot: 'https://data.usanpn.org/geoservices',
   dataApiRoot2: 'https://data-dev.usanpn.org/webservices',
-  popApiRoot: 'https://data-dev.usanpn.org/popservices',
   dataApiUseStatisticsCache: false,
   //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver',
   geoServerRoot: 'https://geoserver.usanpn.org/geoserver',
   tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
   tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token',
-  servicesApiRoot: 'https://services2-dev.usanpn.org'
+  servicesApiRoot: 'https://services2-dev.usanpn.org',
+  // The production portal on purpose. Export used to hardcode data-dev.usanpn.org here,
+  // but that host no longer resolves at all (verified 2026-08-12, same fate as
+  // www-dev.usanpn.org). Since searches are saved to servicesApiRoot above and redeemed
+  // by this page, a dev portal -- if one comes back -- would have to read the same store
+  // this host writes to.
+  observationPortalUrl: 'https://data.usanpn.org/observations'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

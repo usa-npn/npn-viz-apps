@@ -9,6 +9,7 @@ import { ObservationService } from './observation.service';
 import { StationFilterService } from './station-filter.service';
 import { NetworkService } from './network.service';
 import { ProgramService } from './program.service';
+import { SavedSearchService } from './saved-search.service';
 import { StationService } from './station.service';
 
 import { SpeciesTitlePipe, TaxonomicSpeciesTitlePipe } from './species-title.pipe';
@@ -69,6 +70,7 @@ export function tinybirdTokenPrefetch(tokenService: TinybirdTokenService): () =>
         ObservationService,
         NetworkService,
         ProgramService,
+        SavedSearchService,
         PointService,
         StationService,
         StationFilterService,

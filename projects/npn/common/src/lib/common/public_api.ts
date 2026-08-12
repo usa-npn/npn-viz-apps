@@ -15,6 +15,7 @@ export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophases
 export { ObservationService } from './observation.service';
 export { NetworkService } from './network.service';
 export { ProgramService } from './program.service';
+export { SavedSearchService } from './saved-search.service';
 export { StationService } from './station.service';
 export {
     StationFilterService, FoundStation, geometryToPolygonWkts, latLngPathToPolygonWkt

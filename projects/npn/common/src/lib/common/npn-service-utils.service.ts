@@ -34,10 +34,6 @@ export class NpnServiceUtils {
         return `${this.config.tinybirdApiRoot}${suffix}`;
     }
 
-    public popApipUrl(suffix:string) {
-        return `${this.config.popApiRoot}${suffix}`;
-    }
-
     public servicesApiUrl(suffix: string) {
         return `${this.config.servicesApiRoot}${suffix}`;
     }

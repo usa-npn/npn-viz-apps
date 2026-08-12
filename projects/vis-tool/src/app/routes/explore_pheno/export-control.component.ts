@@ -2,11 +2,12 @@ import { Component, Input } from '@angular/core';
 
 import { faDownload } from '@fortawesome/pro-light-svg-icons';
 
-import { NpnServiceUtils } from "@npn/common";
+import { MatSnackBar } from '@angular/material';
+
+import { SavedSearchService } from "@npn/common";
 import { StepComponent, StepState, VisConfigStep } from "./interfaces";
 import { VisSelection } from '@npn/common';
 import { SupportsPOPInput, completePOPDates } from '@npn/common/visualizations/vis-selection';
-import { environment } from 'projects/vis-tool/src/environments/environment';
 
 @Component({
     selector: `export-visualization`,
@@ -33,7 +34,10 @@ export class ExportControlComponent implements StepComponent {
         controlComponent: null
     };
 
-    constructor(private serviceUtils:NpnServiceUtils) {}
+    constructor(
+        private savedSearchService:SavedSearchService,
+        private snackBar:MatSnackBar
+    ) {}
 
     get state():StepState {
         return this.selection && this.selection.isValid()
@@ -48,15 +52,15 @@ export class ExportControlComponent implements StepComponent {
     export() {
         (this.selection as any as SupportsPOPInput).toPOPInput()
             .then(input => completePOPDates(input))
-            // save the POP input and get back a hash
-            .then(searchJson => this.serviceUtils.http.post<any>(
-                    this.serviceUtils.popApipUrl('/search'),
-                    {searchJson}
-                ).toPromise()
-                // just tease out the hash
-                .then(results => results.saved_search_hash)
-            )
-            // argh, so many URLs
-            .then(hash => window.open(`https://data${environment.production ? '' :'-dev'}.usanpn.org/observations?search=${hash}`));
+            // SavedSearchService owns both URLs involved -- saving the search and the
+            // portal address its hash opens at.
+            .then(searchJson => this.savedSearchService.exportUrl(searchJson))
+            .then(url => window.open(url))
+            .catch(err => {
+                // Previously this chain had no catch at all, so a failed save left the
+                // button looking like it had simply done nothing.
+                console.error(err);
+                this.snackBar.open('Unable to export this visualization\'s data.');
+            });
     }
 }

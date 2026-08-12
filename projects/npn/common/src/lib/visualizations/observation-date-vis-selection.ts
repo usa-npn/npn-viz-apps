@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
 import { StationAwareVisSelection, selectionProperty, POPInput, BASE_POP_INPUT, SelectionGroup, GroupHttpParams } from './vis-selection';
-import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, TaxonomicSpeciesRank, TaxonomicPhenophaseRank, SpeciesService, NetworkService, getStaticColor, CURRENT_YEAR, CURRENT_YEAR_VALUE  } from '../common';
+import { NpnServiceUtils, SpeciesPlot, TaxonomicSpeciesTitlePipe, getSpeciesPlotKeys, SpeciesService, NetworkService, ObservationDateService, ObservationDateRow, getStaticColor, CURRENT_YEAR, CURRENT_YEAR_VALUE  } from '../common';
 
 export interface ObservationDatePlot extends SpeciesPlot {
     [x: string]: any;
@@ -20,13 +20,29 @@ export interface ObservationDateData {
 export interface ObservationDatePlotData {
     plot: ObservationDatePlot;
     group?: SelectionGroup;
-    data: any;
+    /** The rows of `/v1/data/observation_dates` belonging to this plot. */
+    data: ObservationDateRow[];
+}
+
+/**
+ * One (plot,group) pair and the request it will be served by.  Plots sharing a group, a
+ * taxonomic rank and a phenophase grain share a single request; see `fetchPlotData`.
+ */
+interface PlotRequest {
+    plot: ObservationDatePlot;
+    group?: SelectionGroup;
+    /** Position in the group params list -- part of the bucket key, so groups never share a request. */
+    groupIndex: number;
+    params: HttpParams;
+    speciesIdKey: string;
+    phenophaseIdKey: string;
+    speciesId: any;
+    phenophaseId: any;
+    data?: ObservationDateRow[];
 }
 
 export abstract class ObservationDateVisSelection extends StationAwareVisSelection {
     $supportsPop:boolean = true;
-
-    requestSrc: string = 'observation-date-vis-selection';
 
     @selectionProperty()
     negative: boolean = false;
@@ -44,7 +60,8 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         protected serviceUtils:NpnServiceUtils,
         protected speciesTitle:TaxonomicSpeciesTitlePipe,
         protected speciesService:SpeciesService,
-        protected networkService:NetworkService
+        protected networkService:NetworkService,
+        protected observationDateService:ObservationDateService
     ) {
         super(serviceUtils,networkService);
     }
@@ -77,8 +94,13 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         return next_count <= this.MAX_PLOTS;
     }
 
+    /**
+     * Note there is no `request_src` here any more -- `/v1/data/observation_dates` rejects
+     * unknown fields outright (`additionalProperties: false`), so sending it is a 400.  It
+     * was vestigial regardless: every caller sent the base class default because
+     * `CalendarSelectionFactory.newSelection()` never applied its own value.
+     */
     toURLSearchParams(params: HttpParams = new HttpParams()): Promise<HttpParams> {
-        params = params.set('request_src', this.requestSrc);
         this.actualYears.forEach((y, i) => {
             params = params.set(`year[${i}]`, `${y}`);
         });
@@ -135,18 +157,25 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         data.forEach(d => {
             const plot = d.plot;
             const group = d.group;
-            const rData:any= d.data;
-            let pPhases = {years:{}}; // empty
-            const pPhaseKey = plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS ? 'pheno_classes' : 'phenophases';
-            if(rData && rData[pPhaseKey] && rData[pPhaseKey].length) {
-                pPhases = rData[pPhaseKey][0];
-            }
+            // Group this plot's flat rows by year.  `status` is numeric: 1 is a day the
+            // phenophase was reported yes, 0 a day it was reported no.  Every row the
+            // endpoint returns is a data point for its day -- `count` is not consulted
+            // (it is neither an intensity nor an abundance value).
+            const byYear = (d.data||[]).reduce((map,row) => {
+                    const yearData = map[row.year] || (map[row.year] = {positive:[],negative:[]});
+                    (row.status === 1 ? yearData.positive : yearData.negative).push(row.day_of_year);
+                    return map;
+                },{} as {[year:number]:{positive:number[];negative:number[]}});
             this.actualYears.forEach(year => {
-                if(pPhases.years[year]) {
+                const yearData = byYear[year];
+                if(yearData) {
+                    // negative first: both land on the same row at the same x and
+                    // calendar.component.ts keys the d3 join on (y,x,color), so the
+                    // later insert covers the earlier one.
                     if(this.negative) {
-                        addDoys(pPhases.years[year].negative,this.negativeColor);
+                        addDoys(yearData.negative,this.negativeColor);
                     }
-                    addDoys(pPhases.years[year].positive,plot.color);
+                    addDoys(yearData.positive,plot.color);
                 }
                 const pp = plot.phenophase as any;
                 response.labels.splice(0, 0, 
@@ -171,46 +200,14 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
         if (!this.isValid()) {
             return Promise.reject(this.INVALID_SELECTION);
         }
-        const fetchDataForPlot = (baseParams,plot,group?) => {
-            const keys = getSpeciesPlotKeys(plot);
-            let plotParams = baseParams.set(`${keys.speciesIdKey}[0]`,`${plot.species[keys.speciesIdKey]}`)
-                .set(`${keys.phenophaseIdKey}[0]`,`${plot.phenophase[keys.phenophaseIdKey]}`);
-            if((plot.speciesRank||TaxonomicSpeciesRank.SPECIES) !== TaxonomicSpeciesRank.SPECIES) {
-                plotParams = plotParams.set('taxonomy_aggregate','1');
-            }
-            if(plot.phenophaseRank === TaxonomicPhenophaseRank.CLASS) {
-                plotParams = plotParams.set('pheno_class_aggregate','1');
-            }
-            return this.serviceUtils.cachedPost(serviceUrl,plotParams.toString())
-                .then((results:any[]) => {
-                    const data = results[0];
-                    return {plot,data,group};
-                });
-        };
         this.working = true;
-        const serviceUrl = this.serviceUtils.apiUrl('/npn_portal/observations/getObservationDates.json');
         return this.toURLSearchParams()
-            // one request per valid plot
-            .then(baseParams => {
-                const validPlots = this.validPlots;
-                return (this.groups && this.groups.length)
-                    ? this.toGroupHttpParams(baseParams)
-                        .then((groupParams:GroupHttpParams[]) => {
-                            let plotIndex = 0;
-                            // just to make TypeScript happy...
-                            const arr:Promise<ObservationDatePlotData>[] = [];
-                            const promises = validPlots.reduce((promises,p) => {
-                                groupParams.forEach(gp => {
-                                    const plot = JSON.parse(JSON.stringify(p));
-                                    plot.color = getStaticColor(plotIndex++);
-                                    promises.push(fetchDataForPlot(gp.params,plot,gp.group));
-                                });
-                                return promises;
-                            },arr);
-                            return Promise.all(promises);
-                        })
-                    : Promise.all(validPlots.map(plot => fetchDataForPlot(baseParams,plot)));
-            })
+            .then(baseParams => (this.groups && this.groups.length)
+                // a SelectionGroup partitions by station set, so each group needs its own
+                // stations array and therefore its own request(s)
+                ? this.toGroupHttpParams(baseParams)
+                : Promise.resolve([{group:undefined,params:baseParams} as GroupHttpParams]))
+            .then((groupParams:GroupHttpParams[]) => this.fetchPlotData(groupParams))
             .then(result => {
                 this.working = false;
                 return result;
@@ -219,5 +216,73 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
                 this.working = false;
                 this.handleError(err);
             });
+    }
+
+    /**
+     * Issues one request per (group, taxonomic rank, phenophase grain) bucket and
+     * demultiplexes the resulting rows back onto the plots that asked for them.
+     *
+     * `/v1/data/observation_dates` takes a single `taxon` and a single `phenophase_grain`
+     * per request and answers with the full cross product of the id arrays it is given.
+     * Plots do not have to agree on rank -- each one carries its own `speciesRank` from
+     * its `higher-species-phenophase-input` control -- so the plots are bucketed by rank
+     * first and the unwanted pairs are dropped here rather than server side.
+     *
+     * In the vis tool this is always exactly one request: plots are capped at three and
+     * groups are never set.  Groups are only ever populated by fws-dashboard.
+     */
+    private fetchPlotData(groupParams:GroupHttpParams[]):Promise<ObservationDatePlotData[]> {
+        const grouped = !!this.groups && this.groups.length > 0;
+        const requests:PlotRequest[] = [];
+        let plotIndex = 0;
+        // plots outer, groups inner -- this ordering both fixes the row order that
+        // postProcessData walks and drives the static color sequence in group mode
+        this.validPlots.forEach(p => {
+            groupParams.forEach((gp,groupIndex) => {
+                // in group mode a plot's color comes from its (plot,group) position
+                // rather than from the plot itself, so it has to be copied before it is
+                // stamped; ungrouped, the plot keeps the color the user picked
+                const plot = grouped ? JSON.parse(JSON.stringify(p)) : p;
+                if(grouped) {
+                    plot.color = getStaticColor(plotIndex++);
+                }
+                const {speciesIdKey,phenophaseIdKey} = getSpeciesPlotKeys(plot);
+                requests.push({
+                    plot,
+                    group: gp.group,
+                    groupIndex,
+                    params: gp.params,
+                    speciesIdKey,
+                    phenophaseIdKey,
+                    speciesId: plot.species[speciesIdKey],
+                    phenophaseId: plot.phenophase[phenophaseIdKey]
+                });
+            });
+        });
+        const buckets = requests.reduce((map,r) => {
+                const key = `${r.groupIndex}/${r.speciesIdKey}/${r.phenophaseIdKey}`;
+                (map[key] = map[key] || []).push(r);
+                return map;
+            },{} as {[key:string]:PlotRequest[]});
+        const distinct = (values:any[]) => values.filter((v,i) => values.indexOf(v) === i);
+        const promises = Object.keys(buckets).map(key => {
+            const bucket = buckets[key];
+            const {speciesIdKey,phenophaseIdKey} = bucket[0];
+            let params = distinct(bucket.map(r => r.speciesId))
+                .reduce((p,id,i) => p.set(`${speciesIdKey}[${i}]`,`${id}`),bucket[0].params);
+            params = distinct(bucket.map(r => r.phenophaseId))
+                .reduce((p,id,i) => p.set(`${phenophaseIdKey}[${i}]`,`${id}`),params);
+            return this.observationDateService.getObservationDates(params)
+                .then(rows => bucket.forEach(r => {
+                    // a bucket holding more than one plot gets back pairs nobody asked
+                    // for.  loose equality on purpose: ids reach a selection as both
+                    // numbers and strings depending on where the plot came from.
+                    r.data = rows.filter(row =>
+                        row[r.speciesIdKey] == r.speciesId &&
+                        row[r.phenophaseIdKey] == r.phenophaseId);
+                }));
+        });
+        return Promise.all(promises)
+            .then(() => requests.map(r => ({plot:r.plot,group:r.group,data:r.data})));
     }
 }

@@ -14,7 +14,7 @@ import { NpnServiceUtils } from './npn-service-utils.service';
  * with `{"expected":"number","code":"invalid_type","path":["species_ids",0], ...}` when
  * given the string ids that `HttpParams` (and the legacy REST convention) always carries.
  */
-function collectLegacyIds(params: HttpParams, legacyName: string): number[] {
+export function collectLegacyIds(params: HttpParams, legacyName: string): number[] {
     const indexed = new RegExp(`^${legacyName}\\[\\d+\\]$`);
     return params.keys()
         .filter(key => key === legacyName || indexed.test(key))
@@ -87,9 +87,9 @@ export function toIndividualPhenometricsBody(params: HttpParams): any {
  * is safe here only because `getSpeciesPlotKeys` picks the same key from the plot/curve's
  * `speciesRank`/`phenophaseRank`, so the two cannot disagree.
  */
-const RANK_KEYS = ['species_id', 'genus_id', 'family_id', 'order_id', 'class_id',
+export const RANK_KEYS = ['species_id', 'genus_id', 'family_id', 'order_id', 'class_id',
     'phenophase_id', 'pheno_class_id'];
-const TAXON_BY_KEY: { [key: string]: string } = {
+export const TAXON_BY_KEY: { [key: string]: string } = {
     species_id: 'species', genus_id: 'genus', family_id: 'family',
     order_id: 'order', class_id: 'class'
 };

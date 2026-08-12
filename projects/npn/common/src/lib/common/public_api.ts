@@ -13,6 +13,7 @@ export * from './species.service';
 export { SpeciesFilterService, toSpeciesFilterParams, TinybirdPipeResponse } from './species-filter.service';
 export { PhenophaseFilterService, toSpeciesPhenophasesParams, toTaxonPhenophasesParams } from './phenophase-filter.service';
 export { ObservationService } from './observation.service';
+export { ObservationDateService, ObservationDateRow } from './observation-date.service';
 export { NetworkService } from './network.service';
 export { ProgramService } from './program.service';
 export { SavedSearchService } from './saved-search.service';

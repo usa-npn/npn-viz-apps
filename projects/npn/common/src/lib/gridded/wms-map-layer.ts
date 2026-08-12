@@ -40,7 +40,7 @@ export class WmsMapLayer extends MapLayer {
             getTileUrl: (coord: google.maps.Point, zoom: number) => {
                 let proj = this.map.getProjection(), zfactor = Math.pow(2, zoom), top = proj.fromPointToLatLng(new google.maps.Point(coord.x * BOX_SIZE / zfactor, coord.y * BOX_SIZE / zfactor)), bot = proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * BOX_SIZE / zfactor, (coord.y + 1) * BOX_SIZE / zfactor)), ctop = srsConversion(top), cbot = srsConversion(bot), base = {};
                 let ddoy = null;
-                if ((layer_def.name == 'gdd:eab_adult' || layer_def.name == 'gdd:eab_egg_hatch' || layer_def.name == 'gdd:slf_adult' || layer_def.name == 'gdd:slf_egg_hatch' || layer_def.name == 'gdd:japanese_beetle_adult' || layer_def.name == 'gdd:japanese_beetle_egg_hatch') && this.extent && this.extent.current) {
+                if ((layer_def.name == 'gdd:eab_adult' || layer_def.name == 'gdd:eab_egg_hatch' || layer_def.name == 'gdd:slf_adult' || layer_def.name == 'gdd:slf_egg_hatch' || layer_def.name == 'gdd:japanese_beetle_adult' || layer_def.name == 'gdd:japanese_beetle_egg_hatch' || layer_def.name == 'gdd:monilinia') && this.extent && this.extent.current) {
                     this.extent.current.addToParams(base, MapLayerServiceType.WMS);
                     var now = this.extent.current.date;
                     var start = new Date(now.getFullYear(), 0, 0);

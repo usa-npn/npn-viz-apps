@@ -10,6 +10,7 @@ export class PestMapLayerLegend extends MapLayerLegend {
         if(this.layerName == 'precipitation:buffelgrass_prism' 
         || this.layerName == 'gdd:eab_adult'
         || this.layerName == 'gdd:eab_egg_hatch' 
+        || this.layerName == 'gdd:monilinia'
         || this.layerName == 'gdd:slf_adult'
         || this.layerName == 'gdd:slf_egg_hatch' 
         || this.layerName == 'gdd:japanese_beetle_adult'
@@ -114,7 +115,7 @@ export class PestMapLayerLegend extends MapLayerLegend {
         // pLegend[0].style.width = 405 + 'px';
         */
         let treatmentMethod = null;
-        if (['emerald_ash_borer', 'lilac_borer', 'apple_maggot'].indexOf(legend.ldef.name) !== -1) {
+        if (['emerald_ash_borer', 'lilac_borer', 'apple_maggot', 'monilinia'].indexOf(legend.ldef.name) !== -1) {
             treatmentMethod = 'Window for Managing Adults';
         }
         else if (legend.ldef.name === 'winter_moth') {

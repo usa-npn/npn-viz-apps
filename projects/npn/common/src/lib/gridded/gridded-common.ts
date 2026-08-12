@@ -228,45 +228,69 @@ export const MAP_LAYERS:MapLayerDefs = {
                 agddSupports30YearAvg: false,
                 agddDefaultThreshold: 90
             }
-        // },{
-        //     name: 'emerald_ash_borer',
-        //     title: 'Emerald Ash Borer',
-        //     abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>',
-        //     meta: {
-        //         agddDefaultThreshold: 450
-        //     }
-        }, {
+        },{
             name: 'gdd:eab_adult',
             title: 'Emerald Ash Borer Adult',
             abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
-        },
-        {
+        },{
             name: 'gdd:eab_egg_hatch',
             title: 'Emerald Ash Borer Egg Hatch',
             abstract: 'Emerald ash borer is a beetle that causes significant harm to ash trees throughout the eastern United States. <a href="https://www.usanpn.org/data/forecasts/EAB" target="_blank">Learn more</a>'
-        // }, {
-        },
-        {
+        },{
+            name: 'hemlock_woolly_adelgid',
+            layerBasis: 'gdd:agdd', // based on a different map than the others.
+            title: 'Hemlock Woolly Adelgid',
+            abstract: 'Hemlock woolly adelgid can be deadly to hemlock trees and, in the eastern United States, lacks enemies that keep their populations in check. Researchers wish to identify the optimal window to release insect predators; you can support this effort by observing hemlock woolly adelgid life cycle stages using Nature’s Notebook. <a href="https://www.usanpn.org/data/forecasts/HWA" target="_blank">Learn more</a>'
+        },{
             name: 'gdd:japanese_beetle_adult',
             title: 'Japanese Beetle Adult',
             abstract: 'The Japanese beetle is considered to be among the most damaging turfgrass pests in eastern and Midwestern states. It has also brought large-scale destruction to garden plants and agricultural crops. <a href="https://www.usanpn.org/data/maps/forecasts/Japanese_beetle" target="_blank">Learn more</a>'
-        },
-        {
+        },{
             name: 'gdd:japanese_beetle_egg_hatch',
             title: 'Japanese Beetle Egg Hatch',
             abstract: 'The Japanese beetle is considered to be among the most damaging turfgrass pests in eastern and Midwestern states. It has also brought large-scale destruction to garden plants and agricultural crops. <a href="https://www.usanpn.org/data/maps/forecasts/Japanese_beetle" target="_blank">Learn more</a>'
-        // }, {
-        },
-        {
+        },{
+            name: 'lilac_borer',
+            title: 'Lilac Borer',
+            abstract: 'Lilac borer is a clear-wing moth that can damage lilac, ash, and privet trees and shrubs by burrowing into the heartwood. <a href="https://www.usanpn.org/data/forecasts/Lilac_borer" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 500
+            }
+        },{
+            name: 'magnolia_scale',
+            title: 'Magnolia Scale',
+            abstract: 'Magnolia scale is a pest native to the Eastern United States that affects magnolia trees and tulip trees. They cause stress to their host trees by removing sap which can lead to yellowing leaves, twig dieback, and even death. <a href="https://www.usanpn.org/data/forecasts/Magnolia_scale" target="_blank">Learn more</a>',
+            meta: {
+                agddDefaultThreshold: 1938
+            }
+        },{
+            name: 'gdd:monilinia',
+            title: 'Monilinia',
+            abstract: 'Brown rot, caused by several fungi in the genus <i>Monilinia</i>, has adverse impacts on stone and pome fruits—including peach, plum, nectarine, apricot, cherry, apple, pear, and quince—worldwide. <a href="https://usanpn.org/data/maps/forecasts/monilinia" target="_blank">Learn more</a>'
+        },{
+            name: 'pine_needle_scale',
+            title: 'Pine Needle Scale',
+            abstract: 'Pine needle scale is a native pest that affects ornamental pines and Christmas tree plantations. <a href="https://www.usanpn.org/data/forecasts/Pine_needle_scale" target="_blank">Learn more</a>',
+            meta: {
+                agddSupports30YearAvg: false,
+                agddDefaultThreshold: 298
+            }
+        },{
+            name: 'gdd:red_brome_flowering',
+            title: 'Red Brome Flowering',
+            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
+        },{
+            name: 'gdd:red_brome_senescence',
+            title: 'Red Brome Senescence',
+            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
+        },{
             name: 'gdd:slf_adult',
             title: 'Spotted Lanternfly Adult',
             abstract: 'The spotted lanternfly is an invasive planthopper that threatens several major agriculture crops in the U.S. including grape, orchard, stone fruit, and hops. Spotted lanternfly damages plants by sucking sap from trunks, stems, and branches as well as by depositing a sticky residue that leads to mold growth. Several U.S. states have quarantine areas in place to help prevent SLFs spread. <a href="https://www.usanpn.org/data/maps/forecasts/spotted_lanternfly" target="_blank">Learn more</a>'
-        },
-        {
+        },{
             name: 'gdd:slf_egg_hatch',
             title: 'Spotted Lanternfly Egg Hatch',
             abstract: 'The spotted lanternfly is an invasive planthopper that threatens several major agriculture crops in the U.S. including grape, orchard, stone fruit, and hops. Spotted lanternfly damages plants by sucking sap from trunks, stems, and branches as well as by depositing a sticky residue that leads to mold growth. Several U.S. states have quarantine areas in place to help prevent SLFs spread. <a href="https://www.usanpn.org/data/maps/forecasts/spotted_lanternfly" target="_blank">Learn more</a>'
-        // }, {
         },{
             name: 'gypsy_moth',
             title: 'Spongy Moth',
@@ -277,54 +301,16 @@ export const MAP_LAYERS:MapLayerDefs = {
                 agddDefaultThreshold: 571
             }
         },{
-            name: 'hemlock_woolly_adelgid',
-            layerBasis: 'gdd:agdd', // based on a different map than the others.
-            title: 'Hemlock Woolly Adelgid',
-            abstract: 'Hemlock woolly adelgid can be deadly to hemlock trees and, in the eastern United States, lacks enemies that keep their populations in check. Researchers wish to identify the optimal window to release insect predators; you can support this effort by observing hemlock woolly adelgid life cycle stages using Nature’s Notebook. <a href="https://www.usanpn.org/data/forecasts/HWA" target="_blank">Learn more</a>'
-        },{
-            name: 'magnolia_scale',
-            title: 'Magnolia Scale',
-            abstract: 'Magnolia scale is a pest native to the Eastern United States that affects magnolia trees and tulip trees. They cause stress to their host trees by removing sap which can lead to yellowing leaves, twig dieback, and even death. <a href="https://www.usanpn.org/data/forecasts/Magnolia_scale" target="_blank">Learn more</a>',
-            meta: {
-                agddDefaultThreshold: 1938
-            }
-        },{
-            name: 'lilac_borer',
-            title: 'Lilac Borer',
-            abstract: 'Lilac borer is a clear-wing moth that can damage lilac, ash, and privet trees and shrubs by burrowing into the heartwood. <a href="https://www.usanpn.org/data/forecasts/Lilac_borer" target="_blank">Learn more</a>',
-            meta: {
-                agddDefaultThreshold: 500
-            }
-        },{
-            name: 'pine_needle_scale',
-            title: 'Pine Needle Scale',
-            abstract: 'Pine needle scale is a native pest that affects ornamental pines and Christmas tree plantations. <a href="https://www.usanpn.org/data/forecasts/Pine_needle_scale" target="_blank">Learn more</a>',
-            meta: {
-                agddSupports30YearAvg: false,
-                agddDefaultThreshold: 298
-            }
-        },{
             name: 'winter_moth',
             title: 'Winter Moth',
             abstract: 'Winter moth is a non-native insect pest that causes damage to deciduous trees, particularly maples and oaks. <a href="https://www.usanpn.org/data/forecasts/Winter_moth" target="_blank">Learn more</a>',
             meta: {
                 agddDefaultThreshold: 20
             }
-        },
-        {
+        },{
             name: 'gdd:winter_wheat',
             title: 'Winter Wheat',
             abstract: 'The USA-NPN winter wheat development forecast predicts the developmental stage of winter wheat from emergence through seed development. Winter wheat is vulnerable to freezing temperatures once it resumes growth in the springtime. <a href="https://www.usanpn.org/data/forecasts/Winter_Wheat" target="_blank">Learn more</a>'
-        },
-        {
-            name: 'gdd:red_brome_flowering',
-            title: 'Red Brome Flowering',
-            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
-        },
-        {
-            name: 'gdd:red_brome_senescence',
-            title: 'Red Brome Senescence',
-            abstract: 'The USA-NPN red brome forecast predicts flowering and senescence in real-time. The red brome forecast is based on Prevéy et al (in prep.), which predicts phenology of the species based on temperature (growing degree days, GDD) and daylength. Daily GDD accumulations are calculated using the simple averaging method, and adjusted based on daylength, where longer days are assumed to promote plant development. The photoperiod adjustment is calculated as [daylength hours]/24). Each day\'s growing degree day accumulation is multiplied by the photoperiod adjustment. The flowering model predicts onset of flowering at 1441 GDDs (F), with a Dec 1 start date and a 23F base temperature. The senescence model predicts onset of flowering at 1049 GDDs (F), with a Jan 1 start date and a 32F base temperature. <a href="https://www.usanpn.org/data/forecasts/Red_brome" target="_blank">Learn more</a>'
         }
         ]
     },{

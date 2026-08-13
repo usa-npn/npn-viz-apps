@@ -169,13 +169,17 @@ export abstract class ObservationDateVisSelection extends StationAwareVisSelecti
             this.actualYears.forEach(year => {
                 const yearData = byYear[year];
                 if(yearData) {
-                    // negative first: both land on the same row at the same x and
-                    // calendar.component.ts keys the d3 join on (y,x,color), so the
-                    // later insert covers the earlier one.
+                    // positive first: a day can be both (reported yes by one site, no by
+                    // another) and the two points differ in color, so the d3 join in
+                    // calendar.component.ts -- keyed on (y,x,color) -- draws both, one
+                    // atop the other.  That component inserts at `:first-child`, which
+                    // reverses data order in the DOM, and SVG paints the last element in
+                    // document order on top; so the point pushed *first* here is the one
+                    // that ends up visible.  Positive data wins.
+                    addDoys(yearData.positive,plot.color);
                     if(this.negative) {
                         addDoys(yearData.negative,this.negativeColor);
                     }
-                    addDoys(yearData.positive,plot.color);
                 }
                 const pp = plot.phenophase as any;
                 response.labels.splice(0, 0, 

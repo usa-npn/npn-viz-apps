@@ -18,7 +18,7 @@ const npnConfiguration:NpnConfiguration = {
   // www-dev.usanpn.org). Since searches are saved to servicesApiRoot above and redeemed
   // by this page, a dev portal -- if one comes back -- would have to read the same store
   // this host writes to.
-  observationPortalUrl: 'https://data.usanpn.org/observations'
+  observationPortalUrl: 'https://test.d34tw1egjgmvnb.amplifyapp.com'
 };
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.

@@ -129,3 +129,40 @@ Items 3 and 4 are known gaps for this pass, not blockers on it.
 - Climate axes return no data while `individualPhenometrics` is on.
 - Genus/family/class-rank plots and phenophase-class plots lose server-side aggregation.
 - Large date ranges fail with a 413 until the cap or compression is addressed.
+
+## Addendum 2026-08-17 — the first two limitations are gone; the third is not
+
+Re-probed `/openapi.json` and the live endpoint. The server-side follow-ups above landed:
+`class_ids` / `order_ids` / `family_ids` / `genus_ids` / `phenophase_ids` /
+`pheno_class_ids`, `num_days_quality_filter_individual`, and the full climate column set
+(`tmin_winter`, `gdd`, `prcp_*`, `daylength`, …) are all supported.
+
+`toIndividualPhenometricsBody` was still built to step 2 above, which dropped all of them.
+A plot at a rank above species therefore sent `species_ids: []` with no phenophase filter —
+a bare date range. The "How do winter temperatures correspond to leafing in the Soapberry
+family?" seasonal story is the only entry in `prod-stories.json` with
+`individualPhenometrics: true`, which is why nothing caught this until that story shipped
+in a prod build: it issued an unfiltered 11-year national query and timed out. Fixed by
+forwarding `RANK_KEYS` and the quality filter.
+
+Measured for that story's plot (`family_ids: [329]`, `pheno_class_ids: [3]`, national):
+
+| Range | Result |
+|---|---|
+| 2019 | 200 — 1,926 rows / 2.5 MB |
+| 2019, `num_days_quality_filter_individual: 14` | 200 — 1,241 rows / 1.6 MB |
+| 2012–2014, same filter | 200 — 1.5 MB |
+| 2019–2020, same filter | 200 — 2.5 MB |
+| 2012–2022, same filter | **413** after 28s |
+
+The server-side quality filter is exactly equivalent to `filterLqSummaryData` — same 1,241
+rows, matched on `Individual_ID`/`Phenophase_ID`/`First_Yes_Year`/`First_Yes_DOY`, no
+surviving `null`s or negatives. The client-side pass is kept as a guard for `null` values
+and for callers that send no filter at all.
+
+**Still open:** the 413. `getIndividualPhenometrics` has no chunking — unlike
+`getSiteLevelData`, which grids by year and splits on 413 (`siteLevelChunks` /
+`postSiteChunk`). With the filters forwarded the Soapberry story fails fast with the 413
+message instead of hanging, but it still does not render over its full 2012–2022 range.
+A 2-year grid clears the cap on the numbers above; whole calendar years are safe to split
+because `filterLqd`'s dedupe key includes `first_yes_year`. Tracked as separate work.

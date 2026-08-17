@@ -25,14 +25,33 @@ export function collectLegacyIds(params: HttpParams, legacyName: string): number
 }
 
 /**
+ * The taxonomic/phenophase rank id keys a plot or curve may set on its `HttpParams`, and
+ * the `taxon` value each implies. `phenophase_id`/`pheno_class_id` drive `phenophase_grain`
+ * instead (see `buildPhenometricsBody` below) so they have no entry here.
+ *
+ * Grain is orthogonal to which id array is populated -- `magnitude_metrics.pipe:30` is
+ * explicit that grain is never inferred server-side from the filter supplied, so both the
+ * id array *and* `taxon`/`phenophase_grain` must be sent. Deriving them from the key name
+ * is safe here only because `getSpeciesPlotKeys` picks the same key from the plot/curve's
+ * `speciesRank`/`phenophaseRank`, so the two cannot disagree.
+ *
+ * All three endpoint body builders pluralize these the same way (`family_id` ->
+ * `family_ids`), so the list is shared rather than duplicated per builder.
+ */
+export const RANK_KEYS = ['species_id', 'genus_id', 'family_id', 'order_id', 'class_id',
+    'phenophase_id', 'pheno_class_id'];
+export const TAXON_BY_KEY: { [key: string]: string } = {
+    species_id: 'species', genus_id: 'genus', family_id: 'family',
+    order_id: 'order', class_id: 'class'
+};
+
+/**
  * Translates the `HttpParams` built by `SiteOrSummaryVisSelection.toURLSearchParams()`
  * into the body required by `/v1/data/individual_phenometrics`.
  *
- * Base shape verified against the live `/openapi.json` and real POSTs on 2026-07-29
- * (see `docs/plans/summarized-data.md`): 12 required fields, so anything not named here
- * -- `phenophase_id[n]`, `num_days_quality_filter_individual`, `request_src` -- is
- * deliberately dropped rather than forwarded. Empty arrays are acceptable for fields this
- * client doesn't populate yet.
+ * The schema is `additionalProperties: false`, so anything not named here -- `climate_data`,
+ * `taxonomy_aggregate`/`pheno_class_aggregate`, `request_src` -- is deliberately dropped
+ * rather than forwarded. Empty arrays are acceptable for fields this client doesn't populate.
  *
  * The selection's `climate_data` param is not forwarded under that name; `include_climate`
  * below is the equivalent this endpoint understands, and it is always set.
@@ -46,13 +65,26 @@ export function collectLegacyIds(params: HttpParams, legacyName: string): number
  * (`Genus_ID`/`Family_ID`/.../`Pheno_Class_ID`) that `filterUnwantedDataFunctor` matches
  * the plot against -- without it those rows come back at the raw species/phenophase
  * level and nothing in the response matches the aggregated id the plot expects.
+ *
+ * The rank id arrays and `num_days_quality_filter_individual` are forwarded per `RANK_KEYS`
+ * below. When this retrofit was written (2026-07-29, `docs/plans/summarized-data.md`) the
+ * endpoint accepted neither and both were dropped; a plot at a rank above species therefore
+ * sent an empty `species_ids` with no phenophase filter at all, i.e. a bare date range --
+ * which for the Soapberry-family seasonal story meant an unfiltered 11-year national query.
+ * Re-verified against the live `/openapi.json` on 2026-08-17: `class_ids`, `order_ids`,
+ * `family_ids`, `genus_ids`, `phenophase_ids`, `pheno_class_ids` and
+ * `num_days_quality_filter_individual` are all part of the request schema now.
+ *
+ * `filterLqSummaryData` still re-applies the day-count cap client-side. That is not
+ * redundant: it also rejects the `null` the API emits for an absent value, and it keeps the
+ * filter meaningful for any caller whose params carry no quality filter at all.
  */
 export function toIndividualPhenometricsBody(params: HttpParams): any {
     const body: any = {
         startDate: params.get('start_date') || '',
         endDate: params.get('end_date') || '',
         state: [],
-        species_ids: collectLegacyIds(params, 'species_id'),
+        species_ids: [],
         species_names: [],
         network_ids: collectLegacyIds(params, 'network_id'),
         dataset_ids: [],
@@ -67,6 +99,16 @@ export function toIndividualPhenometricsBody(params: HttpParams): any {
         // upstream schema types this as `include_climate?: string`, not a number or bool.
         include_climate: '1'
     };
+    RANK_KEYS.forEach(key => {
+        const ids = collectLegacyIds(params, key);
+        if (ids.length) {
+            body[`${key}s`] = ids;
+        }
+    });
+    if (params.has('num_days_quality_filter_individual')) {
+        body.num_days_quality_filter_individual =
+            Number(params.get('num_days_quality_filter_individual'));
+    }
     if (params.has('taxonomy_aggregate')) {
         body.include_taxonomic_detail = '1';
     }
@@ -75,24 +117,6 @@ export function toIndividualPhenometricsBody(params: HttpParams): any {
     }
     return body;
 }
-
-/**
- * The taxonomic/phenophase rank id keys a plot or curve may set on its `HttpParams`, and
- * the `taxon` value each implies. `phenophase_id`/`pheno_class_id` drive `phenophase_grain`
- * instead (see `buildPhenometricsBody` below) so they have no entry here.
- *
- * Grain is orthogonal to which id array is populated -- `magnitude_metrics.pipe:30` is
- * explicit that grain is never inferred server-side from the filter supplied, so both the
- * id array *and* `taxon`/`phenophase_grain` must be sent. Deriving them from the key name
- * is safe here only because `getSpeciesPlotKeys` picks the same key from the plot/curve's
- * `speciesRank`/`phenophaseRank`, so the two cannot disagree.
- */
-export const RANK_KEYS = ['species_id', 'genus_id', 'family_id', 'order_id', 'class_id',
-    'phenophase_id', 'pheno_class_id'];
-export const TAXON_BY_KEY: { [key: string]: string } = {
-    species_id: 'species', genus_id: 'genus', family_id: 'family',
-    order_id: 'order', class_id: 'class'
-};
 
 /**
  * Shared body builder for `/v1/data/magnitude_phenometrics` and `/v1/data/site_phenometrics`

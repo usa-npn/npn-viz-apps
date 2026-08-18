@@ -168,41 +168,70 @@ function lowercaseKeys(row: any): any {
     }, {} as any);
 }
 
+interface DateRange {
+    startDate: string;
+    endDate: string;
+}
+
 /**
- * `site_phenometrics` has no year in its grain key and decomposes per phenological year
- * server-side, so N chunks of a range return the same rows as one call over the whole
- * range -- chunking here is purely to stay under the endpoint's wall-clock budget
- * (`tinybirdSyncExport.ts`'s per-window time guard aborts and 413s past roughly 4-5 years,
- * well before the 25MB byte budget is ever approached; see
- * `docs/plans/magnitude-site-level-data.md`).
+ * Both `site_phenometrics` and `individual_phenometrics` decompose `[startDate, endDate]`
+ * into one window per phenological year server-side and neither carries a year in its grain
+ * key, so N client chunks of a range return exactly the rows one call over the whole range
+ * would -- chunking is purely to stay inside the per-request response budget the middleware
+ * enforces across those windows.
  *
- * Chunks are aligned to a fixed 4-year grid (`floor(year/4)*4`) rather than simply walked
- * from the start date, so that interior chunks keep the same cache key when a user nudges
- * only one end of the range. Every selection that reaches this endpoint builds calendar
- * (Jan 1 - Dec 31) ranges, so grid boundaries coincide with the server's own window
- * boundaries; a water-year range would need this revisited.
+ * What trips it is cumulative cost across windows, and byte volume and wall-clock are
+ * entangled proxies for each other -- do not assume either one alone. Two mechanisms are
+ * known: a 25MB byte budget, and `tinybirdSyncExport.ts:230`'s abort when under 5s of Lambda
+ * time remains before the next window, which returns the **same 413 body** with no
+ * distinguishing field (`docs/plans/magnitude-site-level-data.md`). Site level fails on time
+ * at 7% of the byte budget; individual, measured 2026-08-17 with the Soapberry-family story's
+ * filter (national), passed 2012-2017 at 5.28MB/15.4s but failed 2016-2019 at 12.4s -- fewer
+ * windows and less elapsed time, more data per window. Whichever mechanism dominates, the
+ * remedy is the same: fewer years per request.
+ *
+ * Do not size chunks off the `limit_bytes` in the 413 body. It reports `26214400` (25MB)
+ * while individual queries fail somewhere between 5.28MB and ~5.75MB.
+ *
+ * Sizing is a starting guess, not a guarantee: a dense species-level selection can exceed
+ * the budget inside a single year (`docs/plans/summarized-data.md` measured 1 species x 5
+ * years at 36.9MB). `postChunk`'s split-and-retry on 413 is what actually makes this robust;
+ * the grid only keeps the common case down to one round trip per chunk.
  */
 const SITE_CHUNK_YEARS = 4;
+
+/**
+ * 3 rather than 4: for the Soapberry-family story's filter the worst 3-year window measures
+ * ~4.5MB (2020-2022) against ~5.75MB for the worst 4-year one (2016-2019), which 413s.
+ */
+const INDIVIDUAL_CHUNK_YEARS = 3;
 
 function yearOf(dateStr: string): number {
     return parseInt(dateStr.slice(0, 4), 10);
 }
 
-function siteLevelChunks(startDate: string, endDate: string): { startDate: string; endDate: string }[] {
+/**
+ * Chunks are aligned to a fixed `chunkYears` grid (`floor(year/chunkYears)*chunkYears`)
+ * rather than simply walked from the start date, so that interior chunks keep the same cache
+ * key when a user nudges only one end of the range. Every selection that reaches these
+ * endpoints builds calendar (Jan 1 - Dec 31) ranges, so grid boundaries coincide with the
+ * server's own window boundaries; a water-year range would need this revisited.
+ */
+function yearChunks(startDate: string, endDate: string, chunkYears: number): DateRange[] {
     const startYear = yearOf(startDate);
     const endYear = yearOf(endDate);
-    const gridStart = Math.floor(startYear / SITE_CHUNK_YEARS) * SITE_CHUNK_YEARS;
-    const chunks: { startDate: string; endDate: string }[] = [];
-    for (let s = gridStart; s <= endYear; s += SITE_CHUNK_YEARS) {
+    const gridStart = Math.floor(startYear / chunkYears) * chunkYears;
+    const chunks: DateRange[] = [];
+    for (let s = gridStart; s <= endYear; s += chunkYears) {
         const chunkStartYear = Math.max(s, startYear);
-        const chunkEndYear = Math.min(s + SITE_CHUNK_YEARS - 1, endYear);
+        const chunkEndYear = Math.min(s + chunkYears - 1, endYear);
         if (chunkStartYear > chunkEndYear) {
             continue;
         }
         chunks.push({
             // first/last chunks clip to the actual requested date (not just the year) so
             // e.g. a mid-year start isn't widened back out to the full grid cell -- doing
-            // so would push that chunk back up to a full 4 years and re-risk the time budget.
+            // so would push that chunk back up to a full cell and re-risk the byte cap.
             startDate: chunkStartYear === startYear ? startDate : `${chunkStartYear}-01-01`,
             endDate: chunkEndYear === endYear ? endDate : `${chunkEndYear}-12-31`
         });
@@ -213,9 +242,9 @@ function siteLevelChunks(startDate: string, endDate: string): { startDate: strin
 /**
  * Halves a chunk by year, in response to a 413. Splitting continues only while more than
  * one calendar year remains in the chunk -- a single year that still 413s has nowhere
- * further to split and is a terminal failure (see `postSiteChunk`).
+ * further to split and is a terminal failure (see `postChunk`).
  */
-function splitChunk(chunk: { startDate: string; endDate: string }): { startDate: string; endDate: string }[] {
+function splitChunk(chunk: DateRange): DateRange[] {
     const startYear = yearOf(chunk.startDate);
     const endYear = yearOf(chunk.endDate);
     const midYear = startYear + Math.floor((endYear - startYear) / 2);
@@ -226,14 +255,15 @@ function splitChunk(chunk: { startDate: string; endDate: string }): { startDate:
 }
 
 /**
- * Posts a single site-level chunk, splitting and retrying on 413 (see `splitChunk`). Any
- * other error rejects immediately rather than being retried -- partial data on a scatter
- * plot or map is indistinguishable from years genuinely having no observations, so a
- * request that fails outright must not resolve with only some of its chunks.
+ * Posts a single chunk, splitting and retrying on 413 (see `splitChunk`). Any other error
+ * rejects immediately rather than being retried -- partial data on a scatter plot or map is
+ * indistinguishable from years genuinely having no observations, so a request that fails
+ * outright must not resolve with only some of its chunks.
+ *
+ * `label` names the query in the terminal message a caller ends up surfacing to the user.
  */
-function postSiteChunk(
-    serviceUtils: NpnServiceUtils, url: string, bodyBase: any,
-    chunk: { startDate: string; endDate: string }
+function postChunk(
+    serviceUtils: NpnServiceUtils, url: string, bodyBase: any, chunk: DateRange, label: string
 ): Promise<any[]> {
     const body = { ...bodyBase, startDate: chunk.startDate, endDate: chunk.endDate };
     return serviceUtils.memCachedPost<any[]>(url, body, { 'Content-Type': 'application/json' })
@@ -244,16 +274,32 @@ function postSiteChunk(
                 const endYear = yearOf(chunk.endDate);
                 if (startYear === endYear) {
                     throw new Error(
-                        `Site level query returned too much data (413) for ${startYear} -- ` +
+                        `${label} query returned too much data (413) for ${startYear} -- ` +
                         'narrow the species, station, or phenophase selection and try again.');
                 }
                 const [a, b] = splitChunk(chunk);
-                return postSiteChunk(serviceUtils, url, bodyBase, a)
-                    .then(aRows => postSiteChunk(serviceUtils, url, bodyBase, b)
+                return postChunk(serviceUtils, url, bodyBase, a, label)
+                    .then(aRows => postChunk(serviceUtils, url, bodyBase, b, label)
                         .then(bRows => aRows.concat(bRows)));
             }
             throw err;
         });
+}
+
+/**
+ * Chunks `body`'s date range and posts the chunks **sequentially**, concatenating the rows.
+ * The budget being worked around is per-request on the middleware side, not per-origin
+ * concurrency, so parallel chunk requests would not help and would only make a 413 harder to
+ * attribute to a specific range.
+ */
+function postChunked(
+    serviceUtils: NpnServiceUtils, url: string, body: any, chunkYears: number, label: string
+): Promise<any[]> {
+    return yearChunks(body.startDate, body.endDate, chunkYears).reduce(
+        (promise, chunk) => promise.then(rows => postChunk(serviceUtils, url, body, chunk, label)
+            .then(chunkRows => rows.concat(chunkRows))),
+        Promise.resolve([] as any[])
+    ).then(rows => rows.map(lowercaseKeys));
 }
 
 /**
@@ -274,10 +320,7 @@ export class ObservationService {
      *
      * `include_dispersion` is what supplies `SD_First_Yes_in_Days`, read by
      * `map-visualization-marker-iw.component.ts`; without it that column is absent.
-     * Chunked per `siteLevelChunks`/`postSiteChunk` above and issued sequentially -- the
-     * time budget this works around is wall-clock per Lambda invocation, not per-origin
-     * concurrency, so parallel chunk requests would not help and would only make a 413
-     * harder to attribute to a specific range.
+     * Chunked per `postChunked`/`SITE_CHUNK_YEARS` above.
      */
     getSiteLevelData(params: HttpParams): Promise<any[]> {
         if (!this.serviceUtils.config.servicesApiRoot) {
@@ -291,12 +334,7 @@ export class ObservationService {
         if (params.has('num_days_quality_filter')) {
             body.num_days_quality_filter = Number(params.get('num_days_quality_filter'));
         }
-        const chunks = siteLevelChunks(body.startDate, body.endDate);
-        return chunks.reduce(
-            (promise, chunk) => promise.then(rows => postSiteChunk(this.serviceUtils, url, body, chunk)
-                .then(chunkRows => rows.concat(chunkRows))),
-            Promise.resolve([] as any[])
-        ).then(rows => rows.map(lowercaseKeys));
+        return postChunked(this.serviceUtils, url, body, SITE_CHUNK_YEARS, 'Site level');
     }
 
     /**
@@ -323,6 +361,16 @@ export class ObservationService {
      * Individual phenometrics -- replaces the legacy
      * `/npn_portal/observations/getSummarizedData.json` POST made when
      * `individualPhenometrics` is enabled on `SiteOrSummaryVisSelection`.
+     *
+     * Chunked per `postChunked`/`INDIVIDUAL_CHUNK_YEARS` above. The scatter plot's default
+     * range is 16 years, and the Soapberry-family seasonal story's 2012-2022 exceeded the
+     * middleware's response budget as a single request even with every filter applied, so
+     * this is the normal path rather than an edge case.
+     *
+     * `postChunked` posts through `memCachedPost` -- the memory tier, not sessionStorage: a
+     * single species-year measures ~3M characters, more than the whole ~5MB sessionStorage
+     * origin quota once UTF-16 accounting is applied, so this could never be cached there,
+     * and every attempt used to wipe the cache clean.
      */
     getIndividualPhenometrics(params: HttpParams): Promise<any[]> {
         if (!this.serviceUtils.config.servicesApiRoot) {
@@ -331,18 +379,7 @@ export class ObservationService {
         }
         const url = this.serviceUtils.servicesApiUrl('/v1/data/individual_phenometrics');
         const body = toIndividualPhenometricsBody(params);
-        // memory tier: a single species-year measures ~3M characters, more than the whole
-        // ~5MB sessionStorage origin quota once UTF-16 accounting is applied, so this
-        // could never be cached there -- and every attempt used to wipe the cache clean.
-        return this.serviceUtils.memCachedPost<any[]>(url, body, { 'Content-Type': 'application/json' })
-            .then(rows => (rows || []).map(lowercaseKeys))
-            .catch(err => {
-                if (err && err.status === 413) {
-                    throw new Error(
-                        'Individual phenometrics query returned too much data (413) -- ' +
-                        'narrow the date range, species, or station selection and try again.');
-                }
-                throw err;
-            });
+        return postChunked(
+            this.serviceUtils, url, body, INDIVIDUAL_CHUNK_YEARS, 'Individual phenometrics');
     }
 }

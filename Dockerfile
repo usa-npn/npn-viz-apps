@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 4200
 
-CMD ["npx", "ng", "serve", "vis-tool", "--base-href", "/vis-tool/", "--host", "0.0.0.0", "--poll", "2000", "--disable-host-check"]
+CMD ["npx", "ng", "serve", "vis-tool", "--configuration=production", "--base-href", "/vis-tool/", "--host", "0.0.0.0", "--poll", "2000", "--disable-host-check"]

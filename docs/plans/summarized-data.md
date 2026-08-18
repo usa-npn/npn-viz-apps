@@ -160,9 +160,56 @@ rows, matched on `Individual_ID`/`Phenophase_ID`/`First_Yes_Year`/`First_Yes_DOY
 surviving `null`s or negatives. The client-side pass is kept as a guard for `null` values
 and for callers that send no filter at all.
 
-**Still open:** the 413. `getIndividualPhenometrics` has no chunking — unlike
-`getSiteLevelData`, which grids by year and splits on 413 (`siteLevelChunks` /
-`postSiteChunk`). With the filters forwarded the Soapberry story fails fast with the 413
-message instead of hanging, but it still does not render over its full 2012–2022 range.
-A 2-year grid clears the cap on the numbers above; whole calendar years are safe to split
-because `filterLqd`'s dedupe key includes `first_yes_year`. Tracked as separate work.
+### Client-side chunking (same pass)
+
+Forwarding the filters was not enough on its own: 2012–2022 still 413'd as a single request.
+Tinybird serves every window fine — each individual year returns 200, and the 11 years sum
+to 12.6 MB — so what fails is the middleware accumulating across windows.
+
+`siteLevelChunks`/`postSiteChunk` were generalized into `yearChunks(start, end, chunkYears)`,
+`postChunk(..., label)` and `postChunked(...)`, now shared by both endpoints.
+`SITE_CHUNK_YEARS` stays 4; `INDIVIDUAL_CHUNK_YEARS` is **3**.
+
+Per-year payloads for the story's filter (`family_ids:[329]`, `pheno_class_ids:[3]`,
+national, quality filter 14):
+
+| 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0.28 | 0.45 | 0.75 | 0.92 | 1.34 | 1.55 | 1.33 | 1.53 | 0.90 | 1.98 | 1.62 MB |
+
+Window probes, same filter:
+
+| Window | Years | Result | Size | Time |
+|---|---|---|---|---|
+| 2012–2015 | 4 | 200 | 2.40 MB | 9.4s |
+| 2012–2017 | 6 | 200 | 5.28 MB | 15.4s |
+| 2016–2019 | 4 | **413** | ~5.75 MB | 12.4s |
+| 2019–2022 | 4 | **413** | ~6.03 MB | 13.8s |
+| 2017–2022 | 6 | **413** | ~8.91 MB | 19.6s |
+| 2012–2019 | 8 | **413** | ~8.15 MB | 19.8s |
+
+3 rather than 4 because the worst 4-year window (2016–2019, ~5.75 MB) 413s while the worst
+3-year one (2020–2022, ~4.5 MB) does not.
+
+**On the mechanism:** `magnitude-site-level-data.md` attributes site-level 413s to
+`tinybirdSyncExport.ts:230`'s wall-clock guard, at 7% of the byte budget. Individual does not
+fit that story cleanly — 2012–2017 passed with 6 windows in 15.4s while 2016–2019 failed with
+4 windows in 12.4s, i.e. fewer windows and less elapsed time but more data per window. Byte
+volume and wall-clock are entangled here and these probes can't separate them. Both point the
+same way (fewer years per request), so the code no longer asserts which one it is.
+
+What is unambiguous: **do not size chunks off the `limit_bytes` in the 413 body.** It reports
+`26214400` (25 MB) while these queries fail between 5.28 MB and ~5.75 MB. Worth filing
+server-side.
+
+Verified end to end against the live endpoint: the 5 chunks the 3-year grid produces for
+2012–2022 all return 200 (largest 4.41 MB) and yield **10,207 rows — byte-identical to the
+11-request per-year baseline**, zero rows added or dropped, keyed on
+`Site_ID`/`Individual_ID`/`Phenophase_ID`/`First_Yes_Year`/`First_Yes_DOY`. Grid math was
+separately exercised over 900 range/chunk-size combinations for gaps, overlaps, oversized
+chunks and endpoint drift.
+
+A fixed year count still cannot be safe for every selection (1 species × 5 years was measured
+at 36.9 MB above), so `postChunk`'s split-and-retry on 413 remains the actual guarantee —
+whole calendar years are safe to split because `filterLqd`'s dedupe key includes
+`first_yes_year`.

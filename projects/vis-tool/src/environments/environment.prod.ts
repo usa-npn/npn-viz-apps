@@ -2,12 +2,12 @@ import { NpnConfiguration } from '@npn/common';
 
 const npnConfiguration:NpnConfiguration = {
   cacheTTL: 60,
-  apiRoot: '//services-staging.usanpn.org',
-  dataApiRoot: 'https://services-staging.usanpn.org/geo-services',
-  dataApiRoot2: 'https://services-staging.usanpn.org/web-services',
+  apiRoot: 'https://services.usanpn.org',
+  dataApiRoot: 'https://services.usanpn.org/geo-services',
+  dataApiRoot2: 'https://services.usanpn.org/web-services',
   dataApiUseStatisticsCache: false,
   observationPortalUrl: 'https://test.d34tw1egjgmvnb.amplifyapp.com',
-  geoServerRoot: '//geoserver.usanpn.org/geoserver',
+  geoServerRoot: 'https://geoserver.usanpn.org/geoserver',
   // Tinybird access is intentionally left unconfigured here.  As of 2026-07-30
   // https://services.usanpn.org/v1/data/token 404s and staging 503s -- only the dev
   // host serves tokens.  With these unset the interceptor matches no request and no
@@ -28,12 +28,12 @@ const npnConfiguration:NpnConfiguration = {
   // this was unset has been removed -- those web services are being retired, so the
   // fallback was headed for a 404. Until this is set, the boundary picker is
   // non-functional in a production build.
-   servicesApiRoot: 'https://services2-dev.usanpn.org',
+  servicesApiRoot: 'https://services2-dev.usanpn.org',
   tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
   tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token',
 };
 export const environment = {
   production: true,
-  googleMapsApiKey: 'AIzaSyAsTM8XaktfkwpjEeDMXkNrojaiB2W5WyE',
+  googleMapsApiKey: '__GOOGLE_MAPS_API_KEY__',
   npnConfiguration
 };

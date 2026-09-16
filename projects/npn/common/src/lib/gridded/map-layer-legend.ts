@@ -50,7 +50,12 @@ export abstract class MapLayerLegend {
                 gridded_label_filter_clone.name = 'legendBuffelgrassUnits';
                 this.gformat = ldef.gridded_label_filter ? get_filter(gridded_label_filter_clone) : undefined;
             }
-            else if(ldef.name == 'gdd:eab_adult' || ldef.name == 'gdd:eab_egg_hatch' || ldef.name == 'gdd:monilinia') {
+            else if(ldef.name == 'gdd:monilinia') {
+                let gridded_label_filter_clone = Object.assign({}, ldef.gridded_label_filter);
+                gridded_label_filter_clone.name = 'legendRisk';
+                this.gformat = ldef.gridded_label_filter ? get_filter(gridded_label_filter_clone) : undefined;
+            } 
+            else if(ldef.name == 'gdd:eab_adult' || ldef.name == 'gdd:eab_egg_hatch') {
                 let gridded_label_filter_clone = Object.assign({}, ldef.gridded_label_filter);
                 gridded_label_filter_clone.name = 'legendDoyUnits';
                 this.gformat = ldef.gridded_label_filter ? get_filter(gridded_label_filter_clone) : undefined;
@@ -71,7 +76,7 @@ export abstract class MapLayerLegend {
                     entries = color_map.find('sld\\:ColorMapEntry');
                 }
                 var ddoy = 0;
-                if(ldef.name == 'gdd:eab_adult' || ldef.name == 'gdd:eab_egg_hatch' || ldef.name == 'gdd:slf_adult' || ldef.name == 'gdd:slf_egg_hatch' || ldef.name == 'gdd:japanese_beetle_adult' || ldef.name == 'gdd:japanese_beetle_egg_hatch' || ldef.name == 'gdd:monilinia') {
+                if(ldef.name == 'gdd:eab_adult' || ldef.name == 'gdd:eab_egg_hatch' || ldef.name == 'gdd:slf_adult' || ldef.name == 'gdd:slf_egg_hatch' || ldef.name == 'gdd:japanese_beetle_adult' || ldef.name == 'gdd:japanese_beetle_egg_hatch') {
                     var extDate = ldef.extent.current.date;
                     var start = new Date(extDate.getFullYear(), 0, 0);
                     var diff = extDate.getTime() - start.getTime();

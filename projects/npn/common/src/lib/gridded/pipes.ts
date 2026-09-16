@@ -15,6 +15,19 @@ export class LegendGddUnitsPipe implements PipeTransform {
     }
 }
 
+@Pipe({name: 'legendRisk'})
+export class LegendRiskPipe implements PipeTransform {
+    constructor(private decimalPipe:DecimalPipe) {}
+    transform(n:number,includeUnits?:boolean) {
+        if(n<4)
+            return this.decimalPipe.transform(n,'1.0-2') +': low risk';
+        else if(n<7)
+            return this.decimalPipe.transform(n,'1.0-2') +': moderate risk';
+        else
+            return this.decimalPipe.transform(n,'1.0-2') +': high risk';
+    }
+}
+
 @Pipe({name: 'legendBuffelgrassUnits'})
 export class LegendBuffelgrassUnitsPipe implements PipeTransform {
     constructor(private decimalPipe:DecimalPipe) {}
@@ -183,6 +196,7 @@ export class GriddedPipeProvider {
         private agddDefaultTodayElevation:AgddDefaultTodayElevationPipe,
         private legendGddUnits:LegendGddUnitsPipe,
         private legendBuffelgrassUnits:LegendBuffelgrassUnitsPipe,
+        private legendRisk:LegendRiskPipe,
         private legendDoyUnits:LegendDoyUnitsPipe,
         private thirtyYearAvgDayOfYear:ThirtyYearAvgDayOfYearPipe,
         private date:DatePipe
@@ -195,6 +209,7 @@ export class GriddedPipeProvider {
         this.pipes.agddDefaultTodayElevation = agddDefaultTodayElevation;
         this.pipes.legendGddUnits = legendGddUnits;
         this.pipes.legendBuffelgrassUnits = legendBuffelgrassUnits;
+        this.pipes.legendRisk = legendRisk;
         this.pipes.legendDoyUnits = legendDoyUnits;
         this.pipes.thirtyYearAvgDayOfYear = thirtyYearAvgDayOfYear;
         this.pipes.date = date;

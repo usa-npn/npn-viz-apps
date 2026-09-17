@@ -2,17 +2,17 @@ import { NpnConfiguration } from '@npn/common';
 
 const npnConfiguration:NpnConfiguration = {
   cacheTTL: 60,
-  apiRoot: '//www-dev.usanpn.org',
+  apiRoot: '//www.usanpn.org',
   //apiRoot: 'https://www.usanpn.org',
-  dataApiRoot: 'https://data-dev.usanpn.org/geoservices',
+  dataApiRoot: 'https://data.usanpn.org/geoservices',
   // dataApiRoot: 'https://data.usanpn.org/geoservices',
-  dataApiRoot2: 'https://data-dev.usanpn.org/webservices',
+  dataApiRoot2: 'https://data.usanpn.org/webservices',
   dataApiUseStatisticsCache: false,
   //geoServerRoot: '//geoserver-dev.usanpn.org/geoserver',
   geoServerRoot: 'https://geoserver.usanpn.org/geoserver',
   tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
-  tinybirdTokenUrl: 'https://services2-dev.usanpn.org/v1/data/token',
-  servicesApiRoot: 'https://services2-dev.usanpn.org',
+  tinybirdTokenUrl: 'https://services2.usanpn.org/v1/data/token',
+  servicesApiRoot: 'https://services2.usanpn.org',
   // The production portal on purpose. Export used to hardcode data-dev.usanpn.org here,
   // but that host no longer resolves at all (verified 2026-08-12, same fate as
   // www-dev.usanpn.org). Since searches are saved to servicesApiRoot above and redeemed
@@ -26,7 +26,7 @@ const npnConfiguration:NpnConfiguration = {
 
 export const environment = {
   production: false,
-  googleMapsApiKey: 'AIzaSyAsTM8XaktfkwpjEeDMXkNrojaiB2W5WyE',
+  googleMapsApiKey: 'AIzaSyC3jyxxwpe16ahPurnsbQCrKCWEzqlxR_U',
   npnConfiguration
 };
 

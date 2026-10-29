@@ -40,6 +40,9 @@ export function npnConfigurationFactory():NpnConfiguration {
 
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapsApiKey,
+      // Pinned: Maps JS 3.65 removed google.maps.drawing.DrawingManager (hand-drawn boundaries).
+      // Stopgap until boundary.ts draws polygons itself — see Redmine #3340.
+      apiVersion: '3.64',
       libraries: ['drawing']
     })
   ],

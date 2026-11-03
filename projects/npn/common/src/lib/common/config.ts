@@ -36,6 +36,12 @@ export class NpnConfiguration {
     // code, it is only ever a window.open target. Optional: when absent
     // SavedSearchService.exportUrl rejects rather than opening a malformed URL.
     observationPortalUrl?: string;
+    // API key sent as `x-api-key` on every request beneath servicesApiRoot, including the
+    // Tinybird token request (tinybirdTokenUrl). It identifies this app to the services API;
+    // it is not a secret, since anyone can read it out of the bundle. Production builds take
+    // it from the NPN_API_KEY Amplify variable via a `__NPN_API_KEY__` placeholder. Optional:
+    // when absent (or still the unreplaced placeholder) no header is sent.
+    npnApiKey?: string;
     [x: string]: any; // not going to dictate what else it might have
 }
 

@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpBackend } from '@angular/common/http';
+import { HttpClient, HttpBackend, HttpHeaders } from '@angular/common/http';
 
 import { NpnConfiguration, NPN_CONFIGURATION } from './config';
+import { NPN_API_KEY_HEADER, npnApiKey } from './npn-api-key';
 
 /**
  * The response returned by the token endpoint (config.tinybirdTokenUrl).
@@ -120,7 +121,11 @@ export class TinybirdTokenService {
     }
 
     private fetchToken(): Promise<string> {
-        return this.http.get<TinybirdTokenResponse>(this.config.tinybirdTokenUrl)
+        // NpnApiKeyInterceptor never sees this request (see the class comment), so the
+        // services API key is attached here.
+        const key = npnApiKey(this.config);
+        const options = key ? { headers: new HttpHeaders({ [NPN_API_KEY_HEADER]: key }) } : {};
+        return this.http.get<TinybirdTokenResponse>(this.config.tinybirdTokenUrl, options)
             .toPromise()
             .then(response => {
                 const expiresAt = response && response.expires_at ? Date.parse(response.expires_at) : NaN;

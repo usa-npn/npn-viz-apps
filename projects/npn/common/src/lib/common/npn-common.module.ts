@@ -25,6 +25,7 @@ import { NpnLogoComponent } from './npn-logo.component';
 import { PointService } from '../gridded/point.service';
 import { TinybirdTokenService } from './tinybird-token.service';
 import { TinybirdAuthInterceptor } from './tinybird-auth.interceptor';
+import { NpnApiKeyInterceptor } from './npn-api-key.interceptor';
 
 export const NPN_BASE_HREF = new InjectionToken<string>('npnBaseHref');
 
@@ -81,6 +82,11 @@ export function tinybirdTokenPrefetch(tokenService: TinybirdTokenService): () =>
         {
             provide: HTTP_INTERCEPTORS,
             useClass: TinybirdAuthInterceptor,
+            multi: true
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: NpnApiKeyInterceptor,
             multi: true
         },
         {

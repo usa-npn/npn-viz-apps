@@ -31,6 +31,8 @@ export * from './config';
 export { NpnServiceUtils } from './npn-service-utils.service';
 export { TinybirdTokenService, TinybirdTokenResponse, TINYBIRD_TOKEN_EXPIRY_SKEW } from './tinybird-token.service';
 export { TinybirdAuthInterceptor, TINYBIRD_DEFAULT_REQUEST_SPACING_MS } from './tinybird-auth.interceptor';
+export { NpnApiKeyInterceptor } from './npn-api-key.interceptor';
+export { NPN_API_KEY_HEADER, npnApiKey } from './npn-api-key';
 export * from './detect-ie';
 export * from './monitors-destroy';
 export * from './application-settings';

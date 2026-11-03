@@ -31,6 +31,8 @@ const npnConfiguration:NpnConfiguration = {
   servicesApiRoot: 'https://services2.usanpn.org',
   tinybirdApiRoot: 'https://api.us-west-2.aws.tinybird.co',
   tinybirdTokenUrl: 'https://services2.usanpn.org/v1/data/token',
+  // Replaced at build time from the NPN_API_KEY Amplify variable (see the build spec).
+  npnApiKey: '__NPN_API_KEY__',
 };
 export const environment = {
   production: true,

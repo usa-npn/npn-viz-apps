@@ -155,15 +155,49 @@ function buildPhenometricsBody(params: HttpParams): any {
 }
 
 /**
- * The endpoint responds with a bare array of rows in legacy PascalCase
- * (`First_Yes_DOY`, `NumDays_Since_Prior_No`, `Individual_ID`, ...). Lowercasing each key
- * produces exactly the snake_case names the downstream filters and `AXIS` definitions
- * already read (`first_yes_doy`, `numdays_since_prior_no`, `individual_id`, ...) so
- * nothing else in the fetch/filter pipeline needs to change.
+ * Column names the export is moving to (the old POP field names, lowercased with
+ * underscores), mapped to the names this app's code reads. Both spellings are kept on
+ * each row, so the app works before and after the rename ships:
+ * - scatter plot AXIS keys read `gdd` / `acc_prcp` on individual phenometrics rows;
+ * - activity curve metric ids read `*in-phase*` on magnitude rows. Those ids also live in
+ *   saved and shared URLs, which is why the rows are aliased instead of the ids renamed.
+ * Once the rename is live everywhere this can be inverted and the app moved to the new
+ * names.
  */
-function lowercaseKeys(row: any): any {
+const LEGACY_KEY_ALIASES: { [newKey: string]: string } = {
+    agdd: 'gdd',
+    agdd_in_f: 'gddf',
+    tmax_in_f: 'tmaxf',
+    tmin_in_f: 'tminf',
+    accum_prcp: 'acc_prcp'
+};
+
+function legacyAlias(key: string): string | undefined {
+    if (LEGACY_KEY_ALIASES[key]) {
+        return LEGACY_KEY_ALIASES[key];
+    }
+    if (key.indexOf('in_phase') !== -1) {
+        return key.replace(/in_phase/g, 'in-phase');
+    }
+    return undefined;
+}
+
+/**
+ * The endpoint responds with a bare array of rows. Lowercasing each key produces the
+ * snake_case names the downstream filters and `AXIS` definitions read (`first_yes_doy`,
+ * `numdays_since_prior_no`, `individual_id`, ...), whether the server sends legacy
+ * PascalCase (`First_Yes_DOY`) or lowercase. Renamed columns also get their legacy
+ * spelling via LEGACY_KEY_ALIASES, so nothing else in the fetch/filter pipeline needs to
+ * change.
+ */
+export function normalizeRowKeys(row: any): any {
     return Object.keys(row).reduce((o, key) => {
-        o[key.toLowerCase()] = row[key];
+        const lower = key.toLowerCase();
+        o[lower] = row[key];
+        const alias = legacyAlias(lower);
+        if (alias && !(alias in o)) {
+            o[alias] = row[key];
+        }
         return o;
     }, {} as any);
 }
@@ -299,7 +333,7 @@ function postChunked(
         (promise, chunk) => promise.then(rows => postChunk(serviceUtils, url, body, chunk, label)
             .then(chunkRows => rows.concat(chunkRows))),
         Promise.resolve([] as any[])
-    ).then(rows => rows.map(lowercaseKeys));
+    ).then(rows => rows.map(normalizeRowKeys));
 }
 
 /**
@@ -354,7 +388,7 @@ export class ObservationService {
         const frequency = params.get('frequency');
         body.frequency = frequency === 'months' ? frequency : Number(frequency);
         return this.serviceUtils.cachedPost<any[]>(url, body, { 'Content-Type': 'application/json' })
-            .then(rows => (rows || []).map(lowercaseKeys));
+            .then(rows => (rows || []).map(normalizeRowKeys));
     }
 
     /**
